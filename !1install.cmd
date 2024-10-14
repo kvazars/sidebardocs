@@ -1,0 +1,1 @@
+composer i & cd vue-side & npm i

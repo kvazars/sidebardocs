@@ -1,0 +1,46 @@
+// Here you can add other styles
+.ce-block__content,
+.ce-toolbar__content {
+    max-width: calc(100% - 120px) !important;
+}
+
+.cdx-block {
+    max-width: 95% !important;
+}
+
+body .vsm--menu, body .v-sidebar-menu, body .v-sidebar-menu .vsm--link_level-1.vsm--link_active .vsm--icon,
+body .v-sidebar-menu .vsm--dropdown
+{
+    background: inherit;
+}
+body .v-sidebar-menu .vsm--item,body .v-sidebar-menu .vsm--dropdown .vsm--item,
+body .v-sidebar-menu .vsm--icon{
+    color: inherit;
+}
+
+// body .v-sidebar-menu .vsm--item{ 
+//     padding-left: 10px;
+// }
+body .v-sidebar-menu .vsm--dropdown {
+    padding: inherit;
+    padding-left: 10px;
+}
+
+body .sidebar.sidebar-narrow-unfoldable .v-sidebar-menu .vsm--dropdown{
+    padding: inherit;
+    padding-left: inherit;
+}
+
+body .sidebar.sidebar-narrow-unfoldable:hover .v-sidebar-menu .vsm--dropdown{
+    padding: inherit;
+    padding-left: 10px;
+}
+
+body .sidebar-narrow-unfoldable .v-sidebar-menu .vsm--arrow {
+    display: none;
+}
+
+body .sidebar-narrow-unfoldable:hover .v-sidebar-menu .vsm--arrow {
+    display: flex;
+}
+
