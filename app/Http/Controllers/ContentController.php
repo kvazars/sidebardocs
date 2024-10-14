@@ -17,6 +17,11 @@ class ContentController extends Controller
         $path = Storage::disk("public")->putFile("contentImages", $request->file('image'));
         return response()->json(['success' => 1, 'file' => ['url' => env('APP_URL') . 'public/' . $path]], 200);
     }
+    public function saveFile(Request $request)
+    {
+        $path = Storage::disk("public")->putFile("contentFiles", $request->file('file'));
+        return response()->json(['success' => 1, 'file' => ['url' => env('APP_URL') . 'public/' . $path]], 200);
+    }
 
     public function saveImageByUrl(Request $request)
     {

@@ -9,4 +9,5 @@ use Illuminate\Support\Facades\Route;
 // })->middleware('auth:sanctum');
 
 Route::post("/saveImage", [ContentController::class, "saveImage"]);
+Route::post("/saveFile", [ContentController::class, "saveFile"]);
 Route::post("/saveImageByUrl", [ContentController::class, "saveImageByUrl"]);

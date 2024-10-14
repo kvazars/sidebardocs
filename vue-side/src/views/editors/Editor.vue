@@ -9,6 +9,7 @@ import AceCodeEditorJS from "ace-code-editorjs";
 import ace, { edit } from "ace-builds"
 import "ace-builds/esm-resolver"
 import InlineCode from '@editorjs/inline-code';
+import AttachesTool from '@editorjs/attaches';
 
 import modeHTMLWorker from "ace-builds/src-noconflict/worker-html?url";
 import modeJSWorker from "ace-builds/src-noconflict/worker-javascript?url";
@@ -22,12 +23,12 @@ import { useRoute } from 'vue-router';
 let editor;
 export default {
     setup() {
-    const route = useRoute();
-    const postId = computed(() => route.params.id);
-    return {
-      postId,
-    };
-  },
+        const route = useRoute();
+        const postId = computed(() => route.params.id);
+        return {
+            postId,
+        };
+    },
     props: ["save", "id"],
     mounted() {
         this.createEditor();
@@ -117,6 +118,14 @@ export default {
                 holder: 'editorjs',
 
                 tools: {
+                    attaches: {
+                        class: AttachesTool,
+                        config: {
+                            endpoint: 'http://localhost:8000/api/saveFile',
+                            buttonText: 'Добавить файл',
+                            errorMessage: 'Ошибка загрузки файла',
+                        }
+                    },
                     header: {
                         class: Header,
                         config: {
@@ -185,6 +194,7 @@ export default {
                                 "converter": {
                                     "Convert to": "Конвертировать в",
                                     "Filter": "Фильтр",
+                                    
                                 },
 
 
@@ -198,7 +208,7 @@ export default {
                             "popover": {
                                 "Filter": "Фильтр",
                                 "Nothing found": "Ничего не найдено",
-                                "Convert to": "Конвертировать в"
+                                "Convert to": "Конвертировать в",
                             }
                         },
                         toolNames: {
@@ -217,6 +227,7 @@ export default {
                             "Link": "Ссылка",
                             "Marker": "Маркер",
                             "Bold": "Полужирный",
+                            "Attachment": "Файл",                                 
                             "Italic": "Курсив",
                             "InlineCode": "Моноширинный",
                         },
@@ -259,6 +270,7 @@ export default {
                             "link": {
                                 "Add a link": "Вставьте ссылку"
                             },
+                            
 
                             "stub": {
                                 'The block can not be displayed correctly.': 'Блок не может быть отображен'
@@ -266,8 +278,10 @@ export default {
                         },
                         blockTunes: {
                             "delete": {
-                                "Delete": "Удалить"
+                                "Delete": "Удалить",
+                                "Click to delete": "Уверены?"
                             },
+                            
                             "header": {
                                 "title": "Заголовок",
                                 "Heading": "Заголовок"
