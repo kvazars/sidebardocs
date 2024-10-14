@@ -75,10 +75,7 @@ const props = defineProps({
             }
         },
     },
-    rtl: {
-        type: Boolean,
-        default: false,
-    },
+
     relative: {
         type: Boolean,
         default: false,
@@ -99,8 +96,9 @@ const props = defineProps({
 
 const emits = defineEmits({
     'item-click'(event, item) {
-        return !!(event && item)
         console.log(item);
+        return !!(event && item)
+       
     },
     'update:collapsed'(collapsed) {
         return !!(typeof collapsed === 'boolean')
@@ -146,7 +144,6 @@ const sidebarClass = computed(() => {
         'v-sidebar-menu',
         !isCollapsed.value ? 'vsm_expanded' : 'vsm_collapsed',
         
-        props.rtl && 'vsm_rtl',
         props.relative && 'vsm_relative',
     ]
 })
