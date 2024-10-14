@@ -4,27 +4,22 @@
         <sidebar-menu-scroll>
             <div class="v-sidebar-menu position-relative">
                 <ul class="vsm--menu">
-                    <SidebarMenuItem v-for="item in computedMenu" :key="item.id" :item="item"
-                        :active-show="activeShow" @update-active-show="updateActiveShow">
-                       
-                        <template #dropdown-icon="{ isOpen }" >
-                            <slot name="dropdown-icon" v-bind="{ isOpen }" >
-                                <span class="vsm--arrow_default" />
+                    <sidebar-menu-item v-for="item in computedMenu" :key="item.id" :item="item" :active-show="activeShow"
+                        @update-active-show="updateActiveShow">
+                        <template #dropdown-icon="{ isOpen }">
+                            <button class="btn btn-primary" @click="folderButton()">...</button>
+
+                            <slot name="dropdown-icon" v-bind="{ isOpen }">
+                                <span class="vsm--arrow_default " />
                             </slot>
                         </template>
-                    </SidebarMenuItem>
+                    </sidebar-menu-item>
                 </ul>
             </div>
         </sidebar-menu-scroll>
     </div>
 </template>
 
-<script>
-export default {
-    compatConfig: { MODE: 3 },
-  
-}
-</script>
 
 <script setup>
 import {
@@ -35,11 +30,14 @@ import {
     onUnmounted,
     computed,
 } from 'vue'
+// import { router } from 'vue-router';
+
 import { initSidebar } from 'vue-sidebar-menu/src/use/useSidebar'
 import SidebarMenuItem from 'vue-sidebar-menu/src/components/SidebarMenuItem.vue'
 import SidebarMenuScroll from 'vue-sidebar-menu/src/components/SidebarMenuScroll.vue'
 
 const props = defineProps({
+    idOpen1: null,
     menu: {
         type: Array,
         required: true,
@@ -92,9 +90,14 @@ const props = defineProps({
 
 const emits = defineEmits({
     'item-click'(event, item) {
-        console.log(item);
+        // console.log(item);
+    //    router.push({ path: 'your-path-here' })
+
+        // this.idOpen1 = item.id;
+
         return !!(event && item)
-       
+
+
     },
     'update:collapsed'(collapsed) {
         return !!(typeof collapsed === 'boolean')
@@ -112,16 +115,15 @@ const {
 const activeShow = ref(undefined)
 
 const computedMenu = computed(() => {
-    let id = 0
     function transformItems(items) {
-        let it= items.map((item) => {
+        let it = items.map((item) => {
             return {
                 ...item,
                 ...(item.child && { child: transformItems(item.child) }),
             }
         })
         return it;
-        
+
     }
     return transformItems(props.menu)
 })
@@ -134,13 +136,13 @@ const sidebarClass = computed(() => {
     return [
         'v-sidebar-menu',
         !isCollapsed.value ? 'vsm_expanded' : 'vsm_collapsed',
-        
+
         props.relative && 'vsm_relative',
     ]
 })
 
 const updateActiveShow = (id) => {
-    activeShow.value = id
+    activeShow.value = id;
 }
 
 const onToggleClick = () => {
@@ -155,8 +157,13 @@ watch(
         unsetMobileItem()
         updateIsCollapsed(currentCollapsed)
     }
-)
 
+)
+function folderButton(){
+    // router.push(router.currentRoute+'/edit')
+    // console.log(router);
+    
+}
 const router = getCurrentInstance().appContext.config.globalProperties.$router
 if (!router) {
     onMounted(() => {
@@ -171,9 +178,5 @@ if (!router) {
 defineExpose({
     onRouteChange: updateCurrentRoute,
 })
+   
 </script>
-
-<style lang="scss">
-//@import 'vue-sidebar-menu';
-
-</style>

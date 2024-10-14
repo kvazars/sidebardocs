@@ -1,6 +1,7 @@
 <script setup>
 import { onBeforeMount } from 'vue'
 import { useColorModes } from '@coreui/vue'
+// import AppSidebar from '@/components/AppSidebar.vue'
 
 
 import { useThemeStore } from '@/stores/theme.js'
@@ -31,7 +32,7 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <AppSidebar />
+  <!-- <AppSidebar /> -->
   <router-view />
 
 </template>

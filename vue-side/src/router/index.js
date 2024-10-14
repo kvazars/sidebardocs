@@ -52,6 +52,12 @@ const routes = [
             component: () => import('@/views/editors/Editor.vue'),
             props: true,
           },
+          {
+            path: '/editors/editor/:id/edit',
+            name: 'EditorEdit',
+            component: () => import('@/views/editors/EditFolder.vue'),
+            props: true,
+          },
         ]
       },
       {
