@@ -1,6 +1,5 @@
 <script setup>
 import { onMounted, ref } from 'vue'
-import { CChart } from '@coreui/vue-chartjs'
 import { getStyle } from '@coreui/utils'
 
 const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
@@ -124,5 +123,5 @@ onMounted(() => {
 </script>
 
 <template>
-  <CChart type="line" :data="data" :options="options" ref="mainChartRef" />
+<div></div>
 </template>

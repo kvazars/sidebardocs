@@ -1,5 +1,4 @@
 <script setup>
-import { CChart } from '@coreui/vue-chartjs'
 
 const options = {
   elements: {
@@ -41,26 +40,7 @@ const options = {
         ]"
       >
         <template #icon><CIcon icon="cib-facebook" height="52" class="my-4 text-white" /></template>
-        <template #chart>
-          <CChart
-            class="position-absolute w-100 h-100"
-            type="line"
-            :data="{
-              labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-              datasets: [
-                {
-                  backgroundColor: 'rgba(255,255,255,.1)',
-                  borderColor: 'rgba(255,255,255,.55)',
-                  pointHoverBackgroundColor: '#fff',
-                  borderWidth: 2,
-                  data: [65, 59, 84, 84, 51, 55, 40],
-                  fill: true,
-                },
-              ],
-            }"
-            :options="options"
-          />
-        </template>
+     
       </CWidgetStatsD>
     </CCol>
     <CCol :sm="6" :xl="4" :xxl="3">
@@ -72,26 +52,7 @@ const options = {
         ]"
       >
         <template #icon><CIcon icon="cib-twitter" height="52" class="my-4 text-white" /></template>
-        <template #chart>
-          <CChart
-            class="position-absolute w-100 h-100"
-            type="line"
-            :data="{
-              labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-              datasets: [
-                {
-                  backgroundColor: 'rgba(255,255,255,.1)',
-                  borderColor: 'rgba(255,255,255,.55)',
-                  pointHoverBackgroundColor: '#fff',
-                  borderWidth: 2,
-                  data: [1, 13, 9, 17, 34, 41, 38],
-                  fill: true,
-                },
-              ],
-            }"
-            :options="options"
-          />
-        </template>
+    
       </CWidgetStatsD>
     </CCol>
     <CCol :sm="6" :xl="4" :xxl="3">
@@ -103,26 +64,7 @@ const options = {
         ]"
       >
         <template #icon><CIcon icon="cib-linkedin" height="52" class="my-4 text-white" /></template>
-        <template #chart>
-          <CChart
-            class="position-absolute w-100 h-100"
-            type="line"
-            :data="{
-              labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-              datasets: [
-                {
-                  backgroundColor: 'rgba(255,255,255,.1)',
-                  borderColor: 'rgba(255,255,255,.55)',
-                  pointHoverBackgroundColor: '#fff',
-                  borderWidth: 2,
-                  data: [78, 81, 80, 45, 34, 12, 40],
-                  fill: true,
-                },
-              ],
-            }"
-            :options="options"
-          />
-        </template>
+
       </CWidgetStatsD>
     </CCol>
     <CCol :sm="6" :xl="4" :xxl="3">
@@ -134,26 +76,7 @@ const options = {
         ]"
       >
         <template #icon><CIcon icon="cil-calendar" height="52" class="my-4 text-white" /></template>
-        <template #chart>
-          <CChart
-            class="position-absolute w-100 h-100"
-            type="line"
-            :data="{
-              labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-              datasets: [
-                {
-                  backgroundColor: 'rgba(255,255,255,.1)',
-                  borderColor: 'rgba(255,255,255,.55)',
-                  pointHoverBackgroundColor: '#fff',
-                  borderWidth: 2,
-                  data: [35, 23, 56, 22, 97, 23, 64],
-                  fill: true,
-                },
-              ],
-            }"
-            :options="options"
-          />
-        </template>
+ 
       </CWidgetStatsD>
     </CCol>
   </CRow>
