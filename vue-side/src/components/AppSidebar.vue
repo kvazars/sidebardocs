@@ -9,28 +9,32 @@ const menu = [
   {
     href: '/',
     title: 'Dashboard',
+    id: 0,
     icon: 'fa fa-user',
   },
   {
     href: '/charts',
     title: 'Charts',
-    ids: 150,
+    id: 150,
     icon: 'fa fa-folder',
     child: [
       {
         title: 'Editor',
-        ids: 151,
+        id: 151,
         icon: 'fa fa-folder',
         child: [
           {
             title: 'Editor',
+            id: 152,
             icon: 'fa fa-folder',
             child: [{
+              id: 153,
               href: '/editors/editor/2',
               icon: 'fa fa-file',
               title: 'Editor 2',
             },
             {
+              id: 154,
               href: '/editors/editor/1',
               icon: 'fa fa-file',
               title: 'Editor 1'

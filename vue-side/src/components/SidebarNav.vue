@@ -22,11 +22,7 @@
 <script>
 export default {
     compatConfig: { MODE: 3 },
-    methods: {
-        onItemClicks(id){
-            alert(id);
-        }
-    },
+  
 }
 </script>
 
@@ -40,7 +36,7 @@ import {
     computed,
 } from 'vue'
 import { initSidebar } from 'vue-sidebar-menu/src/use/useSidebar'
-import SidebarMenuItem from 'vue-sidebar-menu/src/components/SidebarMenuItem.vue'///'./SidebarNavItem.vue'
+import SidebarMenuItem from 'vue-sidebar-menu/src/components/SidebarMenuItem.vue'
 import SidebarMenuScroll from 'vue-sidebar-menu/src/components/SidebarMenuScroll.vue'
 
 const props = defineProps({
@@ -118,17 +114,12 @@ const activeShow = ref(undefined)
 const computedMenu = computed(() => {
     let id = 0
     function transformItems(items) {
-        function randomId() {
-            return `${Date.now() + '' + id++}`
-        }
         let it= items.map((item) => {
             return {
-                id: randomId(),
                 ...item,
                 ...(item.child && { child: transformItems(item.child) }),
             }
         })
-        // console.log(it);
         return it;
         
     }
