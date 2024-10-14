@@ -39,9 +39,9 @@ return [
 
         'public' => [
             'driver' => 'local',
-            'root' => 'public/',
+            'root' => '/',
             'url' => env('APP_URL'),
-            'visibility' => 'public',
+            // 'visibility' => 'public',
             'throw' => false,
         ],
 
