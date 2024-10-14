@@ -40,7 +40,7 @@ import {
     computed,
 } from 'vue'
 import { initSidebar } from 'vue-sidebar-menu/src/use/useSidebar'
-import SidebarMenuItem from './SidebarNavItem.vue'
+import SidebarMenuItem from 'vue-sidebar-menu/src/components/SidebarMenuItem.vue'///'./SidebarNavItem.vue'
 import SidebarMenuScroll from 'vue-sidebar-menu/src/components/SidebarMenuScroll.vue'
 
 const props = defineProps({
@@ -100,6 +100,7 @@ const props = defineProps({
 const emits = defineEmits({
     'item-click'(event, item) {
         return !!(event && item)
+        console.log(item);
     },
     'update:collapsed'(collapsed) {
         return !!(typeof collapsed === 'boolean')
@@ -129,7 +130,7 @@ const computedMenu = computed(() => {
                 ...(item.child && { child: transformItems(item.child) }),
             }
         })
-        console.log(it);
+        // console.log(it);
         return it;
         
     }
@@ -185,4 +186,6 @@ defineExpose({
 </script>
 
 <style lang="scss">
-//@import 'vue-sidebar-menu';</style>
+//@import 'vue-sidebar-menu';
+
+</style>

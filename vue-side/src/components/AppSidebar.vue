@@ -2,8 +2,6 @@
 import { RouterLink } from 'vue-router'
 
 import { logo } from '@/assets/brand/logo'
-import { sygnet } from '@/assets/brand/sygnet'
-import { AppSidebarNav } from '@/components/AppSidebarNav.js'
 import SidebarNav from '@/components/SidebarNav.vue'
 import { useSidebarStore } from '@/stores/sidebar.js'
 
@@ -55,13 +53,11 @@ const sidebar = useSidebarStore()
       <RouterLink custom to="/" v-slot="{ href, navigate }">
         <CSidebarBrand v-bind="$attrs" as="a" :href="href" @click="navigate">
           <CIcon custom-class-name="sidebar-brand-full" :icon="logo" :height="32" />
-          <CIcon custom-class-name="sidebar-brand-narrow" :icon="sygnet" :height="32" />
         </CSidebarBrand>
       </RouterLink>
       <CCloseButton class="d-lg-none" dark @click="sidebar.toggleVisible()" />
     </CSidebarHeader>
-    <!-- <AppSidebarNav /> -->
-    <SidebarNav :menu />
+    <SidebarNav :menu="menu" />
     <CSidebarFooter class="border-top d-none d-lg-flex">
       <CSidebarToggler @click="sidebar.toggleUnfoldable()" />
     </CSidebarFooter>
