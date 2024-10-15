@@ -54,13 +54,13 @@ const routes = [
       },
       {
         path: '/files/:id/edit',
-        name: 'Edit File',
+        name: 'EditFile',
         component: () => import('@/views/editFile.vue'),
         props: true,
       },
       {
         path: '/files/new/:parent',
-        name: 'Create File',
+        name: 'CreateFile',
         component: () => import('@/views/editFile.vue'),
         props: true,
       },
