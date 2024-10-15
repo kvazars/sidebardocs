@@ -110,12 +110,11 @@ function folderButton(param) {
 
     switch (store.param) {
         case "editFolder":
-            // this.$router.push({ name: 'EditorEdit', params: { id: store.id } });
-            // this.omg();
-            alert(store.id);
-            router.push({ name: 'EditorEdit', params: { id: store.id } })
+            router.push({ name: 'EditFolder', params: { id: store.id } })
             break;
-
+        case "createFile":
+            router.push({ name: 'createFile'})
+            break;
         default:
             break;
     }

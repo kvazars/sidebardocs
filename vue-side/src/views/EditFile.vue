@@ -29,7 +29,7 @@ export default {
             postId,
         };
     },
-    props: ["save", "id"],
+    props: ["save", "id", "parent"],
     mounted() {
         this.createEditor();
         if (this.id == 1) {

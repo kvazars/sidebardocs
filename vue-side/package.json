@@ -33,6 +33,7 @@
     "@editorjs/list": "^1.10.0",
     "@editorjs/table": "^2.4.2",
     "@popperjs/core": "^2.11.8",
+    "@wdns/vue-code-block": "^2.3.3",
     "ace-builds": "^1.36.2",
     "ace-code-editorjs": "^1.0.3",
     "bootstrap": "^5.3.3",

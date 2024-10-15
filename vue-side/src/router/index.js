@@ -17,9 +17,7 @@ const routes = [
         // this generates a separate chunk (about.[hash].js) for this route
         // which is lazy-loaded when the route is visited.
         component: () =>
-          import(
-            /* webpackChunkName: "dashboard" */ '@/views/dashboard/Dashboard.vue'
-          ),
+          import(/* webpackChunkName: "dashboard" */ '@/views/dashboard/Dashboard.vue'),
       },
       {
         path: '/theme',
@@ -36,29 +34,35 @@ const routes = [
         name: 'Typography',
         component: () => import('@/views/theme/Typography.vue'),
       },
+      // {
+      //   path: '/editors/editor/:id',
+      //   name: 'Editor',
+      //   component: () => import('@/views/editors/Editor.vue'),
+      //   props: true,
+      // },
       {
-        path: '/editors',
-        name: 'Editors',
-        redirect: '/base/editors/editor/1',
-        component: {
-          render() {
-            return h(resolveComponent('router-view'))
-          },
-        },
-        children: [
-          {
-            path: '/editors/editor/:id',
-            name: 'Editor',
-            component: () => import('@/views/editors/Editor.vue'),
-            props: true,
-          },
-          {
-            path: '/editors/editor/:id/edit',
-            name: 'EditorEdit',
-            component: () => import('@/views/editors/EditFolder.vue'),
-            props: true,
-          },
-        ]
+        path: '/folder/:id/edit',
+        name: 'EditFolder',
+        component: () => import('@/views/EditFolder.vue'),
+        props: true,
+      },
+      {
+        path: '/files/:id',
+        name: 'ShowFile',
+        component: () => import('@/views/ShowFile.vue'),
+        props: true,
+      },
+      {
+        path: '/files/:id/edit',
+        name: 'Edit File',
+        component: () => import('@/views/editFile.vue'),
+        props: true,
+      },
+      {
+        path: '/files/new/:parent',
+        name: 'Create File',
+        component: () => import('@/views/editFile.vue'),
+        props: true,
       },
       {
         path: '/base',
@@ -75,8 +79,7 @@ const routes = [
             name: 'Accordion',
             component: () => import('@/views/base/Accordion.vue'),
           },
-          
-         
+
           {
             path: '/base/breadcrumbs',
             name: 'Breadcrumbs',
@@ -330,12 +333,11 @@ const routes = [
         component: () => import('@/views/pages/Register'),
       },
       {
-        path: "/:catchAll(.*)",
-        name: "NotFound",
+        path: '/:catchAll(.*)',
+        name: 'NotFound',
         component: () => import('@/views/pages/Page404'),
-    }
+      },
     ],
-   
   },
 ]
 

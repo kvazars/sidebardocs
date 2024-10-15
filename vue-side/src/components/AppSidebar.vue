@@ -31,24 +31,24 @@ const menu = [
                 title: '456',
                 id: 160,
                 icon: 'fa fa-folder',
-                child: [
-                  {
+                //child: [
+                  // {
                     // id: 161,
                     // href: '/editors/editor/2',
                     // icon: 'fa fa-file',
                     // title: 'paksfkq',
-                  },
-                ]
+                  // },
+                // ]
               },
               {
                 id: 153,
-                href: '/editors/editor/2',
+                href: '/files/2',
                 icon: 'fa fa-file',
                 title: 'Editor 2',
               },
               {
                 id: 154,
-                href: '/editors/editor/1',
+                href: '/files/1',
                 icon: 'fa fa-file',
                 title: 'Editor 1'
               },]
