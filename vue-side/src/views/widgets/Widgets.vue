@@ -1,6 +1,4 @@
 <script setup>
-import { getStyle } from '@coreui/utils'
-import { CChart } from '@coreui/vue-chartjs'
 
 import WidgetsStatsA from './WidgetsStatsTypeA.vue'
 import WidgetsStatsD from './WidgetsStatsTypeD.vue'
@@ -139,128 +137,32 @@ const widgetStatsE = {
         <CRow :xs="{ gutter: 4 }">
           <CCol :sm="4" :md="3" :xl="2">
             <CWidgetStatsE title="title" value="1,123">
-              <CChart
-                class="mx-auto"
-                type="bar"
-                style="height: 40px; width: 80px"
-                :data="{
-                  labels: widgetStatsE.labels,
-                  datasets: [
-                    {
-                      backgroundColor: getStyle('--cui-danger'),
-                      borderColor: 'transparent',
-                      borderWidth: 1,
-                      data: [41, 78, 51, 66, 74, 42, 89, 97, 87, 84, 78, 88, 67, 45, 47],
-                    },
-                  ],
-                }"
-                :options="widgetStatsE.optionsBar"
-              />
+            
             </CWidgetStatsE>
           </CCol>
           <CCol :sm="4" :md="3" :xl="2">
             <CWidgetStatsE title="title" value="1,123">
-              <CChart
-                class="mx-auto"
-                type="bar"
-                style="height: 40px; width: 80px"
-                :data="{
-                  labels: widgetStatsE.labels,
-                  datasets: [
-                    {
-                      backgroundColor: getStyle('--cui-primary'),
-                      borderColor: 'transparent',
-                      borderWidth: 1,
-                      data: [41, 78, 51, 66, 74, 42, 89, 97, 87, 84, 78, 88, 67, 45, 47],
-                    },
-                  ],
-                }"
-                :options="widgetStatsE.optionsBar"
-              />
+            
             </CWidgetStatsE>
           </CCol>
           <CCol :sm="4" :md="3" :xl="2">
             <CWidgetStatsE title="title" value="1,123">
-              <CChart
-                class="mx-auto"
-                type="bar"
-                style="height: 40px; width: 80px"
-                :data="{
-                  labels: widgetStatsE.labels,
-                  datasets: [
-                    {
-                      backgroundColor: getStyle('--cui-warning'),
-                      borderColor: 'transparent',
-                      borderWidth: 1,
-                      data: [41, 78, 51, 66, 74, 42, 89, 97, 87, 84, 78, 88, 67, 45, 47],
-                    },
-                  ],
-                }"
-                :options="widgetStatsE.optionsBar"
-              />
+           
             </CWidgetStatsE>
           </CCol>
           <CCol :sm="4" :md="3" :xl="2">
             <CWidgetStatsE title="title" value="1,123">
-              <CChart
-                class="mx-auto"
-                type="line"
-                style="height: 40px; width: 80px"
-                :data="{
-                  labels: widgetStatsE.labels,
-                  datasets: [
-                    {
-                      backgroundColor: 'transparent',
-                      borderColor: getStyle('--cui-success'),
-                      borderWidth: 2,
-                      data: [41, 78, 51, 66, 74, 42, 89, 97, 87, 84, 78, 88, 67, 45, 47],
-                    },
-                  ],
-                }"
-                :options="widgetStatsE.optionsLine"
-              />
+          
             </CWidgetStatsE>
           </CCol>
           <CCol :sm="4" :md="3" :xl="2">
             <CWidgetStatsE title="title" value="1,123">
-              <CChart
-                class="mx-auto"
-                type="line"
-                style="height: 40px; width: 80px"
-                :data="{
-                  labels: widgetStatsE.labels,
-                  datasets: [
-                    {
-                      backgroundColor: 'transparent',
-                      borderColor: getStyle('--cui-warning'),
-                      borderWidth: 2,
-                      data: [41, 78, 51, 66, 74, 42, 89, 97, 87, 84, 78, 88, 67, 45, 47],
-                    },
-                  ],
-                }"
-                :options="widgetStatsE.optionsLine"
-              />
+        
             </CWidgetStatsE>
           </CCol>
           <CCol :sm="4" :md="3" :xl="2">
             <CWidgetStatsE title="title" value="1,123">
-              <CChart
-                class="mx-auto"
-                type="line"
-                style="height: 40px; width: 80px"
-                :data="{
-                  labels: widgetStatsE.labels,
-                  datasets: [
-                    {
-                      backgroundColor: 'transparent',
-                      borderColor: getStyle('--cui-info'),
-                      borderWidth: 2,
-                      data: [41, 78, 51, 66, 74, 42, 89, 97, 87, 84, 78, 88, 67, 45, 47],
-                    },
-                  ],
-                }"
-                :options="widgetStatsE.optionsLine"
-              />
+          
             </CWidgetStatsE>
           </CCol>
         </CRow>
