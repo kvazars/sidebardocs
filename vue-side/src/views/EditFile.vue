@@ -5,6 +5,7 @@ import ImageTool from '@editorjs/image';
 import List from '@editorjs/list';
 import Table from '@editorjs/table';
 import Embed from '@editorjs/embed';
+import Quote from '@editorjs/quote';
 import AceCodeEditorJS from "ace-code-editorjs";
 import ace, { edit } from "ace-builds"
 import "ace-builds/esm-resolver"
@@ -118,6 +119,14 @@ export default {
                 holder: 'editorjs',
 
                 tools: {
+                    quote: {
+                        class: Quote,
+                        inlineToolbar: true,
+                        config: {
+                            quotePlaceholder: 'Цитата',
+                            captionPlaceholder: 'Подпись к цитате',
+                        },
+                    },
                     attaches: {
                         class: AttachesTool,
                         config: {
@@ -194,7 +203,7 @@ export default {
                                 "converter": {
                                     "Convert to": "Конвертировать в",
                                     "Filter": "Фильтр",
-                                    
+
                                 },
 
 
@@ -227,7 +236,7 @@ export default {
                             "Link": "Ссылка",
                             "Marker": "Маркер",
                             "Bold": "Полужирный",
-                            "Attachment": "Файл",                                 
+                            "Attachment": "Файл",
                             "Italic": "Курсив",
                             "InlineCode": "Моноширинный",
                         },
@@ -270,7 +279,11 @@ export default {
                             "link": {
                                 "Add a link": "Вставьте ссылку"
                             },
-                            
+                            "quote":{
+                                "Align Left": "По левому краю",
+                                "Align Center": "По центру",
+                            },
+
 
                             "stub": {
                                 'The block can not be displayed correctly.': 'Блок не может быть отображен'
@@ -281,7 +294,7 @@ export default {
                                 "Delete": "Удалить",
                                 "Click to delete": "Уверены?"
                             },
-                            
+
                             "header": {
                                 "title": "Заголовок",
                                 "Heading": "Заголовок"
