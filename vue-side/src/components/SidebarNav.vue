@@ -70,7 +70,7 @@ const props = defineProps({
 
 const emits = defineEmits({
     'item-click'(event, item) {
-        this.idOpen = item.id;
+        // this.idOpen = item.id;
         return !!(event && item)
     },
     'update:collapsed'(collapsed) {
