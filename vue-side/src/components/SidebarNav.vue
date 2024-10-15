@@ -1,39 +1,62 @@
 <template>
 
     <div class="vsm--wrapper">
-        <sidebar-menu-scroll>
+        <SidebarMenuScroll>
             <div class="v-sidebar-menu position-relative">
                 <ul class="vsm--menu">
-                    <sidebar-menu-item v-for="item in computedMenu" :key="item.id" :item="item"
-                        :active-show="activeShow" @update-active-show="updateActiveShow">
+                    <SidebarMenuItem v-for="item in computedMenu" :key="item.id" :item="item"
+                        @click="folderButton(item.id)">
                         <template #dropdown-icon="{ isOpen }">
-                            <button class="btn btn-primary" @click="folderButton()">...</button>
+                            <button class="btn btn-primary" @click="(folderButton(item.id))">...</button>
 
                             <slot name="dropdown-icon" v-bind="{ isOpen }">
                                 <span class="vsm--arrow_default " />
                             </slot>
                         </template>
-                    </sidebar-menu-item>
+                    </SidebarMenuItem>
                 </ul>
             </div>
-        </sidebar-menu-scroll>
+        </SidebarMenuScroll>
     </div>
 </template>
 
-
-<script setup>
-import {
-    ref,
-    computed,
-} from 'vue'
-// import { router } from 'vue-router';
+<script>
 
 import { initSidebar } from 'vue-sidebar-menu/src/use/useSidebar'
 import SidebarMenuItem from 'vue-sidebar-menu/src/components/SidebarMenuItem.vue'
 import SidebarMenuScroll from 'vue-sidebar-menu/src/components/SidebarMenuScroll.vue'
+export default {
+    components: [SidebarMenuItem, SidebarMenuScroll],
+    props: ["menu"],
+    data() {
+        return {
+            computedMenu: [],
+            idOpen: null,
+        }
+    },
+    mounted() {
+        this.computedMenu = this.transformItems(this.menu);
+    },
+    methods: {
+        transformItems(items) {
+            let it = items.map((item) => {
+                return {
+                    ...item,
+                    ...(item.child && { child: this.transformItems(item.child) }),
+                }
+            })
+            return it;
+        },
+        folderButton(id) {
+            console.log(id);
 
+        }
+    }
+}
+</script>
+
+<script setup>
 const props = defineProps({
-    idOpen1: null,
     menu: {
         type: Array,
         required: true,
@@ -47,7 +70,7 @@ const props = defineProps({
 
 const emits = defineEmits({
     'item-click'(event, item) {
-        // this.idOpen1 = item.id;
+        this.idOpen = item.id;
         return !!(event && item)
     },
     'update:collapsed'(collapsed) {
@@ -55,36 +78,8 @@ const emits = defineEmits({
     },
 })
 
-const {
+initSidebar(props, emits)
 
-} = initSidebar(props, emits)
-
-const activeShow = ref(undefined)
-
-const computedMenu = computed(() => {
-    function transformItems(items) {
-        let it = items.map((item) => {
-            return {
-                ...item,
-                ...(item.child && { child: transformItems(item.child) }),
-            }
-        })
-        return it;
-
-    }
-    return transformItems(props.menu)
-})
-
-
-
-const updateActiveShow = (id) => {
-    activeShow.value = id;
-}
-
-function folderButton() {
-
-
-}
 
 
 </script>
