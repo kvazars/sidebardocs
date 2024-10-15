@@ -13,7 +13,6 @@ const menu = [
     icon: 'fa fa-user',
   },
   {
-    href: '/charts',
     title: 'Charts',
     id: 150,
     icon: 'fa fa-folder',
@@ -24,21 +23,35 @@ const menu = [
         icon: 'fa fa-folder',
         child: [
           {
-            title: 'Editor',
+            title: '123',
             id: 152,
             icon: 'fa fa-folder',
-            child: [{
-              id: 153,
-              href: '/editors/editor/2',
-              icon: 'fa fa-file',
-              title: 'Editor 2',
-            },
-            {
-              id: 154,
-              href: '/editors/editor/1',
-              icon: 'fa fa-file',
-              title: 'Editor 1'
-            },]
+            child: [
+              {
+                title: '456',
+                id: 160,
+                icon: 'fa fa-folder',
+                child: [
+                  {
+                    // id: 161,
+                    // href: '/editors/editor/2',
+                    // icon: 'fa fa-file',
+                    // title: 'paksfkq',
+                  },
+                ]
+              },
+              {
+                id: 153,
+                href: '/editors/editor/2',
+                icon: 'fa fa-file',
+                title: 'Editor 2',
+              },
+              {
+                id: 154,
+                href: '/editors/editor/1',
+                icon: 'fa fa-file',
+                title: 'Editor 1'
+              },]
           },
 
         ],

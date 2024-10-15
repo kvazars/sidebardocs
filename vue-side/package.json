@@ -35,6 +35,7 @@
     "@popperjs/core": "^2.11.8",
     "ace-builds": "^1.36.2",
     "ace-code-editorjs": "^1.0.3",
+    "bootstrap": "^5.3.3",
     "editorjs-button": "^3.0.3",
     "editorjs-codemirror": "^0.1.3",
     "font-awesome": "^4.7.0",

@@ -11,7 +11,7 @@ import DocsExample from '@/components/DocsExample'
 import VueSidebarMenu from 'vue-sidebar-menu'
 import 'vue-sidebar-menu/dist/vue-sidebar-menu.css'
 import 'font-awesome/css/font-awesome.min.css'
-
+import 'bootstrap/dist/js/bootstrap.bundle'
 const app = createApp(App)
 app.use(createPinia())
 app.use(router)

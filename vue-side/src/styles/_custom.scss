@@ -40,7 +40,18 @@ body .sidebar-narrow-unfoldable .v-sidebar-menu .vsm--arrow {
     display: none;
 }
 
+
 body .sidebar-narrow-unfoldable:hover .v-sidebar-menu .vsm--arrow {
     display: flex;
+
 }
 
+body .v-sidebar-menu .vsm--arrow .btn {
+    position: absolute;
+    right: 25px;
+}
+
+body .v-sidebar-menu .vsm--arrow .vsm--arrow_default {
+    position: absolute;
+    right: 10px;
+}
