@@ -51,6 +51,7 @@ export default {
     },
     methods: {
         transformItems(items) {
+            
             let it = items.map((item) => {
                 return {
                     ...item,

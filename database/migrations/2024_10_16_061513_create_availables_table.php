@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('contents', function (Blueprint $table) {
+        Schema::create('availables', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('group_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('tree_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
-            $table->boolean('accessibility')->default(false);
-            $table->string('data');
             $table->timestamps();
         });
     }
@@ -25,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('contents');
+        Schema::dropIfExists('availables');
     }
 };

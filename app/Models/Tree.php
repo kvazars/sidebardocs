@@ -5,13 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Content extends Model
+class Tree extends Model
 {
     use HasFactory;
-
     protected $fillable = [
-        'tree_id',
-        'accessibility',
-        'data',
+        "name",
+        "tree_id",
+        "user_id",
+        "type",
     ];
+    public function child() {
+        return $this->hasMany(Content::class);
+    }
 }

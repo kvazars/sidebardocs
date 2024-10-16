@@ -19,7 +19,7 @@ ace.config.setModuleUrl("ace/mode/html_worker", modeHTMLWorker);
 ace.config.setModuleUrl("ace/mode/javascript_worker", modeJSWorker);
 ace.config.setModuleUrl("ace/mode/php_worker", modePHPWorker);
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { routerKey, useRoute } from 'vue-router';
 
 let editor;
 export default {
@@ -30,68 +30,18 @@ export default {
             postId,
         };
     },
-    props: ["id", "parent"],
+    props: ["id", "parent", 'datasend'],
     mounted() {
-        this.createEditor();
-        if (this.id == 1) {
-            this.dataBlock = [{
-                "id": "uqvFlzwn4H",
-                "type": "paragraph",
-                "data": {
-                    "text": "ewf"
-                }
-            },
-            {
-                "id": "zRhbMyXyfh",
-                "type": "paragraph",
-                "data": {
-                    "text": "wefwef"
-                }
-            },
-            {
-                "id": "8oPZtnSaDA",
-                "type": "paragraph",
-                "data": {
-                    "text": "wefwefwe"
-                }
-            }];
+        if (this.id) {
+            this.datasend('resource/' + this.id, 'GET', {}).then((res) => {
 
-
-
-        }
-
-        if (this.id == 2) {
-            this.dataBlock = [{
-                "id": "_dPTGC-2dC",
-                "type": "image",
-                "data": {
-                    "caption": "",
-                    "withBorder": false,
-                    "withBackground": false,
-                    "stretched": false,
-                    "file": {
-                        "url": "http://localhost:8000/public/contentImages/VmbQj6R78KqFUEnN5yvqOj4j7tE4JUgW8jfO2Wtl.jpg"
-                    }
-                }
-            },
-            {
-                "id": "ruK35tRzGR",
-                "type": "list",
-                "data": {
-                    "style": "unordered",
-                    "items": [
-                        "wqd",
-                        "qwd"
-                    ]
-                }
-            },
-            {
-                "id": "RXIyHESczT",
-                "type": "paragraph",
-                "data": {
-                    "text": "qwd"
-                }
-            }];
+                // console.log(JSON.parse(res.content.data).blocks);
+                this.pagetitle = res.name;
+                this.dataBlock = JSON.parse(res.content.data).blocks;
+                this.createEditor();
+            }).catch((error) => {
+                console.log(error);
+            });
         }
 
     },
@@ -99,12 +49,46 @@ export default {
         return {
             dataBlock: [],
             pagetitle: null,
+            // pageDetail: this.id ? 'edit' : 'new',
         }
     },
     methods: {
+        deleteFile() {
+            alert("");
+            this.datasend('resource/' + this.id, 'DELETE', {}).then((res) => {
+                // route.push({name: 'home'})
+                console.log(res);
+                
+            }).catch(error => console.log(error));
+            
+        },
         save() {
+
             editor.save().then((outputData) => {
-                console.log('Article data: ', outputData)
+                let form = new FormData();
+                form.append('data', JSON.stringify(outputData));
+                form.append('name', this.pagetitle);
+                if (this.parent) {
+                    form.append('tree_id', this.parent);
+                } else {
+                    form.append('id', this.id)
+                }
+                this.datasend('resource', 'POST', form).then(
+                    (res) => {
+                        console.log(res);
+
+                        // if (res.success) {
+
+                        // } else {
+
+                        // }
+                    }
+                ).catch((error) => {
+                    console.log(error);
+                });
+
+
+                // console.log('Article data: ', outputData)
             }).catch((error) => {
                 console.log('Saving failed: ', error)
             });
@@ -387,7 +371,7 @@ const aceConfig = {
                         <hr class="dropdown-divider" />
                     </li>
                     <li>
-                        <a class="dropdown-item" href="#">Удалить <i class="fa fa-trash-o" aria-hidden="true"></i></a>
+                        <button class="dropdown-item" @click="deleteFile">Удалить <i class="fa fa-trash-o" aria-hidden="true"></i></button>
                     </li>
                 </ul>
             </div>

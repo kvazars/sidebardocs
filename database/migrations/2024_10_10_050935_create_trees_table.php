@@ -11,11 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('contents', function (Blueprint $table) {
+        Schema::create('trees', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tree_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
-            $table->boolean('accessibility')->default(false);
-            $table->string('data');
+            $table->string('name');
+            $table->foreignId('tree_id')->default(0)->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->enum('type', ['folder', 'file'])->default('file');
             $table->timestamps();
         });
     }
@@ -25,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('contents');
+        Schema::dropIfExists('trees');
     }
 };

@@ -47,7 +47,7 @@
           <iframe :src="val.data.embed" :width="val.data.width" :height="val.data.height"></iframe>
         </div>
         <div v-if="val.type == 'quote'">
-          <figure >
+          <figure>
             <blockquote class="blockquote">
               <p v-html="val.data.text"></p>
             </blockquote>
@@ -97,8 +97,9 @@ import { ExportToWord, ExportToPdf } from 'vue-doc-exporter';
 
 export default {
   components: { ExportToWord, ExportToPdf },
-  props: ['id'],
+  props: ['id', 'datasend'],
   mounted() {
+    // console.log(this.datasend);
   },
 
   data() {

@@ -8,11 +8,6 @@ export const useSidebarIdStore = defineStore('sidebarId', {
       param: null,
     }
   },
-  getters: {
-    getId() {
-      return
-    },
-  },
   actions: {
     changeId(id) {
       this.id = id
