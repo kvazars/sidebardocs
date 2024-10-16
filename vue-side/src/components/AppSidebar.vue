@@ -31,14 +31,11 @@ const menu = [
                 title: '456',
                 id: 160,
                 icon: 'fa fa-folder',
-                //child: [
-                  // {
-                    // id: 161,
-                    // href: '/editors/editor/2',
-                    // icon: 'fa fa-file',
-                    // title: 'paksfkq',
-                  // },
-                // ]
+                child: [
+                  {
+                    
+                  },
+                ]
               },
               {
                 id: 153,

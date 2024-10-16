@@ -113,7 +113,7 @@ function folderButton(param) {
             router.push({ name: 'EditFolder', params: { id: store.id } })
             break;
         case "createFile":
-            router.push({ name: 'createFile'})
+            router.push({ name: 'CreateFile', params: {parent: store.id}})
             break;
         default:
             break;

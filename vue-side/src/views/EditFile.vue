@@ -30,7 +30,7 @@ export default {
             postId,
         };
     },
-    props: ["save", "id", "parent"],
+    props: ["id", "parent"],
     mounted() {
         this.createEditor();
         if (this.id == 1) {
@@ -97,21 +97,18 @@ export default {
     },
     data() {
         return {
-            editorDataSave: [],
             dataBlock: [],
+            pagetitle: null,
         }
     },
     methods: {
-        saveData() {
-            this.save(this.editorDataSave);
-            editor.destroy();
-            this.createEditor();
+        save() {
+            editor.save().then((outputData) => {
+                console.log('Article data: ', outputData)
+            }).catch((error) => {
+                console.log('Saving failed: ', error)
+            });
         },
-        // load() {
-        //     this.dataBlock.forEach(element => {
-        //         editor.blocks.insert(element.type, element.data);
-        //     });
-        // },
 
         createEditor() {
             editor = new EditorJS({
@@ -279,7 +276,7 @@ export default {
                             "link": {
                                 "Add a link": "Вставьте ссылку"
                             },
-                            "quote":{
+                            "quote": {
                                 "Align Left": "По левому краю",
                                 "Align Center": "По центру",
                             },
@@ -316,14 +313,7 @@ export default {
                     });
                 },
 
-                onChange: () => {
 
-                    editor.save().then((outputData) => {
-                        this.editorDataSave = outputData;
-                    }).catch((error) => {
-                        console.log('Saving failed: ', error)
-                    });
-                }
             });
         },
     },
@@ -363,5 +353,46 @@ const aceConfig = {
 </script>
 
 <template>
-    <div id="editorjs"></div>
+    <div>
+        parent: {{ parent }}
+        id: {{ id }}
+        <CCard class="mb-4">
+            <CCardHeader>Информация</CCardHeader>
+            <CCardBody>
+                <CFormInput type="text" id="exampleFormControlInput1" label="Название документа"
+                    placeholder="Введите название документа" v-model="pagetitle" />
+
+            </CCardBody>
+        </CCard>
+
+        <CCard>
+            <CCardHeader>Содержимое</CCardHeader>
+            <CCardBody>
+                <div id="editorjs"></div>
+
+            </CCardBody>
+        </CCard>
+        <div class="position-fixed squared">
+            <div class="dropdown">
+                <button class="btn btn-primary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-cog"></i>
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <button class="dropdown-item" @click="save">Сохранить <i class="fa fa-floppy-o"
+                                aria-hidden="true"></i></button>
+                    </li>
+
+                    <li>
+                        <hr class="dropdown-divider" />
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="#">Удалить <i class="fa fa-trash-o" aria-hidden="true"></i></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
 </template>
