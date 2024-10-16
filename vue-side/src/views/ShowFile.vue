@@ -1,8 +1,9 @@
 <template>
   <div>
-    {{ id }}
+  
     <div id="file" class="print-container p-4">
-
+      <h1 class="text-center" v-html="pagetitle"></h1>
+      <hr>
       <div v-for="val in fileData" :key="val">
         <p v-if="val.type == 'paragraph'" v-html="val.data.text"></p>
         <div v-if="val.type == 'code'">
@@ -97,90 +98,20 @@ import { ExportToWord, ExportToPdf } from 'vue-doc-exporter';
 
 export default {
   components: { ExportToWord, ExportToPdf },
+
   props: ['id', 'datasend'],
   mounted() {
-    // console.log(this.datasend);
+    this.datasend("resource/"+this.id,"GET",{}).then(res=>{
+
+      this.pagetitle = res.name;
+      this.fileData = JSON.parse(res.content.data).blocks;
+    }).catch();
   },
 
   data() {
     return {
-
-      fileData: [
-        {
-          id: '_dPTGC-2dC',
-          type: 'image',
-          data: {
-            caption: '123123',
-            withBorder: true,
-            withBackground: false,
-            stretched: true,
-            file: {
-              url: 'http://localhost:8000/contentImages/bw3MxhLzjmx9YQjqttnbDzQGtNlhUUngtKgiJYEu.jpg',
-            },
-          },
-        },
-        {
-          id: 'ruK35tRzGR',
-          type: 'list',
-          data: {
-            style: 'unordered',
-            items: ['wqd', 'qwd'],
-          },
-        },
-        {
-          id: 'RXIyHESczT',
-          type: 'paragraph',
-          data: {
-            text: 'qwd',
-          },
-        },
-        {
-          type: 'header',
-          data: {
-            text: 'Why Telegram is the best messenger',
-            level: 4,
-          },
-        },
-        {
-          type: 'table',
-          data: {
-            withHeadings: true,
-            stretched: false,
-            content: [
-              ['Kine', 'Pigs', 'Chicken'],
-              ['1 pcs', '3 pcs', '12 pcs'],
-              ['100$', '200$', '150$'],
-            ],
-          },
-        },
-        {
-          id: 'UidmH8dcer',
-          type: 'code',
-          data: {
-            code: "<?php\nfunction removeSpace(string $str): string {\n    return str_replace(' ', '', $str);\n}\n?>",
-            language: 'php',
-          },
-        },
-        {
-          id: 'UidmH8dcer',
-          type: 'code',
-          data: {
-            code: "child = document.createElement('table');\nel.data.content.forEach((element, n) => {\nlet tr = document.createElement('tr');\nelement.forEach((element1, num) => {\nlet td = document.createElement(n == 0 && el.data.withHeadings ? 'th' : 'td');\ntd.textContent = element1;\ntr.appendChild(td);\n})\nchild.appendChild(tr)\n}) ",
-            language: 'javascript',
-          },
-        },
-        {
-          type: 'embed',
-          data: {
-            service: 'coub',
-            source: 'https://vk.com/video-223871583_456239712',
-            embed: 'https://vk.com/video_ext.php?oid=-223871583&id=456239712&hash=74a34e322c9352f3',
-            width: 580,
-            height: 320,
-            caption: 'My Life',
-          },
-        },
-      ],
+      pagetitle: null,
+      fileData: [],
     }
   },
 }

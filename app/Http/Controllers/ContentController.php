@@ -68,9 +68,13 @@ class ContentController extends Controller
             return response()->json(['success' => true]);
         }
     }
-    public function getResource(Content $content)
+    public function getResource($content)
     {
-        return response()->json(['content' => $content, "name" => Tree::find($content->tree_id)->name]);
+        
+        $tree = Tree::find($content);
+        $res = Content::where("tree_id",$tree->tree_id)->first();
+     
+        return response()->json(['content' => $res, "name" => $tree->name]);
     }
 
     public function delResource(Content $content) {

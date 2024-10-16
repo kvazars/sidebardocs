@@ -39,9 +39,12 @@ export default {
                 this.pagetitle = res.name;
                 this.dataBlock = JSON.parse(res.content.data).blocks;
                 this.createEditor();
+
             }).catch((error) => {
                 console.log(error);
             });
+        }else{
+            this.createEditor();
         }
 
     },
@@ -54,7 +57,6 @@ export default {
     },
     methods: {
         deleteFile() {
-            alert("");
             this.datasend('resource/' + this.id, 'DELETE', {}).then((res) => {
                 // route.push({name: 'home'})
                 console.log(res);
@@ -95,6 +97,7 @@ export default {
         },
 
         createEditor() {
+            
             editor = new EditorJS({
 
                 holder: 'editorjs',
