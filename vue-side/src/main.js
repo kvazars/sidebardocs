@@ -5,9 +5,6 @@ import App from './App.vue'
 import router from './router'
 
 import CoreuiVue from '@coreui/vue'
-import CIcon from '@coreui/icons-vue'
-import { iconsSet as icons } from '@/assets/icons'
-import DocsExample from '@/components/DocsExample'
 import VueSidebarMenu from 'vue-sidebar-menu'
 import 'vue-sidebar-menu/dist/vue-sidebar-menu.css'
 import 'font-awesome/css/font-awesome.min.css'
@@ -15,7 +12,7 @@ import 'bootstrap/dist/js/bootstrap.bundle'
 import { createVCodeBlock } from '@wdns/vue-code-block'
 
 const VCodeBlock = createVCodeBlock({
-  // options
+ 
 })
 
 const app = createApp(App)
@@ -24,8 +21,5 @@ app.use(router)
 app.use(CoreuiVue)
 app.use(VueSidebarMenu)
 app.use(VCodeBlock)
-app.provide('icons', icons)
-app.component('CIcon', CIcon)
-app.component('DocsExample', DocsExample)
 
 app.mount('#app')

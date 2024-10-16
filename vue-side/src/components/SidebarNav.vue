@@ -6,7 +6,7 @@
             <div class="v-sidebar-menu position-relative">
                 <ul class="vsm--menu">
                     <SidebarMenuItem v-for="item in computedMenu" :key="item.id" :item="item">
-                        <template #dropdown-icon="{ isOpen }">
+                        <template #dropdown-icon="{ isOpen }" >
                             <button class="btn" data-bs-toggle="dropdown" aria-expanded="false"
                                 type="button">...</button>
                             <ul class="dropdown-menu">
@@ -59,9 +59,6 @@ export default {
             })
             return it;
         },
-        omg() {
-            alert();
-        }
 
     }
 }
@@ -109,6 +106,9 @@ function folderButton(param) {
     store.changeFolder(true, param);
 
     switch (store.param) {
+        case "createFolder":
+            router.push({ name: 'NewFolder', params: { parent: store.id } })
+            break;
         case "editFolder":
             router.push({ name: 'EditFolder', params: { id: store.id } })
             break;

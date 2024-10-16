@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper min-vh-100 d-flex flex-row align-items-center">
+  <div class="h-75 d-flex flex-row align-items-center">
     <CContainer>
       <CRow class="justify-content-center">
         <CCol :md="6">

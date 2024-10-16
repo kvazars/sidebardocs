@@ -1,5 +1,6 @@
 <template>
   <div>
+    {{ id }}
     <div id="file" class="print-container p-4">
 
       <div v-for="val in fileData" :key="val">
@@ -98,7 +99,6 @@ export default {
   components: { ExportToWord, ExportToPdf },
   props: ['id'],
   mounted() {
-    // //this.fileParser();
   },
 
   data() {
