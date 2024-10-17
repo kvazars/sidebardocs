@@ -177,6 +177,7 @@ export default {
                         config: {
                             defaultStyle: 'unordered'
                         }
+              
                     },
                     code: {
                         class: AceCodeEditorJS,
@@ -276,6 +277,9 @@ export default {
                             "quote": {
                                 "Align Left": "По левому краю",
                                 "Align Center": "По центру",
+                            },
+                            "attaches":{
+                                "File title": "Название файла"
                             },
 
 

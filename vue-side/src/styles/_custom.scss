@@ -82,6 +82,11 @@ body .v-sidebar-menu .vsm--arrow .vsm--arrow_default {
     // display: block;
 // }
 
+.editorImageBlockBackground .editorImage{
+    max-width: 60%;
+    margin: 0 auto;
+}
+
 .editorImageBlockBorder.editorImageBlock {
     border: 1px solid #ccc;
 }
@@ -156,4 +161,10 @@ body .v-sidebar-menu .vsm--link_level-1.vsm--link_active{
 }
 .vsm--menu i.fa.fa-file{
     color: #1f7757;
+}
+
+.editorImage {
+    max-width: 100%;
+    vertical-align: bottom;
+    // display: block;
 }

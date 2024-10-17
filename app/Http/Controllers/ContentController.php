@@ -55,9 +55,9 @@ class ContentController extends Controller
             return response()->json(['success' => true, 'id' => $fileId->tree_id]);
         } else {
             $tree = Tree::find($request->id);
-            $content = Content::where("tree_id", $tree->tree_id)->first();
+            $fileId = Content::where("tree_id", $request->id)->first();
 
-            $fileId = $content->update([
+            $fileId->update([
                 // 'name' => $request->name,
                 'accessibility' => false,
                 'data' => $request->data,
