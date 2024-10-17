@@ -34,6 +34,7 @@ export default {
     mounted() {
         if (this.id) {
             this.datasend('resource/' + this.id, 'GET', {}).then((res) => {
+                console.log(res);
 
                 // console.log(JSON.parse(res.content.data).blocks);
                 this.pagetitle = res.name;
@@ -59,7 +60,6 @@ export default {
         deleteFile() {
             this.datasend('resource/' + this.id, 'DELETE', {}).then((res) => {
                 // route.push({name: 'home'})
-                console.log(res);
                 
             }).catch(error => console.log(error));
             

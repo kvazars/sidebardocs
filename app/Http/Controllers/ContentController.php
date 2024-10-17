@@ -39,30 +39,30 @@ class ContentController extends Controller
         //    return $request->all();
         if (isset($request->tree_id)) {
             // return 1;
-            Content::create([
-                'tree_id' => $request->tree_id,
-                // 'name' => $request->name,
-                'accessibility' => false,
-                'data' => $request->data,
-            ]);
-            Tree::create([
+            $tree = Tree::create([
                 'name' => $request->name,
                 'tree_id' => $request->tree_id,
                 'user_id' => 1,
             ]);
-            return response()->json(['success' => true]);
-        } else {    
-            $content = Content::find($request->id);
-
-            $content->update([
-                // 'tree_id' => $request->tree_id,
+            Content::create([
+                'tree_id' => $tree->id,
                 // 'name' => $request->name,
                 'accessibility' => false,
                 'data' => $request->data,
             ]);
-            Tree::where('id',$content->tree_id)->update([
+            
+            return response()->json(['success' => true]);
+        } else {    
+            $tree = Tree::find($request->id);
+            $content = Content::where("tree_id",$tree->id)->first();
+            
+            $content->update([
+                // 'name' => $request->name,
+                'accessibility' => false,
+                'data' => $request->data,
+            ]);
+            $tree->update([
                 'name' => $request->name,
-                // 'tree_id' => $request->tree_id,
                 // 'user_id' => 1,
             ]);
             return response()->json(['success' => true]);
@@ -70,15 +70,14 @@ class ContentController extends Controller
     }
     public function getResource($content)
     {
-        
+
         $tree = Tree::find($content);
-        $res = Content::where("tree_id",$tree->tree_id)->first();
-     
+        $res = Content::where("tree_id",$content)->first();     
         return response()->json(['content' => $res, "name" => $tree->name]);
     }
 
-    public function delResource(Content $content) {
-        Tree::find($content->tree_id)->delete();
+    public function delResource($content) {
+        Tree::find($content)->delete();
         return response()->json(["success"=> true]);
     }
 }

@@ -97,45 +97,63 @@ body .v-sidebar-menu .vsm--link_level-1.vsm--link_active{
     -webkit-box-shadow:none;
 }
 
-.vsm--link_level-1::before{
+.vsm--link_level-1 .vsm--title::after{
     content: "";
     height: 55px; position: absolute;
     width: 3px;
     display: flex;
+    left: 0;
     background: #1ad2bb;
 }
-.vsm--link_level-2::before{
+.vsm--link_level-2 .vsm--title::after{
     content: "";
     height: 55px; position: absolute;
     width: 3px;
     display: flex;
+    left: 20px;
     background: #1d1ad2;
 }
-.vsm--link_level-3::before{
+.vsm--link_level-3 .vsm--title::after{
     content: "";
     height: 55px; position: absolute;
     width: 3px;
     display: flex;
+    left: 30px;
     background: #d2951a;
 }
-.vsm--link_level-4::before{
+
+.vsm--link .vsm--title:has(> span:empty) {
+    display: none;
+}
+
+.vsm--link_level-4 .vsm--title::after{
     content: "";
     height: 55px; position: absolute;
     width: 3px;
     display: flex;
+    left: 40px;
     background: #d21a30;
 }
-.vsm--link_level-5::before{
+.vsm--link_level-5 .vsm--title::after{
     content: "";
     height: 55px; position: absolute;
     width: 3px;
     display: flex;
+    left: 50px;
     background: #d2d21a;
 }
-.vsm--link_level-6::before{
+.vsm--link_level-6 .vsm--title::after{
     content: "";
     height: 55px; position: absolute;
     width: 3px;
     display: flex;
+    left: 60px;
     background: #1ad29e;
+}
+
+.vsm--menu i.fa.fa-folder{
+    color: #2759ae;
+}
+.vsm--menu i.fa.fa-file{
+    color: #1f7757;
 }
