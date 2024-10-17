@@ -19,12 +19,12 @@ ace.config.setModuleUrl("ace/mode/html_worker", modeHTMLWorker);
 ace.config.setModuleUrl("ace/mode/javascript_worker", modeJSWorker);
 ace.config.setModuleUrl("ace/mode/php_worker", modePHPWorker);
 import { computed } from 'vue';
-import { routerKey, useRoute } from 'vue-router';
+import { routerKey, useRoute, useRouter } from 'vue-router';
 
 let editor;
 export default {
     setup() {
-        const route = useRoute();
+        // const route = useRoute();
         const postId = computed(() => route.params.id);
         return {
             postId,
@@ -44,7 +44,7 @@ export default {
             }).catch((error) => {
                 console.log(error);
             });
-        }else{
+        } else {
             this.createEditor();
         }
 
@@ -53,16 +53,22 @@ export default {
         return {
             dataBlock: [],
             pagetitle: null,
+            router: useRouter(),
             // pageDetail: this.id ? 'edit' : 'new',
         }
     },
     methods: {
         deleteFile() {
             this.datasend('resource/' + this.id, 'DELETE', {}).then((res) => {
-                // route.push({name: 'home'})
-                
+                console.log(res);
+
+                if (res.success == true) {
+                    this.getMenu();
+                    this.router.push({ name: 'Home' })
+                }
+
             }).catch(error => console.log(error));
-            
+
         },
         save() {
 
@@ -77,9 +83,12 @@ export default {
                 }
                 this.datasend('resource', 'POST', form).then(
                     (res) => {
-                        this.getMenu();
-                        console.log(res);
+                        if (res.success == true) {
+                            this.getMenu();
+                            console.log(res);
+                            this.router.push({ name: 'ShowFile', params: { id: res.id } })
 
+                        }
                         // if (res.success) {
 
                         // } else {
@@ -98,7 +107,7 @@ export default {
         },
 
         createEditor() {
-            
+
             editor = new EditorJS({
 
                 holder: 'editorjs',
@@ -375,7 +384,8 @@ const aceConfig = {
                         <hr class="dropdown-divider" />
                     </li>
                     <li>
-                        <button class="dropdown-item" @click="deleteFile">Удалить <i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                        <button class="dropdown-item" @click="deleteFile">Удалить <i class="fa fa-trash-o"
+                                aria-hidden="true"></i></button>
                     </li>
                 </ul>
             </div>

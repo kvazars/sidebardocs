@@ -10,11 +10,13 @@
                     <div class="w-100 d-flex flex-column gap-4">
                         <div class="w-100 d-flex flex-column gap-2">
                             <label for="folderName" class=" fw-bold">Изменение имени папки</label>
-                            <CFormInput v-model="folderTitle" name="folderName" type="text" id="folderName" placeholder="Новое имя папки" />
+                            <CFormInput v-model="folderTitle" name="folderName" type="text" id="folderName"
+                                placeholder="Новое имя папки" />
                         </div>
                         <div class="w-100 d-flex flex-row gap-2">
                             <CButton color="success" class="w-50 text-white" @click="save">Сохранить</CButton>
-                            <CButton color="danger" class="w-50 text-white" disabled>Удалить папку</CButton>
+                            <CButton color="danger" class="w-50 text-white" @click="deleteFolder">Удалить папку
+                            </CButton>
                         </div>
                     </div>
                 </div>
@@ -23,11 +25,13 @@
     </div>
 </template>
 <script>
+import { useRouter } from 'vue-router';
 export default {
     props: ["id", "parent", 'datasend', "getMenu"],
     data() {
         return {
             folderTitle: null,
+            router: useRouter(),
         }
     },
     mounted() {
@@ -44,15 +48,16 @@ export default {
         // }
     },
     methods: {
-        // deleteFolder() {
-        //     alert("");
-        //     this.datasend('resource/' + this.id, 'DELETE', {}).then((res) => {
-        //         // route.push({name: 'home'})
-        //         console.log(res);
+        deleteFolder() {
+            this.datasend('folder/' + this.id, 'DELETE', {}).then((res) => {
+                if (res.success == true) {
+                    this.getMenu();
+                    this.router.push({ name: 'Home' })
+                }
 
-        //     }).catch(error => console.log(error));
+            }).catch(error => console.log(error));
 
-        // },
+        },
         save() {
             let form = new FormData();
             form.append('name', this.folderTitle);
@@ -65,6 +70,7 @@ export default {
                 (res) => {
                     this.getMenu();
                     console.log(res);
+                    this.router.push({ name: 'Home' })
 
                     // if (res.success) {
 

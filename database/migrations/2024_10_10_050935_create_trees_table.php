@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('trees', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('tree_id')->default(0)->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('tree_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->enum('type', ['folder', 'file'])->default('file');
             $table->timestamps();

@@ -81,12 +81,6 @@
                   aria-hidden="true"></i></button>
             </ExportToPdf>
           </li>
-          <li>
-            <hr class="dropdown-divider" />
-          </li>
-          <li>
-            <a class="dropdown-item" href="#">Удалить <i class="fa fa-trash-o" aria-hidden="true"></i></a>
-          </li>
         </ul>
       </div>
     </div>

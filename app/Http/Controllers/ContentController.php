@@ -36,6 +36,7 @@ class ContentController extends Controller
 
     public function saveResource(Request $request)
     {
+        $fileId = null;
         //    return $request->all();
         if (isset($request->tree_id)) {
             // return 1;
@@ -44,19 +45,19 @@ class ContentController extends Controller
                 'tree_id' => $request->tree_id,
                 'user_id' => 1,
             ]);
-            Content::create([
+            $fileId = Content::create([
                 'tree_id' => $tree->id,
                 // 'name' => $request->name,
                 'accessibility' => false,
                 'data' => $request->data,
             ]);
-            
-            return response()->json(['success' => true]);
-        } else {    
+
+            return response()->json(['success' => true, 'id' => $fileId->tree_id]);
+        } else {
             $tree = Tree::find($request->id);
-            $content = Content::where("tree_id",$tree->id)->first();
-            
-            $content->update([
+            $content = Content::where("tree_id", $tree->tree_id)->first();
+
+            $fileId = $content->update([
                 // 'name' => $request->name,
                 'accessibility' => false,
                 'data' => $request->data,
@@ -65,19 +66,21 @@ class ContentController extends Controller
                 'name' => $request->name,
                 // 'user_id' => 1,
             ]);
-            return response()->json(['success' => true]);
+            return response()->json(['success' => true, 'id' => $fileId->tree_id]);
         }
     }
     public function getResource($content)
     {
 
         $tree = Tree::find($content);
-        $res = Content::where("tree_id",$content)->first();     
+        $res = Content::where("tree_id", $content)->first();
         return response()->json(['content' => $res, "name" => $tree->name]);
     }
 
-    public function delResource($content) {
+    public function delResource($content)
+    {
+        // return Tree::find($content->id);
         Tree::find($content)->delete();
-        return response()->json(["success"=> true]);
+        return response()->json(["success" => true]);
     }
 }

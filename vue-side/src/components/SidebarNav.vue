@@ -5,8 +5,8 @@
         <SidebarMenuScroll>
             <div class="v-sidebar-menu position-relative">
                 <ul class="vsm--menu">
-                    <SidebarMenuItem v-for="item in computedMenu" :key="item.id" :item="item">
-                        <template #dropdown-icon="{ isOpen }" >
+                    <SidebarMenuItem v-for="item in menu" :key="item.id" :item="item">
+                        <template #dropdown-icon="{ isOpen }">
                             <button class="btn" data-bs-toggle="dropdown" aria-expanded="false"
                                 type="button">...</button>
                             <ul class="dropdown-menu">
@@ -40,29 +40,15 @@ export default {
 
     data() {
         return {
-            computedMenu: [],
+            // computedMenu: [],
             idOpen: null,
             store: useSidebarIdStore(),
         }
     },
     mounted() {
-        this.computedMenu = this.transformItems(this.menu);       
+        // this.menu;
     },
     methods: {
-        transformItems(items) {
-            
-            let it = items.map((item) => {
-                if(item.type=='folder'&&item.child.length==0){
-                    item.child=[{}];
-                }
-                
-                return {
-                    ...item,
-                    ...(item.child && { child: this.transformItems(item.child) }),
-                }
-            })
-            return it;
-        },
 
     }
 }
@@ -117,7 +103,7 @@ function folderButton(param) {
             router.push({ name: 'EditFolder', params: { id: store.id } })
             break;
         case "createFile":
-            router.push({ name: 'CreateFile', params: {parent: store.id}})
+            router.push({ name: 'CreateFile', params: { parent: store.id } })
             break;
         default:
             break;

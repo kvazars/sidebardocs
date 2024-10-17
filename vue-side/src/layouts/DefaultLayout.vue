@@ -1,16 +1,15 @@
-
 <script>
 import { CContainer } from '@coreui/vue'
-import  AppFooter  from '@/components/AppFooter.vue'
-import  AppHeader  from '@/components/AppHeader.vue'
-import AppSidebar  from '@/components/AppSidebar.vue'
+import AppFooter from '@/components/AppFooter.vue'
+import AppHeader from '@/components/AppHeader.vue'
+import AppSidebar from '@/components/AppSidebar.vue'
 // import { data } from 'autoprefixer';
 import { useUserDataStore } from '../stores/userData';
 
 const api = 'http://localhost:8000/api/'
 // const store = useUserDataStore();
 export default {
-  components:{AppFooter, AppHeader, AppSidebar},
+  components: { AppFooter, AppHeader, AppSidebar },
   data() {
     return {
       menu: [],
@@ -54,18 +53,34 @@ export default {
     getMenu() {
       this.datasend('folder', 'GET', {}).then((res) => {
         let menus = res;
-        // console.log(menus);
-        // let r = JSON.parse(a);
 
-        function menucreate(i = 0) {
+        // let r = JSON.parse(a);
+        function menucreateparent() {
           let rrr = [];
           menus.forEach((e) => {
-            if (e.tree_id == i) {
-             if(e.type=='file'){
-              e.href = '/files/'+e.id;
-            }
+            if (e.tree_id == null) {
               e.title = e.name;
-              e.icon = e.type=='folder'?'fa fa-folder':'fa fa-file';
+              e.icon = 'fa fa-folder';
+
+              e.child = menucreate(e.id);
+              rrr.push(e);
+            }
+          })
+          return rrr;
+        }
+
+        function menucreate(i = 0) {
+
+          let rrr = [];
+          menus.forEach((e) => {
+
+
+            if (e.tree_id == i) {
+              if (e.type == 'file') {
+                e.href = '/files/' + e.id;
+              }
+              e.title = e.name;
+              e.icon = e.type == 'folder' ? 'fa fa-folder' : 'fa fa-file';
 
               e.child = menucreate(e.id);
               rrr.push(e);
@@ -80,17 +95,29 @@ export default {
 
 
 
-        this.menu = menucreate();console.log(this.menu);
-        //co//nsole.log(menu);
 
-        // sidebar = useSidebarStore();
 
-        // this.sidebar = useSidebarStore();
-        // console.log(menu12);
+        this.menu = menucreateparent();
+        console.log(this.menu);
+        this.menu = this.transformItems(this.menu);
+        console.log(this.menu);
 
       }).catch((error) => {
         console.log(error);
       });
+    },
+    transformItems(items) {
+      let it = items.map((item) => {
+        if (item.type == 'folder' && item.child.length == 0) {
+          item.child = [{}];
+        }
+
+        return {
+          ...item,
+          ...(item.child && { child: this.transformItems(item.child) }),
+        }
+      })
+      return it;
     }
   }
 }
