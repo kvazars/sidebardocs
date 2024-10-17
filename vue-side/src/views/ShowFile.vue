@@ -79,14 +79,17 @@
 
           </li>
           <li>
-            <ExportToPdf filename="document">
-              <button class="dropdown-item" href="#">Экспорт <i class="fa fa-file-pdf-o"
+           
+              <button class="dropdown-item" @click="pdfDownload">Экспорт <i class="fa fa-file-pdf-o"
                   aria-hidden="true"></i></button>
-            </ExportToPdf>
+            
           </li>
         </ul>
       </div>
     </div>
+    <textarea id="textContainer" style="width: 400px; height: 240px"></textarea>
+   <br>
+   <div id="pdfContainer"></div>
   </div>
 </template>
 
