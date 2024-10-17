@@ -23,6 +23,7 @@
             editorImageBlockBackground: val.data.withBackground,
           }"
         >
+        <DataImage :src="val.data.file.url"/>
           <img
             :src="val.data.file.url"
             :alt="val.data.caption"
@@ -118,9 +119,9 @@
 <script>
 
 import jsPDF from 'jspdf'
-
+import DataImage from '@/components/DataImage.vue';
 export default {
-
+components:{DataImage},
   methods: {
     pdfDownload() {
       var doc = new jsPDF()
