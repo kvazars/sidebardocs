@@ -30,7 +30,7 @@ export default {
             postId,
         };
     },
-    props: ["id", "parent", 'datasend'],
+    props: ["id", "parent", 'datasend', "getMenu"],
     mounted() {
         if (this.id) {
             this.datasend('resource/' + this.id, 'GET', {}).then((res) => {
@@ -77,6 +77,7 @@ export default {
                 }
                 this.datasend('resource', 'POST', form).then(
                     (res) => {
+                        this.getMenu();
                         console.log(res);
 
                         // if (res.success) {

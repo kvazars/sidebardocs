@@ -66,6 +66,7 @@ export default {
             }
               e.title = e.name;
               e.icon = e.type=='folder'?'fa fa-folder':'fa fa-file';
+
               e.child = menucreate(e.id);
               rrr.push(e);
 
@@ -78,7 +79,8 @@ export default {
         }
 
 
-        this.menu = menucreate();
+
+        this.menu = menucreate();console.log(this.menu);
         //co//nsole.log(menu);
 
         // sidebar = useSidebarStore();
@@ -102,7 +104,7 @@ export default {
       <AppHeader />
       <div class="body flex-grow-1">
         <CContainer class="px-4" lg>
-          <router-view :datasend :key="$route.fullPath" />
+          <router-view :datasend :getMenu :key="$route.fullPath" />
         </CContainer>
       </div>
       <AppFooter />

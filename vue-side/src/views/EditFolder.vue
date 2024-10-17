@@ -24,7 +24,7 @@
 </template>
 <script>
 export default {
-    props: ["id", "parent", 'datasend'],
+    props: ["id", "parent", 'datasend', "getMenu"],
     data() {
         return {
             folderTitle: null,
@@ -63,6 +63,7 @@ export default {
             }
             this.datasend('folder', 'POST', form).then(
                 (res) => {
+                    this.getMenu();
                     console.log(res);
 
                     // if (res.success) {

@@ -47,12 +47,18 @@ export default {
     },
     mounted() {
         this.computedMenu = this.transformItems(this.menu);
-
+        console.log(this.computedMenu);
+        
     },
     methods: {
         transformItems(items) {
             
             let it = items.map((item) => {
+                console.log(item);
+                if(item.type=='folder'&&item.child.length==0){
+                    item.child=[{}];
+                }
+                
                 return {
                     ...item,
                     ...(item.child && { child: this.transformItems(item.child) }),
