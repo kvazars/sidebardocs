@@ -88,3 +88,54 @@ body .v-sidebar-menu .vsm--arrow .vsm--arrow_default {
 .editorImageBlockBackground.editorImageBlock {
     background-color: #cdd1e0;
 }
+.vsm--link.vsm--link_open i.fa.fa-folder:before{
+    content: "\f07c";
+}
+
+body .v-sidebar-menu .vsm--link_level-1.vsm--link_active{
+    box-shadow: none;
+    -webkit-box-shadow:none;
+}
+
+.vsm--link_level-1::before{
+    content: "";
+    height: 55px; position: absolute;
+    width: 3px;
+    display: flex;
+    background: #1ad2bb;
+}
+.vsm--link_level-2::before{
+    content: "";
+    height: 55px; position: absolute;
+    width: 3px;
+    display: flex;
+    background: #1d1ad2;
+}
+.vsm--link_level-3::before{
+    content: "";
+    height: 55px; position: absolute;
+    width: 3px;
+    display: flex;
+    background: #d2951a;
+}
+.vsm--link_level-4::before{
+    content: "";
+    height: 55px; position: absolute;
+    width: 3px;
+    display: flex;
+    background: #d21a30;
+}
+.vsm--link_level-5::before{
+    content: "";
+    height: 55px; position: absolute;
+    width: 3px;
+    display: flex;
+    background: #d2d21a;
+}
+.vsm--link_level-6::before{
+    content: "";
+    height: 55px; position: absolute;
+    width: 3px;
+    display: flex;
+    background: #1ad29e;
+}
