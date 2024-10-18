@@ -156,15 +156,74 @@ body .v-sidebar-menu .vsm--link_level-1.vsm--link_active{
     background: #1ad29e;
 }
 
-.vsm--menu i.fa.fa-folder{
+
+.vsm--menu i.fa.fa-folder, body .sidebar .v-sidebar-menu .vsm--link_active .vsm--icon.fa-folder{
     color: #2759ae;
 }
-.vsm--menu i.fa.fa-file{
+.vsm--menu i.fa.fa-file, body .sidebar .v-sidebar-menu .vsm--link_active .vsm--icon.fa-file{
     color: #1f7757;
 }
+
+[data-coreui-theme="dark"] .vsm--menu i.fa.fa-folder,[data-coreui-theme="dark"] body .sidebar .v-sidebar-menu .vsm--link_active .vsm--icon.fa-folder{
+    color: #fff;
+}
+[data-coreui-theme="dark"] .vsm--menu i.fa.fa-file,[data-coreui-theme="dark"]  body .sidebar .v-sidebar-menu .vsm--link_active .vsm--icon.fa-file{
+    color: #aceed6;
+}
+
+
 
 .editorImage {
     max-width: 100%;
     vertical-align: bottom;
     // display: block;
+}
+.vsm--wrapper, .vsm--scroll{
+    overflow: auto;
+}
+
+// body .sidebar:has( .sidebar-narrow-unfoldable) .vsm--wrapper {
+//     overflow: auto;
+// }
+
+body .sidebar-narrow-unfoldable .vsm--wrapper {
+    overflow: hidden;
+}
+
+body .sidebar-narrow-unfoldable:hover .vsm--wrapper {
+    overflow: auto;
+}
+body .sidebar-narrow-unfoldable .sidebar-toggler{
+   display: none;
+}
+
+body .sidebar-narrow-unfoldable:hover .sidebar-toggler {
+    display: block;
+}
+
+body .sidebar-narrow-unfoldable .vsm--item{
+   width: 100%;
+}
+
+body .sidebar-narrow-unfoldable:hover .vsm--item {
+    width: auto;
+}
+body .sidebar-narrow-unfoldable .vsm--link .vsm--title::after
+{
+    left:0;
+}
+body .sidebar-narrow-unfoldable:hover .vsm--link.vsm--link_level-2  .vsm--title::after{
+    left: 10px;
+}
+body .sidebar-narrow-unfoldable:hover .vsm--link.vsm--link_level-3  .vsm--title::after{
+    left: 20px;
+}
+body .sidebar-narrow-unfoldable:hover .vsm--link.vsm--link_level-4  .vsm--title::after{
+    left: 30px;
+}
+body .sidebar-narrow-unfoldable:hover .vsm--link.vsm--link_level-5  .vsm--title::after{
+    left: 40px;
+}
+body .sidebar-narrow-unfoldable:hover .vsm--link.vsm--link_level-6  .vsm--title::after{
+    left: 50px;
 }

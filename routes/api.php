@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 Route::post("/saveImage", [ContentController::class, "saveImage"]);
 Route::post("/saveFile", [ContentController::class, "saveFile"]);
 Route::post("/saveImageByUrl", [ContentController::class, "saveImageByUrl"]);
+Route::post("/getImage", [ContentController::class, "getImage"]);
 Route::post("/resource", [ContentController::class, "saveResource"]);
 // Route::post("/saveResource", [ContentController::class, "saveResource"]);
 

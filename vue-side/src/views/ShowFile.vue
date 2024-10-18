@@ -23,13 +23,8 @@
             editorImageBlockBackground: val.data.withBackground,
           }"
         >
-        <DataImage :src="val.data.file.url"/>
-          <img
-            :src="val.data.file.url"
-            :alt="val.data.caption"
-            class="editorImage text-center"
-            :style="''"
-          />
+        <DataImage :datasend class="editorImage text-center" :src="val.data.file.url"/>
+
           <p v-html="val.data.caption" class="text-center fst-italic"></p>
         </div>
         <div v-if="val.type == 'attaches'" class="my-4">

@@ -34,6 +34,23 @@ class ContentController extends Controller
         return response()->json(['success' => 1, 'file' => ['url' => env('APP_URL') . 'public/' . $name]], 200);
     }
 
+    public function getImage(Request $request)
+    {
+        // return $request->all();
+        if($request->image){
+        $img = explode('/contentImages', $request->image);
+ 
+        $data = file_get_contents(public_path().'/contentImages'.end($img));
+        
+     $type = explode('.',$request->image);
+        $base64 = 'data:image/' . end($type) . ';base64,' . base64_encode($data);
+        return response()->json(data: ['success'=> true,'image'=>  $base64]);
+        //return end( $img);
+        // '/contentImages'.
+        // return $img;
+    }
+}
+
     public function saveResource(Request $request)
     {
         $fileId = null;
