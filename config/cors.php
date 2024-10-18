@@ -15,14 +15,15 @@ return [
     |
     */
 
- 'paths' => ['*'],
-    'allowed_methods' => ['*'],
+    'paths' => ['api/*', 'api/admin/*', 'api/users/*', '*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_methods' => ['POST', 'GET', 'DELETE', 'PUT', '*'],
+
+    'allowed_origins' => ['http://localhost:3000', 'https://client.myapp.com','*'],
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['Authorization,Accept,Origin,DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range'],
+    'allowed_headers' => ['X-Custom-Header', 'Upgrade-Insecure-Requests', '*'],
 
     'exposed_headers' => [],
 

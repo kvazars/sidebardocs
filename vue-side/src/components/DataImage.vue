@@ -3,8 +3,6 @@
   </template>
   
   <script>
-
-  
   export default {
     props: ["src"],
     data() {
@@ -13,11 +11,9 @@
       };
     },
     mounted() {
-        const toDataURL = url => fetch(url, { mode: 'no-cors'})
+      const toDataURL = url => fetch(url)
   .then(response => response.blob())
   .then(blob => new Promise((resolve, reject) => {
-
-    
     const reader = new FileReader()
     reader.onloadend = () => resolve(reader.result)
     reader.onerror = reject
@@ -25,11 +21,14 @@
   }))
 
 
-toDataURL(this.src)
+toDataURL('http://localhost:8000/contentImages/dEHD3n2GHNH6JPSYeqNp7Tfivs3deq1xEF264vFi.jpg')
   .then(dataUrl => {
-    this.imageAsBase64 = dataUrl;
+    console.log('RESULT:', dataUrl)
   })
-    //   this.imageAsBase64 = fs.readFileSync("", "base64");
-    }
+
+    },
+
+
+
   };
   </script>
