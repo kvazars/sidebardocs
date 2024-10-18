@@ -20,7 +20,7 @@ class TreeController extends Controller
         } else {
             Tree::create([
                 "name" => $request->name,
-                'tree_id' => $request->tree_id,
+                'tree_id' => $request->tree_id?:null,
                 'user_id' => 1,
                 'type' => 'folder',
             ]);
