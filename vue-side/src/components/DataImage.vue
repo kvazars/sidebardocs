@@ -3,6 +3,7 @@
   </template>
   
   <script>
+
   
   export default {
     props: ["src"],
@@ -12,9 +13,11 @@
       };
     },
     mounted() {
-        const toDataURL = url => fetch(url)
+        const toDataURL = url => fetch(url, { mode: 'no-cors'})
   .then(response => response.blob())
   .then(blob => new Promise((resolve, reject) => {
+
+    
     const reader = new FileReader()
     reader.onloadend = () => resolve(reader.result)
     reader.onerror = reject

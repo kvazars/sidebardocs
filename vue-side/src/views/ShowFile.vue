@@ -110,9 +110,6 @@
         </ul>
       </div>
     </div>
-    <textarea id="textContainer" style="width: 400px; height: 240px"></textarea>
-    <br />
-    <div id="pdfContainer"></div>
   </div>
 </template>
 
