@@ -1,29 +1,19 @@
 <template>
   <div>
-    <div id="file" class="print-container p-4" ref="file">
+    <div id="file" class="print-container p-4">
       <h1 class="text-center" v-html="pagetitle"></h1>
       <hr />
       <div v-for="val in fileData" :key="val">
         <p v-if="val.type == 'paragraph'" v-html="val.data.text" class="my-4"></p>
         <div v-if="val.type == 'code'" class="my-4">
-          <VCodeBlock
-            :code="val.data.code"
-            highlightjs
-            label="Пример кода"
-            :lang="val.data.language"
-            theme="monokai"
-          />
+          <VCodeBlock :code="val.data.code" highlightjs label="Пример кода" :lang="val.data.language" theme="monokai" />
         </div>
-        <div
-          v-if="val.type == 'image'"
-          class="editorImageBlock text-center my-4"
-          :class="{
-            editorImageBlockStretched: val.data.stretched,
-            editorImageBlockBorder: val.data.withBorder,
-            editorImageBlockBackground: val.data.withBackground,
-          }"
-        >
-        <DataImage :datasend class="editorImage text-center" :src="val.data.file.url"/>
+        <div v-if="val.type == 'image'" class="editorImageBlock text-center my-4" :class="{
+        editorImageBlockStretched: val.data.stretched,
+        editorImageBlockBorder: val.data.withBorder,
+        editorImageBlockBackground: val.data.withBackground,
+      }">
+          <DataImage :datasend="datasend" class="editorImage text-center" :src="val.data.file.url" />
 
           <p v-html="val.data.caption" class="text-center fst-italic"></p>
         </div>
@@ -38,16 +28,14 @@
         </div>
 
         <div class="tableBlock my-4" v-if="val.type == 'table'">
-          <table
-            class="table table-bordered"
-            style="margin: auto"
-            :class="!val.data.stretched ? 'table-nonfluid' : ''"
-          >
+          <table class="table table-bordered" style="margin: auto" :class="!val.data.stretched ? 'table-nonfluid' : ''">
             <tbody>
               <tr v-for="(tRow, num) in val.data.content" :key="num">
+                <!-- eslint-disable -->
                 <th v-if="num == 0 && val.data.withHeadings" v-for="tHeader in tRow" :key="tHeader">
                   {{ tHeader }}
                 </th>
+                <!-- eslint-enable -->
                 <td v-else v-for="tText in tRow" :key="tText">{{ tText }}</td>
               </tr>
             </tbody>
@@ -75,19 +63,13 @@
     </div>
     <div class="position-fixed squared">
       <div class="dropdown">
-        <button
-          class="btn btn-primary"
-          type="button"
-          data-bs-toggle="dropdown"
-          aria-expanded="false"
-        >
+        <button class="btn btn-primary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
           <i class="fa fa-cog"></i>
         </button>
         <ul class="dropdown-menu">
           <li>
-            <router-link class="dropdown-item" :to="{ name: 'EditFile', params: { id: id } }"
-              >Редактировать <i class="fa fa-pencil-square-o" aria-hidden="true"></i
-            ></router-link>
+            <router-link class="dropdown-item" :to="{ name: 'EditFile', params: { id: id } }">Редактировать <i
+                class="fa fa-pencil-square-o" aria-hidden="true"></i></router-link>
           </li>
           <li>
             <hr class="dropdown-divider" />
@@ -98,9 +80,11 @@
             </button>
           </li>
           <li>
-            <button class="dropdown-item" @click="pdfDownload">
-              Экспорт <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
-            </button>
+            <ExportToPdf :filename="pagetitle ? pagetitle : 'document'">
+              <button class="dropdown-item">
+                Экспорт <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+              </button>
+            </ExportToPdf>
           </li>
         </ul>
       </div>
@@ -111,32 +95,12 @@
 <script>
 
 import jsPDF from 'jspdf'
+import { ExportToWord, ExportToPdf } from 'vue-doc-exporter';
 import DataImage from '@/components/DataImage.vue';
 export default {
-components:{DataImage},
+  components: { ExportToWord, ExportToPdf, DataImage },
   methods: {
-    pdfDownload() {
-      var doc = new jsPDF()
-      function toDataURL(url, callback) {
-        var xhr = new XMLHttpRequest()
-        xhr.onload = function () {
-          var reader = new FileReader()
-          reader.onloadend = function () {
-            callback(reader.result)
-          }
-          reader.readAsDataURL(xhr.response)
-        }
-        xhr.open('GET', url)
-        xhr.responseType = 'blob'
-        xhr.send()
-      }
-    //   $f = document.querySelector('#file').innerHTML;
 
-
-      doc.html(document.querySelector('#file').innerHTML)
-
-      doc.save(this.pagetitle+'.pdf');
-    },
     html2doc() {
       let els = document.querySelector('#file').innerHTML
 

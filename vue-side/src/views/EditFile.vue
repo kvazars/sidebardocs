@@ -24,19 +24,16 @@ import { routerKey, useRoute, useRouter } from 'vue-router';
 let editor;
 export default {
     setup() {
-        // const route = useRoute();
         const postId = computed(() => route.params.id);
         return {
             postId,
         };
     },
-    props: ["id", "parent", 'datasend', "getMenu"],
+    props: ["id", "parent", 'datasend', "getMenu", "api"],
     mounted() {
         if (this.id) {
             this.datasend('resource/' + this.id, 'GET', {}).then((res) => {
-                console.log(res);
-
-                // console.log(JSON.parse(res.content.data).blocks);
+  
                 this.pagetitle = res.name;
                 this.dataBlock = JSON.parse(res.content.data).blocks;
                 this.createEditor();
@@ -54,24 +51,19 @@ export default {
             dataBlock: [],
             pagetitle: null,
             router: useRouter(),
-            // pageDetail: this.id ? 'edit' : 'new',
         }
     },
     methods: {
         deleteFile() {
             this.datasend('resource/' + this.id, 'DELETE', {}).then((res) => {
-                console.log(res);
-
                 if (res.success == true) {
                     this.getMenu();
                     this.router.push({ name: 'Home' })
                 }
-
             }).catch(error => console.log(error));
 
         },
         save() {
-
             editor.save().then((outputData) => {
                 let form = new FormData();
                 form.append('data', JSON.stringify(outputData));
@@ -86,32 +78,20 @@ export default {
                         if (res.success == true) {
                             this.getMenu();
                             console.log(res);
-                            this.router.push({ name: 'ShowFile', params: { id: res.id } })
-
+                            this.router.push({ name: 'ShowFile', params: { id: res.id } });
                         }
-                        // if (res.success) {
-
-                        // } else {
-
-                        // }
                     }
                 ).catch((error) => {
                     console.log(error);
                 });
-
-
-                // console.log('Article data: ', outputData)
             }).catch((error) => {
                 console.log('Saving failed: ', error)
             });
         },
 
         createEditor() {
-
             editor = new EditorJS({
-
                 holder: 'editorjs',
-
                 tools: {
                     quote: {
                         class: Quote,
@@ -124,7 +104,7 @@ export default {
                     attaches: {
                         class: AttachesTool,
                         config: {
-                            endpoint: 'http://localhost:8000/api/saveFile',
+                            endpoint: this.api+'saveFile',
                             buttonText: 'Добавить файл',
                             errorMessage: 'Ошибка загрузки файла',
                         }
@@ -145,8 +125,8 @@ export default {
                         class: ImageTool,
                         config: {
                             endpoints: {
-                                byFile: 'http://localhost:8000/api/saveImage',
-                                byUrl: 'http://localhost:8000/api/saveImageByUrl',
+                                byFile: this.api+'saveImage',
+                                byUrl: this.api+'saveImageByUrl',
                             }
                         },
                     },
@@ -313,14 +293,10 @@ export default {
                         editor.blocks.insert(element.type, element.data);
                     });
                 },
-
-
             });
         },
     },
-
 }
-
 
 const aceConfig = {
     languages: {
@@ -346,31 +322,23 @@ const aceConfig = {
         minLines: 4,
         theme: "ace/theme/monokai"
     }
-
-
 }
-
-
 </script>
 
 <template>
+   
     <div>
-        parent: {{ parent }}
-        id: {{ id }}
         <CCard class="mb-4">
             <CCardHeader>Информация</CCardHeader>
             <CCardBody>
                 <CFormInput type="text" id="exampleFormControlInput1" label="Название документа"
                     placeholder="Введите название документа" v-model="pagetitle" />
-
             </CCardBody>
         </CCard>
-
         <CCard>
             <CCardHeader>Содержимое</CCardHeader>
             <CCardBody>
                 <div id="editorjs"></div>
-
             </CCardBody>
         </CCard>
         <div class="position-fixed squared">
@@ -383,7 +351,6 @@ const aceConfig = {
                         <button class="dropdown-item" @click="save">Сохранить <i class="fa fa-floppy-o"
                                 aria-hidden="true"></i></button>
                     </li>
-
                     <li>
                         <hr class="dropdown-divider" />
                     </li>

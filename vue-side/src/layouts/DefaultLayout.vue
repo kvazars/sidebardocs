@@ -6,7 +6,6 @@ import AppSidebar from '@/components/AppSidebar.vue'
 // import { data } from 'autoprefixer';
 import { useUserDataStore } from '../stores/userData';
 
-const api = 'http://localhost:8000/api/'
 // const store = useUserDataStore();
 export default {
   components: { AppFooter, AppHeader, AppSidebar },
@@ -14,6 +13,7 @@ export default {
     return {
       menu: [],
       store: useUserDataStore(),
+      api: 'http://localhost:8000/api/',
     }
   },
   mounted() {
@@ -21,8 +21,6 @@ export default {
   },
   methods: {
     async datasend(path, method = "POST", data = {}) {
-      // const api = 'http://localhost:8000/api/'
-      // const store = useUserDataStore();
       const myHeaders = new Headers();
       if (this.store.token) {
         myHeaders.append("Authorization", `Bearer ${this.store.token}`);
@@ -44,7 +42,7 @@ export default {
         requestOptions.body = JSON.stringify(object);
       }
 
-      let response = await fetch(api + path, requestOptions);
+      let response = await fetch(this.api + path, requestOptions);
       if (response.status == 403) {
         this.store.changeToken(null);
       }
@@ -88,8 +86,6 @@ export default {
             }
           });
 
-          //rrr.sort((f, s) => f.tree_id - s.tree_id);
-          //console.log(rrr);
           return rrr;
         }
 
@@ -98,9 +94,7 @@ export default {
 
 
         this.menu = menucreateparent();
-        console.log(this.menu);
         this.menu = this.transformItems(this.menu);
-        console.log(this.menu);
 
       }).catch((error) => {
         console.log(error);
@@ -125,13 +119,13 @@ export default {
 
 <template>
   <div>
-    <AppSidebar :menu v-if="menu.length > 0" />
+    <AppSidebar :menu="menu" v-if="menu.length > 0" />
 
     <div class="wrapper d-flex flex-column min-vh-100">
       <AppHeader />
       <div class="body flex-grow-1">
         <CContainer class="px-4" lg>
-          <router-view :datasend :getMenu :key="$route.fullPath" />
+          <router-view :datasend="datasend" :api="api" :getMenu="getMenu" :key="$route.fullPath" />
         </CContainer>
       </div>
       <AppFooter />
