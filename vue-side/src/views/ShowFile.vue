@@ -135,8 +135,10 @@ export default {
   mounted() {
     this.datasend('resource/' + this.id, 'GET', {})
       .then((res) => {
-        this.pagetitle = res.name
-        this.fileData = JSON.parse(res.content.data).blocks
+        this.pagetitle = res.name;
+        this.fileData = JSON.parse(res.content.data).blocks;
+        document.querySelector('.sidebar.sidebar-fixed').classList.remove('show');
+
       })
       .catch()
   },
