@@ -32,7 +32,7 @@ class ContentController extends Controller
         $name = 'contentImages/' . Str::random(40) . '.' . end($name);
         Storage::disk('public')->put($name, $contents);
 
-        return response()->json(['success' => 1, 'file' => ['url' => URL::to('/'). $name]], 200);
+        return response()->json(['success' => 1, 'file' => ['url' => URL::to('/'). "/" . $name]], 200);
     }
 
     public function getImage(Request $request)
