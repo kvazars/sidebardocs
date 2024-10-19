@@ -17,6 +17,9 @@ function save() {
   props.datasend('folder', 'POST', form).then(
     (res) => {
       props.getMenu();
+      folderTitle.value = '';
+      
+      
     }
   ).catch((error) => {
     console.log(error);
@@ -61,7 +64,7 @@ function save() {
       <CButton color="secondary" @click="() => { visibleModalFolder = false }">
         Отмена
       </CButton>
-      <CButton color="primary" @click="() => { save(); visibleModalFolder = false; }">Сохранить</CButton>
+      <CButton color="primary" @click="() => { save();  }">Сохранить</CButton>
     </CModalFooter>
   </CModal>
 </template>
