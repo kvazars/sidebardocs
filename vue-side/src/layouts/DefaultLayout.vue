@@ -1,5 +1,4 @@
 <script>
-import { CContainer } from '@coreui/vue'
 import AppFooter from '@/components/AppFooter.vue'
 import AppHeader from '@/components/AppHeader.vue'
 import AppSidebar from '@/components/AppSidebar.vue'
@@ -119,7 +118,10 @@ export default {
 
 <template>
   <div>
-    <AppSidebar :menu="menu" v-if="menu.length > 0" />
+    <template   v-if="menu.length > 0">
+      <AppSidebar :menu="menu" :datasend="datasend" :getMenu="getMenu" />
+    </template>
+    
 
     <div class="wrapper d-flex flex-column min-vh-100">
       <AppHeader />
