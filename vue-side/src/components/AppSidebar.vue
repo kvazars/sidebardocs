@@ -20,12 +20,11 @@ const sidebar = useSidebarStore();
       <CCloseButton class="d-lg-none" dark @click="sidebar.toggleVisible()" />
     </CSidebarHeader>
     <SidebarNav :menu="props.menu" />
+      <router-link class="btn btn btn-light p-0" :to="{ name: 'NewFolder', params: { 'parent': 0 } }">
+        <i class="fa fa-plus-circle fs-4" aria-hidden="true"></i>
+      </router-link>
     <CSidebarFooter class="border-top d-none d-lg-flex">
-      <div>
-        <router-link :to="{ name: 'NewFolder', params: {'parent': 0} }">
-          <i class="fa fa-plus-circle fs-4" aria-hidden="true"></i>
-        </router-link>
-      </div>
+
       <CSidebarToggler @click="sidebar.toggleUnfoldable()" />
     </CSidebarFooter>
   </CSidebar>
