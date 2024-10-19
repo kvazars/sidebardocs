@@ -189,6 +189,9 @@ body .v-sidebar-menu .vsm--link_level-1.vsm--link_active{
 body .sidebar-narrow-unfoldable .vsm--wrapper {
     overflow: hidden;
 }
+body .vsm--wrapper{
+    height:100%;
+}
 
 body .sidebar-narrow-unfoldable:hover .vsm--wrapper {
     overflow: auto;
