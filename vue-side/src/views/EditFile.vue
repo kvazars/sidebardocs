@@ -343,7 +343,7 @@ const aceConfig = {
         </CCard>
         <div class="position-fixed squared">
             <div class="dropdown">
-                <button class="btn btn-primary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <button class="btn btn-primary border-end-0 rounded-0 rounded-start" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa fa-cog"></i>
                 </button>
                 <ul class="dropdown-menu">
