@@ -137,6 +137,7 @@ export default {
       .then((res) => {
         this.pagetitle = res.name;
         this.fileData = JSON.parse(res.content.data).blocks;
+        if(document.querySelector('.sidebar.sidebar-fixed'))
         document.querySelector('.sidebar.sidebar-fixed').classList.remove('show');
 
       })
