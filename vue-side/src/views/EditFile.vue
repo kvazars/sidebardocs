@@ -20,6 +20,7 @@ ace.config.setModuleUrl("ace/mode/javascript_worker", modeJSWorker);
 ace.config.setModuleUrl("ace/mode/php_worker", modePHPWorker);
 import { computed } from "vue";
 import { routerKey, useRoute, useRouter } from "vue-router";
+import { toast } from "vue3-toastify";
 
 let editor;
 export default {
@@ -29,7 +30,7 @@ export default {
 			postId,
 		};
 	},
-	props: ["id", "parent", "datasend", "getMenu", "api"],
+	props: ["id", "parent", "datasend", "getMenu", "showToast", "api"],
 	mounted() {
 		if (this.id) {
 			this.datasend("resource/" + this.id, "GET", {})
@@ -56,8 +57,9 @@ export default {
 		deleteFile() {
 			this.datasend("resource/" + this.id, "DELETE", {})
 				.then((res) => {
-					if (res.success == true) {
+					if (res.success) {
 						this.getMenu();
+						this.showToast(res.success, res.message);
 						this.router.push({ name: "Home" });
 					}
 				})
@@ -77,9 +79,10 @@ export default {
 					}
 					this.datasend("resource", "POST", form)
 						.then((res) => {
-							if (res.success == true) {
+							if (res.success) {
 								this.getMenu();
 								console.log(res);
+								this.showToast(res.success, res.message);
 								this.router.push({
 									name: "ShowFile",
 									params: { id: res.id },

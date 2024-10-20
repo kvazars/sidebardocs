@@ -17,15 +17,16 @@ class TreeController extends Controller
     {
         if (isset($request->id)) {
             Tree::find($request->id)->update(["name" => $request->name]);
+            return response()->json(['success' => true, 'message' => 'Название папки изменено']);
         } else {
             Tree::create([
                 "name" => $request->name,
-                'tree_id' => $request->tree_id?:null,
+                'tree_id' => $request->tree_id ?: null,
                 'user_id' => 1,
                 'type' => 'folder',
             ]);
+            return response()->json(['success' => true, 'message' => 'Новая папка успешно создана']);
         }
-        return response()->json(['success' => true]);
     }
     public function delete($del)
     {
@@ -34,7 +35,7 @@ class TreeController extends Controller
             Tree::find($del)->delete();
             return response()->json(['success' => true]);
         } else {
-            return response()->json(['success' => false, 'message' => 'Нельзя удалить']);
+            return response()->json(['success' => false, 'message' => 'Данную папку нельзя удалить']);
         }
     }
 }

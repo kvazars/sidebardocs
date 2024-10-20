@@ -67,7 +67,7 @@ class ContentController extends Controller
                 'data' => $request->data,
             ]);
 
-            return response()->json(['success' => true, 'id' => $fileId->tree_id]);
+            return response()->json(['success' => true, 'message' => 'Файл успешно создан', 'id' => $fileId->tree_id]);
         } else {
             $tree = Tree::find($request->id);
             $fileId = Content::where("tree_id", $request->id)->first();
@@ -81,13 +81,16 @@ class ContentController extends Controller
                 'name' => $request->name,
                 // 'user_id' => 1,
             ]);
-            return response()->json(['success' => true, 'id' => $fileId->tree_id]);
+            return response()->json(['success' => true, 'message' => 'Данные файла обновлены', 'id' => $fileId->tree_id]);
         }
     }
     public function getResource($content)
     {
 
         $tree = Tree::find($content);
+        if (!$tree) {
+            return response()->json(['success' => false, "message" => 'Файла не существует']);
+        }
         $res = Content::where("tree_id", $content)->first();
         return response()->json(['content' => $res, "name" => $tree->name]);
     }
@@ -96,6 +99,6 @@ class ContentController extends Controller
     {
         // return Tree::find($content->id);
         Tree::find($content)->delete();
-        return response()->json(["success" => true]);
+        return response()->json(["success" => true, 'message' => 'Файл удален']);
     }
 }

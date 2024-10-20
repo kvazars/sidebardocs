@@ -4,6 +4,7 @@ import AppHeader from "@/components/AppHeader.vue";
 import AppSidebar from "@/components/AppSidebar.vue";
 // import { data } from 'autoprefixer';
 import { useUserDataStore } from "../stores/userData";
+import { toast } from "vue3-toastify";
 
 // const store = useUserDataStore();
 export default {
@@ -110,6 +111,25 @@ export default {
 			});
 			return it;
 		},
+		showToast(success, message) {
+			if (success) {
+				toast.success(message, {
+					theme: "colored",
+					transition: toast.TRANSITIONS.ZOOM,
+					position: toast.POSITION.BOTTOM_RIGHT,
+					multiple: false,
+					autoClose: 3000,
+				});
+			} else {
+				toast.error(message, {
+					theme: "colored",
+					transition: toast.TRANSITIONS.ZOOM,
+					position: toast.POSITION.BOTTOM_RIGHT,
+					multiple: false,
+					autoClose: 3000,
+				});
+			}
+		},
 	},
 };
 </script>
@@ -128,6 +148,7 @@ export default {
 						:datasend="datasend"
 						:api="api"
 						:getMenu="getMenu"
+						:showToast
 						:key="$route.fullPath"
 					/>
 				</CContainer>

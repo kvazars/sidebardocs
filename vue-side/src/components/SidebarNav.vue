@@ -115,6 +115,8 @@ import SidebarMenuItem from "vue-sidebar-menu/src/components/SidebarMenuItem.vue
 import SidebarMenuScroll from "vue-sidebar-menu/src/components/SidebarMenuScroll.vue";
 import { useRouter } from "vue-router";
 import { ref } from "vue";
+import { toast } from "vue3-toastify";
+
 const folderTitle = defineModel();
 const folderId = ref();
 const folderParent = ref();
@@ -155,7 +157,15 @@ function deleteFolder() {
 		.then((res) => {
 			if (res.success == true) {
 				props.getMenu();
-				router.push({ name: "Home" });
+				// router.push({ name: "Home" });
+			} else {
+				toast.error(res.message, {
+					theme: "colored",
+					transition: toast.TRANSITIONS.ZOOM,
+					position: toast.POSITION.BOTTOM_RIGHT,
+					multiple: false,
+					autoClose: 3000,
+				});
 			}
 		})
 		.catch((error) => console.log(error));
@@ -175,11 +185,20 @@ function save() {
 	props
 		.datasend("folder", "POST", form)
 		.then((res) => {
-			props.getMenu();
-			folderTitle.value = "";
-			folderId.value = "";
-			folderParent.value = "";
-			visibleModalFolder.value = false;
+			if (res.success) {
+				props.getMenu();
+				folderTitle.value = "";
+				folderId.value = "";
+				folderParent.value = "";
+				visibleModalFolder.value = false;
+				toast.success(res.message, {
+					theme: "colored",
+					transition: toast.TRANSITIONS.ZOOM,
+					position: toast.POSITION.BOTTOM_RIGHT,
+					multiple: false,
+					autoClose: 3000,
+				});
+			}
 		})
 		.catch((error) => {
 			console.log(error);

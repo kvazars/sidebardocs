@@ -4,6 +4,7 @@ import { RouterLink } from "vue-router";
 
 import SidebarNav from "@/components/SidebarNav.vue";
 import { useSidebarStore } from "@/stores/sidebar.js";
+import { toast } from "vue3-toastify";
 
 const props = defineProps(["menu", "datasend", "getMenu"]);
 const sidebar = useSidebarStore();
@@ -19,6 +20,14 @@ function save() {
 		.then((res) => {
 			props.getMenu();
 			folderTitle.value = "";
+			visibleModalFolder.value = false;
+			toast.success(res.message, {
+				theme: "colored",
+				transition: toast.TRANSITIONS.ZOOM,
+				position: toast.POSITION.BOTTOM_RIGHT,
+				multiple: false,
+				autoClose: 3000,
+			});
 		})
 		.catch((error) => {
 			console.log(error);
