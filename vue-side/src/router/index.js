@@ -11,20 +11,6 @@ const routes = [
     component: DefaultLayout,
     children: [
       {
-        path: '/folder/:id/edit',
-        name: 'EditFolder',
-        meta: { title: 'Редактирование папки' },
-        component: () => import('@/views/EditFolder.vue'),
-        props: true,
-      },
-      {
-        path: '/folder/new/:parent',
-        name: 'NewFolder',
-        meta: { title: 'Создание папки' },
-        component: () => import('@/views/EditFolder.vue'),
-        props: true,
-      },
-      {
         path: '/files/:id',
         name: 'ShowFile',
         meta: { title: 'Просмотр файла' },

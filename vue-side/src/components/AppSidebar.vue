@@ -40,7 +40,7 @@ function save() {
       </RouterLink>
       <CCloseButton class="d-lg-none" dark @click="sidebar.toggleVisible()" />
     </CSidebarHeader>
-    <SidebarNav :menu="props.menu" :datasend="props.datasend" />
+    <SidebarNav :menu="props.menu" :datasend="props.datasend" :getMenu="props.getMenu"/>
 
     <button class="btn btn btn-light p-0" @click="() => { visibleModalFolder = true }"><i class="fa fa-plus-circle fs-4" aria-hidden="true"></i></button>
     <CSidebarFooter class="border-top d-none d-lg-flex">

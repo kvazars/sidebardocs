@@ -5,17 +5,15 @@ export const useSidebarIdStore = defineStore('sidebarId', {
     return {
       id: null,
       folder: false,
-      param: null,
+      name: null,
     }
   },
   actions: {
-    changeId(id) {
-      this.id = id
+    changeId(id, name = '') {
+      this.id = id;
+      this.name = name;
     },
-    changeFolder(folder = true, param) {
-      this.folder = folder;
-      this.param = param;
-    },
+
   
   },
 })
