@@ -230,3 +230,20 @@ body .sidebar-narrow-unfoldable:hover .vsm--link.vsm--link_level-5  .vsm--title:
 body .sidebar-narrow-unfoldable:hover .vsm--link.vsm--link_level-6  .vsm--title::after{
     left: 50px;
 }
+
+.overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: transparent;
+	z-index: 999999;
+}
+
+.overlay::before {
+	content: "";
+	position: absolute;
+	width: 100%;
+	height: 100%;
+}

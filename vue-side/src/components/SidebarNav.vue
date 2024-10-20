@@ -7,6 +7,7 @@
 						v-for="item in menu"
 						:key="item.id"
 						:item="item"
+						@contextmenu.prevent="showContextMenu($event)"
 					>
 						<template #dropdown-icon="{ isOpen }">
 							<button
@@ -14,7 +15,6 @@
 								data-bs-toggle="dropdown"
 								aria-expanded="false"
 								type="button"
-                              
 							>
 								...
 							</button>
@@ -107,6 +107,16 @@
 			>
 		</CModalFooter>
 	</CModal>
+
+	<div class="overlay" @click="closeContextMenu" v-if="showMenu" />
+
+	<ContextMenu
+		v-if="showMenu"
+		:actions="contextMenuActions"
+		@action-clicked="handleActionClick"
+		:x="menuX"
+		:y="menuY"
+	/>
 </template>
 
 <script setup>
@@ -121,6 +131,30 @@ const folderTitle = defineModel();
 const folderId = ref();
 const folderParent = ref();
 
+import ContextMenu from "@/components/ContextMenu.vue";
+
+const showMenu = ref(false);
+const menuX = ref(0);
+const menuY = ref(0);
+const contextMenuActions = ref([
+	{ label: "Edit", action: "edit" },
+	{ label: "Delete", action: "delete" },
+]);
+
+const showContextMenu = (event) => {
+	showMenu.value = true;
+	menuX.value = event.clientX;
+	menuY.value = event.clientY;
+};
+
+const closeContextMenu = () => {
+	showMenu.value = false;
+};
+
+function handleActionClick(action) {
+	console.log(action);
+}
+
 const props = defineProps([
 	"menu",
 	"collapsed",
@@ -132,6 +166,8 @@ const store = useSidebarIdStore();
 
 const emits = defineEmits({
 	"item-click"(event, item) {
+		console.log(item);
+
 		const store = useSidebarIdStore();
 		store.changeId(item.id, item.name);
 		return !!(event && item);
