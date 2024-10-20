@@ -32,7 +32,7 @@ const routes = [
 				props: true,
 			},
 			{
-				path: "/:catchAll(.*)",
+				path: "/:catchAll(.*)*",
 				name: "NotFound",
 				meta: { title: "Ресурс не найден" },
 				component: () => import("@/views/pages/Page404"),

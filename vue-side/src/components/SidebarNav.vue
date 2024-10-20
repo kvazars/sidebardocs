@@ -14,6 +14,7 @@
 								data-bs-toggle="dropdown"
 								aria-expanded="false"
 								type="button"
+                              
 							>
 								...
 							</button>
@@ -115,13 +116,18 @@ import SidebarMenuItem from "vue-sidebar-menu/src/components/SidebarMenuItem.vue
 import SidebarMenuScroll from "vue-sidebar-menu/src/components/SidebarMenuScroll.vue";
 import { useRouter } from "vue-router";
 import { ref } from "vue";
-import { toast } from "vue3-toastify";
 
 const folderTitle = defineModel();
 const folderId = ref();
 const folderParent = ref();
 
-const props = defineProps(["menu", "collapsed", "datasend", "getMenu"]);
+const props = defineProps([
+	"menu",
+	"collapsed",
+	"datasend",
+	"getMenu",
+	"showToast",
+]);
 const store = useSidebarIdStore();
 
 const emits = defineEmits({
@@ -155,18 +161,8 @@ function deleteFolder() {
 	props
 		.datasend("folder/" + store.id, "DELETE", {})
 		.then((res) => {
-			if (res.success == true) {
-				props.getMenu();
-				// router.push({ name: "Home" });
-			} else {
-				toast.error(res.message, {
-					theme: "colored",
-					transition: toast.TRANSITIONS.ZOOM,
-					position: toast.POSITION.BOTTOM_RIGHT,
-					multiple: false,
-					autoClose: 3000,
-				});
-			}
+			props.showToast(res.success, res.message);
+			props.getMenu();
 		})
 		.catch((error) => console.log(error));
 }
@@ -191,13 +187,7 @@ function save() {
 				folderId.value = "";
 				folderParent.value = "";
 				visibleModalFolder.value = false;
-				toast.success(res.message, {
-					theme: "colored",
-					transition: toast.TRANSITIONS.ZOOM,
-					position: toast.POSITION.BOTTOM_RIGHT,
-					multiple: false,
-					autoClose: 3000,
-				});
+				props.showToast(res.success, res.message);
 			}
 		})
 		.catch((error) => {

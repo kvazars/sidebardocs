@@ -4,9 +4,8 @@ import { RouterLink } from "vue-router";
 
 import SidebarNav from "@/components/SidebarNav.vue";
 import { useSidebarStore } from "@/stores/sidebar.js";
-import { toast } from "vue3-toastify";
 
-const props = defineProps(["menu", "datasend", "getMenu"]);
+const props = defineProps(["menu", "datasend", "getMenu", "showToast"]);
 const sidebar = useSidebarStore();
 const folderTitle = defineModel();
 const visibleModalFolder = ref(false);
@@ -21,13 +20,7 @@ function save() {
 			props.getMenu();
 			folderTitle.value = "";
 			visibleModalFolder.value = false;
-			toast.success(res.message, {
-				theme: "colored",
-				transition: toast.TRANSITIONS.ZOOM,
-				position: toast.POSITION.BOTTOM_RIGHT,
-				multiple: false,
-				autoClose: 3000,
-			});
+			props.showToast(res.success, res.message);
 		})
 		.catch((error) => {
 			console.log(error);
@@ -64,6 +57,7 @@ function save() {
 			:menu="props.menu"
 			:datasend="props.datasend"
 			:getMenu="props.getMenu"
+      :showToast="props.showToast"
 		/>
 
 		<button

@@ -137,7 +137,7 @@ export default {
 <template>
 	<div>
 		<template v-if="menu.length > 0">
-			<AppSidebar :menu="menu" :datasend="datasend" :getMenu="getMenu" />
+			<AppSidebar :showToast="showToast" :menu="menu" :datasend="datasend" :getMenu="getMenu" />
 		</template>
 
 		<div class="wrapper d-flex flex-column min-vh-100">
@@ -148,7 +148,7 @@ export default {
 						:datasend="datasend"
 						:api="api"
 						:getMenu="getMenu"
-						:showToast
+						:showToast="showToast"
 						:key="$route.fullPath"
 					/>
 				</CContainer>

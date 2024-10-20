@@ -19,8 +19,7 @@ ace.config.setModuleUrl("ace/mode/html_worker", modeHTMLWorker);
 ace.config.setModuleUrl("ace/mode/javascript_worker", modeJSWorker);
 ace.config.setModuleUrl("ace/mode/php_worker", modePHPWorker);
 import { computed } from "vue";
-import { routerKey, useRoute, useRouter } from "vue-router";
-import { toast } from "vue3-toastify";
+import { useRouter } from "vue-router";
 
 let editor;
 export default {
@@ -79,14 +78,15 @@ export default {
 					}
 					this.datasend("resource", "POST", form)
 						.then((res) => {
+							this.showToast(res.success, res.message);
 							if (res.success) {
 								this.getMenu();
-								console.log(res);
-								this.showToast(res.success, res.message);
-								this.router.push({
-									name: "ShowFile",
-									params: { id: res.id },
-								});
+								setTimeout(() => {
+									this.router.push({
+										name: "ShowFile",
+										params: { id: res.id },
+									});
+								}, 2000);
 							}
 						})
 						.catch((error) => {

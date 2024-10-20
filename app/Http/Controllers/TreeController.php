@@ -33,9 +33,9 @@ class TreeController extends Controller
         $tree = Tree::where('tree_id', $del)->first();
         if (!$tree) {
             Tree::find($del)->delete();
-            return response()->json(['success' => true]);
+            return response()->json(['success' => true, 'message'=>'Папка успешно удалена']);
         } else {
             return response()->json(['success' => false, 'message' => 'Данную папку нельзя удалить']);
         }
-    }
+    }   
 }
