@@ -11,13 +11,12 @@
 						<template #dropdown-icon="{ isOpen }">
 							<button
 								class="btn"
-								data-bs-toggle="dropdown"
-								aria-expanded="false"
-								type="button"
+							
+								type="button" @click="showContextMenu($event)"
 							>
 								...
 							</button>
-							<ul class="dropdown-menu">
+							<!-- <ul class="dropdown-menu">
 								<li>
 									<button
 										class="dropdown-item"
@@ -50,7 +49,7 @@
 										Удалить папку
 									</button>
 								</li>
-							</ul>
+							</ul> -->
 							<slot name="dropdown-icon" v-bind="{ isOpen }">
 								<span class="vsm--arrow_default" />
 							</slot>
@@ -106,8 +105,14 @@
 				>
 			</CModalFooter>
 		</CModal>
-
-	
+		<ContextMenu
+        v-if="showMenu"
+        :actions="contextMenuActions"
+        @action-clicked="handleActionClick"
+        :x="menuX"
+        :y="menuY"
+    />
+	<div class="overlay" @click="closeContextMenu" v-if="showMenu" />
 	
 	</div>
 </template>
@@ -120,12 +125,34 @@ import SidebarMenuScroll from "vue-sidebar-menu/src/components/SidebarMenuScroll
 import "vue-sidebar-menu/dist/vue-sidebar-menu.css";
 import { useRouter } from "vue-router";
 import { ref } from "vue";
+import ContextMenu from '@/components/ContextMenu.vue';
 
 const folderTitle = defineModel();
 const folderId = ref();
 const folderParent = ref();
 
+const showMenu = ref(false);
+const menuX = ref(0);
+const menuY = ref(0);
+const contextMenuActions = ref([
+  { label: 'Edit', action: 'edit' },
+  { label: 'Delete', action: 'delete' },
+]);
 
+const showContextMenu = (event) => {
+  event.preventDefault();
+  showMenu.value = true;
+  menuX.value = event.clientX;
+  menuY.value = event.clientY;
+};
+
+const closeContextMenu = () => {
+  showMenu.value = false;
+};
+
+function handleActionClick(action){
+  console.log(action);
+}
 const props = defineProps([
 	"menu",
 	"collapsed",
