@@ -7,7 +7,6 @@
 						v-for="item in menu"
 						:key="item.id"
 						:item="item"
-						@contextmenu.prevent="showContextMenu($event)"
 					>
 						<template #dropdown-icon="{ isOpen }">
 							<button
@@ -60,63 +59,57 @@
 				</ul>
 			</div>
 		</SidebarMenuScroll>
-	</div>
-	<CModal
-		:visible="visibleModalFolder"
-		@close="
-			() => {
-				visibleModalFolder = false;
-			}
-		"
-		aria-labelledby="FolderLabel"
-	>
-		<CModalHeader>
-			<CModalTitle id="FolderLabel">Новая папка</CModalTitle>
-		</CModalHeader>
-		<CModalBody>
-			<div class="w-100 d-flex flex-column gap-4">
-				<div class="w-100 d-flex flex-column gap-2">
-					<CFormInput
-						v-model="folderTitle"
-						name="folderName"
-						type="text"
-						placeholder="Новое имя папки"
-					/>
+
+		<CModal
+			:visible="visibleModalFolder"
+			@close="
+				() => {
+					visibleModalFolder = false;
+				}
+			"
+			aria-labelledby="FolderLabel"
+		>
+			<CModalHeader>
+				<CModalTitle id="FolderLabel">Новая папка</CModalTitle>
+			</CModalHeader>
+			<CModalBody>
+				<div class="w-100 d-flex flex-column gap-4">
+					<div class="w-100 d-flex flex-column gap-2">
+						<CFormInput
+							v-model="folderTitle"
+							name="folderName"
+							type="text"
+							placeholder="Новое имя папки"
+						/>
+					</div>
 				</div>
-			</div>
-		</CModalBody>
-		<CModalFooter>
-			<CButton
-				color="secondary"
-				@click="
-					() => {
-						visibleModalFolder = false;
-					}
-				"
-			>
-				Отмена
-			</CButton>
-			<CButton
-				color="primary"
-				@click="
-					() => {
-						save();
-					}
-				"
-				>Сохранить</CButton
-			>
-		</CModalFooter>
-	</CModal>
+			</CModalBody>
+			<CModalFooter>
+				<CButton
+					color="secondary"
+					@click="
+						() => {
+							visibleModalFolder = false;
+						}
+					"
+				>
+					Отмена
+				</CButton>
+				<CButton
+					color="primary"
+					@click="
+						() => {
+							save();
+						}
+					"
+					>Сохранить</CButton
+				>
+			</CModalFooter>
+		</CModal>
 
-	<div class="overlay" @click="closeContextMenu" v-if="showMenu" />
-
-	<ContextMenu
-		v-if="showMenu"
-		:actions="contextMenuActions"
-		@action-clicked="handleActionClick"
-		:x="menuX"
-		:y="menuY"
-	/>
+	
+	
+	</div>
 </template>
 
 <script setup>
@@ -124,6 +117,7 @@ import { useSidebarIdStore } from "../stores/sidebarId";
 import { initSidebar } from "vue-sidebar-menu/src/use/useSidebar";
 import SidebarMenuItem from "vue-sidebar-menu/src/components/SidebarMenuItem.vue";
 import SidebarMenuScroll from "vue-sidebar-menu/src/components/SidebarMenuScroll.vue";
+import "vue-sidebar-menu/dist/vue-sidebar-menu.css";
 import { useRouter } from "vue-router";
 import { ref } from "vue";
 
@@ -131,29 +125,6 @@ const folderTitle = defineModel();
 const folderId = ref();
 const folderParent = ref();
 
-import ContextMenu from "@/components/ContextMenu.vue";
-
-const showMenu = ref(false);
-const menuX = ref(0);
-const menuY = ref(0);
-const contextMenuActions = ref([
-	{ label: "Edit", action: "edit" },
-	{ label: "Delete", action: "delete" },
-]);
-
-const showContextMenu = (event) => {
-	showMenu.value = true;
-	menuX.value = event.clientX;
-	menuY.value = event.clientY;
-};
-
-const closeContextMenu = () => {
-	showMenu.value = false;
-};
-
-function handleActionClick(action) {
-	console.log(action);
-}
 
 const props = defineProps([
 	"menu",
