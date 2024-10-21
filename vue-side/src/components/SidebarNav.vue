@@ -15,41 +15,7 @@
 								type="button" @click="showContextMenu($event)"
 							>
 								...
-							</button>
-							<!-- <ul class="dropdown-menu">
-								<li>
-									<button
-										class="dropdown-item"
-										@click="editFolder()"
-									>
-										Редактировать
-									</button>
-								</li>
-								<li>
-									<button
-										class="dropdown-item"
-										@click="newFolder()"
-									>
-										Создать папку
-									</button>
-								</li>
-								<li>
-									<button
-										class="dropdown-item"
-										@click="newFile()"
-									>
-										Создать ресурс
-									</button>
-								</li>
-								<li>
-									<button
-										class="dropdown-item"
-										@click="deleteFolder()"
-									>
-										Удалить папку
-									</button>
-								</li>
-							</ul> -->
+							</button>							
 							<slot name="dropdown-icon" v-bind="{ isOpen }">
 								<span class="vsm--arrow_default" />
 							</slot>
