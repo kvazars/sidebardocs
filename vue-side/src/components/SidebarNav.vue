@@ -1,7 +1,7 @@
 <template>
 	<div class="vsm--wrapper">
 		<SidebarMenuScroll>
-			<div class="v-sidebar-menu position-relative">
+			<div class="v-sidebar-menu">
 				<ul class="vsm--menu">
 					<SidebarMenuItem
 						v-for="item in menu"
