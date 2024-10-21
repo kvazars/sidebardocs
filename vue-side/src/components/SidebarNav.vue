@@ -135,8 +135,10 @@ const showMenu = ref(false);
 const menuX = ref(0);
 const menuY = ref(0);
 const contextMenuActions = ref([
-  { label: 'Edit', action: 'edit' },
-  { label: 'Delete', action: 'delete' },
+  { label: 'Редактировать', action: 'editFolder' },
+  { label: 'Создать папку', action: 'newFolder' },
+  { label: 'Создать ресурс', action: 'newFile' },
+  { label: 'Удалить папку', action: 'deleteFolder' },
 ]);
 
 const showContextMenu = (event) => {
@@ -151,7 +153,20 @@ const closeContextMenu = () => {
 };
 
 function handleActionClick(action){
-  console.log(action);
+	closeContextMenu();
+	if(action=='editFolder'){
+		editFolder();
+	} 
+	else if(action == 'newFolder'){
+		newFolder();
+	}
+	else if(action == 'newFile'){
+		newFile();
+	}
+	else if(action == 'deleteFolder'){
+		deleteFolder();
+	}
+
 }
 const props = defineProps([
 	"menu",
@@ -164,8 +179,6 @@ const store = useSidebarIdStore();
 
 const emits = defineEmits({
 	"item-click"(event, item) {
-		console.log(item);
-
 		const store = useSidebarIdStore();
 		store.changeId(item.id, item.name);
 		return !!(event && item);
