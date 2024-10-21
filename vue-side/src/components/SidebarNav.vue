@@ -7,6 +7,7 @@
 						v-for="item in menu"
 						:key="item.id"
 						:item="item"
+						@contextmenu.prevent="showContextMenu($event)"
 					>
 						<template #dropdown-icon="{ isOpen }">
 							<button
