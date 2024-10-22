@@ -9,7 +9,7 @@ export default {
 	props: ["menu", "datasend", "getMenu", "showToast", "catchError"],
 	data() {
 		return {
-			folderTitle: null,
+			folderTitle: '',
 			contextMenuActionsFolder: ([
 				{ label: 'Редактировать', action: 'editFolder' },
 				{ label: 'Создать папку', action: 'newFolder' },
@@ -60,7 +60,7 @@ export default {
 						this.visibleModalFolder = false;
 						this.showToast(res.success, res.message);
 					} else if (res.errors) {
-						this.catchError(res.message);
+						this.catchError(res.errors);
 					}
 				})
 				.catch((error) => {

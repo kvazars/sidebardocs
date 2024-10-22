@@ -14,6 +14,7 @@ export default {
 			menu: [],
 			store: useUserDataStore(),
 			api: "http://localhost:8000/api/",
+			server: 'http://localhost:8000',
 		};
 	},
 	mounted() {
@@ -49,7 +50,13 @@ export default {
 			return await response.json();
 		},
 		catchError(error) {
-			this.showToast(false, error)
+			// console.log(error, Object.keys.length);
+			for (let index = 0; index < Object.keys(error).length ; index++) {
+			Object.values(error)[index].forEach(element => {
+				this.showToast(false, element)
+			});	
+			}
+			
 		},
 		getMenu() {
 			this.datasend("folder", "GET", {})
@@ -128,7 +135,7 @@ export default {
 					theme: "colored",
 					transition: toast.TRANSITIONS.ZOOM,
 					position: toast.POSITION.BOTTOM_RIGHT,
-					multiple: false,
+					// multiple: false,
 					autoClose: 3000,
 				});
 			}
@@ -140,15 +147,16 @@ export default {
 <template>
 	<div class=" vh-100">
 		<template v-if="menu.length > 0">
-			<AppSidebar :catchError="catchError" :showToast="showToast" :menu="menu" :datasend="datasend" :getMenu="getMenu" />
+			<AppSidebar :catchError="catchError" :showToast="showToast" :menu="menu" :datasend="datasend"
+				:getMenu="getMenu" />
 		</template>
 
 		<div class="wrapper d-flex flex-column">
 			<AppHeader />
 			<div class="body flex-grow-1">
 				<CContainer class="px-4">
-					<router-view :catchError="catchError" :datasend="datasend" :api="api" :getMenu="getMenu" :showToast="showToast"
-						:key="$route.fullPath" />
+					<router-view :server="server" :catchError="catchError" :datasend="datasend" :api="api"
+						:getMenu="getMenu" :showToast="showToast" :key="$route.fullPath" />
 				</CContainer>
 			</div>
 			<AppFooter />

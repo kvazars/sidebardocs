@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ResourceSaveRequest;
 use App\Models\Content;
 use App\Models\Tree;
 use Illuminate\Http\Request;
@@ -35,25 +36,40 @@ class ContentController extends Controller
         return response()->json(['success' => 1, 'file' => ['url' => URL::to('/') . "/" . $name]], 200);
     }
 
+
     public function getImage(Request $request)
     {
-        if ($request->image and file_exists($request->image)) {
-            $img = explode('/contentImages', $request->image);
 
-            $data = file_get_contents(public_path() . '/contentImages' . end($img));
+        if ($request->image and  file_exists(public_path() . '/' . $request->image)) {
+            // $img = explode('/contentImages', $request->image);
+
+            $data = file_get_contents(public_path() . $request->image);
 
             $type = explode('.', $request->image);
             $base64 = 'data:image/' . end(array: $type) . ';base64,' . base64_encode($data);
             return response()->json(data: ['success' => true, 'image' =>  $base64]);
         } else {
-            return response()->json(data: ['success' => false, 'image' =>  URL::to('/') . "/contentImages/notfound.webp"]);
+            return response()->json(data: ['success' => false, 'image' =>  URL::to('/') . "/notfound.webp"]);
+        }
+    }
+    public function getFile(Request $request)
+    {
+        // return response()->json(data: ['success' => true, 'url' => URL::to('/') .$request->file]);
+
+        if ($request->file and file_exists(public_path() . '/' . $request->file)) {
+            // $img = explode('/contentImages', $request->image);
+            // return 1;
+            // $data = file_get_contents(public_path() . $request->file);
+
+            return response()->json(data: ['success' => true, 'url' => URL::to('/') .$request->file]);
+        } else {
+            return response()->json(data: ['success' => false]);
         }
     }
 
-    public function saveResource(Request $request)
+    public function saveResource(ResourceSaveRequest $request)
     {
         $fileId = null;
-        //    return $request->all();
         if (isset($request->tree_id)) {
             // return 1;
             $tree = Tree::create([

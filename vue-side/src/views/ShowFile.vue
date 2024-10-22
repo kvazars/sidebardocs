@@ -17,10 +17,9 @@
 
           <p v-html="val.data.caption" class="text-center fst-italic"></p>
         </div>
+
         <div v-if="val.type == 'attaches'" class="my-4">
-          <i class="fa fa-file"></i>
-          <a :href="val.data.file.url" download>
-            {{ val.data.title }}</a>
+          <DataFile :datasend="datasend" :src="val.data.file.url" :title="val.data.title" />
         </div>
 
         <div class="headerBlock text-center my-4" v-if="val.type == 'header'">
@@ -57,7 +56,8 @@
           </li>
         </ol>
         <div class="text-center my-4" v-if="val.type == 'embed'">
-          <iframe :src="val.data.embed" :width="val.data.width" :height="val.data.height"></iframe>
+          <iframe :src="val.data.embed" width="100%" height="500px"></iframe>
+          <p v-html="val.data.caption" class="text-center fst-italic"></p>
         </div>
         <div v-if="val.type == 'quote'" class="my-4">
           <figure class="card card-body" :class="{
@@ -77,6 +77,13 @@
           <i class="fa fa-cog"></i>
         </button>
         <ul class="dropdown-menu">
+          <li>
+            <router-link class="dropdown-item" :to="{ name: 'EditFile', params: { id: id } }">Редактировать
+              <i class="fa fa-pencil-square-o" aria-hidden="true"></i></router-link>
+          </li>
+          <li>
+            <hr class="dropdown-divider" />
+          </li>
           <li>
             <button class="dropdown-item" @click="html2doc">
               Экспорт
@@ -101,9 +108,10 @@
 import jsPDF from "jspdf";
 import { ExportToWord, ExportToPdf } from "vue-doc-exporter";
 import DataImage from "@/components/DataImage.vue";
+import DataFile from "@/components/DataFile.vue";
 
 export default {
-  components: { ExportToWord, ExportToPdf, DataImage },
+  components: { ExportToWord, ExportToPdf, DataImage, DataFile },
   methods: {
     html2doc() {
       let els = document.querySelector("#file").innerHTML;
@@ -151,7 +159,7 @@ export default {
           }, 2000);
         } else {
           this.pagetitle = res.name;
-          this.fileData = JSON.parse(res.content.data).blocks;
+          this.fileData = JSON.parse(res.content.data);
           if (document.querySelector(".sidebar.sidebar-fixed")) {
             document
               .querySelector(".sidebar.sidebar-fixed")
