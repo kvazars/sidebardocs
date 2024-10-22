@@ -363,7 +363,7 @@ const aceConfig = {
 		</CCard>
 		<CCard>
 			<CCardHeader>Содержимое</CCardHeader>
-			<CCardBody>
+			<CCardBody class="p-1">
 				<div id="editorjs"></div>
 			</CCardBody>
 		</CCard>

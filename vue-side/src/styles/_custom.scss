@@ -344,3 +344,7 @@ body .v-sidebar-menu .vsm--item {
 .wrapper .body {
 	overflow: auto;
 }
+
+body .ce-block--selected .ce-block__content{
+	background: none;
+}
