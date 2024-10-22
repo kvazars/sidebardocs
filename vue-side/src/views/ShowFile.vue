@@ -78,13 +78,6 @@
         </button>
         <ul class="dropdown-menu">
           <li>
-            <router-link class="dropdown-item" :to="{ name: 'EditFile', params: { id: id } }">Редактировать
-              <i class="fa fa-pencil-square-o" aria-hidden="true"></i></router-link>
-          </li>
-          <li>
-            <hr class="dropdown-divider" />
-          </li>
-          <li>
             <button class="dropdown-item" @click="html2doc">
               Экспорт
               <i class="fa fa-file-word-o" aria-hidden="true"></i>

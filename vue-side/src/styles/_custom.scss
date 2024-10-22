@@ -104,8 +104,8 @@ body .v-sidebar-menu .vsm--link_level-1.vsm--link_active {
 	box-shadow: none;
 	-webkit-box-shadow: none;
 }
-
-.vsm--link_level-1 .vsm--title::after {
+/*
+.v-sidebar-menu .vsm--link .vsm--link_level-1 .vsm--title::after {
 	content: "";
 	height: 55px;
 	position: absolute;
@@ -114,7 +114,7 @@ body .v-sidebar-menu .vsm--link_level-1.vsm--link_active {
 	left: 0;
 	background: #1ad2bb;
 }
-.vsm--link_level-2 .vsm--title::after {
+.v-sidebar-menu .vsm--link .vsm--link_level-2 .vsm--title::after {
 	content: "";
 	height: 55px;
 	position: absolute;
@@ -123,7 +123,7 @@ body .v-sidebar-menu .vsm--link_level-1.vsm--link_active {
 	left: 10px;
 	background: #1d1ad2;
 }
-.vsm--link_level-3 .vsm--title::after {
+.v-sidebar-menu .vsm--link .vsm--link_level-3 .vsm--title::after {
 	content: "";
 	height: 55px;
 	position: absolute;
@@ -132,12 +132,12 @@ body .v-sidebar-menu .vsm--link_level-1.vsm--link_active {
 	left: 20px;
 	background: #d2951a;
 }
-
+*/
 .vsm--link .vsm--title:has(> span:empty) {
 	display: none;
 }
-
-.vsm--link_level-4 .vsm--title::after {
+/*
+.v-sidebar-menu .vsm--link .vsm--link_level-4 .vsm--title::after {
 	content: "";
 	height: 55px;
 	position: absolute;
@@ -146,7 +146,7 @@ body .v-sidebar-menu .vsm--link_level-1.vsm--link_active {
 	left: 30px;
 	background: #d21a30;
 }
-.vsm--link_level-5 .vsm--title::after {
+.v-sidebar-menu .vsm--link .vsm--link_level-5 .vsm--title::after {
 	content: "";
 	height: 55px;
 	position: absolute;
@@ -155,7 +155,7 @@ body .v-sidebar-menu .vsm--link_level-1.vsm--link_active {
 	left: 40px;
 	background: #d2d21a;
 }
-.vsm--link_level-6 .vsm--title::after {
+.v-sidebar-menu .vsm--link .vsm--link_level-6 .vsm--title::after {
 	content: "";
 	height: 55px;
 	position: absolute;
@@ -163,7 +163,7 @@ body .v-sidebar-menu .vsm--link_level-1.vsm--link_active {
 	display: flex;
 	left: 50px;
 	background: #1ad29e;
-}
+}*/
 
 .vsm--menu i.fa.fa-folder,
 body .sidebar .v-sidebar-menu .vsm--link_active .vsm--icon.fa-folder {
@@ -304,4 +304,43 @@ body .sidebar .v-sidebar-menu {
 body .v-sidebar-menu .vsm--menu,
 body .v-sidebar-menu .vsm--item {
 	position: relative;
+}
+
+.context-menu {
+	position: absolute;
+	border: 1px solid #ccc;
+	box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+	min-width: 150px;
+	z-index: 9999999;
+	border-radius: 5px;
+}
+
+[data-coreui-theme="dark"] .context-menu {
+	background-color: #212631;
+}
+
+[data-coreui-theme="light"] .context-menu {
+	background-color: #fff;
+}
+
+.context-menu div {
+	padding: 10px;
+	cursor: pointer;
+}
+
+[data-coreui-theme="light"] .context-menu div:hover {
+	background-color: #f0f0f0;
+}
+[data-coreui-theme="dark"] .context-menu div:hover {
+	background-color: #323a49;
+}
+
+.wrapper {
+	overflow: hidden;
+	height: 100vh;
+	max-height: 100vh;
+}
+
+.wrapper .body {
+	overflow: auto;
 }

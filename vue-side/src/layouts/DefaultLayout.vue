@@ -48,6 +48,9 @@ export default {
 			}
 			return await response.json();
 		},
+		catchError(error) {
+			this.showToast(false, error)
+		},
 		getMenu() {
 			this.datasend("folder", "GET", {})
 				.then((res) => {
@@ -135,22 +138,17 @@ export default {
 </script>
 
 <template>
-	<div>
+	<div class=" vh-100">
 		<template v-if="menu.length > 0">
-			<AppSidebar :showToast="showToast" :menu="menu" :datasend="datasend" :getMenu="getMenu" />
+			<AppSidebar :catchError="catchError" :showToast="showToast" :menu="menu" :datasend="datasend" :getMenu="getMenu" />
 		</template>
 
-		<div class="wrapper d-flex flex-column min-vh-100">
+		<div class="wrapper d-flex flex-column">
 			<AppHeader />
 			<div class="body flex-grow-1">
-				<CContainer class="px-4" lg>
-					<router-view
-						:datasend="datasend"
-						:api="api"
-						:getMenu="getMenu"
-						:showToast="showToast"
-						:key="$route.fullPath"
-					/>
+				<CContainer class="px-4">
+					<router-view :catchError="catchError" :datasend="datasend" :api="api" :getMenu="getMenu" :showToast="showToast"
+						:key="$route.fullPath" />
 				</CContainer>
 			</div>
 			<AppFooter />

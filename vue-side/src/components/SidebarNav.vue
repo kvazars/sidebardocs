@@ -3,7 +3,8 @@
 		<SidebarMenuScroll>
 			<div class="v-sidebar-menu">
 				<ul class="vsm--menu">
-					<SidebarMenuItem :showContextMenu="showContextMenu" v-for="item in menu" :key="item.id" :item="item">
+					<SidebarMenuItem :showContextMenu="showContextMenu" v-for="item in menu" :key="item.id"
+						:item="item">
 						<template #dropdown-icon="{ isOpen }">
 							<slot name="dropdown-icon" v-bind="{ isOpen }">
 								<span class="vsm--arrow_default" />
@@ -13,9 +14,6 @@
 				</ul>
 			</div>
 		</SidebarMenuScroll>
-
-		
-
 	</div>
 
 </template>

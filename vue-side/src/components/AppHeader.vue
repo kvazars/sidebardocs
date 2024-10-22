@@ -5,7 +5,7 @@ import { useColorModes } from "@coreui/vue";
 import AppBreadcrumb from "@/components/AppBreadcrumb.vue";
 import { useSidebarStore } from "@/stores/sidebar.js";
 
-const headerClassNames = ref("mb-4 p-0");
+const headerClassNames = ref("p-0");
 const { colorMode, setColorMode } = useColorModes(
 	"coreui-free-vue-admin-template-theme"
 );
@@ -14,71 +14,40 @@ const sidebar = useSidebarStore();
 onMounted(() => {
 	document.addEventListener("scroll", () => {
 		if (document.documentElement.scrollTop > 0) {
-			headerClassNames.value = "mb-4 p-0 shadow-sm";
+			headerClassNames.value = "p-0 shadow-sm";
 		} else {
-			headerClassNames.value = "mb-4 p-0";
+			headerClassNames.value = "p-0";
 		}
 	});
 });
+
+const modeTheme = ref(localStorage.getItem('coreui-free-vue-admin-template-theme'));
+// modeTheme.value = 
+console.log(modeTheme.value);
+
 </script>
 
 <template>
 	<CHeader position="sticky" :class="headerClassNames">
 		<CContainer class="border-bottom px-4" fluid>
-			<CHeaderToggler
-				@click="sidebar.toggleVisible()"
-				style="margin-inline-start: -14px"
-			>
+			<CHeaderToggler @click="sidebar.toggleVisible()" style="margin-inline-start: -14px">
 				<i class="fa fa-bars" aria-hidden="true"></i>
 			</CHeaderToggler>
 			<CHeaderNav>
 				<li class="nav-item py-1">
 					<div class="vr h-100 mx-2 text-body text-opacity-75"></div>
 				</li>
-				<CDropdown variant="nav-item" placement="bottom-end">
-					<CDropdownToggle :caret="false">
-						<i
-							class="fa"
-							v-if="colorMode == 'dark'"
-							:class="{ 'fa-moon-o': colorMode == 'dark' }"
-						></i>
-						<i
-							class="fa"
-							v-else-if="colorMode == 'light'"
-							:class="{ 'fa-sun-o': colorMode == 'light' }"
-						></i>
-						<i class="fa" v-else :class="'fa-cogs'"></i>
-					</CDropdownToggle>
-					<CDropdownMenu>
-						<CDropdownItem
-							:active="colorMode === 'light'"
-							class="d-flex align-items-center"
-							component="button"
-							type="button"
-							@click="setColorMode('light')"
-						>
-							<i class="fa fa-sun-o me-2"></i> Светлая тема
-						</CDropdownItem>
-						<CDropdownItem
-							:active="colorMode === 'dark'"
-							class="d-flex align-items-center"
-							component="button"
-							type="button"
-							@click="setColorMode('dark')"
-						>
-							<i class="fa fa-moon-o me-2"></i> Темная тема
-						</CDropdownItem>
-						<CDropdownItem
-							:active="colorMode === 'auto'"
-							class="d-flex align-items-center"
-							component="button"
-							type="button"
-							@click="setColorMode('auto')"
-						>
-							<i class="fa fa-cogs me-2"></i> Системная тема
-						</CDropdownItem>
-					</CDropdownMenu>
-				</CDropdown>
+				<div style="padding: 0.2rem;" class="d-flex align-items-center justify-content-center">
+
+					<div v-if="modeTheme == 'light'" :active="colorMode === 'light'" class="d-flex align-items-center"
+						component="button" type="button" @click="setColorMode('dark'); modeTheme = 'dark'">
+						<i class="fa fa-sun-o "></i>
+					</div>
+					<div v-if="modeTheme == 'dark'" :active="colorMode === 'dark'" class="d-flex align-items-center"
+						component="button" type="button" @click="setColorMode('light'); modeTheme = 'light'">
+						<i class="fa fa-moon-o "></i>
+					</div>
+				</div>
 				<li class="nav-item py-1">
 					<div class="vr h-100 mx-2 text-body text-opacity-75"></div>
 				</li>

@@ -1,4 +1,11 @@
 <?php return array (
+  'kerigard/laravel-lang-ru' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Kerigard\\LaravelLangRu\\LangRuServiceProvider',
+    ),
+  ),
   'laravel/sail' => 
   array (
     'providers' => 

@@ -6,12 +6,13 @@
     {{ item.header }}
   </li>
   <li v-else-if="!isHidden" :class="itemClass" @mouseover="onMouseOver" @mouseout="onMouseOut" v-on="isCollapsed && isFirstLevel
-      ? { mouseenter: onMouseEnter, mouseleave: onMouseLeave }
-      : {}
+    ? { mouseenter: onMouseEnter, mouseleave: onMouseLeave }
+    : {}
     ">
 
     <component :is="linkComponentName ? linkComponentName : SidebarMenuLink" :item="item" :id="item.id"
-      :class="linkClass" v-bind="linkAttrs" @click="onLinkClick" @contextmenu.prevent="showContextMenu($event, item)">
+      :class="linkClass" v-bind="linkAttrs" @click="onLinkClick"
+      @contextmenu.prevent="showContextMenu($event, item)">
       <template v-if="isCollapsed && isFirstLevel">
         <transition name="slide-animation">
           <div v-if="hover" class="vsm--mobile-bg" :style="mobileItemBackgroundStyle" />
@@ -19,9 +20,9 @@
       </template>
       <sidebar-menu-icon v-if="item.icon" :icon="item.icon" />
       <div :class="[
-    'vsm--title',
-    isCollapsed && isFirstLevel && !isMobileItem && 'vsm--title_hidden',
-  ]" :style="isMobileItem && mobileItemStyle">
+        'vsm--title',
+        isCollapsed && isFirstLevel && !isMobileItem && 'vsm--title_hidden',
+      ]" :style="isMobileItem && mobileItemStyle">
         <span>{{ item.title }}</span>
         <sidebar-menu-badge v-if="item.badge" :badge="item.badge" />
         <div v-if="hasChild" :class="['vsm--arrow', { 'vsm--arrow_open': show }]">
@@ -35,17 +36,16 @@
         <div v-if="show" :class="['vsm--child', isMobileItem && 'vsm--child_mobile']"
           :style="isMobileItem && mobileItemDropdownStyle" v-bind="childAttrs">
           <ul class="vsm--dropdown">
-            <sidebar-menu-item v-for="subItem in item.child" :key="subItem.id" :item="subItem" :level="level + 1"
-              :active-show="subActiveShow" @update-active-show="updateActiveShow">
+            <SidebarMenuItem v-for="subItem in item.child" :key="subItem.id" :item="subItem" :level="level + 1"
+              :active-show="subActiveShow" :showContextMenu="showContextMenu" @update-active-show="updateActiveShow">
+              <!--  @contextmenu.prevent="showContextMenu($event, subItem)" -->
               <template #dropdown-icon="{ isOpen }">
                 <slot name="dropdown-icon" v-bind="{ isOpen }" />
               </template>
-            </sidebar-menu-item>
+            </SidebarMenuItem>
           </ul>
         </div>
       </transition>
-
-
     </template>
   </li>
 

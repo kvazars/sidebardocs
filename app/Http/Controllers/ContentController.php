@@ -32,20 +32,21 @@ class ContentController extends Controller
         $name = 'contentImages/' . Str::random(40) . '.' . end($name);
         Storage::disk('public')->put($name, $contents);
 
-        return response()->json(['success' => 1, 'file' => ['url' => URL::to('/'). "/" . $name]], 200);
+        return response()->json(['success' => 1, 'file' => ['url' => URL::to('/') . "/" . $name]], 200);
     }
 
     public function getImage(Request $request)
     {
-        if ($request->image) {
+        if ($request->image and file_exists($request->image)) {
             $img = explode('/contentImages', $request->image);
 
             $data = file_get_contents(public_path() . '/contentImages' . end($img));
 
             $type = explode('.', $request->image);
-            $base64 = 'data:image/' . end($type) . ';base64,' . base64_encode($data);
+            $base64 = 'data:image/' . end(array: $type) . ';base64,' . base64_encode($data);
             return response()->json(data: ['success' => true, 'image' =>  $base64]);
-
+        } else {
+            return response()->json(data: ['success' => false, 'image' =>  URL::to('/') . "/contentImages/notfound.webp"]);
         }
     }
 
