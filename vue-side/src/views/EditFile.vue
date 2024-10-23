@@ -29,7 +29,16 @@ export default {
 			postId,
 		};
 	},
-	props: ["id", "parent", "datasend", 'server', "getMenu", 'catchError', "showToast", "api"],
+	props: [
+		"id",
+		"parent",
+		"datasend",
+		"server",
+		"getMenu",
+		"catchError",
+		"showToast",
+		"api",
+	],
 	mounted() {
 		if (this.id) {
 			this.datasend("resource/" + this.id, "GET", {})
@@ -48,7 +57,7 @@ export default {
 	data() {
 		return {
 			dataBlock: [],
-			pagetitle: '',
+			pagetitle: "",
 			router: useRouter(),
 			// server: ''
 		};
@@ -70,18 +79,22 @@ export default {
 				.save()
 				.then((outputData) => {
 					let form = new FormData();
-					outputData.blocks.forEach(el => {
-						if (el.type == 'image' || el.type == 'attaches') {
-							el.data.file.url = el.data.file.url.split(this.server)[1];
+					outputData.blocks.forEach((el) => {
+						if (el.type == "image" || el.type == "attaches") {
+							el.data.file.url = el.data.file.url.split(
+								this.server
+							)[1];
 						}
-						if (el.type == 'attaches') {
-							el.data.title = el.data.title ? el.data.title : 'Скачать файл';
+						if (el.type == "attaches") {
+							el.data.title = el.data.title
+								? el.data.title
+								: "Скачать файл";
 						}
-					})
+					});
 					console.log(outputData.blocks);
 
 					form.append("data", JSON.stringify(outputData.blocks));
-					form.append("name", this.pagetitle ?? '');
+					form.append("name", this.pagetitle ?? "");
 					if (this.parent) {
 						form.append("tree_id", this.parent);
 					} else {
@@ -89,21 +102,21 @@ export default {
 					}
 					this.datasend("resource", "POST", form)
 						.then((res) => {
-
 							if (res.success) {
 								this.getMenu();
-								this.showToast(res.success, res.message);
-								setTimeout(() => {
-									this.router.push({
+								// this.showToast(res.success, res.message);
+								this.router.push({
 										name: "ShowFile",
 										params: { id: res.id },
 									});
-								}, 2000);
+								// setTimeout(() => {
+								// 	this.router.push({
+								// 		name: "ShowFile",
+								// 		params: { id: res.id },
+								// 	});
+								// }, 2000);
 							} else if (res.errors) {
-								this.catchError(res.errors)
-								// console.log();
-
-								// this.showToast(res.errors);
+								this.catchError(res.errors);
 							}
 						})
 						.catch((error) => {
@@ -312,9 +325,13 @@ export default {
 
 				onReady: () => {
 					this.dataBlock.forEach((element) => {
-						if (element.type == 'image' || element.type == 'attaches') {
+						if (
+							element.type == "image" ||
+							element.type == "attaches"
+						) {
 							// console.log(element);
-							element.data.file.url = this.server + element.data.file.url;
+							element.data.file.url =
+								this.server + element.data.file.url;
 							// console.log(element.data.file.url);
 						}
 						editor.blocks.insert(element.type, element.data);
@@ -357,8 +374,13 @@ const aceConfig = {
 		<CCard class="mb-4">
 			<CCardHeader>Информация</CCardHeader>
 			<CCardBody>
-				<CFormInput type="text" id="exampleFormControlInput1" label="Название документа"
-					placeholder="Введите название документа" v-model="pagetitle" />
+				<CFormInput
+					type="text"
+					id="exampleFormControlInput1"
+					label="Название документа"
+					placeholder="Введите название документа"
+					v-model="pagetitle"
+				/>
 			</CCardBody>
 		</CCard>
 		<CCard>
@@ -369,8 +391,12 @@ const aceConfig = {
 		</CCard>
 		<div class="position-fixed squared">
 			<div class="dropdown">
-				<button class="btn btn-primary border-end-0 rounded-0 rounded-start" type="button"
-					data-bs-toggle="dropdown" aria-expanded="false">
+				<button
+					class="btn btn-primary border-end-0 rounded-0 rounded-start"
+					type="button"
+					data-bs-toggle="dropdown"
+					aria-expanded="false"
+				>
 					<i class="fa fa-cog"></i>
 				</button>
 				<ul class="dropdown-menu">

@@ -1,26 +1,24 @@
 <script>
-
 import SidebarNav from "@/components/SidebarNav.vue";
 import { useSidebarStore } from "@/stores/sidebar.js";
-import ContextMenu from '@/components/ContextMenu.vue';
+import ContextMenu from "@/components/ContextMenu.vue";
 
 export default {
 	components: { SidebarNav, ContextMenu },
 	props: ["menu", "datasend", "getMenu", "showToast", "catchError"],
 	data() {
 		return {
-			folderTitle: '',
-			contextMenuActionsFolder: ([
-				{ label: 'Редактировать', action: 'editFolder' },
-				{ label: 'Создать папку', action: 'newFolder' },
-				{ label: 'Создать ресурс', action: 'newFile' },
-				{ label: 'Удалить папку', action: 'deleteFolder' },
-			]),
-			contextMenuActionsFile: ([
-				{ label: 'Редактировать', action: 'editFile' },
-				// <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-				{ label: 'Удалить', action: 'deleteFile' },
-			]),
+			folderTitle: "",
+			contextMenuActionsFolder: [
+				{ label: "Редактировать", action: "editFolder" },
+				{ label: "Создать папку", action: "newFolder" },
+				{ label: "Создать ресурс", action: "newFile" },
+				{ label: "Удалить папку", action: "deleteFolder" },
+			],
+			contextMenuActionsFile: [
+				{ label: "Редактировать", action: "editFile" },
+				{ label: "Удалить", action: "deleteFile" },
+			],
 			visibleModalFolder: false,
 			sidebar: useSidebarStore(),
 
@@ -33,7 +31,7 @@ export default {
 			folderParent: null,
 			menuX: null,
 			menuY: null,
-		}
+		};
 	},
 	methods: {
 		closeContextMenu() {
@@ -48,10 +46,8 @@ export default {
 			} else {
 				form.append("id", this.folderId);
 			}
-			this
-				.datasend("folder", "POST", form)
+			this.datasend("folder", "POST", form)
 				.then((res) => {
-					console.log(res);
 					if (res.success) {
 						this.getMenu();
 						this.folderTitle = "";
@@ -65,7 +61,6 @@ export default {
 				})
 				.catch((error) => {
 					console.log(error);
-
 				});
 		},
 		newFolder(id) {
@@ -101,24 +96,21 @@ export default {
 		},
 		handleActionClick(action) {
 			this.closeContextMenu();
-			// console.log(action, this.treeId, this.treeName);
 
-			if (action == 'editFolder') {
+			if (action == "editFolder") {
 				this.editFolder(this.treeId, this.treeName);
-			}
-			else if (action == 'newFolder') {
+			} else if (action == "newFolder") {
 				this.newFolder(this.treeId);
-			}
-			else if (action == 'newFile') {
+			} else if (action == "newFile") {
 				this.newFile(this.treeId);
-			}
-			else if (action == 'deleteFolder') {
+			} else if (action == "deleteFolder") {
 				this.deleteFolder(this.treeId);
-			}
-			else if (action == 'editFile') {
-				this.$router.push({ name: "EditFile", params: { id: this.treeId } });
-			}
-			else if (action == 'deleteFile') {
+			} else if (action == "editFile") {
+				this.$router.push({
+					name: "EditFile",
+					params: { id: this.treeId },
+				});
+			} else if (action == "deleteFile") {
 				this.datasend("resource/" + this.treeId, "DELETE", {})
 					.then((res) => {
 						if (res.success) {
@@ -129,29 +121,41 @@ export default {
 					})
 					.catch((error) => console.log(error));
 			}
-
 		},
 		addFirstLevel() {
 			this.visibleModalFolder = true;
-			this.folderTitle = '';
+			this.folderTitle = "";
 			this.folderId = null;
-			this.folderParent = 'new';
-		}
+			this.folderParent = "new";
+		},
 	},
-
-}
-
+};
 </script>
 
 <template>
-	<CSidebar class="border-end" colorScheme="light" position="fixed" :unfoldable="sidebar.unfoldable"
-		:visible="sidebar.visible" @visible-change="(value) => sidebar.toggleVisible(value)">
+	<CSidebar
+		class="border-end"
+		colorScheme="light"
+		position="fixed"
+		:unfoldable="sidebar.unfoldable"
+		:visible="sidebar.visible"
+		@visible-change="(value) => sidebar.toggleVisible(value)"
+	>
 		<CSidebarHeader class="border-bottom">
 			<RouterLink custom to="/" v-slot="{ href, navigate }">
-				<CSidebarBrand v-bind="$attrs" as="a" :href="href" @click="navigate">
+				<CSidebarBrand
+					v-bind="$attrs"
+					as="a"
+					:href="href"
+					@click="navigate"
+				>
 				</CSidebarBrand>
 			</RouterLink>
-			<CCloseButton class="d-lg-none" dark @click="sidebar.toggleVisible()" />
+			<CCloseButton
+				class="d-lg-none"
+				dark
+				@click="sidebar.toggleVisible()"
+			/>
 		</CSidebarHeader>
 		<SidebarNav :showContextMenu="showContextMenu" :menu="menu" />
 
@@ -161,37 +165,64 @@ export default {
 		<CSidebarFooter class="border-top d-none d-lg-flex">
 			<CSidebarToggler @click="sidebar.toggleUnfoldable()" />
 		</CSidebarFooter>
-	</CSidebar>
-
-	<CModal :visible="visibleModalFolder" @close="() => {
-		visibleModalFolder = false;
-	}
-		" aria-labelledby="FolderLabel">
-		<CModalHeader>
-			<CModalTitle id="FolderLabel">Новая папка</CModalTitle>
-		</CModalHeader>
-		<CModalBody>
-			<div class="w-100 d-flex flex-column gap-4">
-				<div class="w-100 d-flex flex-column gap-2">
-					<CFormInput v-model="folderTitle" name="folderName" type="text" placeholder="Новое имя папки" />
+		<CModal
+			:visible="visibleModalFolder"
+			@close="
+				() => {
+					visibleModalFolder = false;
+				}
+			"
+			aria-labelledby="FolderLabel"
+		>
+			<CModalHeader>
+				<CModalTitle id="FolderLabel">Новая папка</CModalTitle>
+			</CModalHeader>
+			<CModalBody>
+				<div class="w-100 d-flex flex-column gap-4">
+					<div class="w-100 d-flex flex-column gap-2">
+						<CFormInput
+							v-model="folderTitle"
+							name="folderName"
+							type="text"
+							placeholder="Новое имя папки"
+						/>
+					</div>
 				</div>
-			</div>
-		</CModalBody>
-		<CModalFooter>
-			<CButton color="secondary" @click="() => {
-				visibleModalFolder = false;
-			}
-				">
-				Отмена
-			</CButton>
-			<CButton color="primary" @click="() => {
-				save();
-			}
-				">Сохранить</CButton>
-		</CModalFooter>
-	</CModal>
-	<ContextMenu v-if="showMenu" :actions="treeType == 'folder' ? contextMenuActionsFolder : contextMenuActionsFile"
-		@action-clicked="handleActionClick" :x="menuX" :y="menuY" />
+			</CModalBody>
+			<CModalFooter>
+				<CButton
+					color="secondary"
+					@click="
+						() => {
+							visibleModalFolder = false;
+						}
+					"
+				>
+					Отмена
+				</CButton>
+				<CButton
+					color="primary"
+					@click="
+						() => {
+							save();
+						}
+					"
+					>Сохранить</CButton
+				>
+			</CModalFooter>
+		</CModal>
+		<ContextMenu
+			v-if="showMenu"
+			:actions="
+				treeType == 'folder'
+					? contextMenuActionsFolder
+					: contextMenuActionsFile
+			"
+			@action-clicked="handleActionClick"
+			:x="menuX"
+			:y="menuY"
+		/>
 
-	<div class="overlay" @click="closeContextMenu" v-if="showMenu" />
+		<div class="overlay" @click="closeContextMenu" v-if="showMenu" />
+	</CSidebar>
 </template>

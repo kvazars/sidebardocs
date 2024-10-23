@@ -1,7 +1,19 @@
 // Here you can add other styles
-.ce-block__content,
-.ce-toolbar__content {
-	max-width: calc(100% - 120px) !important;
+// .ce-block__content,
+// .ce-toolbar__content {
+// 	max-width: calc(100% - 120px) !important;
+// }
+
+body .ce-block__content{
+	width: 100%;
+	max-width: inherit;
+	margin: 0;
+}
+body .ce-toolbar, body .ce-toolbar__actions {
+	right: inherit;
+}
+.codex-editor__redactor{
+	padding-left: 60px;
 }
 
 // .cdx-block {
