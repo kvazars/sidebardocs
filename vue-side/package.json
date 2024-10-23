@@ -34,6 +34,7 @@
     "@editorjs/quote": "^2.7.2",
     "@editorjs/table": "^2.4.2",
     "@popperjs/core": "^2.11.8",
+    "@rmp135/vue-splitter": "^2.0.2",
     "@wdns/vue-code-block": "^2.3.3",
     "ace-builds": "^1.36.2",
     "ace-code-editorjs": "^1.0.3",
