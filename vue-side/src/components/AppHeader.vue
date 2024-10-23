@@ -23,7 +23,7 @@ onMounted(() => {
 
 const modeTheme = ref(localStorage.getItem('coreui-free-vue-admin-template-theme'));
 // modeTheme.value = 
-console.log(modeTheme.value);
+// console.log(modeTheme.value);
 
 </script>
 

@@ -11,6 +11,7 @@ body .ce-block__content{
 }
 body .ce-toolbar, body .ce-toolbar__actions {
 	right: inherit;
+	left: 0;
 }
 .codex-editor__redactor{
 	padding-left: 60px;
@@ -361,11 +362,29 @@ body .ce-block--selected .ce-block__content{
 	background: none;
 }
 
+//style for splitter
+@media (min-width: 992px) {
+   body .sidebar.sidebar-fixed {
+         position: inherit;
+	}
+	.sidebar.hide:not(.sidebar-end){
+		margin-left:0;
+	}
+}
+	body .sidebar{
+		width: 100%;
+	}
 
-// @media (min-width: 992px) {
-//    body .sidebar.sidebar-fixed {
-//          position: relative;
-// 	}}
-// 	body .sidebar{
-// 		width: 100%;
-// 	}
+	.splitter-pane.left-pane:has(> .sidebar.hide){
+		display: none;
+	}
+
+	.vue-splitter:has( .sidebar.hide){
+		display: block;
+		
+	}
+.vue-splitter:has( .sidebar.sidebar-narrow-unfoldable) {
+	grid-template: none / 6% auto 1fr !important;
+}
+	// , .splitter-pane.left-pane:has( .sidebar.sidebar-narrow-unfoldable)
+//end style for splitter	
