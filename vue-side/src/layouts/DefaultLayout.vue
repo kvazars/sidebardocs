@@ -64,7 +64,7 @@ export default {
 			this.datasend(localStorage.getItem('token') ? "userFolder" : 'folder', "GET", {})
 				.then((res) => {
 					let menus = res;
-					console.log(menus);
+					// console.log(menus);
 					
 
 					// let r = JSON.parse(a);
