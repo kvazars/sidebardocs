@@ -14,16 +14,18 @@ class TreeController extends Controller
     {
         $c = Content::where('accessibility', true)->pluck('tree_id')->toArray();
         if (count($c) > 0) {
-            $uName = User::find(Tree::find($c[0])->user_id)->name;
-            $user = ['id' =>100500, 'name' => $uName, 'type' => 'folder', 'tree_id' => null];
-
             $all = array_merge($c, $this->uploadTree($c));
-            // return $all;
             $tree = Tree::whereIn('id', $all)->get();
-            // $tree = array_push($tree, $user);
-            // $tree = $tree->toBase()->merge([$user]);
-            return $tree->toArray();
-            $tree = array_merge($user, $tree->toArray());
+            $users = User::whereIn('id', $tree->pluck("user_id")->toArray())->get()->keyBy("id");
+            $userArray = [];
+            foreach ($users as $user) {
+                $userArray[] = ['id' => "user_" . $user->id, 'name' => $user->name, 'type' => 'folder', 'tree_id' => null];
+            }
+            $new_collection = collect($tree)->map(function ($arr) use ($users) {
+                $arr['tree_id'] = $arr['tree_id'] ?: "user_" . $users[$arr->user_id]['id'];
+                return $arr;
+            });
+            $tree = array_merge($userArray, $new_collection->toArray());
             return $tree;
         } else {
             return [];
@@ -38,7 +40,7 @@ class TreeController extends Controller
                 array_push($this->fatherChild, $trs->tree_id);
                 $this->uploadTree([$trs->tree_id]);
             } else {
-                array_push(  $this->fatherChild, 0);
+                array_push($this->fatherChild, 0);
             }
         }
         return $this->fatherChild;

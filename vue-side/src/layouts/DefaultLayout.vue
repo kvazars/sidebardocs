@@ -64,30 +64,26 @@ export default {
 			this.datasend(localStorage.getItem('token') ? "userFolder" : 'folder', "GET", {})
 				.then((res) => {
 					let menus = res;
+					console.log(menus);
+					
 
 					// let r = JSON.parse(a);
 					function menucreateparent() {
 						let rrr = [];
 						menus.forEach((e) => {
-							console.log(e);
+							//console.log(e);
 							// let uNames = [];
 							// if (typeof $) {
 								
 							// }
 							if (e.tree_id == null) {
-								// e.title = e.name;
-								// e.icon = "fa fa-folder";
-								
-								// e.child = menucreate(e.id);
-								// rrr.push(e);
-								e.tree_id = 100500;
-							} else if (e.id == 100500) {
 								e.title = e.name;
 								e.icon = "fa fa-folder";
-								e.tree_id = null;
-
+								
 								e.child = menucreate(e.id);
 								rrr.push(e);
+								e.tree_id = 0;
+							
 							}
 						});
 						return rrr;
