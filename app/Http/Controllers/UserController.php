@@ -15,6 +15,13 @@ class UserController extends Controller
 {
     public function reg(RegistrationRequest $request)
     {
+
+        if ($request->role == 'user') {
+            $request->validate([
+                'group_id' => 'required|exists:groups,id',
+            ]);
+        }
+
         $user = User::create([
             'name' => $request->name,
             'login' => $request->login,
@@ -23,28 +30,21 @@ class UserController extends Controller
         ]);
 
         if ($user->role == 'user') {
-            if (isset($request->group_id)) {
-                $request->validate([
-                    'group_id' => 'required|exists:user_groups,group_id',
-                ]);
-                UserGroups::create([
-                    'group_id' => $request->group_id,
-                    'user_id' => $user->id,
-                ]);
-            } else {
-
-            }
+            UserGroups::create([
+                'group_id' => $request->group_id,
+                'user_id' => $user->id,
+            ]);
         }
 
         return response()->json(['success' => true, 'message' => 'Новый пользователь был создан']);
     }
 
-    public function login(AuthRequest $request)
+    public function auth(AuthRequest $request)
     {
         $user = User::where('login', $request->login)->first();
         if ($user and Hash::check($request->password, $user->password)) {
             $token = $user->createToken('api');
-            return response()->json(['success' => true, 'token' => $token]);
+            return response()->json(['success' => true, 'token' => $token->plainTextToken]);
         } else {
             return response()->json(['success' => false, 'message' => 'Ошибка авторизации']);
         }

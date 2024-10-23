@@ -11,6 +11,8 @@ const { colorMode, setColorMode } = useColorModes(
 );
 const sidebar = useSidebarStore();
 
+const props = defineProps(['openWindowFunction']);
+
 onMounted(() => {
 	document.addEventListener("scroll", () => {
 		if (document.documentElement.scrollTop > 0) {
@@ -61,7 +63,7 @@ const modeTheme = ref(localStorage.getItem('coreui-free-vue-admin-template-theme
 						</CDropdownItem>
 
 						<CDropdownDivider />
-						<CDropdownItem>
+						<CDropdownItem @click="openWindowFunction">
 							<i class="fa fa-lock"></i> Вход
 						</CDropdownItem>
 						<CDropdownItem>

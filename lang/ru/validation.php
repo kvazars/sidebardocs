@@ -200,6 +200,8 @@ return [
         'code' => 'Код',
         'content' => 'Контент',
         'country' => 'Страна',
+        'group_id' => 'Группа',
+        'login' => 'Логин',
         'current_password' => 'Текущий пароль',
         'date' => 'Дата',
         'day' => 'День',

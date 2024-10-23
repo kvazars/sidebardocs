@@ -362,3 +362,25 @@ body .v-sidebar-menu .vsm--item {
 body .ce-block--selected .ce-block__content {
 	background: none;
 }
+
+.backgroundWindow {
+	z-index: 9998;
+	background-color: white;
+	filter: blur(40px);
+}
+
+.loginWindow {
+	position: absolute;
+	z-index: 9998;
+	width: 30%;
+	height: 45%;
+	background-color: #323a49;
+	border-radius: 20px;
+	color: white;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	padding: 7px;
+	// border: 2px black solid;
+}

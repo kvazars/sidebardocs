@@ -2,30 +2,32 @@
 import AppFooter from "@/components/AppFooter.vue";
 import AppHeader from "@/components/AppHeader.vue";
 import AppSidebar from "@/components/AppSidebar.vue";
+import AuthWindow from '@/components/AuthWindow.vue';
 // import { data } from 'autoprefixer';
-import { useUserDataStore } from "../stores/userData";
+// import { useUserDataStore } from "../stores/userData";
 import { toast } from "vue3-toastify";
-import { computed } from "vue";
 // const store = useUserDataStore();
 export default {
-	components: { AppFooter, AppHeader, AppSidebar },
+	components: { AppFooter, AppHeader, AppSidebar, AuthWindow },
 	data() {
 		return {
 			menu: [],
-			store: useUserDataStore(),
 			api: "http://localhost:8000/api/",
 			server: "http://localhost:8000",
-
+			openWindow: false,
 		};
 	},
 	mounted() {
 		this.getMenu();
 	},
 	methods: {
+		openWindowFunction() {
+			this.openWindow = !this.openWindow;
+		},
 		async datasend(path, method = "POST", data = {}) {
 			const myHeaders = new Headers();
-			if (this.store.token) {
-				myHeaders.append("Authorization", `Bearer ${this.store.token}`);
+			if (localStorage.getItem('token')) {
+				myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
 			}
 			myHeaders.append("Accept", "application/json");
 			const requestOptions = {
@@ -46,7 +48,7 @@ export default {
 
 			let response = await fetch(this.api + path, requestOptions);
 			if (response.status == 403) {
-				this.store.changeToken(null);
+				localStorage.removeItem('token')
 			}
 			return await response.json();
 		},
@@ -59,7 +61,7 @@ export default {
 			}
 		},
 		getMenu() {
-			this.datasend("folder", "GET", {})
+			this.datasend(localStorage.getItem('token') ? "userFolder" : 'folder', "GET", {})
 				.then((res) => {
 					let menus = res;
 
@@ -67,9 +69,22 @@ export default {
 					function menucreateparent() {
 						let rrr = [];
 						menus.forEach((e) => {
+							console.log(e);
+							// let uNames = [];
+							// if (typeof $) {
+								
+							// }
 							if (e.tree_id == null) {
+								// e.title = e.name;
+								// e.icon = "fa fa-folder";
+								
+								// e.child = menucreate(e.id);
+								// rrr.push(e);
+								e.tree_id = 100500;
+							} else if (e.id == 100500) {
 								e.title = e.name;
 								e.icon = "fa fa-folder";
+								e.tree_id = null;
 
 								e.child = menucreate(e.id);
 								rrr.push(e);
@@ -89,8 +104,7 @@ export default {
 								e.icon =
 									e.type == "folder"
 										? "fa fa-folder"
-										: "fa fa-file";
-
+										: "fa fa-file"; 
 								e.child = menucreate(e.id);
 								rrr.push(e);
 							}
@@ -145,11 +159,11 @@ export default {
 </script>
 
 <template>
-	<div class="vh-100">
+	<div class="vh-100 position-relative">
 		<AppSidebar v-if="menu.length > 0" :catchError="catchError" :showToast="showToast" :menu="menu"
 			:datasend="datasend" :getMenu="getMenu" />
 		<div class="wrapper d-flex flex-column">
-			<AppHeader />
+			<AppHeader :openWindowFunction />
 			<div class="body flex-grow-1">
 				<CContainer class="px-4">
 					<router-view :server="server" :catchError="catchError" :datasend="datasend" :api="api"
@@ -158,5 +172,6 @@ export default {
 			</div>
 			<AppFooter />
 		</div>
+		<AuthWindow :openWindow :openWindowFunction :api :datasend :catchError :getMenu />
 	</div>
 </template>
