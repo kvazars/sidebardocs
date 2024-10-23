@@ -5,16 +5,17 @@ import AppSidebar from "@/components/AppSidebar.vue";
 // import { data } from 'autoprefixer';
 import { useUserDataStore } from "../stores/userData";
 import { toast } from "vue3-toastify";
-import VueSplitter from "@rmp135/vue-splitter";
+import { computed } from "vue";
 // const store = useUserDataStore();
 export default {
-	components: { AppFooter, AppHeader, AppSidebar, VueSplitter },
+	components: { AppFooter, AppHeader, AppSidebar },
 	data() {
 		return {
 			menu: [],
 			store: useUserDataStore(),
 			api: "http://localhost:8000/api/",
 			server: "http://localhost:8000",
+
 		};
 	},
 	mounted() {
@@ -145,36 +146,17 @@ export default {
 
 <template>
 	<div class="vh-100">
-		<vue-splitter initial-percent="20">
-			<template #left-pane>
-				<AppSidebar
-				v-if="menu.length > 0" 
-					:catchError="catchError"
-					:showToast="showToast"
-					:menu="menu"
-					:datasend="datasend"
-					:getMenu="getMenu"
-				/>
-			</template>
-			<template #right-pane>
-				<div class="wrapper d-flex flex-column">
-					<AppHeader />
-					<div class="body flex-grow-1">
-						<CContainer class="px-4">
-							<router-view
-								:server="server"
-								:catchError="catchError"
-								:datasend="datasend"
-								:api="api"
-								:getMenu="getMenu"
-								:showToast="showToast"
-								:key="$route.fullPath"
-							/>
-						</CContainer>
-					</div>
-					<AppFooter />
-				</div>
-			</template>
-		</vue-splitter>
+		<AppSidebar v-if="menu.length > 0" :catchError="catchError" :showToast="showToast" :menu="menu"
+			:datasend="datasend" :getMenu="getMenu" />
+		<div class="wrapper d-flex flex-column">
+			<AppHeader />
+			<div class="body flex-grow-1">
+				<CContainer class="px-4">
+					<router-view :server="server" :catchError="catchError" :datasend="datasend" :api="api"
+						:getMenu="getMenu" :showToast="showToast" :key="$route.fullPath" />
+				</CContainer>
+			</div>
+			<AppFooter />
+		</div>
 	</div>
 </template>

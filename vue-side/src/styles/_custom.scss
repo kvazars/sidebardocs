@@ -4,16 +4,17 @@
 // 	max-width: calc(100% - 120px) !important;
 // }
 
-body .ce-block__content{
+body .ce-block__content {
 	width: 100%;
 	max-width: inherit;
 	margin: 0;
 }
-body .ce-toolbar, body .ce-toolbar__actions {
+body .ce-toolbar,
+body .ce-toolbar__actions {
 	right: inherit;
 	left: 0;
 }
-.codex-editor__redactor{
+.codex-editor__redactor {
 	padding-left: 60px;
 }
 
@@ -358,33 +359,6 @@ body .v-sidebar-menu .vsm--item {
 	overflow: auto;
 }
 
-body .ce-block--selected .ce-block__content{
+body .ce-block--selected .ce-block__content {
 	background: none;
 }
-
-//style for splitter
-@media (min-width: 992px) {
-   body .sidebar.sidebar-fixed {
-         position: inherit;
-	}
-	.sidebar.hide:not(.sidebar-end){
-		margin-left:0;
-	}
-}
-	body .sidebar{
-		width: 100%;
-	}
-
-	.splitter-pane.left-pane:has(> .sidebar.hide){
-		display: none;
-	}
-
-	.vue-splitter:has( .sidebar.hide){
-		display: block;
-		
-	}
-.vue-splitter:has( .sidebar.sidebar-narrow-unfoldable) {
-	grid-template: none / 6% auto 1fr !important;
-}
-	// , .splitter-pane.left-pane:has( .sidebar.sidebar-narrow-unfoldable)
-//end style for splitter	

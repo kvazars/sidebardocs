@@ -34,7 +34,6 @@
     "@editorjs/quote": "^2.7.2",
     "@editorjs/table": "^2.4.2",
     "@popperjs/core": "^2.11.8",
-    "@rmp135/vue-splitter": "^2.0.2",
     "@wdns/vue-code-block": "^2.3.3",
     "ace-builds": "^1.36.2",
     "ace-code-editorjs": "^1.0.3",
@@ -46,7 +45,7 @@
     "jspdf": "^2.5.2",
     "pinia": "^2.2.2",
     "vue": "^3.5.8",
-    "vue-doc-exporter": "^1.3.2",
+    "vue-doc-exporter": "^1.2.9",
     "vue-router": "^4.4.5",
     "vue3-toastify": "^0.2.3"
   },
