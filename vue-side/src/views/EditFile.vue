@@ -106,9 +106,9 @@ export default {
 								this.getMenu();
 								// this.showToast(res.success, res.message);
 								this.router.push({
-										name: "ShowFile",
-										params: { id: res.id },
-									});
+									name: "ShowFile",
+									params: { id: res.id },
+								});
 								// setTimeout(() => {
 								// 	this.router.push({
 								// 		name: "ShowFile",
@@ -143,6 +143,11 @@ export default {
 					attaches: {
 						class: AttachesTool,
 						config: {
+							additionalRequestHeaders: {
+								Authorization: `Bearer ${localStorage.getItem(
+									"token"
+								)}`,
+							},
 							endpoint: this.api + "saveFile",
 							buttonText: "Добавить файл",
 							errorMessage: "Ошибка загрузки файла",
@@ -163,6 +168,11 @@ export default {
 					image: {
 						class: ImageTool,
 						config: {
+							additionalRequestHeaders: {
+								Authorization: `Bearer ${localStorage.getItem(
+									"token"
+								)}`,
+							},
 							endpoints: {
 								byFile: this.api + "saveImage",
 								byUrl: this.api + "saveImageByUrl",

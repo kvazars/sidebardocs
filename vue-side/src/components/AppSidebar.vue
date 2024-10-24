@@ -2,6 +2,8 @@
 import SidebarNav from "@/components/SidebarNav.vue";
 import { useSidebarStore } from "@/stores/sidebar.js";
 import ContextMenu from "@/components/ContextMenu.vue";
+import { useAuthIdStore } from "../stores/authId";
+
 
 export default {
 	components: { SidebarNav, ContextMenu },
@@ -9,6 +11,7 @@ export default {
 	data() {
 		return {
 			folderTitle: "",
+			auths: useAuthIdStore(),
 			contextMenuActionsFolder: [
 				{ label: "Редактировать", action: "editFolder" },
 				{ label: "Создать папку", action: "newFolder" },
@@ -145,7 +148,7 @@ export default {
 		</CSidebarHeader>
 		<SidebarNav :showContextMenu="showContextMenu" :menu="menu" />
 
-		<button class="btn btn btn-light p-0" @click="addFirstLevel">
+		<button class="btn btn btn-light p-0" @click="addFirstLevel" v-if="auths.role=='ceo'||auths.role=='admin'">
 			<i class="fa fa-plus-circle fs-4" aria-hidden="true"></i>
 		</button>
 		<CSidebarFooter class="border-top d-none d-lg-flex">
@@ -178,7 +181,8 @@ export default {
 					">Сохранить</CButton>
 			</CModalFooter>
 		</CModal>
-		<ContextMenu v-if="showMenu" :actions="treeType == 'folder'
+		<ContextMenu v-if="showMenu && auths.id" :actions="treeType == 'folder'
+		
 			? contextMenuActionsFolder
 			: contextMenuActionsFile
 			" @action-clicked="handleActionClick" :x="menuX" :y="menuY" />

@@ -14,4 +14,7 @@ class Content extends Model
         'accessibility',
         'data',
     ];
+    public function tree(){
+        return $this->belongsTo(Tree::class);
+    }
 }

@@ -3,7 +3,7 @@
 		<div id="file" class="print-container p-4">
 			<h1 class="text-center" v-html="pagetitle"></h1>
 			<hr />
- 
+
 			<div v-for="val in fileData" :key="val">
 				<p
 					v-if="val.type == 'paragraph'"
@@ -141,9 +141,10 @@
 					<i class="fa fa-cog"></i>
 				</button>
 				<ul class="dropdown-menu">
-					<li>
+					<li v-if="content">
 						<router-link
 							class="dropdown-item"
+							v-if="auths.id == content.tree.user_id"
 							:to="{ name: 'EditFile', params: { id: id } }"
 							>Редактировать
 							<i
@@ -152,9 +153,12 @@
 							></i
 						></router-link>
 					</li>
-					<li>
-						<hr class="dropdown-divider" />
-					</li>
+					<template v-if="content">
+						<li v-if="auths.id == content.tree.user_id">
+							<hr class="dropdown-divider" />
+						</li>
+					</template>
+
 					<li>
 						<button class="dropdown-item" @click="html2doc">
 							Экспорт
@@ -185,6 +189,7 @@ import jsPDF from "jspdf";
 import { ExportToWord, ExportToPdf } from "vue-doc-exporter";
 import DataImage from "@/components/DataImage.vue";
 import DataFile from "@/components/DataFile.vue";
+import { useAuthIdStore } from "../stores/authId";
 
 export default {
 	components: { ExportToWord, ExportToPdf, DataImage, DataFile },
@@ -235,6 +240,7 @@ export default {
 				} else {
 					this.pagetitle = res.name;
 					this.fileData = JSON.parse(res.content.data);
+					this.content = res.content;
 					if (document.querySelector(".sidebar.sidebar-fixed")) {
 						document
 							.querySelector(".sidebar.sidebar-fixed")
@@ -248,7 +254,9 @@ export default {
 	data() {
 		return {
 			pagetitle: null,
+			auths: useAuthIdStore(),
 			fileData: [],
+			content: null,
 		};
 	},
 };

@@ -2,10 +2,11 @@
 import AppFooter from "@/components/AppFooter.vue";
 import AppHeader from "@/components/AppHeader.vue";
 import AppSidebar from "@/components/AppSidebar.vue";
-import AuthWindow from '@/components/AuthWindow.vue';
+import AuthWindow from "@/components/AuthWindow.vue";
 // import { data } from 'autoprefixer';
 // import { useUserDataStore } from "../stores/userData";
 import { toast } from "vue3-toastify";
+import { useAuthIdStore } from "../stores/authId";
 // const store = useUserDataStore();
 export default {
 	components: { AppFooter, AppHeader, AppSidebar, AuthWindow },
@@ -15,6 +16,7 @@ export default {
 			api: "http://localhost:8000/api/",
 			server: "http://localhost:8000",
 			openWindow: false,
+			auths: useAuthIdStore(),
 		};
 	},
 	mounted() {
@@ -26,8 +28,11 @@ export default {
 		},
 		async datasend(path, method = "POST", data = {}) {
 			const myHeaders = new Headers();
-			if (localStorage.getItem('token')) {
-				myHeaders.append("Authorization", `Bearer ${localStorage.getItem('token')}`);
+			if (localStorage.getItem("token")) {
+				myHeaders.append(
+					"Authorization",
+					`Bearer ${localStorage.getItem("token")}`
+				);
 			}
 			myHeaders.append("Accept", "application/json");
 			const requestOptions = {
@@ -47,8 +52,9 @@ export default {
 			}
 
 			let response = await fetch(this.api + path, requestOptions);
-			if (response.status == 403) {
-				localStorage.removeItem('token')
+			if (response.status == 403 || response.status == 401) {
+				localStorage.removeItem("token");
+				this.auths.changeUser(null,null,null,null);
 			}
 			return await response.json();
 		},
@@ -61,11 +67,18 @@ export default {
 			}
 		},
 		getMenu() {
-			this.datasend(localStorage.getItem('token') ? "userFolder" : 'folder', "GET", {})
+			this.datasend(
+				localStorage.getItem("token") ? "userFolder" : "folder",
+				"GET",
+				{}
+			)
 				.then((res) => {
-					let menus = res;
+					let menus = res.menu;
+					if (localStorage.getItem("token")) {
+						let user = res.user;
+						this.auths.changeUser(user.id, user.name, user.role);
+					}
 					// console.log(menus);
-					
 
 					// let r = JSON.parse(a);
 					function menucreateparent() {
@@ -74,16 +87,15 @@ export default {
 							//console.log(e);
 							// let uNames = [];
 							// if (typeof $) {
-								
+
 							// }
 							if (e.tree_id == null) {
 								e.title = e.name;
 								e.icon = "fa fa-folder";
-								
+
 								e.child = menucreate(e.id);
 								rrr.push(e);
 								e.tree_id = 0;
-							
 							}
 						});
 						return rrr;
@@ -100,7 +112,7 @@ export default {
 								e.icon =
 									e.type == "folder"
 										? "fa fa-folder"
-										: "fa fa-file"; 
+										: "fa fa-file";
 								e.child = menucreate(e.id);
 								rrr.push(e);
 							}
@@ -156,18 +168,37 @@ export default {
 
 <template>
 	<div class="vh-100 position-relative">
-		<AppSidebar v-if="menu.length > 0" :catchError="catchError" :showToast="showToast" :menu="menu"
-			:datasend="datasend" :getMenu="getMenu" />
+		<AppSidebar
+			v-if="menu.length > 0"
+			:catchError="catchError"
+			:showToast="showToast"
+			:menu="menu"
+			:datasend="datasend"
+			:getMenu="getMenu"
+		/>
 		<div class="wrapper d-flex flex-column">
-			<AppHeader :openWindowFunction />
+			<AppHeader :openWindowFunction="openWindowFunction" />
 			<div class="body flex-grow-1">
 				<CContainer class="px-4">
-					<router-view :server="server" :catchError="catchError" :datasend="datasend" :api="api"
-						:getMenu="getMenu" :showToast="showToast" :key="$route.fullPath" />
+					<router-view
+						:server="server"
+						:catchError="catchError"
+						:datasend="datasend"
+						:api="api"
+						:getMenu="getMenu"
+						:showToast="showToast"
+						:key="$route.fullPath"
+					/>
 				</CContainer>
 			</div>
 			<AppFooter />
 		</div>
-		<AuthWindow :openWindow :openWindowFunction :api :datasend :catchError :getMenu />
+		<AuthWindow
+			:openWindow="openWindow"
+			:openWindowFunction="openWindowFunction"
+			:datasend="datasend"
+			:catchError="catchError"
+			:getMenu="getMenu"
+		/>
 	</div>
 </template>

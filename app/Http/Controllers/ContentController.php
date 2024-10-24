@@ -6,6 +6,7 @@ use App\Http\Requests\ResourceSaveRequest;
 use App\Models\Content;
 use App\Models\Tree;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -75,12 +76,12 @@ class ContentController extends Controller
             $tree = Tree::create([
                 'name' => $request->name,
                 'tree_id' => $request->tree_id,
-                'user_id' => 1,
+                'user_id' => Auth::user()->id,
             ]);
             $fileId = Content::create([
                 'tree_id' => $tree->id,
                 // 'name' => $request->name,
-                'accessibility' => false,
+                'accessibility' => $request->accessibility?:false,
                 'data' => $request->data,
             ]);
 
@@ -108,7 +109,7 @@ class ContentController extends Controller
         if (!$tree) {
             return response()->json(['success' => false, "message" => 'Файла не существует']);
         }
-        $res = Content::where("tree_id", $content)->first();
+        $res = Content::with("tree")->where("tree_id", $content)->first();
         return response()->json(['content' => $res, "name" => $tree->name]);
     }
 
