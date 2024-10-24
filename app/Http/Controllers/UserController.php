@@ -9,6 +9,7 @@ use App\Models\Group;
 use App\Models\User;
 use App\Models\UserGroups;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -48,5 +49,12 @@ class UserController extends Controller
         } else {
             return response()->json(['errors' => ["passsword" => ["Ошибка авторизации"]]]);
         }
+    }
+
+    public function logout(Request $request)
+    {
+        // $user = User::find(Auth::user()->id);
+        $request->user()->currentAccessToken()->delete();
+        return response()->json(["success" => true]);
     }
 }

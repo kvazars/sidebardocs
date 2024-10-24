@@ -5,18 +5,11 @@
         <CCol :md="6">
           <span class="clearfix">
             <h1 class="float-start display-3 me-4">500</h1>
-            <h4 class="pt-3">Houston, we have a problem!</h4>
+            <h4 class="pt-3">Хьюстон, у нас проблемы!</h4>
             <p class="text-body-secondary float-start">
-              The page you are looking for is temporarily unavailable.
+              Сайт временно не доступен
             </p>
           </span>
-          <CInputGroup class="input-prepend">
-            <CInputGroupText>
-              <CIcon icon="cil-magnifying-glass" />
-            </CInputGroupText>
-            <CFormInput type="text" placeholder="What are you looking for?" />
-            <CButton color="info">Search</CButton>
-          </CInputGroup>
         </CCol>
       </CRow>
     </CContainer>

@@ -33,6 +33,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post("/getImage", [ContentController::class, "getImage"]);
     Route::post("/getFile", [ContentController::class, "getFile"]);
     Route::post("/resource", [ContentController::class, "saveResource"]);
+    Route::get('logout', [UserController::class, 'logout']);
 });
 
 

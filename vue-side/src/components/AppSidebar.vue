@@ -148,7 +148,7 @@ export default {
 		</CSidebarHeader>
 		<SidebarNav :showContextMenu="showContextMenu" :menu="menu" />
 
-		<button class="btn btn btn-light p-0" @click="addFirstLevel" v-if="auths.role=='ceo'||auths.role=='admin'">
+		<button class="btn btn btn-light p-0" @click="addFirstLevel" v-if="auths.role=='ceo'">
 			<i class="fa fa-plus-circle fs-4" aria-hidden="true"></i>
 		</button>
 		<CSidebarFooter class="border-top d-none d-lg-flex">

@@ -51,12 +51,16 @@ export default {
 				requestOptions.body = JSON.stringify(object);
 			}
 
-			let response = await fetch(this.api + path, requestOptions);
-			if (response.status == 403 || response.status == 401) {
-				localStorage.removeItem("token");
-				this.auths.changeUser(null,null,null,null);
+			try {
+				let response = await fetch(this.api + path, requestOptions);
+				if (response.status == 403 || response.status == 401) {
+					this.logoutFun();
+				}
+				return await response.json();
+			} catch (error) {
+				// this.catchError(error)
+				this.$router.push({ name: 'Page500' });
 			}
-			return await response.json();
 		},
 		catchError(error) {
 			// console.log(error, Object.keys.length);
@@ -66,6 +70,12 @@ export default {
 				});
 			}
 		},
+		logoutFun() {
+			localStorage.removeItem("token");
+			this.auths.changeUser(null, null, null, null);
+			this.getMenu();
+			this.$router.push({ name: 'Home' });
+		},
 		getMenu() {
 			this.datasend(
 				localStorage.getItem("token") ? "userFolder" : "folder",
@@ -74,6 +84,8 @@ export default {
 			)
 				.then((res) => {
 					let menus = res.menu;
+					console.log(menus);
+					
 					if (localStorage.getItem("token")) {
 						let user = res.user;
 						this.auths.changeUser(user.id, user.name, user.role);
@@ -168,37 +180,19 @@ export default {
 
 <template>
 	<div class="vh-100 position-relative">
-		<AppSidebar
-			v-if="menu.length > 0"
-			:catchError="catchError"
-			:showToast="showToast"
-			:menu="menu"
-			:datasend="datasend"
-			:getMenu="getMenu"
-		/>
+		<AppSidebar v-if="menu.length > 0" :catchError="catchError" :showToast="showToast" :menu="menu"
+			:datasend="datasend" :getMenu="getMenu" />
 		<div class="wrapper d-flex flex-column">
-			<AppHeader :openWindowFunction="openWindowFunction" />
+			<AppHeader :openWindowFunction="openWindowFunction" :datasend="datasend" :logoutFun />
 			<div class="body flex-grow-1">
 				<CContainer class="px-4">
-					<router-view
-						:server="server"
-						:catchError="catchError"
-						:datasend="datasend"
-						:api="api"
-						:getMenu="getMenu"
-						:showToast="showToast"
-						:key="$route.fullPath"
-					/>
+					<router-view :server="server" :catchError="catchError" :datasend="datasend" :api="api"
+						:getMenu="getMenu" :showToast="showToast" :key="$route.fullPath" />
 				</CContainer>
 			</div>
 			<AppFooter />
 		</div>
-		<AuthWindow
-			:openWindow="openWindow"
-			:openWindowFunction="openWindowFunction"
-			:datasend="datasend"
-			:catchError="catchError"
-			:getMenu="getMenu"
-		/>
+		<AuthWindow :openWindow="openWindow" :openWindowFunction="openWindowFunction" :datasend="datasend"
+			:catchError="catchError" :getMenu="getMenu" />
 	</div>
 </template>
