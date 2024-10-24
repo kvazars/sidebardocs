@@ -28,7 +28,7 @@ onMounted(() => {
 });
 
 const modeTheme = ref(
-	localStorage.getItem("coreui-free-vue-admin-template-theme")
+	localStorage.getItem("coreui-free-vue-admin-template-theme")??'light'
 );
 
 function logout() {
@@ -70,17 +70,19 @@ function logout() {
 						<i class="fa fa-moon-o"></i>
 					</div>
 				</div>
-				<li class="nav-item py-1">
-					<div class="vr h-100 mx-2 text-body text-opacity-75"></div>
-				</li>
-				<CDropdown placement="bottom-end" variant="nav-item">
+				<li class="nav-item py-1"><div class="vr h-100 mx-2 text-body text-opacity-75"></div></li>
+				<div style="padding: 0.2rem" class="d-flex align-items-center justify-content-center" v-if="!auths.id">
+				
+					<div class="d-flex align-items-center">
+						<div @click="openWindowFunction"class="d-flex align-items-center" component="button" type="button"><i class="fa fa-user"></i></div>
+						
+					</div>
+				</div>
+				<CDropdown placement="bottom-end" variant="nav-item" v-if="auths.id">
 					<CDropdownToggle class="pe-0" :caret="false">
 						<i class="fa fa-user"></i>
 					</CDropdownToggle>
 					<CDropdownMenu class="pt-0">
-						<CDropdownItem @click="openWindowFunction" v-if="!auths.id">
-							<i class="fa fa-lock"></i> Вход
-						</CDropdownItem>
 						<CDropdownItem v-if="auths.role == 'admin'">
 							<i class="fa fa-cog"></i> Управление
 						</CDropdownItem>

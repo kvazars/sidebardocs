@@ -86,12 +86,12 @@ class TreeController extends Controller
             Tree::find($request->id)->update(["name" => $request->name]);
             return response()->json(['success' => true, 'message' => 'Название папки изменено']);
         } else {
-            $user = gettype($request->tree_id) == 'string' ? explode("user_", $request->tree_id)[1] : ($request->tree_id != null ? Tree::where('id', $request->tree_id)->get('user_id') : Auth::user()->id);
-
+            $user = explode( "user_", $request->tree_id);
+            $user1 = count($user)>1?$user[1]:Tree::where('id', $request->tree_id)->first()->user_id;
             Tree::create([
                 "name" => $request->name,
-                'tree_id' => $request->tree_id == 'new' || gettype($request->tree_id) == 'string'  ? null : $request->tree_id,
-                'user_id' => $user,
+                'tree_id' => $request->tree_id == 'new' || count($user)>1  ? null : $request->tree_id,
+                'user_id' => $user1,
                 'type' => 'folder',
             ]);
             return response()->json(['success' => true, 'message' => 'Новая папка успешно создана']);

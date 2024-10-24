@@ -41,15 +41,18 @@ export default {
 		"api",
 	],
 	mounted() {
-		if (this.id) {
-			if (!this.user.id) {
-				this.$router.push({ name: 'Home' });
-			}
+		if (!this.user.id) {
+			this.$router.push({ name: "Home" });
+		}
 
+		if (this.id) {
 			this.datasend("resource/" + this.id, "GET", {})
 				.then((res) => {
-					if (res.user_id != this.user.id && this.user.role != 'admin') {
-						this.$router.push({ name: 'NotFound' });
+					if (
+						res.user_id != this.user.id &&
+						this.user.role != "admin"
+					) {
+						this.$router.push({ name: "NotFound" });
 					}
 					this.pagetitle = res.name;
 					this.dataBlock = JSON.parse(res.content.data);
@@ -100,7 +103,6 @@ export default {
 								: "Скачать файл";
 						}
 					});
-					console.log(outputData.blocks);
 
 					form.append("data", JSON.stringify(outputData.blocks));
 					form.append("name", this.pagetitle ?? "");
@@ -348,10 +350,8 @@ export default {
 							element.type == "image" ||
 							element.type == "attaches"
 						) {
-							// console.log(element);
 							element.data.file.url =
 								this.server + element.data.file.url;
-							// console.log(element.data.file.url);
 						}
 						editor.blocks.insert(element.type, element.data);
 					});
@@ -393,8 +393,13 @@ const aceConfig = {
 		<CCard class="mb-4">
 			<CCardHeader>Информация</CCardHeader>
 			<CCardBody>
-				<CFormInput type="text" id="exampleFormControlInput1" label="Название документа"
-					placeholder="Введите название документа" v-model="pagetitle" />
+				<CFormInput
+					type="text"
+					id="exampleFormControlInput1"
+					label="Название документа"
+					placeholder="Введите название документа"
+					v-model="pagetitle"
+				/>
 			</CCardBody>
 		</CCard>
 		<CCard>
@@ -405,8 +410,12 @@ const aceConfig = {
 		</CCard>
 		<div class="position-fixed squared">
 			<div class="dropdown">
-				<button class="btn btn-primary border-end-0 rounded-0 rounded-start" type="button"
-					data-bs-toggle="dropdown" aria-expanded="false">
+				<button
+					class="btn btn-primary border-end-0 rounded-0 rounded-start"
+					type="button"
+					data-bs-toggle="dropdown"
+					aria-expanded="false"
+				>
 					<i class="fa fa-cog"></i>
 				</button>
 				<ul class="dropdown-menu">

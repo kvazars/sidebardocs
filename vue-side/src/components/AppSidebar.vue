@@ -49,8 +49,10 @@ export default {
 			} else {
 				form.append("id", this.folderId);
 			}
+		
 			this.datasend("folder", "POST", form)
 				.then((res) => {
+					
 					if (res.success) {
 						this.getMenu();
 						this.folderTitle = "";

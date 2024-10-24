@@ -58,12 +58,10 @@ export default {
 				}
 				return await response.json();
 			} catch (error) {
-				// this.catchError(error)
-				this.$router.push({ name: 'Page500' });
+				this.$router.push({ name: "Page500" });
 			}
 		},
 		catchError(error) {
-			// console.log(error, Object.keys.length);
 			for (let index = 0; index < Object.keys(error).length; index++) {
 				Object.values(error)[index].forEach((element) => {
 					this.showToast(false, element);
@@ -74,7 +72,7 @@ export default {
 			localStorage.removeItem("token");
 			this.auths.changeUser(null, null, null, null);
 			this.getMenu();
-			this.$router.push({ name: 'Home' });
+			this.$router.push({ name: "Home" });
 		},
 		getMenu() {
 			this.datasend(
@@ -84,23 +82,15 @@ export default {
 			)
 				.then((res) => {
 					let menus = res.menu;
-					console.log(menus);
-					
+
 					if (localStorage.getItem("token")) {
 						let user = res.user;
 						this.auths.changeUser(user.id, user.name, user.role);
 					}
-					// console.log(menus);
 
-					// let r = JSON.parse(a);
 					function menucreateparent() {
 						let rrr = [];
 						menus.forEach((e) => {
-							//console.log(e);
-							// let uNames = [];
-							// if (typeof $) {
-
-							// }
 							if (e.tree_id == null) {
 								e.title = e.name;
 								e.icon = "fa fa-folder";
@@ -180,19 +170,41 @@ export default {
 
 <template>
 	<div class="vh-100 position-relative">
-		<AppSidebar v-if="menu.length > 0" :catchError="catchError" :showToast="showToast" :menu="menu"
-			:datasend="datasend" :getMenu="getMenu" />
+		<AppSidebar
+			v-if="menu.length > 0"
+			:catchError="catchError"
+			:showToast="showToast"
+			:menu="menu"
+			:datasend="datasend"
+			:getMenu="getMenu"
+		/>
 		<div class="wrapper d-flex flex-column">
-			<AppHeader :openWindowFunction="openWindowFunction" :datasend="datasend" :logoutFun />
+			<AppHeader
+				:openWindowFunction="openWindowFunction"
+				:datasend="datasend"
+				:logoutFun
+			/>
 			<div class="body flex-grow-1">
 				<CContainer class="px-4">
-					<router-view :server="server" :catchError="catchError" :datasend="datasend" :api="api"
-						:getMenu="getMenu" :showToast="showToast" :key="$route.fullPath" />
+					<router-view
+						:server="server"
+						:catchError="catchError"
+						:datasend="datasend"
+						:api="api"
+						:getMenu="getMenu"
+						:showToast="showToast"
+						:key="$route.fullPath"
+					/>
 				</CContainer>
 			</div>
 			<AppFooter />
 		</div>
-		<AuthWindow :openWindow="openWindow" :openWindowFunction="openWindowFunction" :datasend="datasend"
-			:catchError="catchError" :getMenu="getMenu" />
+		<AuthWindow
+			:openWindow="openWindow"
+			:openWindowFunction="openWindowFunction"
+			:datasend="datasend"
+			:catchError="catchError"
+			:getMenu="getMenu"
+		/>
 	</div>
 </template>
