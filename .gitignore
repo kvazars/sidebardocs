@@ -20,5 +20,4 @@ yarn-error.log
 /.vscode
 /.zed
 *.log
-database/database.sqlite
 storage/logs/laravel.log

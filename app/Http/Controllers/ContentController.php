@@ -143,8 +143,9 @@ class ContentController extends Controller
         return response()->json(["name" => $tree->name, 'content' => $res,  'groups' => $availablesGroups]);
     }
 
-    public function delResource($content, Request $request)
+    public function delResource(Request $request, Tree $content)
     {
+
         if ($request->user()->role == 'user') {
             return response()->json(["success" => false, 'message' => 'Недостаточно прав']);
         }
@@ -153,7 +154,7 @@ class ContentController extends Controller
             return response()->json(["success" => false, 'message' => 'Недостаточно прав']);
         }
 
-        Tree::find($content)->delete();
+        Tree::find($content->id)->delete();
         return response()->json(["success" => true, 'message' => 'Файл удален']);
     }
 }

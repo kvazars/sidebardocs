@@ -116,7 +116,7 @@ export default {
 					params: { id: this.treeId },
 				});
 			} else if (action == "deleteFile") {
-				this.datasend("resource/" + this.treeId, "DELETE", {})
+				this.datasend("resourcedel/" + this.treeId, "DELETE", {})
 					.then((res) => {
 						if (res.success) {
 							this.getMenu();
