@@ -19,15 +19,13 @@ class ContentController extends Controller
      */
     public function saveImage(Request $request)
     {
-       
         if($request->file('image')){
         $path   = Image::read($request->file('image'));
         $resize = $path->scaleDown(1024, 1024)->toWebp(90);
         $path = "contentImages/" . Auth::user()->id . "/" . Str::random(40) . ".webp";
         Storage::disk("public")->put($path, $resize);
         return response()->json(['success' => 1, 'file' => ['url' => URL::to('/') . "/" . $path]], 200);
-        }
-        
+        }        
     }
     public function saveFile(Request $request)
     {
@@ -37,7 +35,6 @@ class ContentController extends Controller
 
     public function saveImageByUrl(Request $request)
     {
-
         $path   = Image::read(file_get_contents($request->url));
         $resize = $path->scaleDown(1024, 1024)->toWebp(100);
         $path = "contentImages/" . Auth::user()->id . "/" . Str::random(40) . ".webp";
@@ -48,10 +45,7 @@ class ContentController extends Controller
 
     public function getImage(Request $request)
     {
-
         if ($request->image and  file_exists(public_path() . '/' . $request->image)) {
-            // $img = explode('/contentImages', $request->image);
-
             $data = file_get_contents(public_path() . $request->image);
 
             $type = explode('.', $request->image);
@@ -63,13 +57,7 @@ class ContentController extends Controller
     }
     public function getFile(Request $request)
     {
-        // return response()->json(data: ['success' => true, 'url' => URL::to('/') .$request->file]);
-
         if ($request->file and file_exists(public_path() . '/' . $request->file)) {
-            // $img = explode('/contentImages', $request->image);
-            // return 1;
-            // $data = file_get_contents(public_path() . $request->file);
-
             return response()->json(data: ['success' => true, 'url' => URL::to('/') . $request->file]);
         } else {
             return response()->json(data: ['success' => false]);
