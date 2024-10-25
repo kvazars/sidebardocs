@@ -21,15 +21,11 @@ class ContentController extends Controller
     {
        
         if($request->file('image')){
-
-
         $path   = Image::read($request->file('image'));
         $resize = $path->scaleDown(1024, 1024)->toWebp(90);
         $path = "contentImages/" . Auth::user()->id . "/" . Str::random(40) . ".webp";
         Storage::disk("public")->put($path, $resize);
         return response()->json(['success' => 1, 'file' => ['url' => URL::to('/') . "/" . $path]], 200);
-        }else if ($request->file('file')){
-            return $request->file('file');
         }
         
     }
