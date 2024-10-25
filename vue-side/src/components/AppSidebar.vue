@@ -183,7 +183,7 @@ export default {
 					">Сохранить</CButton>
 			</CModalFooter>
 		</CModal>
-		<ContextMenu v-if="showMenu && auths.id" :actions="treeType == 'folder'
+		<ContextMenu v-if="showMenu && auths.id && auths.role!='user'" :actions="treeType == 'folder'
 		
 			? contextMenuActionsFolder
 			: contextMenuActionsFile

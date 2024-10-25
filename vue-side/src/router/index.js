@@ -20,7 +20,7 @@ const routes = [
 			{
 				path: "/files/:id/edit",
 				name: "EditFile",
-				meta: { title: "Редактирование документа" },
+				meta: { title: "Редактирование документа", requiresAuth: true },
 				component: () => import("@/views/editFile.vue"),
 				props: true,
 			},

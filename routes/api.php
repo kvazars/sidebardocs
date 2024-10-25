@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AvailableController;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\TreeController;
 use App\Http\Controllers\UserController;
@@ -33,7 +34,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post("/getImage", [ContentController::class, "getImage"]);
     Route::post("/getFile", [ContentController::class, "getFile"]);
     Route::post("/resource", [ContentController::class, "saveResource"]);
-    Route::get('logout', [UserController::class, 'logout']);
+    Route::get('/logout', [UserController::class, 'logout']);
+    
 });
 
 

@@ -7,6 +7,7 @@ import AuthWindow from "@/components/AuthWindow.vue";
 // import { useUserDataStore } from "../stores/userData";
 import { toast } from "vue3-toastify";
 import { useAuthIdStore } from "../stores/authId";
+import router from "../router";
 // const store = useUserDataStore();
 export default {
 	components: { AppFooter, AppHeader, AppSidebar, AuthWindow },
@@ -81,6 +82,8 @@ export default {
 				{}
 			)
 				.then((res) => {
+					console.log(res);
+					
 					let menus = res.menu;
 
 					if (localStorage.getItem("token")) {
@@ -171,7 +174,7 @@ export default {
 <template>
 	<div class="vh-100 position-relative">
 		<AppSidebar
-			v-if="menu.length > 0"
+			v-if="menu.length > 0 || auths.id"
 			:catchError="catchError"
 			:showToast="showToast"
 			:menu="menu"
@@ -194,6 +197,17 @@ export default {
 						:getMenu="getMenu"
 						:showToast="showToast"
 						:key="$route.fullPath"
+						v-if="!$route.meta.requiresAuth"						
+					/>
+					<router-view
+						:server="server"
+						:catchError="catchError"
+						:datasend="datasend"
+						:api="api"
+						:getMenu="getMenu"
+						:showToast="showToast"
+						:key="$route.fullPath"
+						v-if="$route.meta.requiresAuth&&auths.id"						
 					/>
 				</CContainer>
 			</div>

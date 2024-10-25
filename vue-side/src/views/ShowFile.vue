@@ -11,9 +11,9 @@
 					class="my-4"
 				></p>
 
-				<div v-if="val.type == 'gallery'" class="my-4 pt-4 bg-secondary">
+				<div v-if="val.type == 'gallery'" class="my-4 py-4 border">
 				
-					<div :id="'carousel'+val.id" class="carousel slide  ">
+					<div :id="'carousel'+val.id" class="carousel slide carousel-dark " style="height: 400px;">
 						<div class="carousel-indicators">
 							<button
 								v-for="(url, key) in val.data.files"
@@ -26,7 +26,7 @@
 								aria-current="true"
 							></button>
 						</div>
-						<div class="carousel-inner" style="max-height:400px !important;">
+						<div class="carousel-inner" style="height:400px !important;">
 							<div
 								class="carousel-item text-center"
 								v-for="(url, key) in val.data.files"
@@ -35,7 +35,7 @@
 							>
 								<DataImage
 									:datasend="datasend"
-									class="img-fluid"
+									class="mg-fluid"
 									:src="url.url"
 									style="max-height:400px !important;"
 									:alt="'slide' + key"

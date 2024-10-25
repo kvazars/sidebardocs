@@ -369,20 +369,12 @@ body .ce-block--selected .ce-block__content {
 	filter: blur(40px);
 }
 
-.loginWindow {
-	position: absolute;
-	z-index: 9998;
-	width: 30%;
-	height: 45%;
-	background-color: #323a49;
-	border-radius: 20px;
-	color: white;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-direction: column;
-	padding: 7px;
-	// border: 2px black solid;
+a.dropdown-item{cursor: pointer;}
+
+body .accordion-body {
+	min-width: 100%;
 }
 
-a.dropdown-item{cursor: pointer;}
+body .form-check-label {
+	user-select: none;
+}
