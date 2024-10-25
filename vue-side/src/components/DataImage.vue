@@ -1,10 +1,10 @@
 <template>
-	<img :src="imageAsBase64" />
+	<img :src="imageAsBase64" :alt="alt" />
 </template>
 
 <script>
 export default {
-	props: ["src", "datasend"],
+	props: ["src", "datasend", "alt"],
 	data() {
 		return {
 			imageAsBase64: "",

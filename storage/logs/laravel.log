@@ -42,3 +42,704 @@
 #39 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\resources\\server.php(23): require_once('D:\\\\Desktop\\\\sbd\\\\...')
 #40 {main}
 "} 
+[2024-10-25 02:29:07] local.ERROR: Attempt to read property "user_id" on null {"userId":2,"exception":"[object] (ErrorException(code: 0): Attempt to read property \"user_id\" on null at D:\\Desktop\\sbd\\sidebardocs\\app\\Http\\Controllers\\TreeController.php:90)
+[stacktrace]
+#0 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Bootstrap\\HandleExceptions.php(256): Illuminate\\Foundation\\Bootstrap\\HandleExceptions->handleError(2, 'Attempt to read...', 'D:\\\\Desktop\\\\sbd\\\\...', 90)
+#1 D:\\Desktop\\sbd\\sidebardocs\\app\\Http\\Controllers\\TreeController.php(90): Illuminate\\Foundation\\Bootstrap\\HandleExceptions->Illuminate\\Foundation\\Bootstrap\\{closure}(2, 'Attempt to read...', 'D:\\\\Desktop\\\\sbd\\\\...', 90)
+#2 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\ControllerDispatcher.php(46): App\\Http\\Controllers\\TreeController->store(Object(App\\Http\\Requests\\TreeStoreRequest))
+#3 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Route.php(262): Illuminate\\Routing\\ControllerDispatcher->dispatch(Object(Illuminate\\Routing\\Route), Object(App\\Http\\Controllers\\TreeController), 'store')
+#4 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Route.php(208): Illuminate\\Routing\\Route->runController()
+#5 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(808): Illuminate\\Routing\\Route->run()
+#6 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Illuminate\\Routing\\Router->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#7 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Middleware\\SubstituteBindings.php(51): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#8 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#9 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Auth\\Middleware\\Authenticate.php(64): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#10 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Auth\\Middleware\\Authenticate->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'sanctum')
+#11 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#12 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(807): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#13 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(786): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#14 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(750): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#15 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(739): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#16 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(201): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#17 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}(Object(Illuminate\\Http\\Request))
+#18 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#19 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#20 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#21 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#22 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#23 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#24 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#25 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#26 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance.php(110): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#27 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#28 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\HandleCors.php(62): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#29 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#30 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#31 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#32 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#33 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#34 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#35 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(176): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#36 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(145): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#37 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1188): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#38 D:\\Desktop\\sbd\\sidebardocs\\public\\index.php(17): Illuminate\\Foundation\\Application->handleRequest(Object(Illuminate\\Http\\Request))
+#39 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\resources\\server.php(23): require_once('D:\\\\Desktop\\\\sbd\\\\...')
+#40 {main}
+"} 
+[2024-10-25 02:40:25] local.ERROR: GD PHP extension must be installed to use this driver. {"userId":2,"exception":"[object] (Intervention\\Image\\Exceptions\\DriverException(code: 0): GD PHP extension must be installed to use this driver. at D:\\Desktop\\sbd\\sidebardocs\\vendor\\intervention\\image\\src\\Drivers\\Gd\\Driver.php:41)
+[stacktrace]
+#0 D:\\Desktop\\sbd\\sidebardocs\\vendor\\intervention\\image\\src\\Drivers\\AbstractDriver.php(36): Intervention\\Image\\Drivers\\Gd\\Driver->checkHealth()
+#1 D:\\Desktop\\sbd\\sidebardocs\\vendor\\intervention\\image\\src\\ImageManager.php(123): Intervention\\Image\\Drivers\\AbstractDriver->__construct()
+#2 D:\\Desktop\\sbd\\sidebardocs\\vendor\\intervention\\image\\src\\ImageManager.php(26): Intervention\\Image\\ImageManager::resolveDriver('Intervention\\\\Im...', autoOrientation: true, decodeAnimation: true, blendingColor: 'ffffff')
+#3 D:\\Desktop\\sbd\\sidebardocs\\vendor\\intervention\\image-laravel\\src\\ServiceProvider.php(42): Intervention\\Image\\ImageManager->__construct('Intervention\\\\Im...', autoOrientation: true, decodeAnimation: true, blendingColor: 'ffffff')
+#4 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(931): Intervention\\Image\\Laravel\\ServiceProvider->Intervention\\Image\\Laravel\\{closure}(Object(Illuminate\\Foundation\\Application), Array)
+#5 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(815): Illuminate\\Container\\Container->build(Object(Closure))
+#6 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1046): Illuminate\\Container\\Container->resolve('image', Array, true)
+#7 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(751): Illuminate\\Foundation\\Application->resolve('image', Array)
+#8 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1028): Illuminate\\Container\\Container->make('image', Array)
+#9 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Container\\Container.php(1559): Illuminate\\Foundation\\Application->make('image')
+#10 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\Facades\\Facade.php(237): Illuminate\\Container\\Container->offsetGet('image')
+#11 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\Facades\\Facade.php(208): Illuminate\\Support\\Facades\\Facade::resolveFacadeInstance('image')
+#12 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\Facades\\Facade.php(352): Illuminate\\Support\\Facades\\Facade::getFacadeRoot()
+#13 D:\\Desktop\\sbd\\sidebardocs\\app\\Http\\Controllers\\ContentController.php(26): Illuminate\\Support\\Facades\\Facade::__callStatic('make', Array)
+#14 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\ControllerDispatcher.php(46): App\\Http\\Controllers\\ContentController->saveImage(Object(Illuminate\\Http\\Request))
+#15 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Route.php(262): Illuminate\\Routing\\ControllerDispatcher->dispatch(Object(Illuminate\\Routing\\Route), Object(App\\Http\\Controllers\\ContentController), 'saveImage')
+#16 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Route.php(208): Illuminate\\Routing\\Route->runController()
+#17 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(808): Illuminate\\Routing\\Route->run()
+#18 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Illuminate\\Routing\\Router->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#19 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Middleware\\SubstituteBindings.php(51): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#20 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#21 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Auth\\Middleware\\Authenticate.php(64): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#22 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Auth\\Middleware\\Authenticate->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'sanctum')
+#23 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#24 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(807): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#25 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(786): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#26 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(750): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#27 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(739): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#28 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(201): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#29 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}(Object(Illuminate\\Http\\Request))
+#30 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#31 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#32 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#33 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#34 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#35 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#36 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#37 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#38 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance.php(110): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#39 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#40 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\HandleCors.php(62): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#41 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#42 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#43 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#44 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#45 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#46 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#47 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(176): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#48 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(145): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#49 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1188): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#50 D:\\Desktop\\sbd\\sidebardocs\\public\\index.php(17): Illuminate\\Foundation\\Application->handleRequest(Object(Illuminate\\Http\\Request))
+#51 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\resources\\server.php(23): require_once('D:\\\\Desktop\\\\sbd\\\\...')
+#52 {main}
+"} 
+[2024-10-25 02:41:50] local.ERROR: Call to undefined method Intervention\Image\ImageManager::make() {"userId":2,"exception":"[object] (Error(code: 0): Call to undefined method Intervention\\Image\\ImageManager::make() at D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\Facades\\Facade.php:358)
+[stacktrace]
+#0 D:\\Desktop\\sbd\\sidebardocs\\app\\Http\\Controllers\\ContentController.php(26): Illuminate\\Support\\Facades\\Facade::__callStatic('make', Array)
+#1 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\ControllerDispatcher.php(46): App\\Http\\Controllers\\ContentController->saveImage(Object(Illuminate\\Http\\Request))
+#2 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Route.php(262): Illuminate\\Routing\\ControllerDispatcher->dispatch(Object(Illuminate\\Routing\\Route), Object(App\\Http\\Controllers\\ContentController), 'saveImage')
+#3 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Route.php(208): Illuminate\\Routing\\Route->runController()
+#4 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(808): Illuminate\\Routing\\Route->run()
+#5 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Illuminate\\Routing\\Router->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#6 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Middleware\\SubstituteBindings.php(51): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#7 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#8 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Auth\\Middleware\\Authenticate.php(64): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#9 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Auth\\Middleware\\Authenticate->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'sanctum')
+#10 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#11 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(807): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#12 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(786): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#13 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(750): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#14 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(739): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#15 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(201): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#16 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}(Object(Illuminate\\Http\\Request))
+#17 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#18 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#19 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#20 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#21 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#22 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#23 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#24 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#25 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance.php(110): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#26 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#27 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\HandleCors.php(62): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#28 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#29 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#30 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#31 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#32 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#33 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#34 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(176): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#35 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(145): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#36 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1188): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#37 D:\\Desktop\\sbd\\sidebardocs\\public\\index.php(17): Illuminate\\Foundation\\Application->handleRequest(Object(Illuminate\\Http\\Request))
+#38 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\resources\\server.php(23): require_once('D:\\\\Desktop\\\\sbd\\\\...')
+#39 {main}
+"} 
+[2024-10-25 02:42:54] local.ERROR: Call to undefined method Intervention\Image\ImageManager::make() {"userId":2,"exception":"[object] (Error(code: 0): Call to undefined method Intervention\\Image\\ImageManager::make() at D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Support\\Facades\\Facade.php:358)
+[stacktrace]
+#0 D:\\Desktop\\sbd\\sidebardocs\\app\\Http\\Controllers\\ContentController.php(26): Illuminate\\Support\\Facades\\Facade::__callStatic('make', Array)
+#1 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\ControllerDispatcher.php(46): App\\Http\\Controllers\\ContentController->saveImage(Object(Illuminate\\Http\\Request))
+#2 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Route.php(262): Illuminate\\Routing\\ControllerDispatcher->dispatch(Object(Illuminate\\Routing\\Route), Object(App\\Http\\Controllers\\ContentController), 'saveImage')
+#3 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Route.php(208): Illuminate\\Routing\\Route->runController()
+#4 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(808): Illuminate\\Routing\\Route->run()
+#5 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Illuminate\\Routing\\Router->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#6 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Middleware\\SubstituteBindings.php(51): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#7 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#8 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Auth\\Middleware\\Authenticate.php(64): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#9 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Auth\\Middleware\\Authenticate->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'sanctum')
+#10 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#11 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(807): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#12 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(786): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#13 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(750): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#14 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(739): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#15 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(201): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#16 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}(Object(Illuminate\\Http\\Request))
+#17 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#18 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#19 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#20 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#21 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#22 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#23 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#24 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#25 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance.php(110): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#26 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#27 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\HandleCors.php(62): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#28 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#29 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#30 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#31 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#32 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#33 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#34 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(176): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#35 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(145): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#36 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1188): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#37 D:\\Desktop\\sbd\\sidebardocs\\public\\index.php(17): Illuminate\\Foundation\\Application->handleRequest(Object(Illuminate\\Http\\Request))
+#38 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\resources\\server.php(23): require_once('D:\\\\Desktop\\\\sbd\\\\...')
+#39 {main}
+"} 
+[2024-10-25 02:46:44] local.ERROR: Call to undefined method Intervention\Image\EncodedImage::hashName() {"userId":2,"exception":"[object] (Error(code: 0): Call to undefined method Intervention\\Image\\EncodedImage::hashName() at D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Filesystem\\FilesystemAdapter.php:421)
+[stacktrace]
+#0 D:\\Desktop\\sbd\\sidebardocs\\app\\Http\\Controllers\\ContentController.php(29): Illuminate\\Filesystem\\FilesystemAdapter->putFile('contentImages', Object(Intervention\\Image\\EncodedImage))
+#1 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\ControllerDispatcher.php(46): App\\Http\\Controllers\\ContentController->saveImage(Object(Illuminate\\Http\\Request))
+#2 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Route.php(262): Illuminate\\Routing\\ControllerDispatcher->dispatch(Object(Illuminate\\Routing\\Route), Object(App\\Http\\Controllers\\ContentController), 'saveImage')
+#3 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Route.php(208): Illuminate\\Routing\\Route->runController()
+#4 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(808): Illuminate\\Routing\\Route->run()
+#5 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Illuminate\\Routing\\Router->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#6 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Middleware\\SubstituteBindings.php(51): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#7 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#8 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Auth\\Middleware\\Authenticate.php(64): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#9 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Auth\\Middleware\\Authenticate->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'sanctum')
+#10 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#11 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(807): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#12 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(786): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#13 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(750): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#14 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(739): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#15 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(201): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#16 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}(Object(Illuminate\\Http\\Request))
+#17 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#18 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#19 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#20 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#21 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#22 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#23 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#24 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#25 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance.php(110): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#26 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#27 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\HandleCors.php(62): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#28 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#29 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#30 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#31 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#32 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#33 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#34 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(176): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#35 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(145): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#36 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1188): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#37 D:\\Desktop\\sbd\\sidebardocs\\public\\index.php(17): Illuminate\\Foundation\\Application->handleRequest(Object(Illuminate\\Http\\Request))
+#38 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\resources\\server.php(23): require_once('D:\\\\Desktop\\\\sbd\\\\...')
+#39 {main}
+"} 
+[2024-10-25 02:48:49] local.ERROR: The file "RIFF:}  WEBPVP8 .}  ð~* h>µN K§$&¬ª’üÙ‰cn1È®%Úf5Œt4Þî2÷#@~©öœ²âÝ-w&s¡^/^•Ë§›ŸÒñòÿ¹¥çž;Xûèœoó<Gú¨¿¼xZ@ìK”ù£¿ÿÛæ¯Qn›¢F*Í®AîbŒ”XŸðú¾ýž_Wb"N‡;µ‹9uÜíˆœX¢Òýký „;~`Ö•†ŠƒLë>Í¹HôòÆë]sßƒ×8÷·—¯}‚íhK®MŒœœë¢×Â1Dî‘'‰4štÛ€¹.ó`	` H»Sa«Ä?A©ï¯£~ed_å ûfús>;:%L÷G‹™qmc½É"½PxÔ¯'Pn«é	PÕÿ”šÂv»MõDÅ&$ž_²UxhŸÞÎ mKð›ûîÚÃ2BkÅòOGÎ$ÚüÛ‘¼––òö;Ðñ¬ÔáÂ÷É¿ß¶>!a,\ˆ]²Ñø¥	Vv¶Ðž1•ÓÝBðsu*ÓÊ`Ìs{JÑM$»aÇQ.;PÁ¼jo
+6dÚúwwœåŽN¡¶‡Ñƒ?c{ñÇê¤Ov÷i#«dqHk2sä«¤à{fV9ä3˜©u¼¤ÀÂ“ÚÎR÷Ì®h««^ƒšÑ–1·œ´ª¶o7	–ÂŸp©ÕàÊ9eÔ”(bæ©lH(Eá@ŸI#¶1É ÑÏ+q×gü–yÏo…¼I¡l™ÖšßVÏ[Td.ìŒü•-µÍº8É”úA±¨r9Gá
+ÂðS}ùàÆd—o¥þÁÈNÍuÊV4×‰¦òsW í–¾<YTDf£½Ä¤ë¹lÔ_/ ÙÙ—3Ki+UV[lnƒ+ m»B©°{ó$¥£ú}wÇžõäoC9ÚQ9°¤*lòLAF›lÃyC^l1 ä(BõŸ2±øŒ÷Ë¿¸bZÚÚH ¦÷uV+û®@{qŸ“Vo»;$}>Y»®òª âîÚ·ªëŽwÐþ“&ƒPs[jÎ^îc±~&>ÿB¡ÏÔo®Ñ~®ÁIž¢AÙ^ue9êÒ(QR:.,jû¨‡k,›Z`¢£ª/øÌh¾wìÇÕH‰„wFy[@Ø1ÿŸ+†©Ý`sfº]—õªºXgþyœ^yQ—%aªˆÀ/ÎkDÄ3šÔ‘U£½À•ÑÀ,Tì;3‰peF 6§G«ÎG¨ÇÓWÉ´Mès>2È!Ú$5-®#|Ç{?=›ô`Qû'ÂMé‡IÝmÛw,¢óÖõ¶Rçÿ;‰õ&ZÏËÆäACþñAéÓèßKTÛq×”ÕÃD´Ç;óR•Ÿ9Ms  M[Û–'›°ER}Ò¯g¬žêA½³K¦Ù4O®«£”6	y ?ÁèÀ~õIèæ(ÓÏÃÌI°x›“äî1ó+¤ØßÁ1°ŽUx-[í•òóS=D¶š‚K»eÃæ^žý£²µ>?P¶nO*ÊýÃ8`B¥RüÇ
+5ôwˆ^W“¢ÎPûYeÑ'6Íö¥&§/aRXÀ}ò6‡nàƒÄØ?r@ÃSRçç£å–$rcTD….ßñØTí„TòþÜY–L˜u?š“ÔÛKiÑËÜL„ÈÕôJyŒš÷&Ü;}^[¶¶ÂK@P	’n¹=t[f£Âãf„Ûã¥»ÿ¹¼41ÜÿÈöû¿”ÐìNu	ÅÃ‰g–ÿ‡8á‹÷òE^‘!v»`×ýâR_6Í0K11õ¾'`6oõ¹ªl˜¤ðþ}¥Tµ97Â8ZJ9];Øøpá­ã­	à8>Õá“)NÆ¸Èð:5#˜ßaê˜eDÁÚâ™EL†ûèé7F	T¥ÉÓlJ¤€}hØ@€~`¬Y´3¬ÔðBÙg‘Ð›|fÌ)ÛËÛ'$p ýè£m–£ìÛ©%?ÈÒ'’)K«¦ 3{ÿ7ü—á£/—×r9ðÒ¨êç·è›ðŠ¬`O\è%à„•Å‘>BòÏ›`²µÎÏzë÷V£ôÁ‡ÉöÊD¢bÓÆ9ŠAT /Þ¼jþ|ì—A¼+¢:SÉ÷µÂýv…»|O:)íð:Öœ˜$ä™Oš‡ýbÇù˜Â¸¼C†{±ÃU¸xï$7áˆÙ®ÿÑã BãŸgu ƒ^æuFàî5µ3Ûý!OŸ}¿õ#‡Þï‰Þ<.Š)M@ãÄlò˜pÉ€Í6?ÍcVL{º|®|Ý»ÐÍ	ÞÝ\®ô=X9ÆÝÊ*ïeÆòè'|Ó±Àˆ†yõ‹Ùúw(éÎ8¸Ÿl2kÖ8äx£\Ã®v>j¬¯NÍ“ùzæi™#*¸'Wð ªqJD:âfôóùÀz4`È+›©ó·ˆŸ÷ÁJs6 Ê.UKú7¹7ÑŒ†Ë€¿iëBw–ïqàã&ëÿa˜—aþ€/z¾7û´|J“é•]®ã\Ù_Ä)M+Ð•ªÃ7GâË¨:s÷óŸ×8¯R‘¹L=MË¹ð 7¸/—dØáÉËïÚúœÕzÿ¥õM\)vCñÑ*´â@!Füv^ÍŸ\$¼Sã,9LtÁûÆá·,×¥q‘@ùÕ HÒS®4P¬ÔÞ ¸Š²°Ažû×lÅ€žpÙBÿ çùñß)Ø]ïf`Ûé¢M¢ÄBÑ=B¡ü+Ù‡ä¨ª»Í,7ÞA¨g=$-4Ì*¡™h'>VƒÊ‘-‚Ëá-+Œ«Ñþ	ƒÎ2Z²î$YmB° *2„Htà1'C£…>xVƒOŒíKs3÷c
+*ñ=V1ö^ÿñ†ÎôÉŒ„iÃ#•…¾)Œ¿èóÃœ˜þmžÐ2
+¦×\èÎ²ÔÀ «µ€¸ƒøv¬ÎsŠýNxìDžD%Û3ïÒ}©Â‹¾‘„OÁÆWíô¨úTÃ¨uý! ùH2q5ñüI|$w1áU‡vÕlA¿(<ø®e§˜Þ²Z%”êx5}T±3ZÜÁ“ç…cÿÿóâõË¿ŠWŽÁíþý<‚ÕÝjÝ¬nr§¨¸á“Þ Y¼¢/£D,k]í¹¾*	±ðxêþ&yT—³ˆ35Óµ* Õ#¿® ?&_õK¤§	åÉù&Øê”K;>í”÷†!êx“õ ¼BöòŠäÕ‰3‘ç¨]‚N-Px¶Ë›,Y’›=ñ|>e³Â-FÚ°ÓX?U#Ýu.O%¯QØÓ¸åð˜8{µD›åÛÙG-|W‹Ö˜¶Ÿ{rOsvp;;" Ö¼È¿IñÕvÆïªÞû§X+ÂÚ…Ó‡
+Eƒ±ý:³ÛyFy8ø‚e¿Žmþ±HƒèM®RXd‚cŽþ/ãƒ\5ÝÏ7N-C~:ƒÝveBT)´³è‚XP<ïX%Ó›¯dÇýøð ·! Öˆ««Òº‚Ö˜—³(ÛÇyÖQ9Wd=Ð>š¥^ô‡Ã5,‰¢AÞX¶w3÷½.o´Òuõ[ÉF
+ñÏ8*¢„‡p½	bCÎœ©Ä†[QöpƒPZ”‹Q± —Ìý+TÚçÝ÷Ö“Ûwýª6 †þ-›>\žœØ®´ë×òÿU€$°°–
+&¶˜~'…lGM_ÔÖ‚€¼0":›€«»$DxëÿRQšÐ¥ÅÊ»y_²’%â@Ùr:u†IeƒÙ†wöøš:FSï÷‰5Ç¬™;Ä%ûši/FîŠÅñtÕ{“nÓ¯Æ"ctÙõŠÿ£ë[wwÒÑ1«Æ*“õ—6«æþ?¯&©’Î€Ë¨á†­®.±Xi#c¼>Ì›¹‹uTÔ	[Ó<kEüÛ„m=©¨
+¹¢’àwÍhüÎ4ùŸï^5ÊiØá©ÀÞÉÆûJ
+0¼¬õ5¦aãà?F‘´r{&ˆ¢ç7ÃÈÉQSX†#Q(<Ã]Å?½26f&ñtuÑâ	ÚüÄÍŽá ÿ½yøýëÿÕÆ¾m&!Äd	ÍWïni´3îU=¹¸œCUºÿØ¤¯Â>28k˜ÅÏëé‡‰ÒÁˆ!÷vUž“~q„½˜_wB‚Ä
+´%ÏÈ‘Z^½së<™8ˆ^Jå)»ƒ›ì«ÿ0HD'oevKºö§ÝD:Þ·ï ¥¸WÒ„p­L¸j‘.ª3„€2`Ò„_æ1ºøˆZÿG¯øäíö_l{Ïpßót4Bø86ž({m’ƒ{”µ+¸bˆÝÛí$«Çº&2êEôôÕ.2ÀäñØ´°=tä_~«ÿ˜ÃSöþ$±juð£ƒ€¾í‚à®?J1W>Ð­’=KÓöôx~ ¸*š'ŠÜ!Ÿ/ÛN$/¯ç¸	[G9±!´Ðe£—âÇ,T‰NÿgÉ­0½ÍÐ­`›átw7Š¥É1dìF»®p,zÏîÏ$eœ(|¬È½åÏzJ²c×Ñ$?Ãmð„ükÿþVÕ–·¢A©×	ULÀ³¨¹)e’€ÍY.ãQúÏÉÁµ˜µ?CmÇLE±H=‹…¹{2_S²q«ùüÛ÷p4r/Ÿ]h´h
+2›=>cgGuãy‡kQ,&¤ÅÏ²‚V’¥~fž¼HÔã
+ä·õ[J« ’â^Õ.”`œÝª¯ª(p"ï* ÿ=²)`«»×u‚°eÙR¾ÄHëo²Toús¥¨ì\)ïÊ¶hY6®Ä45iëÆYfÝ§`—…´Oë×æ‡¼þjJº˜[rKº¹Xö8Úš’ÐðÃè|$Ž}ÁXG%ýáÑ»GÔÌ’+¨ºnÐ9ü7áUÆNIñi^ó„†¨}º7Ž˜è€ýÙÞÜÐà¬s¿à¹ö¸ã1ld8èÎoœÐ„â(tõ˜+ÒÅùÛ=)	3”yQ	MTíXêks^Â„	é’8Rý¡rÏ†ª
+J”V,Äœó ¢n‘Ë)™†BM3Byù\¬úã¯¬zY…Û?q>2Þ<
+œbœèÜ|ñ‹iß•kÉL|£ÂG³‡3<#Ix¹û‚!ª”Ü[" õÀeÄôr‰ñÿ“B]‹öÁh!mÿ}•§¯žÃß:§â:XÚÅ¥öÖ«Äî|7Å‚…nµÿ0F}ñgÔìÓGX8z‘Í_HÁÿ„¸QçåAq§4Âq‹N7ñoSâR[ðm#ô÷gŠÐœ_#|ç#‹¯eú}«á²H„„åw‡‹¿A©öQÁk‰];±BÎrUg^<áMvŒœH3Ú@nQç”Ø8ð”HÆp·X©4.8šÑ÷pûÄ©˜Eº_ßjÖMZŽ¾™‘%[=ô”{ù·.Å]­=øè:wäìÍtË`Z¿=¦naX³@H‡Gý“=ÁHùjºòõˆœHéÉçˆ‘°vÿµ”ÜÄ¼›!™:Æ(ß€+ZªŽ‰cíÄöjOÑ¤_©oH­<^;„—%v|¼gõéDÊwÎø“‹Öªw}M \‹CYDNÉüùŠÜZ‘ ‰ÝÂyåÔVæžÃ…™$É¼NiPÖæ87½¶’øë…X÷/N	-ºÊ6ßdÜMG]tÑ—)°	²5
+ž2:ù»¥Œ†»·èâJ©CÆq1ë`AÌ ÍeßÌQÞ®—{¹c‘’°°’œ¤ Še¤•n\à…u?)rn´(ÎÁâÓ³¹Œ¦Øqu‡sÞ‡ÿK¬Ño¿¡?ºÕÑ!$ïœa=ë AÅgôdOhÌ˜ÐóÚe`¿FDEÇä„yÖü1aGš?7 Ã	å½tÜÛµqê‰ ¶$
+ßªóÇ¼QÇæëµŒÅ!½ÕŒ‹ª8>%2ø7ÈÜ'gRqßßÉÀ×¾<˜ÑêR©ïµ¼ a)õW©uíê4ÉÕ(ñjPtQŒ†™ì•\P
+ßT	‚‰:Û%Ñ¯?Ô®gÆFÌAVZ±èýžà—ùxXïí¥ô'„)“¿õõmŒ¡ñäfáJšÁüGÎt¬tHÞa+†øõ8äÚæ–~$™oì&â†ßÎ‡¾êoÊ@¾ÚVl‹p7BmÒ49ÌÖ†t¿úŸ%º„ÏmÜìç¬¶Œwþ <w±Ë¢»0~ÝG,W[–ôÌÑ„n­Ú'¡³_º;:‰gøb¨…(ºí-¡Y…sX¥$6ÂæÞ¯²~åÓ*3zó—ÞWºç^åKAce³8åR{ÔÁ†HÑá†Žôa–¶Q2-?^Í±ëq™Ny­âûú€À>F9c1*’zýËaÏ7²hµÇÔ§’z‰±²,µ{üÚní?èÂÅ×$ÔÌÓc…º‰ûŠÑŽë¨¸^‘ƒá³eÈ«7JËµ5šÖ9‘œÄ´oµýFnÎsy)OT¿îú¡œ?YVót
+!Ï"ÿ³ŽÐw÷a<šÚÇ^Á¶à¡U'¯ 	MÌ¢ñ9²qp»”×ËA=ø” —L­è8(gfXnÍôPåX¨b¯Z%ZŠ]fJ‡‹ìòrµH Â%íhÿª)§5ÁKÌ<èIéyvpÈ~JN¡¼ ëçàCväe BŸá5±Üg4ÍRVÍK;"ïÏ‘ë-~;¿ÛÝX!M6ÙÂÝ]£À^³YH‚ŸëÏ*6woÛÖ®bàÜ°ÐÔIïqÜZ×·„`–Á.IõÞÆ¿Ì~PÀé‚¦á„%?Àf¾ ÿf¤7sô™óq„ÿw0bª‰l}¨ÉÊ^d£·Á$û…ÿ®"°<~
+±Éƒ”eˆÃNÂøñ|ñ¬ËÐ~óàZDýŽd- þëeT¬|QìB²:e€çyá,ø_°—T"QæÒÝþˆûÓUÞ;W=$à$Ð'˜Iïñ¡KYûõûøœ:*.ÒÁ-}vžisQ7uÕSà€†D‹7JaÌÞZÊ¿ïJŸd6Ï$@µ„q•ŒÖ°Ú(Ã~láÆ¡Š¢Ãã1™Æ9Áô×™Á2ì~òÒ‡äP[sT²j!sqú«ð„æšu%µ!åEÝ ˆ' ±E—›ð×ìg^F¸-¯ƒ:bá	Ô4‡ #ý0ÎÚt.Š$€àäåVîÖqf!óâˆÖ˜»
+Ôºvî›sttš77WËsXˆêåŒ£ãóIGb¾ÄdœÖß ³©Çf8˜‚OøM¸Ú‡ðüÆÙ5<mñˆŽ€¿•rœ
+yâèˆÁq¨šËf‹‹ÖƒiroâõJmØ“!«!œô1Ó®IÏ»g°¿Æ’2Ü»öù¿1‘}lê7Ë¹Åà eG)Ý^J¹”ò¨ËXÓÊÎP á¬#Çy4ÞOÝæpÏ(O…Ûÿå*yÄBF=.a(dÃ»J?„˜Àñ«Â©ImfjOWÄÍ<)4'#¹ˆÇt$eÆ½à•39+ñÆêõÊ®(l°ZŸÅÈÖ*iCtŒ’—#æÚƒÏB(cŒå'C04`OiZçÉó0z‘¦àh•ÖÙ:åkJóµ¦ôµÝ\ùH™ÊQ9‚ÜHrê¸äÁ¾‹ËÆÈ@G¿g,Òò•("`ŒÀ¯.“LS+sJ÷\ø4'/¬>´½»U­¡­j37O$»kØüQð lˆ+S÷rCGù™Èx =€× A¯¬Évd íG°ŠýšhŽ]Ž©µ’ˆp·}E ê|¤im¢	|ùóHO½xª[‚˜â;€ËÿŒ@üþ1‚#vŽrÃ=ÜrL³ú:§¸¨Ð25F0Àº¶ŒätòDÔ …wçLè`hH=SMqDÁø¦~Ñ¢•õšá5åUÓnòÉÇÅÒD&‘GˆñÖÐÐì7N¹<ÝØë8gÙ††Çßá‚P1Lo¶§Ýf’.Ä½Ÿ†›­*^ ¡9¦ü2µŸ@"í?ÖÜËÊÚÖ¯&v÷ˆ3pFÔÎ‡u•AÑIY¥Cä8cÌOu¨OXR‘n?<žqiC
+9d|VðÚS’,Öÿ8E5·ªWðO+1Äaøöm)RþYß*‹½hÕ6J2è,Åñà(T¹ý-cSˆ¾T Ùû¿r6®zî	Þ’os¦À™l‡¢©Œ^ºN‹æÌMõ§'3qže°è{A†§ÿ41¼ÚŽ* \yüYäÓŠ7/ÓžðÀãpKÒÎ"É!µ­û/Rä‹—d÷Ïˆ‘E¾,n!Çï¸úÚb›|é†OÂE¤`X•ÝqvÚÚ¬j 4¡cÂ­þ)(úLÏ]m¥œÞCñã£rÅ™Ó"Pµ\û¡ËXSÆp€ß±û6@ÈI¼8÷‹Žæ‡	)‹€Ah€Î€FÉ3˜õ=^þa`Æ†²—vÔ’·7/Y˜åt6D]Pü¾s‰ïjPÑ¸`€œ«Õ9Ä ÊÒE–~nõ›*»0CZˆúÙŒ ÔL¥W—ýƒ}¹7•Åc¤â7JÇÒ#ál–îøGÓ¥y¢ˆ= §4idÃQúûÓÊE¹¨Gºlj^ÎÁÂ¼^´$…'%’âˆåe)WÇÂ×É0*Tž¶#Ç_tŸÊ#ž&G7þõÄÖ`*§é0Oz‚Ó8ÄáÊ]Ž²rêc{oc6ø«žšŸè ýjÂ4€,b-×˜­¬¦!ÁQ¤qê¤ü³ïÆ*Yøœ_®Ñ
+T©'(”¬¦ÿŸ[Êšäy¹Ç¨’2 ñ4¨Í>‚pØ‰í§­ñ$©B¾ñp¾“Êîëù½Ò&¡æSˆ½X»µu´GµQ“Q Íë%Ç	,Q„Î_V³@`ùòŠs}îå‡HCÑ9Ï1f¹×ûœZ³Ûàr2$ªFõü;Ër¯5€JÜžVÞ`¸zÀBÞ¢u%b1ˆÃ/%;~©iïBzà}†¨T/§ä%OO÷¹ 9½ŠúÙaÒßòu¤–Jò#¡9ì=’erë²<ºG}Á¾GŒ6›_è?³›ì$¥Fm~­ÝVK¬ò26°²ÃÆv6w¿§ÐM¯Ätá}‚W(#Ä´âÔ¾þ*KŸÕªi•6b·—-)sùW7–{aÄŽ‚ÎBõnÜ]R£qcH”2°ÆâË’?m2wžÂg…ôSçèÝíæ§ÃOú¶™W¥ñQK]÷ç¨ *»F#j-„ËËP¶„Àoå`Ø
+np/A¯v¹íÓî>ÁKúÇ½ÙZ¤¡²ãE³._[›f‚+“½~Â”‹,Bq>4>ÆÄq°vŠÏošÌkÎ“p£ÅAAY·›rðVb\¸v7LOÛòM‰iú¡?„él¥¿ÎùÚkaÓw“ðjnÓ úTË­´O+Åi¯§tò/hH|Ä; jLç¥"’",ò@ÜXHáB’|Óí™¯ÑÎùµü×çƒ k4¢dý€­ã”»{†Ø|•.ÿ\f\—ÜØj@Î×ë£æ ºÔÞ²—ô¶w®Q€úy.ŽFR††Ç©¾ëØˆ^ËÑJe
+í iéèÿÉÌmÝt$ÚMB…¯?ç™-Û7M$ÏçVï­e®Á‰^ü|¡kÁ§Ö÷ÿ”¡b>–"qJóWÍÇ^üE6çë0)Öm¬ðSû!-ã£ÅJ  çvÉªlU@oèÍ{w"['–—é”_u¼ŒCæÞCò;€–ÞNL5“·oQˆ<ŒÜ¦^HX>Ú|ÛËy·Ñy7—f‘är‰ï eGH¢ÅÆ‡ñ1³z bO˜BdÜÃ|•0w)ß{dÍ[Ir›un'®qsH8•ãÀtö–cûùô[~*+².·ŸÇTŠñ./ ZwszölFì¢à¼pÀª3£b}Í!^”Atg£2e…Ôó'Åßë×:‡ÉìöÉìo!d	€Õ<Ìà’±j¨$ÙŒqkÚoBcÃHôgýsÇÂ>Î"r–`æÌ^€~É–(Š•ä…÷íI1`ÿí4Ö1ÂJï?›Éw58ùóÇÏ“²>ïâqÆ±ŸójÂæ²Àè^—wbjyãù;2!–Òª)÷¤UY¬ßû,€Ê¦áuŸ~[„F`èüð.XãþÀÜ‰NüDgÖ×|‘·‰•TLV|›‰hò^€
+Ð´—øÍ{åÈœá¬ÎEÌ¥ü§9'{Lh9©TïÆTù_[Ôæˆm¼Òu…jÀ5Óõ££
+eu-þç ý: Èk8EÐÒBƒßXØsÄ€aÑlÀ×†alP?t«šµÛƒ´ ›gé÷Âß+Ñð¯¦ÖßÞóþç4µ	„’4û!ª(ÎÄ-qæqŽ€y¦~„°àÙLÍ§ÕÉÍL5pAÎòûô>C¬Só|¾bç¢šþ}šÊ³Šm™Ý˜>r+ºß”¡¿¦Ýš³â*xœ’"áP¹O¼ÚÝ®™¹'ÿ—5úÜˆ¸ÞÖ¨Ÿ»ÔÏ©³sH«p†êhÓ(•Ðybh‚›C”a¦]•_,9\*\`Ì‘êùMfh†—~‚½¦¦–C.×*?é§ŒÖuRùn½(&3QÁûÀ)Ø¶1°pÕg±ÊìYÎO®›ýGS¯ß©¾ß7i?%uäßºˆ ¥BÇðC€¡1F(Ê¬÷î@­°5¼2j2VË£90·»Fgr‰e`i*.Q¬iÙ„
+>.™=Ê6€óŸ\=â¸í¹(ËOÉþÔÊ¿|TƒªS¯ëëkæÈy·3¿…‹Å$#öÑ2]ÓgÓ™,>–”
+M„„Ü‡šþºµÂ”‹›‡7Ü /±PÎ³ji/A3?DSº¥,Û©â’sC|QžwYË0ç+±œöAì&OM¼æ/ˆSò‹¹bñÈ†G˜¤Ãl_€Øò¼1ÿ¤`QQ²i“âœ¨Y§º›öíóR_Teå¾—¶‹GÙ˜Òô4IÜ:Øx’Îs,¨+f¬/(âYRB>Ž¶MDäÓýn(Ñïl¯=É{”ÝÞw×¨>™…ã[‚0¹ò69vðyÊÂ(8ûÍœ¾Õ9{n		w­‚µ[(Õ„!—%êÃY*c_3¯ÛÁÓþo HÄßWFÎMØ%H‹vn•å¬·Ç ªË÷£š¨oR­‡ ´o>çë«©¬ “*L“í.‹ÁÕŒOŒ9»ðU† ²ïd®’ÈqœÇ„I¾’ˆì?6FäŠ>`¿æ´ÊÕ¾R5R6[¡kÇh³fNl¥¥&³i7Íká1ÔvO¼·nÿ“·ëeƒÙ\dC8ù®ÍÙ62ÑñIoÍéïsŽáæÒwíÜ`K¯KF'„4¿~O¯p›ˆô©³Tq»vÞ|ï,«#¼ }V!LþÝaHiýR=ì•Š6G.	£WSu«åýØ%ó.ö·1fM
+Ô_}óA¡`’´¼»'	½ä9’² ¯œ‘ˆC,VôÆHEŠ¡gz|$>;ê0€ÿl-öÄ^r=| ¸óš=0°â@Jñ£¤°¬¹ªaÕ˜O]s}¾ÅVkœtv;›n¿Be8]íXQ‰3¹i-åÅ#Ìr¸iÊðJÆcGnOrƒƒ0êGÐx®TE„âÎwƒÀõdyLödDèX”“Øþð\s_x¾dL•8ÃÞ±Ê·ÜiþNîIÔMMÍîIí–®vt‹ö!‰pîîØ¶XøÓ×è¼jMŽDwØZ@rsÔ¤f)‡‡£_ÉŠê•Ô´¡£W!›ö	ñVGfn±>fò£_â…èÔõ?TÑ…Ùð»=q¤‚DGœ—Ÿ³ö<t½»5Ô#0KœmÕ¹îì²dÑËíòÛ(w\~9ùy”ÿŸƒç5ÅºŽXjÝÖÙ³+žb"Œ²÷åaG±sè^sîg!ÔeÈVß5g¸r´3Ï¯I†â¶G -'’Þ¥ŽQK\LÞ_Þ*c¨…œøPeÐê¥¸A²âä?Òµ%
+øg9û0qe(* ÊœPu>ñÏ|ôC÷ëK7Tå<:	úˆÂ„z”@äüœôÀc¦Ï/»^»ØÌœ>´åÌ¯êöu=ÄqxoëÄË¡O6ÙF\·F(ŸÔj¶0Í <ÇÜê³X1í{—Ýx&U53Õ¼âðª¨]ö.
+øq¸cZæ(p²_æ,ÇàSá!çB¡¨/Jú°èV|¹sB.÷Ýì/MzïV?‹béVEÂ˜	4‚
+‡óÌ ‚*ëÀ¶%šÎhø\Qý/¹{fÐ®ÉoÏJ €•ÿ³Sé©(`XîTÚOcåôZ¹y$+¡í@Ý{Ó¡Fcôró¾qX±·i¹è'$r­ªøó]5¤ÛÏÁOn1ØÖ…Îë1Â½±îÝà.\†ƒŸ;Èv:[‡kšÒÎ÷˜¡/Æë‡’EÀZáèñAdm†/N+HC/‘ƒÔnÆ\Ô(‹áùKý1“ÇÝö0C¶qÊ£AÞ½ÁGdj†\ÝÝò²Úœ*Æ_Êá<ãœU6Ù¿y3¸[lqÅÿ<æ•Cu’\Œ<7ë°&¬6ú]!u³_ŽO;å1½!&š„óü®Mºò|‘ãYÔÞÁ±5;Ç]‡Í K„é<"¾$%y±¤)ã«!0[±î¼èÙÛÇ`­N6ù 4«Ee9{§”4Ø€À n(ØÉX¯”+Âµñ¨õöûõëåÛÕÿ—:ÍàX°õgÌö2r€ÐBÿëY–<øä%Œë!®S 4‰ÚÙ=ÿ—÷d3tº.=ô`(À
+d€n VÊõiÅ;V´	bBqPï7à«í‡‘ôEIŠx¿¥Ê
+±<­”’ŸþÀbX^g[š¸¤õý†¬°e]‡"êl"O@óÂÿ½§}Œ({ûÁÌæ‚a9£ñŒþ}àIåÁ>öl7’©sýûGëx˜r÷&,/ŠÊ>ßãz'‰#Ÿ¸gû@Òn ¿%*‡ÿƒ³4„*ãYT·›§”—s'ˆÞ¦Îø•P@09U)Ã?ÙÞ=QÏŠëiMÿ0"Êvææêa5D¾Ü#Ë…¹§Æ×@ßª§¦þ¦EI7NTWš…ø€K˜†@¯ðD^ðò2Ë9c6ÅIrq Oô8zâaýÓ*cµÉï"'&‚Á«…áP‘'ƒ€)‚GO,^í`z·¦õ¹5i|*Œï÷'ÎÖqœÞÖí©OÏ›¡_nœMJ¥.^¨1ž=Ž,WIèvY1ñ\ñ ñ3üïâ¯»õ¤Ì;®ìq1Ô¨.NlZ3øjXs{6\vuõÿé™¿$Û¤ƒj.ÁUød2) èŒ~WÛ”ºÍNoWÐ²œBÏ2šþ‹T)èHOi3Éì¬¶l­~Å¿Us– Ö©äÚ÷¸Ö­Fþ#+ˆ¯2¢xmvNùÐ ß° "Q­\JÐµD³í);Ú½ ‰ÉHø´­w5s¦&%P^½(pû !ëàé¢²r¿iS$¿'1Ú©úó#(‰¼ªm„J~|BIÕãÖ Á7sv¾¬ƒ!oKÄÂ#ºÏ^}Ì$yNÆ+Ä×Cðó¹Í(lœáU«}äØ'º' Bàó{þÐÙûÿdœQc¯WrÐÈ›˜©sa1¾æð+9ô%OT…èK2i~˜w SÒÁþ;2t-ç=BÐò'èqƒ>p^Ù"C¡EÝûO[4ª·âÔpKÉ8ÙH¾DXK½¾*%‚V¬"$H±’(áöÚošÊ–EÄ„2M}ó<Âï£®DéhþŠtæ@9U÷9Ä’õ*7 dqÉÄá{ÐmíU ˜¾)LmÎs[çþÓtµ¸&ÿ
+pc÷åûµ	Þ¬PÍPR—!R»ËÇÃ×ñ‘ y*p-~˜/Þµ¥	¶òîg±;ª{!GµnÙ?2ÄÝ*{¯§GÈ‹Ænü:nVxéßðü}nìƒÄPT–¿Û¼¿ÂZrgò´ø#’{élÇÙR}?f:øÎtqðÅ^§EV(Q.VªØú[˜œÚáhÛ¢¯¨“"¿#ê¬åêõöœj8FþùŠ§ªkXõ]š^Ö•d—'Ú{¥ý?ú?ž{Z®ž›ÉÖ‚èÊ•™Š|xÛŒLª™ð¥XÌtèHQAì&«-Þôx†ˆ&bæ»Y:A9ÿØ¦BJ¸òCã:/Wg‚ºÄ¹¢ï‰C¬ëúàˆÈZ™#hõçŽ}Ø¾…a½dJ¤«á„4ÍÃ×Ð1ïLP2bÞ5bœ”OˆëØY&MŸ*D¯âF+Üt}i‘Ê£’ÝüþE.ÑÀ’ß_¢²;,ôMÆpÃ\ŒìY{‘ÐÎ]‹.æj!ê¨²äy‘kÚ.ånP–Á,Y<ÿg.%™·£0sö·LÉçÉo"¡;O È ªØÂŸwxõãçíÓgwå‡ºU”]†Èê‚í1GZV“üFÓUøSFa(g£u•¿À‰[´<ˆ;¾ý¨®!y$Ñ•º,nÃêT¯|?(ì?Ü]ñF<Žyó@¨&†ôë2òžî–Ë&m‡Üƒ'˜EG´xÎþÏaU×Rgï/ÿFí4ñÉnÿjØxÿžF§ãdmmy0+N7Ô+¿
+FWãfÑ°:Ýôá›ýØ¦è
+1ŽS…ý‹*úÕ0?ñ ÍŒI„‹eÌœ¿^½OY“eÆ'^ºatÍÐÅ2rìø} €.Ï÷A‚žªíÈ	K"¤:’Qì	,nÀÔÀËËh6›d¾Z¨Fž8Y"F˜€/ð«áR…A,‡ŒÙo•ñŠÄ:-™H6!ç`ý4ß÷Þí^8"ŠmS~R-¯œ—~'x;EÔþ04ì|=$¬j€A"F!ç¡¼dKB“›sZx”3ž†v[b*~Ëª
+úydökSyªÒ¾ÏË’3¾ &6Þ¼GjæÔXÝË[“êð_±Bc¼‰z›üïW¨„Ð
+3È|^«Þ)UÜrþ•Ó ]8…$J“Òr^¬<YW,Ä…6<7+ŒØ|¿ƒ\%:¨…îhS[½ÒVO°gl£"~Ý‘ø)ˆ$øû÷—èæ":¦¾)Ž¿ÍïÖâ/ñƒûW…À½§ð•:$·ŽÍ«*lÞóRE²U·%÷®åÝL_®1%ý·É#£^Ö^X–%~bQ,yŠz*îÖ“kÌhMÊÓÔÈnŒºçazA”"Í.a;Ì¼ÑtÀ1í“ 	V²¾óá€À2ãôÐ	ÚdÁÅÿÝ-·à6³m*CJ™ˆ¬ÉÒq/å%\D°x(•„#_¡n±_0=ì¤[ºßöÚ‹\}Kºá{¯TË¢•:z0mYüeó±nx]<«²¦Å'öfÎ”G÷€ÝÖ¶iMÿFncÎaÃKŸ2Ø¦¹½oNØóD;…wðŽnÜóyXóIOW“´˜_¯®›MTÅ=D& ´[µÉæk~ »`ïùŸ \¥ïÿø¯òäùqÒfx,Œcæw˜FC¨®{Y=*@É—é¡ø¬é`<~í4|ì÷:ä“GÙ™»ï<€>~9lGA‘p%^òÃþÄJ
+Òå.}—°?Ô\¾ï‚Ë–³WµÊ¦h6j=ù’4( )B/`•ähÈw«œå›”j»Ê\˜÷?Iß³aŠ2SÞ
+¨d„2Ôì:•_b~SHœµõ?BI,Ýûbÿä#6ÿî°s¿QÖ!¬T*º¢Dá0ç‚‹Úè<+=cƒ|}Ì¥”+¬2õD—(ZWO÷áfUh’CW7™&à~¢Ü1—º†âš¯Qm~kL¼½&5 `‡´)ÿ	›ïJ¦ìÖ»È¶I“l¿°±ñi<lîä!GñÜ:ˆ€£ö×¯¯DêXßD'wñe°ÓuÕÎ4 xLƒ8±br»’µ.¼©Í¨#ÉxçÈÝqC"GÙ:Ée -è—Ýˆ£” ÊOA%ÝAUöeHUsw½šÅUšF/ŸÈÍ	°Mªºc“ÝjÒ=ÚI/ø&¬-dqgVªV5ÙQf,Ö9>†Öã-*¬õÀ‘º_N—4‚×G7]jm%ÇÒN®6  ß
+tç(¢üŸó^%Ó½2Ö/Yõ‡!Y• Ä­^¨Î	ž!ÀµÆ5»¨÷6tð¦\˜ÊŒnI.ê oØÖ @sÇ»‰Ì*»MÊøo5O“±`ó÷ÔªIp”’Ô]„dãÍ`š¿jÐî^ÕÝI}Í‚VäÂ¸mvàÐ¦;¨Ä±PÖÎèùb€[%ªGoªÕÔùOZ¡ch"½åÐÅ×ª’ce>[OÃ&1¸Ý˜oXQg ÃœÖ¢£·šP,m ­×–hÍõøŽÏt©#¢´¶] ×ÛíýÂÆ¾ü—…F`ª¾ƒé§Pƒ$.<´B•EV
+Î›¯t–AXRv•Ü˜‚ÒÚi¿£jFP‚ÇKq^<Û‡› šÇ6Ë)"ÃÑÏº¼œþŒþæ3€é´¦ÙÜ3õÁæŠ'¤Ùà•4\k#…8y«û”·¥q	å€RRêÓ‚91IÊ€/Z;—%ù˜`Ì¦¼ý-Û(<%FåKçi<¥ÔæÈ=…Düïm4m=Ç$Ú™v)ë±Mž¦9·w¦U•Sñ)ê[¹æð*Š¦Q?©kx¤¡T=Ïqn¿iÜä	PÏœH7¡.ÝjñçvŒŒG8böéÁ{ZÍ÷îÝÈÓÇOÉLÁ"“Ð€•œ·¡Wí
+Á?ýƒ9¤Q,€Ñk~SºCè¾1Í¤@@,;´¥fÍX¦C¢¯*šH›gÎfùy»Æ¢ÿ2‰œ“×€ÿ o'ŽçÛZk·nÞ²3u,ßÆ‡2 Å’M,‡a`Â…tvÜEÕý2à2Þ¢&"öÔõº•D¡³Ë	&%mÙH¤Ž‡ÝãÇãì*ý„W<tâH$‘"…¥ãqÅÉØßÔ.öÑÔVwÙÅsÚüßþ×˜.jj‹¡ÄÂrn:QMƒ—È4jÄa¬v¤[ØôN9–œÜ®wdÌAÒgTËùu&‘aõÐ¹¬³h»Rc¶ÑGÖVµÝÒñÜ	Þé$S¤¸µp#ÈÊ ñÀð
+M›d¾«Gä§KXé²3°ÙB¶z†$_ê#ù/²<Zö\Þ°A¿ç^/[MÔáÝOí†5)åÒqÉ»Íð´`œ.ø±'Ø¢Y“‚¸yäAJ¯³Šž£Ò¢Þ†Sü:|•-—ŸËY†  @Š„¦Ž2Õ½D^"s'ŽyÿCŸ'Çm_Í¹Ì(·IÎmeúä;ðPO\:~ìT+õ:‘y2Ê7~Cš¸ZÍzÓU1æAÍW¦!f ïÎ9OŸÑ¾ÀôØ°½zû•ò—þ¨å ªg:­žù¬½\¾é2w\ÝôV×;¨ V±Wz¡R [·îQJq"ÂŠÿE^õnrï´+˜p›Ãƒ+­f‰hõcÐC¸ÜÏ"&äWÏNÔß+2 Ý÷ÜI#yH½! o*Çzí;7Š*«‹ó^UÉ
+ìýÂÎIìñ
+ê9ÕlI¿Zmß7¸ÿ«©g¹GN0¿=zÁ¯Eºcabý‘¥:t°X“ÓUbfVªÉT¨‡¯Œ'à´¿,4qo‚ûš#óOV|Öb^1ö×´DV}AÕÅÇ‘QÏ¹Üƒ²[€Š¿k…Ð•FŒEàE*ÏÝÂošÐÌ­W„[æÍ–ÌÃ9þ)-+Ê¢šOkŸŸ¬žÄ¸‹•À°æÕûŸ¿”E)ªÔ~üxzÆÉŸ’å¢<Êm½‡A`e ÔŽ,zýÆ¨´²Zù‰×‚¾…ÁiT»j>4&ƒš—šü6ý*ƒœÜöànv@(¥õâ£ÛÏBpS
+€“XZL ÓÛ&º±ö|*nt |Ïª5«af>ï}'›½¼Œ(aFÇRh#=ç%Z™k¼ÀÖµlB“G×€àJÕËà5C¯æ¤EízNži‘R¸]h‡~ÓYÐe³ú>ÇÔ¶ÞQƒ¨MÏpœ»¦u¼@ªöÔûÊÎ<TŒ½KLÂ	ŽN<-Üýg/ca²äãôé?ú™’#W¸¸Í%—§nòhËá°_1‰°#vû5ö\¨I’|¨-§>È0–?yû($½<<ªMØáhjØ;«„/çääÕðÊÀ¥UF[ÁMºÔ8/»RÁÍCu	DPQùËRkž9h(eC|×¥mö“ÙŽeëŽÜÕÉR©(
+£·'oéäVº‹à: (WP@ð++ñöc‘B¦O02=´ËBTšã8Âö=0
+µ z}óÑï£7}Np½f#>nL³&ì"ŒI'@c·øyš`EÖÇ'ÌüPN\ÚSæ3~hÛ}œœŠœóÉáÁ+H¡éP#£"¢ßøÙI×åÙ3
+Â	/A}ð×0i`(Añ³ºš/…²ü~sþa¤!qä@ÌYt­¬ßŸéeÆëG…»‰KL©kÜê´a¼ÕÄô‰ÍH	®Ž\Ø¨) ¤Sü$þ±Ó¶§ÏÀ«AìÇüô7~¤-âçcÿxâß°•Ujê^DAÍ¹Ót^þ•Òv¼75ˆî¸¢s(ZDós“	ÇÊg‚<Õé²‹ôQeµ jMž$Šýø¹ í:Ç3iAÁê’³LœËEx«{yÀl´c(çûpCø¡[gt=¸Žr.Ò}$¯å”®¬Ái·>¬±‘…
+BáÌGþìÀšSÍ:|\W[÷høQ.,?Fì¾ì&ÎŒÃg­åL‘Ò3áG&¯ óža±zâEF¢SpRxÙ Kè‡ß¸CŠ±3Ç}mßõs:²z4PÕWÞuçzÉZŸït¿"’ùñoZXýc8£uõ…|«L{_–·žù2)Åð¦…±yK×ˆÝë»Þ‘/àc¥^»·xŒà¦ÜÈïZjBï	y©;û¢¹ð5+õùŠ`ihÉµ	ßIŠëÃõÎ9[ÕŠ‡—»«“iÉMØG
+4èãGc©¤N+ã<á6Q;»²äaBz¬}Ý9áUÕJÇ‘ú‘ú½_zdX]vBsùð=f¿’¡¤PÎYÞðYSt”#C’ý{õÔÓjqTSi“mÛh·.;>n0¸­0”+.)å½ŠùuDm£-IÌwÝ•*`áK¥Ó¬v²™üè5Î…À: ×ù¨À*`O‰mÜgë²nžs—c³±#aW"G»xp*gá›hÎð!kt˜>ÃN66}É Ëc¼ÌÚixx¬CœHÇe“›
+år*#82¥‡)K’M-ž”Ë†b%,ÆdKÂ6 ÌžYøò‡¿JÏ–|}&£'À›˜³€e®8§ó Pe½{Ð™€´H»kX‹‹ùÖF¡;6=®¬{µ|&üA°W¹¤6k!tl–]ÁrDCOÓ´å›ˆ<Q˜¹Ê1§¬hÉé¿%êlû&ª3Xî9ënöJhaòylž:šž	î|bø“æ°‰X‚^hgwÚã¥A«}h®í—ÿ5+uOP:KyÃšt,R·XèpKãÁê!:–ó#8„sÎ‘krÐöYÔÄÐc.í{/ú°Ë¾ëô:´×mÅÐÆ	GNhŸ}ä£~…^ÎFúë#ÊŸ“­úTþ.ª¤™Ôÿ¡P2çúidna£ô$/ƒúëÛ`ðÇaöÜÃÎ¡éM‘×  '$˜°prò±Û=¸ú"ëmªÃ_CYuXÖü	MîÍÖ^‹ØJ¬xss›ELí8g€•2?Y+;Z+4Àƒ—ø\{w%–½4kR“cÖã—ýê	”m=ž½`Z5;ˆæºbÿ„ˆÆ6ñÞœ>È§&Çq½ÆQ¸2I?ñ¹Ì;	dþ¯¾±Tò;~=_œëM˜gå®|ôø6?Bþ`À²_Â­ªfKçE`#
+f(¤#„c¤Q[ÐaŒ“S$€¯%·¯ú™5-ê9Ø§£Š,î¬OÆ(J„6‘CYx*r†áAöò(™¡dUœšBTÝŠÉ²¡õ;UíWÜgD–:Ü$4»ªã©½¢ƒ”­Ä-ëi.FöÈ=|L‹ÎDb.}ž’”“î”þµù«_ë]tR•§gÂa¢ªÉ…¦ü¥I·›k Ïè9B¢¸3®clvö
+•^GÌNÁ7®1à[§s}FTß)§.ò~®Fz¾²rSøqÄ;Öª(%_þàà7‚)‹Œ	fü„:_GHr:$ûÅLŽ²«»ýê«þ 	nFŽÏB;þ0j4ªçTX µŸ`D‹€ó£j^'›´Ò*Ø8N>l6Ïœ`ê¾ÃJF%}¸üÀµ4/Í	] W¼6"*‹~=$­û"h‹¸%€’lVŽX‘:ô»ÇÛyÔ·5ÙœF¨ {?Ú(>Å4Ý¬{AOÉ“×ÅÈŽÁs£0ÏŽÍâ¶LÀéöF—…¶=°ºÄÔÿCëßT øË¥À7óXŠèkúgÊÃñí £·šM7ûàa9‚"g_±Ãg”WèsÆ…-êñak ð®×1]ü2b—\ã\+|2M…Ë@
+–SUú¸Â«»Åéb°”-í‰HÅ*kV9díàÒA²+S3dÄ$f¡˜IãY\ /4"ÄkAž6²(óýpšq¼ù`YæZ<ˆØ„€ñŸPm²Ìè»¶+¥ÂÉ9ƒâj ýh³pR9*4DÌé×—·Oð@zw’Ô™V1â3td6ÄÞÂ±‡Rfµiðéw!µl^ïa†ƒ²÷ +ò%6QÁÿKC¢m{"½ÈÌZ¢¿¡N3åÅèŽË+ŸcÜ§EÖcg0[Ó+
+¬ÒžúÿžÄpùÂ¶‰A83l¡r½û[‹ñýën1K,H_<"p×&ƒØï¯xÍ¢³~0U¡Ð66ß-¾ÑÿÆá˜×ž¬<.M­½­KE¿Œ™@Ö7mß62â&\"Q9@Ž¿síÙ—!×_vLã†ã-'‰L‡ýªT†ödruQ×cˆÎÇ­ÿ]•W`8¶D1åCKK
+hzÇnð¯~Çµ):qµ‚9[ð@¨1	ARÜ§|	a›ÕœÖŽ÷×%î¬„‘æ0®‹óiÐq½²àA;\Ü0»˜ï@Õ¾ ›Sw\Ab~ª²‚Æß¸«yú­PØ‚*Dœì#¢hCqÚ] Hž¢Ì5ýR*þŸH6w;úËšÄgŠÜ;ã´I
+4ùû;v„ãµE !ÉÌ%ûp.yDï¯í1xÿYÁîõƒì·­;¥0‘SQ<~%ºs˜2WP–3³ƒ‘þîvXÂ™ô¨^µ<±t,
+ž»W|Bº%œWä°%'z¿üÿ°`R&úœÁòÔá³Gï%òN¤]w´ÈZò±yõéºUXs15"@rÕ ‘8‹ý‡ÈBZ VN.»è§TPã*í)}Ùà»Ù SÍL ¹Tï3¤5<¡Fç‚îÆF`t¹Ï3œÓóœ"ŽïÃ7”Òª"1$áðÈ²!¥µÙ]÷OïFdËRœ45AòÞƒ+^/‚G§áéÂÉ•­A­„ÎL3x&¹ý>]^Øm—KU~ó†žƒ“Ì¢2]¤“›ÿãJôwúY×£ÒÔ(„²pUa×Uñ¤íË€y
+Q¿|(A§CEÚæ#âçVJ/¾Æ¯eßyà•Ì¤ú´~´:i³ýV¨ —í¨RÖ—ÅB½ÙÂÝëÆ2IPäs‡žÌQÇ¸j×kÑÐ’7Ë5%ˆ¬
+–?:8Ô¼&íAÃ‹“º<¸Ör¬øÀn›U46î¸×ÕÖÌÃŸ|||9êÉ'lnùì;Òv.WšìAîoxÇ¹	º¿9Ý’„6<Âûð/pò˜Î%ž<
+èkÄ'uíàDÙRË#²L´¸¤ÚÙì¼ÜRíÔQmW½d®Öä±b’&Þ¨b}rø—á{uÊ@£&ß]×˜m& :4Ø÷–E!vÇ!C“E kE'ÏÇ…=-Yý€Ñ½°Í›&I8œ?k¾…j˜îÙÄ§éäLZÖ²Or°=5$ö„Îä©G©g¶,Î+æÁÊ²
+Goßm0¾œf÷@…Ô3l> m¹ðb‚’ö]Ùß—¦îìsÛ¹S½…òö¥<‹øX’R:j}ä¾F= ¥&Y»âRN+ÿ²»’63€s³ƒ•¬ìþµýábjoßEŸA3± "²ÄÅ·~šÎ{­z;ˆbÓ¡úóAã£„…ûOáJrõŠ4µ çcHâi‹Ì%]gÇ0•ïÓd˜›!³÷æüìä˜4%‡£báäÙ²K`ÄHG¦ÐSò·mšéÌ‡~Snin8*|ãñO—Òe¸ÕŠtº3x/,x­fKœ x›qÈã(˜ô)ùÉ‚\‹hƒ˜ñtßï P¯%eã0*•‹·ð£ßO ×4ÃÎÁ¾w“ÚäëžX²[€šH†Kža%W €¾eO9açWíKIÍÍÚxú<ºxRÉà¾5•Â]hxïÒ	í¨i>BÔýÑB½o×´%?•Ê]sÓ„U6Û?ñëQªöT r;	$_°Tæ++¼Yâ´•4ÛÙ¬E—°ã]¤ïîØð"ø Û=õþRaŠÐ(9Di·7xæH‘¹6&‰:MðÂnÔylP¼²ó3öÂÉJ®ð4ì»í™MjÎ•tÖèIÃmh€åUÍ{7?Þ]‡ÉHÏQô‡=´=}äž@“ˆøYyÓ¸güVD¥`ƒÉÏV›ño¸ve[·âg¦Ö1ú¿n®æ:@º*p{7²‚TŽòåoVìŠblq÷k¸DÒâ)í]è‹ ²X<H¬E õ&Ü ´µ–òu#z
+OÝ7¦`&b—Ó²±íèj¬¶•¶Wšò0€‘æçbc0X»òC'™öuÐ#ÚÓÂŽ§Æ&íÏ¸‚¾èŒRÑwë,.B5;XÇÄ6=Š>`gˆC÷ûíÅiá¾wÞ£‘ßÑ;ª·çÐü”+Ñ;4”J=É |¦ßhû~Cè·cÈÈhHÙ’eA"îë#¬gñ‰2ª©m½UÒdþ›9CÇ«6¿bNá¤J½ÛÛÒBOãÖŠ?k<l”IèÂÒ±»`[}hh	†<}K0Ó¯œv_ôñ|PþºRhT?ð×z á\ûØ?Vo‰œ½bŽˆ9Ê´ÿ—2-y[ðq¬i4b—«Qwl^Ö •h|Ò&K¼¾ä¼ÜâV·^vá]WžŠ‚´ÿœëoíó5Wgô^ „ÈÔ«H¿Ò¶KÁ`_µÎHú@ÛžªýUÞ}­ÏaqUï%©j£ú1Ò¹±ä@!á€âçÐØrçöãÎŸx-m.XÇy±Ùt#âº7cçšf©jÓp$aµ‹¸e§5q e{½¿´óß-«E<9´öÄèið?»I^D)Øï°ùÆûÈïi¯›¯™¿-oª. ŽŠãHŸ=ø—{Åýû¤µË#zÏ÷’ò´ô€ú²ê‹K5ÏËMin¯Yúèw&içäz}8—ÜŽ¤¼m
+E(9Mv;q‘û³iÓòçº 0ƒìkêö¢Å{«¨=\NŽ>•iˆ’ƒ$Ò£tZþ¡Jý*;ŸNrmbÑÍ!%ê!Þ¼ÒH8Á)ØñÆ'5™òt‰(‹Vï‘•Ì4&±€ˆ7[ÒÙÚL8Oo¾öoùM%þ¸CwtiO‚Ÿì»Wÿc->Á7Q×zRsÕj4ËÊ©m-Í1“‡ _ÞÖ³3V[78Þ|Ð…´†³Ÿ  pÉ¼¤v:¢›ú¶ÍŒÇðoUÓXHÞ19­n)ÓÞC¾SÔŠ:¯ÉÏC²?Cá!³å¢f’I¥8Yî¡TµudLÃìh”¿X^¡§bmê=ïÑADÝ\¬´¬GS)Òk©‡î*[]£‚ão’™g·¨^eXPsÄYXÒCÕ=m‰ø'…â‘¶…küVñ1N-\Lpä"ãëàíÔ•Óø'»·å©BP#ôúéO¼p`0´+ÐñõT­+´.¹©É;còwí6¥=©¶ÆúæàØwBãÏãZ\ÞÌ¹z¤sg†Á>éšsÀÌëÕ®fåŸzZN;UA=ˆˆäU)<Öº­eJ7Ín}®me>ös'P²¡ßÙU=YÄ³ì]g¸Èyø$ÂêÙÒ0Úô>öcŽÔ †B+ip^%«±*/>!¢ÃBš“›aŽPãŽS©ÀKq¦‘†Ý€¨".s»?{¡c–tY·ÁÈ•;Çr6ÛG·‚ ¤V?ßâ<m?C6ïç8MRtÝs¦ lW@fþµgËØ»BõJSnÂED*ÿÆ8•J‘€åâ"8„LAó&ñ’‚ÒùT¦‹ÄÙox‘jÐ)¼‹$ßµŠ‘q¸ð VzÎžð}<ãXEËè¶Ð¾ë¿sa*O!Kæ/Ÿêå-S™ß•Ò¬ZÓ[*º`©š-e/Ÿ¾¹–kºˆ HDûoP±™\8ªóEÖ°®ÓTê½¡ ul?Ï»Ã$r¡t®X-T¡yî–öí‹KÄnVV+\ŸœÍ…„J/˜jä¥ÍVî¬;o#Ÿ@_çðkG5K½ÓZ˜8Ó´•[ur“4LZs†Îàå{õ .‰œ×°1‚}ß>y±½ŠúeÁ»ÒÍòGàlh£dLqžX§\Fal>¥ Õí>÷ù/ÚåÏ sñMÖZ ¡,qfš0\–Ô·5HßïeZ8EMçZ†tÆ$sBG»ÕÅšµÁ0Í(8
+½rã[4•6›o¯RD‘x¶®úDYI9Ø?=¯¬|!éÑ£@¡¸zü1žþ—ŒäÿÄ,†=I?f÷æÞN–Œ¡gÀ²³cÿÙÔ}ÎE)SÕŒ¨ÁuUÐL‰tŠÈê•æg{52|P:M×í5$˜“ê€{'”Hbö=
+»NŠ¯9žÏ‚ñ«´’,™ô9ÍµIIßZÙD‚Ì¿óÖJ§g§Í˜ÅŒ=í®\+„gwóLv_A¹fÐävÿà<ºGòeŒJÄ3¿³êJe†ù…¦þRr÷5®€€Ážfw6fÑ)ŽcŒýª¼È(¢z‚ùšD§ì$ºª³ÀÏ»5†±-–t’+5$:}4`êu”÷zß¿È²Pà¥š¨rkçÀ 
+¦«Äãê_™ü<. þ¶n`±){«!{|Ñ³*HüÂ	Õ—ÑU{žïÉñõVËÒJÙh Ë›Ž–Z•ÛíŠòB\	d¬Aö}ÖËÄê{{ì8jñ$OùPÃÄ‡Rm\ÚÑ˜“º¥G©1uv˜Ø¼ uËµ¿3$Ñ3GMùÓ,ñr—à<x™FÑ‡4Þ…Sž
+D)ãäÎÎé{Áv—áRûf`þŒ/\‰ù‚ p­ÄØd˜Œ¸hÄœáKTçs1d
+}ÐoMäy?.Ûx,«£c;ß®`Ä+”§×D…×ó‘¨P`u¸ÝàÈ ˆ÷í°ïu†z©)§DdÏ©9;¬ŒLÜÃq&95ª çˆ2ŒIÑàyëôË/¶õîº36ˆ$v\ÛßñóFÑý L+P³a3ÔØañp³íL­¸â_Y	â­¡„’ž}ÌŠKéÖýê*eþÙ£†m{n´™O"©þCóWT1÷pˆDl¼A¡icRh;nÝºcm6EbCî"?<iînQ¿‰GN‡˜›âË.èiôu½Œ×{zòEƒƒ­lºÜ3JPM·÷ú„xá1¥y§B¹7@Ã£“\Ÿ–v%|’`Šs!
+/Õ¾Ø"\zd¿ú:l#¸@i«L8Â©Õç¸ ŸŸÒ¬Ý(„Ú*Á	ã0äÇDßÜòdšE Ó§÷tZò€dÙM:v<™Þ¹Ê¥U'ÚW^Þ-çsÐùèm%*ü"ÿDÝ /[¨R–²#önVé¤@£o{6µä+õ ‹6õù{À®TÖÛ*Ûu³rïç87ÏÜ¨Þíq[š “ù¤ú-Ú©6g\ÞQ6&E¿0÷ÍD—ÞR¤R©}6*#ãR»åÔ)©^˜¢‰Æv ¦Õ¶Àlî¸þ5¢foû¼"?¼¥¤`nµî>#5š®Y[Ë‡-ÖÝ"Óg£Ó«‘#«ù½r8ù‚²Fã'^~bsà?3F!œOk±¹EX‚Ç–ÈÑF"IœŠ3Íô'{6¯86óùÁ³ÄXû#å¦•¹Í;ˆ)˜GìoØAâ°@Q*ÉQ…	C§!	¡qdÔÒœÈbB«t­fn®Tû n^Ã:.0úÐ#G°¯iþ ®LE16Ÿª©A²®í6Cå¤ÙRt‡Ý®«@ä¤‡f7’]yánMÝÚ˜	íò×?á>pXð««Ãz7Rr~_ä²ØBÝY(„¸6JŽM×©¸ÿ©ãšxÏüêÙh´w‘±6`¥äÉÐÚYëQ¹RÄUè£-¶‚pN#zHcØDdÊÔÆX'MpF¦²^ZÛbý‰øîy;%©"U]^Ð]âú[Ý…RÆ”žñºän´•qLíAe•{œORsˆ³Œ©´„!soâŠs¤z‚Â5™­} Yj–†fÖ¯\ÚæGÑÕR6
+]•Þ ÁAPpVV³%(ÿvèç'ŠÖ¹Ö©ö–Ú¸ôP?;Ï1éàÔ@ŒrúÅÞG&˜A[~5Â/¬ó*7vÄ©HJL¶ASÇ'HYŸÆA|Õ3…=ØJ~±§Ómh”ÐÿÍ« âCµ9rÚö\AÍÍ42°PpÎ9aÏsn +ý­–P^…&Ni{PEðtÙ]C&gˆL=.Uiÿ/ÅðÂ8£ÖJB•0‹mÄŽiM÷6sC®-¨Â`%¯žíàšô_²ñˆö;+Í¬þå@ç‹ïÂ#<^€wë<w„Æ‹åÐ!B¶·Øa#YUHß7 ]»mÂ(Äš>§Mål×ïuö¤u«¼Žâã—õEñfÉc6KK”^Ä¤ÂÊF|ßØûæ“õN,´ÈMOÑ¸E•Ÿøžø [;>DwF1ˆ»ö%Ô¼ ‚nÃÓxhË¬Vmf»CÇ¼³¦¯›ÆÝÎ:Òrª$ñ‚à²ý”R´Õ½¼¼ýò.Ú÷/ÊŽ¢mßÈ=AKÏn;f.Ü>¼>öBÌºËÞ;äç9¼ÆÇÊ^NÂçU q,¦'Øªõßü%¨\t,ãËuÁ‘k
+ôD€¸ýH=IL^@áÜ%X+ïªû—KZwûÀ”à¬| ˜b•ÄOiÄy–-Šçœx>ÑõÉž˜Ê˜VãõFG mŸ4úZÍË¼ 0šŽÀóú<þE4µ›Üïš[Ã ^×ï‹*bêCã—âp b†?gûçÐòÙWyY„Y<ït#80°(P,yeÍZ0ûæšÊ7’Ä‘ÍfmÙ‰¿Ï–R•ž„–¼‚4º›þ¼Vàµ“Qæ‡k›16UÚrèÚæ›¶ÑžâEöÅ/åìúô"8*È³‘,0AJ~¶ƒ„‚¸ûúú–¨³~œ¡‡ÇÄ‰ƒnÒCb€‹ßkI Éñÿœ«)P]0 7˜vå,{äVü­‘G­HV5Ô¶SµfZÉi‚ífÎsQ~}d‰€±ùv TEÌ™û!)…,«þ¿´Gï=®Ú£Ö´šËŠo#:òïf¾/Q+¯§ðW§*¤QÓQï‘OÎâ–¶Î_åfòDˆ¨fõBÄ ¸Î*Þ{6ÖÿUóÊ¬Ãî4˜¢7©rT¿€ÃËéžÍ­n{ûÍŒÕÔª§ëÐ³3œö,DœDìÎp¡sÉ&K	)è«zP¨®xúbz/å.ÌãiäWÇ\°_K|97ê2º¨ƒóF\Üßc2#tÀqK+³½Óp^ý½cY/Ré˜¤|eT›&‘,³Ÿƒ=íâ,tuÙ Ï8hi}ívå£Ú”ZaÈÐMÂ;yÖÀnˆnj§ü1y0©V‰“ç0pŸñ¾7ñÏ“è2Ÿ‚°—„CäyÁxÖÉ®¿» ›š-JÓIÿ
+¸1rQRßæÏ-fÇaúÐË%Gf#,f‡ó]¯ %¾iÖ–G×&9ká(òÐT—ÛŠˆ\ZcJÑÀB¡V¯¦`ÏàÄªtÏ,Ä`ìÍg”SËöSæñf†% •}—‘Ýp©å˜ÁLÈ¸]©b8›¹úký›êÑx¯—D4Õ¾SÉÙÜ>3 ‡H["Ù}zÝ_Ë,”f¦±¹1”úÕZ¡¾Ë¬fƒúÄÆ+¼§ùs‰ùCƒº´ÀÅ ŒR¶3IN7/þ¢«Ê;à¡-ßˆös˜ðm«éOqSuÙ>®n)šsUg†§#8¯J_¦È02ëß²ä[²gpâ2R2EÊˆ¾«‰IÅÊÂçÂ®àÜSŠ+½0á
+Ð”¶ZF¡ìÏÛ0¤oß«S¤€XMA~Fê¼_9 Â¾Gh¡ý¾p#Ø‹D¶ÁÔvzÿº"å?—÷ÙhXQ«ÒQœùUÍÉpêvKB1}ãGV´ü\‹¹j&“Œ‚‰íÃ°ùžøÿÂŸlNIp¶©0ÌzÏL(òçþ!
+)Ö„ã®²x™c ôD¶XU™ØZK†gi"kù¦×™[Õ©¼Ú?öäåÆƒ¦Qo£ ·vQOÃÒ¬»eRùq»y“XÏFS°]*ßÕpª·Bãà× ‘BâbeZ	€%—Ýy¸†Ú‡ŒóÃP}Ÿ;&ÛðZE½vŒµ
+43¯â.ªN-}lêJ´XÈ”F«„ŸìeÿÁK0DÁÓ½U…ë~ÏÃè<e5–Àî…
+½´ôÉ÷ÆDølÊé µücÈM¼•A4¹’Ã‹‰j‰¨ì@Ú›ŒªöÎ§÷¹‘‚ÄùzàK•­h£˜OŸQI(Êñ#öáyîÄ¦èÑª7UªîœúýÆM£èYåUÀ‚UM×è=YÝ“@ýúF[¶Ë›éÐ‚¶ä¶ÅÀÇC(á@fNÓo+A
+P0:¨VÝëÙUd].kóÅ¾pòmir_Û}—×›Ús>p!Åu¤‡í“Ru&™±û¹ê>W{ùM«ÅpO)ª›óy]ú9”luÄ8K$÷#v?bÛŠ¨ù}âÈ¬7NÈÈM3%+R3= Fñ’÷ŸITøø"ÈpŒ›@©«g¢…ª$Æ€c&mõÕi¨HÛ“ªÕ’›þÛCn*Í	Jb`±|Àž_&T¿hôû™æ|'³ˆG)}Ë¹lÏPl)uRs?1¿øàÎ˜ñÍÙýþ;,«úx¯(3ïÖ„I@e`€e“cHížJËûâUpg¸Ý5ØÑj¸¼$ªØâ:‘»Sz&â¦‘^C±![áù¢ºc®jÈ5TÊžú†©Äž©²°ÁÔOHk7ŒÆx™@'l›*ƒç^AÛa7`Öú`Ê8}v¸ðÞýF¨UÔUãÑ¡—íÆú‚é_Ò|½v½¹V§Þxò fq'—ÛÑÒè6‡ÐÓÐŒÒŸ\;®¬È¹½“ý{9[Ëz_«ÆÉ„.H(e˜ÍÖ–;œJ€£€.ëVEÓù5¬à\ý‰©&;œ$>xÍøžYéú‡ØÇ‚	¦8|~…œ»öââdµ’0­ë•–7€Æ'þñ¦Ã	fGî£ðÁÉaËræÃÛéã’Ú,ëàU™P‹nvÐXqÄ²Q:¤ <‘±¤*ÖÝ"qñlí:æ—œ-Õ%ozKNè^„O/§ÞË´•-’bZò õœSM5`¶Õµ!wÃ=(1Ùv twU¼ºðãdå³‰õ€¨âX_Î!y† —gÏÛ¬LûT%ù>Ô>G³c¹Þê•¨fÜþú¡¢¥“Ê“ í°äú?È4Éy–]‡e‡A•eÿŒ*RÕ]œŠT›G[©ÚKJsÕ„¬¨éä'¼ÀoÉ·æ’‹zJƒiàm/×À”ð|ÕiÉ¢$¾J‹ÌŸwä O$œ‰±Ž V+|3Z’Ž	²Njv!ø[«´5Ñ¼­¹(h†ç+8XÿÌ¿>ëw&únp?~¿OI‹õ-9þZ2doD-ˆr|mnUÂG¬úŠ?7SÐ|_Nb-Ä\‰[×ÓPä¬ÕT“9aš1Âuw÷wÍßsps‰`áöîÞ™å[ZÇá8VQHÑñ…mðLý¤§&ÆÅ2¡˜,s8T*Ôn-iÔc!dðŽ”îV-#“»¤U#½	¦¬áÑ¤r!ƒ¯ûxó	Yôšf»ä© ùËÄqXô
+Ôù·î‡vÆzæ‰AF®¶/Äç‚æ&=rÀ¦ÐÆhÜ• õmÑª€Cò±ötà h²$SžMšà¥cïìÂwû>ÏÛã¤VßþîžæÎ3¦µ"·µ]ü2þêD]®Ý¾žiL¯Zâ‰­TØÿ\>ÚýyŸÙJ†‚"í>t±wkº‰’Ìà´"ß(«R;M(,mì{I<á¿ptt@'P7´KÈë´ÝMµŠIy÷ ·|nK7?•Q,Ìv\L›¿”ä¾
+ØM37zª	ñƒŸ‚õd4›ãèÄ¨0åã2Ê	Û‚õ_ix ®¢€#6V¾Dž©a@ŒÁQ!öDUý¤,ëg-ía[n °.½AVWÀƒµÛ%jM¯"œUŒZ?4«'½¢¥9ø^ÔŒSk•L«µ{XeÝ¶$hÁ¦()• r†!á.Ãæ!ÚÒkÆèGÈ[¤¶8@Ÿ›:Ã[®ÇDeÒuz§¨k¨ðAž:`ù2#¼Œ<µ Çp—¨Ù\7bwAà,É$)£	qÿœ.”ã›‡	6‹‹'û~Ânt}fVÐ•©³†M.öú€9©Ý×Œˆ±ªZÄÒªÇ+3ßy
+X_‡þ£fÊu ‹Tøà]p„	_Å…Ãh¼ò¥É¿d¸º7¾äí‹äOÌ¨ôô~x„sÁ©ÖÈ)•äÔèÀŽú)ÿôºá B€{€­ñ¢mGiiÄ|¬J°ÇOìÀýóq\ÎÑcaß=ÝöÊ+©q@À¬&ƒ¨9†öî_å¿AÜ?Æ¾[½ªéy(*Ž¼Œïãý‚ÖÅÄÈ<2]š×%JÕŠ{.œ>ïŒ¢²±A†£É™ðú}¿œÚÈQL_½÷q9‚åšY¯:14a:G-?Yµ¡%µ„JZngÓÎÃí&Ë_]¸ô1—í|B«ÂXðH0†Ê|{û^t èÈSèŽÀß&zg6Õ¯åH-j†1—jçÅryrD<'X­Èpê/Ä3p)P¯êL¯¬+R´¸µ¹šSVdàNvâ¾F	·»u„EÉèMaàîC¡ýÎµJ}-„Øh9ÊEéÿÀ%w¨<à™3rB—†.¯Wê8pÒuv1ÎŽìL»hh‰°+3’»hb][¨6ûÈ¸°ãyÐçM¤ÊÃý¹¢ÄÔ›r€Óy……ÊFß\¦®Ú÷FCN4§¢À^ Áæ;F“:W¿c¶kAÄ A†Ùâ{†)•˜ÉeÄHM×Î¢|ù>ø;Õ§m »¬ÿè÷=û•ÒŠ}Ä­ßÄ2`È¬óÅ,!a2pSTÏ¡ØÙkHƒrÕCn/\O1A¥½Ë;üÇK”¯ÍØI+ûÍûüoL?êxŸWÏêÝiÐ}Õ–‹ŒßíÏÆè*Ê«â{³YdHÃ7L¸7‘Ú€2öÀ»#Ê°|RYJ"n*þ¸¾þ¤5;¾~°1.	ÁSí,ÈˆÍR~NyHÀ ÓÂP¦•R¾ã_P î”ÉüÒµhð+ã0¶­¾æ¹ØÃ-)…1`¼ÀB'³„Æön7ø¯ù‹>ûÏ+Ý3ý8,Î¬ùüïÐëÁÀÑ¼l«›ŸËƒqŒû‹	jª0ß#,ñÿ4.º®&&SžF…ô>vÁ2r²6>b(±Fy1…% N\Ç²Æ_Œ’R 1Ud”3­ª×O/äT€£&«
+ÍZÊ(/§;i#øÏ¾D€|šx¶‘ì*4ß£kÍb<‡x\ŒÆ¡~«Ý#?õ>à°”^´Æ2´E;Dõ~[ñ=²b§2kõ †upY`Ÿ^od¡Áå&½ÈÂaôiÀéÛyÐ®qS«Ý™Hz0ÚJ²/n@ÀÊîÛýÃ3Éuç±Ô»'¶Ÿ–^`á'd}d¡ÿŽ—Õ!áŒ~
+9„M²&PöÉ
+<q>Ä•&[[ßc\¿“íR ÷à"‰p1êÔqmk|¦™
+é¿ø=-ws(yLiuU³ÎçM$G”ÖôeÕ<ñ	ÞY¼üì©Ña±í!sD\dï%A?Ë+²|¥t^K>ª‰¹£y­¯ZSBÿQØ` ÷[G&l‚»'ÂÖ·¶ˆ„‡ø»2.ûJ‘L¿`èb%¥²"1åôQ9ýÛ/úÑ¬€ãrñáHÊœÆn‡é6'F^‘µêXû=hD<bÝ´É±Õz÷ì
+Yì‡!ð'‚¨Ì™_!š5Ä
+J«3À%–™D‚¦Þÿ’<õ†gßsípŠÑRº—¢a‰‹°+%7Ò5jn¸íwãyPJÞúlŽXVØ7öŠ6ìÝ®³VÇTE\{kz¤cÎï,i¬³Øz°o«6±ºº”
+ÚXKëŽM.r8l­¸×ñÓùÈ¿T_¦üÉuQÀ2¾JyUâ:| o0Ð@žSh¹ÿ’¢ÊŠZ~l‹Ô9'K³ÀƒS(5ö¹! bÊÈêè$˜ƒª”:èúÚM“ZH
+|†zWÏÏDOF,ò‹½¨Çà6Àé¾!o¿äÈãámœ“<õ7û‡;Mš!"IˆÈ4—‘íØ4²„¸QâÒÔœ¼ï<M»ƒòªœn¼ùÇ-pê×ÂÆÑWº!|{²åL4O…Ý®~§IÃÝc{}‹?ÓPWÙ34ñ½^ÛÈØ‘B•h­ú©ônrÙê,œ’!Kà!“ˆã«ß16ä¢¼hi)=Ã{öÑ~ €Ì¨#›=ÀùÄ³9KÔ3MåmÕ¹)q 3.ßæ£ÁåæöúÊÏƒª('Ï zŸ•\–=Ï\6…ÎNÊ:7Îáe—ýq7²ÅÏWÍ!èá´6ÊU6âÀo¹Y?¬ù
+9>Zå„èËwùÆ	»¦¯ÆdjÅá¦ÁQP:/XAô…¦{Ñ|ºÈ¶RépAµ2lôß¯KÈžGÅóØ¥Ò	÷¡å“€ À›/óEô?¦#y±×VË¾‰ï‘àœu’…qôfòtŽSzøù¥‹¸ööE?ÞßÅéãxG£‡È•ðØÂòFnh43ll'Ù)Ûy=?:¼áÈè·¥ñƒ†E0"‘ô5žn	N‘&° Z¬Q¼ÛÌ‚õŠå'×hU)I@‡êž§ÐïŽf0óÑâ`!=®üÈ»xÐL|¡‘ú¬Šƒ?6Á!xøëfœˆ ‡NTe]ÀjRó…‹¢¹¥`ÝiüÇá\‡H2šéä¯ðBî¡ÀtÊ¢ºÙ	ÿXÁ‘z¤|Ÿâ™ðïË¨‹œîcY/~a×^Âm|¹k¦å~]ïœÉC]H‚È 5ö—ˆÔ' Ç€¡žL«¡+Ç¼X9©šÝÕ‹éõÅmÌLc÷êH¶/»n{ÄXÃRQ³`Syv‘Üìm”GtiE}þiË¶ùE\âh £ÑÞïB‘X¢âL¸|.ÿ@†ŸûÀê-úAf„v•‰lºhÜüõ¿_Öf{rÜú;.©dúÔXzóm_tÃ=lNà¯®]¶îòõ9¢žTã¥âAêI4À3ñ 26aˆå½ñGðlØeƒòÓ‘Þ|qŠ†4ëµ¹«'pG¯.ÄØþ×ú“M*›$68¯‘/­¯&'‹çRb©°_|· }$WQv6ò¯……—weG–z<Ôhü4\P:¦Ñ¤G}ü¦éóõ¬ÿ^L®àÇìŸÓ†{Þ¿ÑG§àVŒ”yã;ËO(bM´‡¤Áù3µR«—‡	ß…s3|3¡Ï¨m€Ð£yæÏaAãº„ýð?îloÂè*ÂsêlÙ²ßÊ)™eÓV§"Žë¤ØxÐªCê	Üc5èkÝƒàüðº˜0NŒ*8ú…9‰`Ós´À§åïr¿›†ujußÀø©O—m¹!ŸˆN.ß™¿¶‚~PG#!¶‘fŠójÏ]"C˜SA>É¼°âºñù›ÄÚÜ4*dzä*'aÿ½o Y(L ­·r8<{Í'›ø}ñõ<S1Ê¤I¹C!0(Ø‹ÃÐ`lÉŒ¸ÿÕÅCôßHèð9c8Ã²|ûeÐ]Åt«b;´ÌÈu×-jf¤á‰¢ ‰ýEÆÐ	2âwîp ü”îVW‹ßâ ×0õ{É^ÇuX’( Åxê/ŸVáàœ5e‰Û€Ò_’TÕÏÏØÅ#:™@/Á¶°*¦ÁÌ€­lÂU)a&Ã`5Ã+3ÙÅìU_v§ò,l´þsÔòÊJ@¸ycB;S¤i')%ýNÂø:;¤W”HrQÀö§IW4þÈ^jë÷¤767çˆ§ƒjµ¶´ÎŠãå±’5gØSt¤' 5}»À±"ÀFñ†€È²Œí.þH‡‡6œ÷sÿa;­ÒŽñÔÔû‹fíMW%v«T4ÍÅâ~+¹b:y›çÔ€Áh™^ämßŽ2_{å üöcç§f>ãÊnô€@~(íh‚Å…ÁŽ¥ÿ·7„³Ñ2È¢z*»ü¶ZšžïÄ¹ç áðãÉÿR@³`”%-4GN‘•Gakûµ8QAh¦†x	¼j0V¯}»Bœ§U§«9¹ã¯^Ó‡ê
+ö‚5Æ>E´QÈ°õêB9ŽNöëX‡­æ3þ-öÕ.“òö…kú7•N7+€¨Ô
+Ÿr/”.­Ú51yU²^ÅÙäa$+ll=nXÆ,
+ÞÚW! áriì ?UÃ¶U—³79k‘óìnjÍ¬’"hût«æû,Ì^€Êa«5N’ó×D¹²Ê”~¼©5¾´[¯NÖþ‰3®Kc¿$Ö­ï¡š,“ÖW9t“K’~-{íL4P@pØØ¨©bWý(È9ÚZi[î+-'ÐÏ3"{n‰k³àLu/µßœÅÚ‡»h3ôýÙâdíYoÀ²áú:b½Ãh¹”·ýÑh4+ÃÄAÙ/¿QJõ Ù¢é	²k""í/œ^ñ™èj›âS¸ˆI@õ¹Žâ_}á.!9¥¡Ws5Ðînlò/õ'u`ibÆWúL#†š 1gÀ|îXØoÆ­,aÕ'ß)Ä?µÀ BÖEy+ç–ƒ«×HN‡ Ê•%ŽAìn[÷xëÖ$œc…?¨m¥“¹áš‰m»þ&óTl‹¤uíæý¦ä*ÿœDôãJ¹™F´¢&Ñò¡²îv¹'ò ÕPŸ`C±vYñ»^³¿åy6{e|Žy/€Ù(´e<yÏÔ©GÓ·]ê§o7]’ûWO£¿º,C:5; ÛÛwM
+ 	|#è ×ûxvmo&+šQ3‰}˜ª"˜à®ˆ–›WÇé”ÑÅþþ½I‡½m‘™5¢Þö^i[´¹?ÊþŠ"Ð¥âsõ?¶êðƒCqw¶fntQÌœ“ sQuªÿ »-úÇcá8ÌµLWÈñŠ}uÔ]Þæ*.Oî‘{uªÄR…at`„!ˆëˆë¥<ÒFÓqm’%¾:%Ó8]Ã!S4^æ±—„QÔæ:ù÷’´‘@ÏõS«›O G	b&xº	Ü^ƒj™¬0¯-O"ë®ÔLl½éÕªnÚú>ej¡”²’X½ÿ—ÄSíÌS±ØªZÀ‚{›ýhçºs	
+ØäNßc¿zÔ´VÒ.äÕºA”­~hiKÊ”ÙdÏ$ÌÕgˆ»{÷©Ý:´°É˜-”x•ÎÝ—EœsB =CkyºY04÷…ûÀ¤Â*	î*“W19ãë'	é$J—i&áI±†ß(v‡%¤+çìZS’`ˆ…WSPu*>H_!Ö¹èxÊUØàý)h‚utu>þÃ)“ŒæJA…Õ©56–%H°’.1¸7‰È
+“ˆkxŽËàQXº´Û>ÃÂ'RÈË¡÷fß¶M›Â-¬¹I€7ž­–1 73w|0ãoÏH2
+	ìÌŸ?ÊðÉ´v'Å:F§*œÛá¯#ó#“2/¤VÌùðÜ¸ÈE-öÁ_™ð—öl’&IìµÕ4ÍgÞ Eãû²ü$¥ÏZÆ«ÃFSÒ~àL¡¬I†dbÊDbK©5 Äâù³Õ…î 6iõ¨+°s	uÿßj»tN0K¼ˆ.Ð–@LJQ˜0wÕbö—×Bs+#_ãÔ18¹V ðþÙGÞ©©õAˆºÂE¤²[w6pýˆtË¢‡ìÈg@1z'›N3@Á…9dd4$^fª}8Mï®	5ïœE…Èë„ïŽŸñn¿AõmÕ5áø€$Žùæåº»¶S¦-æe¯¤\­D)xupâ%I¿éÜ‚˜Q}ÛC»$Ù9ùÙò¢ð)™ñ“¸ÓÃÖ*)|äG)ÝKÒËÃh'ç”Il]1]¬,Î]­‚K—lœº`¼)	cô¼4U^P Ï|¬ÂîÍÍ7Œ¼ïJ›Ê[«€´›÷nHƒè…èÛl8»Ûj2Äy"ØrÂVØm,\jœN2L83fÄäšS°¾ˆr¹§ûð•ú€ËBw{?E'ZB©“.ƒê‚ž¨CyÝµ@%ì Í±êée Ý˜”·,Í"“a‡‹þº^ž}2³ÛSg mÀ<ZÁÔEk5;r£»—•êK÷ò–7êhåyZXk¶nìá/€J”hg4˜ï®áã=ëÊ_±Ë,¨7fþä‰òí‚5ð»×ÙÕ¿H²/œTŸ{ÍXØ4û4Í2™©¼:9Q‘çÇ$‰¥z‹ç—å¶ÀTÜÒ—ÿa{,‰™È,|t¯¤N"ô¬£~ZÓæÊ!@Þœ‹1hÅÕ`ð<ºL˜=%<&<ÿÁöúŠ’N{Ï~°âB|xêÏgHíQ7ÿ\7'.ÁIüëˆwãoqŒ˜¤£pÏŽ;™+7°ò„»ÓÊ4~Àù€Æù‰VÚ´ÕgMr;˜u†P^D±]ÍÜÊFÖK.)JãFà•b¶Š·äPyÊ-è•Œ]d©V>\™LîV7Uå«ðWÖHôðxÚ!Tƒè¸ÀuëöÙŸPúÉéýM¬+ˆÅÝï­E[¬Q³"lpÇ(»r>ß³§÷õJ•«wkú`s{ä÷DƒX ú¹&Se•Œïû›¤3šzp	Ð<ðÃôÛGÁÅfÄ@h¨ÃQ8Ïí³_YD³¶Š;“hù=·¤oÑHžõÐG8º÷„B+¯æ`?3L^‹ïÞ"ïKá3	÷3a†âÂe¹<-¶2(pjoÛÈÂ.XB´g¼s	kA@ìÙ9ö%¢Ñ…A‡iK.1®ore0â–¹øs½ Ý©>‡eØ))²ÝnHêÎænùPô€–¬ÈC€õ™Ëµˆéá4·bóÃ"¦£:¦Ü½È[ÈD–Üg¥¯d	D2ò¸þßßÒ”ùÙù=7*¶À¼®?S¾~‹±¥npÛÍ0&iAGqù™ï*ýFJ™*s*Î©n‡Zäïÿ-Ý„
+»uÐ+àÎíïï)Ý£a1ôÉgHþÐ2iº»·ën²~õHÝI¥£…F,¸åïÕå]ÉÈ«pðßR†ô/œôÈ½ äŽzüœ´Ô³«yõ¨3¼š<¾è &O^|rÍ)ÏÿC¹ìÓÐ‡]»ûz«ý¼£AÃŽdA9”
+nÙŒ
+6oo´!ãÂrË<3äš†-x,†¢lÞDÙ>·ýÀ¥Ó””Ð«GÒDuãä% ³nŸiˆ“IKä@y?Sàa$„öÝc·Q¡³`çÄÅÆ'Âã`Ú`Ê:5sèºY4^<{»Hìj»¸:ŸDhsò{¨¦efÆðEÕ2š±¾±á×á]\'eý‡ÇilQÔÈ0ú|y×ò-PÃ ÎO{d5»˜©TŽBùâ7xjG‚^>í‚ÏÛ"“µ&ÎwÚ8añná`ýë"ï”ÈJîÇ»ÅÀY\ë¼~T¡„Ó;®ìý)¡,ÁKsàÏ6Žwp/˜ÿi‡#£†
+½Ž¦Û&&hVD‰T<P§J­c·:ôm»Ì™5˜<À+<=»PníßÌh®ì¬7Ãwd¦0„ùú†ƒêÍŸ(4[ú}Ö.k¡¨æ$sg¦Z‘ËÃ` Hùºß3“$ÿ¹/Ž3À
+‡ù }#|‘;]¢8:Þ‘«y±4×åñ=ÖeŸwaÅ3Ó?K×ð+÷Ú‰Ï 1,á {Oºg˜$ë×)LÄžTy=Ï±<ô§!´í¬!÷¾À)PùOÅÔJ“ísAˆÊo`¹²	lß9@k«Âœo9©/€…†æñÌdÚ€ÊìXN‚E¥7Ìë™—$—˜Z»ÜúZkÜh'JX0$'àÕ;ºø ‚âv9=Ç¬²ƒ§"õÍ%“Û?Çl½Iqoð©'äÄ@é4„f÷à"…ÆKá_ã¢
+BTÞ@&™õõÀÕ§dhÚÓÝ€,D½ÚâBe´’¤2Å|ü›Ç‰¸)Dþ4C‹Æ»¹}Û°€…àÁ1?aœ€àÕÆ5»O1Dë´U™€«"´µII±mðh˜¾Ò“©2Û®¿» ÍnBcUT½ãÿ£âÃñ„ø){&i}Kö®Eÿ¬—±b.ºxëZ¸Ð„PâÇvz´íKo¨ÎÆUZã!†•À­ÅÙt¾›½;V%¦Ä{c2À	$«BS¡'4IXG'l÷© Yßì©­"Û³ëud¢“XŽ•b“›TÜd?~T>ý’\š†;hdÆ}­}ÍÖº—^=ÍÚÌv¬v–ÜŸ|ƒƒÆRN¼t3^ÓÉ=h.‘¾M;k?ÜÜIVýÕîéÓ$9Þx	Æƒónµº¨1ä‡|Ò©´IÒ9«ÎãMGpbý°Â©ÂD×§ÚðöûùÑŠlWÀÝ4“&$(XÏÿ/‘£’ÿ[¸Êüh©ŸÉ™ù’òVôºKÍš© - ÑŒeiå1%êã=µªõÝVeÖLË*g)­ù!ågœ"â!U¼‹!±ç´|å{°>(îXÖp_ÜŸäÅ¸ód–Ñö(ûâëvÈüš8Õ˜2çù4=4¶az“V3 G·Dö/>Èq}±EHÍÇ3sGí1äg@Ýâ"›ž Ph^7Á˜þy ö:šqü<C`AtüfÄh¦áÀ6eÙ›	ˆcÕ*ÕÓF‰`¾o9,ˆª·?³}üAÿñÂ|F	×íB`ˆï2^dÊbúZ¬EÎvVî	 $Nù/¥X2Ÿ:!*ÙŸ“+nuˆŠ
+·8Þ/3b-plGyÇ^Sé1¬WëCtúX­ÜŽk° IÛèÒ“áË¨/RƒÍººWuç·ßÑ¢fÎEò_ÓƒBMjâ.QüvZÑ¾öÑÕÇ…rÑjŠØË6…ësÀ~RÆ0˜öS#EQ°JÕ}uûØö¥©—lî(CÜ Ü
+[sˆs¾/£zöhqaù¹ C¯]PË˜1vö¬0–€ ´¦–"º+‘æèHZ'èÇá<^„(!æF8ÕòNGJ¿¹Ù$ð:í |Eþ¥ö¾„5ƒžv‰.ÈXFx¢‹Õ7·Ð:wé¹×é!ýcu°Gà´HÜ(ìY)?ÈòOeò3Q.Øöw3U¯³Ì ±»ÁßÛh,_³ô¹Ía¼ð‰Ä<4(ð#õuåeJÊÈƒ	
+Ì¾qh´°#;"õ¶¯J¥ÍA\i‰"Æ ‰ð¦êH(6¤Hyö›LŽcÅqve–3«YCã8ªUuŠ“_š`¶FB+L²Ç®–gÑêÎB€;…X©‡eçÑxÙkwx|îB'¢Ìæ5(½r
+N(ôc-„ 9å!yç:ä¥Pã£"%q"vÞõ;a¾ê®.~”Še¹T_—xnÍõ«Ê…M•\TæEëv‰PËcótY´(öA¸Öfú¨á òñ}NrÉ23|·d)çñ ®Ã•ì˜ÉÛŽþÈŽý‰¼óW#5U©WVÊÕÇØˆÀI¢º5ªáž”Gœ¬Îvë³š±²[ ’”`”ßd’»›Åy</6cÒ*ó.jå¡Òìgcš°ØËwF’N¨VÏÝ¯í¥Ç ßÁöùlóÿûfº¤ÎþkÅýææŠÒðÛB-%¾Fx¡8P}˜‘1Ý¡º&p³HÕÓã•þý$ŸC›Î¹Èö²µ¢Ú3r¡î1¥Í6¡9dÍ»ÜéžYqÐÅNò#Ü6k†3_.šaÂ<;a½o?	ÍGI›é š]“	ØsMiÿ±þø&•” QÇ­Oï]¬ûÂÚRBª?»G×Éü_mëÕ‚¨i*–À¶bónš-8÷ì¨*‚ÙÈÚ¼†b±%Öâ£}œ›p·Ñ'twRqbÊ†Ñš°2yQgˆ”¾ŒI–Á½©«LF÷®o¯›?÷ð¿dH`blÏ¸úÍùZE9_ª¡´WÅ¥ jˆ}˜ç9’[S[cj¯/#´_ò‡‚z†û@¨OãÓeï¯šÊ´,š¿ÓR_ßÚ4o6¥±mC/Ž¢úìéƒÅˆŸ­xÅ0ƒìøÑÇ¥3áÑ~
+IUÜ¦\Óò˜˜)¼ª:àøšIíqŽÈ+©.^#|  ]ßB‰}+ªtš>Gû÷^×d‘ê±Ò"4‰üšLÃÌ÷DjLN&,ýaÌn{ušÔe>ÇºB„LçM²?¶NûœUXCË^…YÑÏòèa‘_ü¥¬mBBøË~Ü8NôúÿÛ0“y#}KPÜè	b}£ôß¨å«œ~Œ2•j1ªê§Í°Oá´%ƒ¾t‡vV)Ž»ÝEÎN©Bu¤ò²R“"ÅÌÃ}œF›zØEÖjet­F@Ç1ŒÚsè_Ç˜e àyh”Þþ3‘ý-Å¬á 9ó¾:Ë¹îZ–:H*õàøÙ$˜XýúïbcàÇì{Ë˜N”9C0(·Û·´§H¬K8“‡á•_	m¸`Üâ¾ãòqýì›+J¹Á\$!kBƒ+ûf4µÍË²e†¿»@?L‡¢‚#‹’ª™­7¦à	ýje'7¶1GWZ`cÙê“Ô ªX)a€±‘˜¶d_)M[/iZ¸±±	ª+Ðn[–†#ÉÑ÷¸™ò{K¼rVLJ×}ûËÇÖ:WU¥Ôëó¥¬n©vÏò²ÃdñáZ<z0¬¤s¤…_8®P½³²¢ W;–þå LÍµ˜æ`¡¬g:ÔV¾ ð‹üL-¼WÜî‰’x_;	ùo;w¦Rìýa)³ª¹vî©ï*ºf†î¢ÔVN‹(Ó¤£–kK½Mñšù%ÑÀ6MÂfˆ.>ÖÎYjjÛâ9kp+}ƒ[cTïç“&È«ãùIÆ-©˜²ýl ¦+ Ÿá†ÿ=°²‚³îhk	7*MTRˆ™þaW”á2ìÎ'¨ªÕ¥€VÁâ*#¥tÖq¯ãÀ:Re¬ý±¤Ò¤x
+1±ZITÓ‚E59ÆrœîÇ,¼®nË½ñf+T\Ž’+¤R$9 àþ<@d4àmŠŒ²;8p`‚°¦A$0¡Œ-6ÙQQ´¢X çCh7ßYÓ|V}©è¸îÛ²_Tœ¡Þ3/ö bMàwq»×ºˆ¹ítÎØª²\x1¹·Ìº¯Â÷IwîÎLkC/#Æg(8cçfØ%Y1¯7‚¬XÊF°m`:™¹“°–™.mø„¤¨¡!Y0Ú^¶¾ÁÞ¼zéäà¦6tùx5™yUÀYy"K¹ÑÖr´€¡Pö©ÔkÐ!×iÏáÉE5€2ÒOµ³¾CJG%Ö’áV”}ÞåÃ’Grš¸,q4/ €Çcàà$2ôDŒÁ(
+ì3ê “:]0H6[×ðõò‡¶mkŒÆ©'+ß£¨€ñðÛñ¿>¸m¯©×¯_[P?ŸA.Áž8
+l€Š‡>I²£ñd3´L±ßH³í¼ÅØ@yÎˆ(ù¸Ý%úT>?gn˜‹éç0 " does not exist {"userId":2,"exception":"[object] (Symfony\\Component\\HttpFoundation\\File\\Exception\\FileNotFoundException(code: 0): The file \"RIFF:}\u0000\u0000WEBPVP8 .}\u0000\u0000ï¿½~\u0002ï¿½\u0001* \u0003h\u0001>ï¿½Nï¿½Kï¿½$&ï¿½ï¿½ï¿½ï¿½Ù\u0016ï¿½cn1È®%ï¿½f5\u0004ï¿½t4ï¿½ï¿½2\u0004ï¿½#@~ï¿½ï¿½ï¿½ï¿½ï¿½\u000fï¿½-\u0003w&sï¿½^/^ï¿½Ë§ï¿½ï¿½ï¿½ï¿½\u0017ï¿½ï¿½ï¿½\u0015ï¿½;Xï¿½ï¿½oï¿½<Gï¿½\u001fï¿½ï¿½ï¿½xZ@ï¿½\u001eKï¿½\u0004ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Qnï¿½ï¿½F\u000b*Í®A\fï¿½ï¿½bï¿½ï¿½Xï¿½ï¿½\u000eï¿½\u0013_\u0017Wb\"Nï¿½;ï¿½ï¿½9uï¿½íˆœXï¿½ï¿½kï¿½ï¿½ï¿½;~`Öï¿½ï¿½ï¿½ï¿½ï¿½\u001aLï¿½>Í¹H\u0011ï¿½ï¿½ï¿½\u001eï¿½]sßƒï¿½8ï¿½ï¿½ï¿½\u0015ï¿½\u0014}ï¿½ï¿½\u001bhK\bï¿½Mï¿½ï¿½ï¿½\u0005ï¿½ï¿½ï¿½1Dï¿½'ï¿½4ï¿½tÛ€ï¿½.ï¿½\u0019`\t`ï¿½Hï¿½Saï¿½ï¿½?Aï¿½ï¯£~e
+d_ï¿½fï¿½s>;:%Lï¿½Gï¿½ï¿½qmcï¿½ï¿½\"ï¿½PxÔ¯'Pnï¿½ï¿½\tP\fï¿½ï¿½ï¿½ï¿½vï¿½ï¿½Mï¿½Dï¿½&$\u001b\u0013ï¿½_ï¿½Uxhï¿½ï¿½Î mKï¿½ï¿½ï¿½ï¿½2Bk\u0013ï¿½ï¿½OGï¿½$ï¿½Û‘ï¿½ï¿½ï¿½ï¿½;ï¿½ï¿½ï¿½ï¿½\u000fï¿½É¿\u0002\u0019ï¿½\u0017ï¿½>!a,\\ï¿½]ï¿½ï¿½ï¿½\u0005\tï¿½Vvï¿½Ðž\u000f1ï¿½ï¿½ï¿½\u0019Bï¿½su*ï¿½ï¿½`ï¿½s{Jï¿½M$ï¿½\u0016aï¿½Q.;Pï¿½ï¿½jo
+\u00046\u001b\u001cdï¿½wwï¿½ï¿½Nï¿½ï¿½ï¿½ï¿½Ñƒ?cï¿½{ï¿½ï¿½ï¿½Ovï¿½i#ï¿½ï¿½dqHk2s\u001bä«¤ï¿½{fV9\u001dï¿½3ï¿½ï¿½uï¿½ï¿½ï¿½ï¿½Â“ï¿½ï¿½Rï¿½Ì®h\u0006ï¿½ï¿½^ï¿½ï¿½Ñ–1ï¿½ï¿½ï¿½ï¿½ï¿½o7\tï¿½ÂŸpï¿½\u0018ï¿½ï¿½ï¿½9eÔ”(bæ©l\u000fH(Eï¿½@ï¿½I#ï¿½1ï¿½ï¿½\u001e ï¿½ï¿½+qï¿½gï¿½ï¿½yï¿½oï¿½ï¿½Iï¿½\u0007lï¿½\u001eÖšï¿½Vï¿½[\u0003Td.ï¿½ï¿½-ï¿½ï¿½Íº\u00158É”ï¿½A\u001c\u001eï¿½ï¿½r9ï¿½Gï¿½
+ï¿½ï¿½S\u0013}ï¿½\u0002ï¿½ï¿½\u001fdï¿½ï¿½oï¿½\u0016ï¿½ï¿½ï¿½\u001aï¿½\u0005Nï¿½uï¿½V4×‰ï¿½ï¿½sW í–¾<YT\u0004Dfï¿½ï¿½Ä¤ï¿½\u001dlï¿½\u0014_/ ï¿½ï¿½\u000bï¿½3Ki+UV[l\u0010\u001anï¿½+ï¿½mï¿½B\u0007ï¿½ï¿½{ï¿½$ï¿½ï¿½ï¿½\u000f}wÇžï¿½ï¿½o\fC9ï¿½Q9ï¿½ï¿½*\u0012lï¿½L\u0011AFï¿½lï¿½yC^l1ï¿½ï¿½(Bï¿½\u0002ï¿½2ï¿½\u0001ï¿½ï¿½ï¿½Ë¿ï¿½bZï¿½ï¿½Hï¿½ ï¿½ï¿½uV+ï¿½ï¿½@{qï¿½ï¿½Voï¿½;$}>Yï¿½ï¿½ï¿½\u0000\u0007ï¿½ï¿½Ú·ï¿½ï¿½\u0014ï¿½wï¿½ï¿½&ï¿½Ps[jï¿½^ï¿½cï¿½~&\u000b>ï¿½Bï¿½ï¿½ï¿½o\u0002ï¿½ï¿½\u0010\u0013~ï¿½ï¿½Iï¿½ï¿½Aï¿½^\u0002ueï¿½\u00069ï¿½ï¿½(Q\u001fR:.,jï¿½ï¿½ï¿½ï¿½\u001c\u0013k,ï¿½Z`ï¿½ï¿½ï¿½/ï¿½ï¿½\u0007hï¿½wï¿½ï¿½ï¿½H\u0019ï¿½ï¿½w\fFy[ï¿½@ï¿½\u00111ï¿½ï¿½+ï¿½ï¿½ï¿½\u0007`sfï¿½\u0006]ï¿½ï¿½ï¿½ï¿½Xgï¿½yï¿½^yQï¿½%aï¿½ï¿½ï¿½/ï¿½kDï¿½3ï¿½Ô‘Uï¿½ï¿½ï¿½ï¿½ï¿½,Tï¿½;3ï¿½pï¿½eF\u0000\u00036ï¿½Gï¿½ï¿½Gï¿½ï¿½ï¿½\u0013WÉ´Mï¿½s>\u00052ï¿½\u0002ï¿½ï¿½!ï¿½$5-\u001f\u0015ï¿½#|ï¿½\u0011{?ï¿½\u001f=ï¿½ï¿½\u0010`Qï¿½'ï¿½Mï¿½Iï¿½m\u0018ï¿½w,ï¿½ï¿½ï¿½ï¿½Rï¿½;ï¿½ï¿½&Zï¿½ï¿½ï¿½ï¿½AC\u000eï¿½ï¿½Aï¿½ï¿½ï¿½ï¿½KTï¿½q×”\u001fï¿½ï¿½Dï¿½ï¿½;ï¿½R\u0019ï¿½\u000fï¿½9Ms  \u000e\u001dM[Û–'ï¿½ï¿½ER}Ò¯g\u000bï¿½ï¿½ï¿½Aï¿½ï¿½Kï¿½ï¿½4Oï¿½ï¿½ï¿½ï¿½6\t\u0004yï¿½?ï¿½ï¿½\u0005~ï¿½Iï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½Iï¿½xï¿½ï¿½ï¿½ï¿½1ï¿½ï¿½+ï¿½ï¿½ï¿½1ï¿½ï¿½Ux\u0013-\u0015[ï¿½ï¿½ï¿½ï¿½S=Dï¿½ï¿½ï¿½Kï¿½eï¿½ï¿½^ï¿½ï¿½ï¿½ï¿½ï¿½>?Pï¿½nO*ï¿½ï¿½\u000f\u00048`Bï¿½Rï¿½ï¿½
+5ï¿½w\u001eï¿½^\u0007
+Wï¿½ï¿½ï¿½Pï¿½\u0003Yeï¿½\u0017'6ï¿½ï¿½&ï¿½/aR\u0004Xï¿½}ï¿½6\u001eï¿½n\u0016ï¿½ï¿½ï¿½?r@ï¿½ï¿½SRï¿½ï¿½ï¿½$r\bcTDï¿½.ï¿½ï¿½ï¿½Tï¿½Tï¿½\u0011ï¿½Yï¿½Lï¿½u?ï¿½ï¿½ï¿½ï¿½Kiï¿½ï¿½ï¿½L\u0010ï¿½ï¿½\u001bÕï¿½\u001fJyï¿½ï¿½ï¿½&ï¿½;}\u0018^[ï¿½ï¿½ï¿½K@P\t\u0003ï¿½nï¿½=\u0013t[fï¿½ï¿½ï¿½fï¿½\u0006ï¿½ã¥»ï¿½ï¿½ï¿½41Üï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Nu\tï¿½Ã‰\u0002gï¿½ï¿½ï¿½ï¿½8\u000fï¿½ï¿½E^ï¿½\u0002\u0003!vï¿½`ï¿½ï¿½R_6ï¿½0K11\u000eï¿½ï¿½'\u001bï¿½`6oï¿½ï¿½ï¿½lï¿½ï¿½ï¿½\u001eï¿½}ï¿½ï¿½Tï¿½97Â8\bZJ9];\u000eï¿½pï¿½\u0012\u001aï¿½ã­\u0019\t\bï¿½8>ï¿½ï¿½)N\u0001Æ¸ï¿½ï¿½:5#ï¿½ï¿½aï¿½eDï¿½ï¿½ï¿½ELï¿½ï¿½\u0018ï¿½ï¿½7F\b\tTï¿½\u001fï¿½ï¿½lJ\u0014ï¿½ï¿½}hï¿½@ï¿½~`ï¿½Y\u000fï¿½3\u0006ï¿½ï¿½ï¿½B\u0012ï¿½g\fï¿½Ð›|fï¿½)ï¿½ï¿½ï¿½'$p ï¿½ï¿½mï¿½\u0017ï¿½ï¿½Û©%?ï¿½ï¿½'ï¿½)Kï¿½ï¿½ 3{ï¿½7ï¿½ï¿½ï¿½ï¿½\u000b\u0004ï¿½/ï¿½ï¿½r9ï¿½Ò¨ï¿½ï¿½ï¿½ï¿½\u001eï¿½\u001bï¿½\u001d`O\\ï¿½%ï¿½\u001fÅ‘\u0011>Bï¿½Ï›`\u0003\u001cï¿½ï¿½ï¿½ï¿½zï¿½Vï¿½ï¿½ï¿½\b\u001bï¿½Dï¿½bï¿½ï¿½9ï¿½AT\u0013ï¿½/\u001aÞ¼j\u0013ï¿½|ï¿½Aï¿½+ï¿½:S\u0015ï¿½ï¿½ï¿½vï¿½ï¿½|O:)\u0012ï¿½ï¿½:\u0004Öœï¿½\u0011$ï¿½Oï¿½ï¿½ï¿½
+bï¿½ï¿½Â¸ï¿½Cï¿½{ï¿½ï¿½Uï¿½x\u0004ï¿½$7ï¿½ï¿½\u0010
+ï¿½\u001cï¿½\u0005ï¿½ï¿½\u0000Bï¿½\u0007ï¿½guï¿½ï¿½\u001c^ï¿½uFï¿½\bï¿½5ï¿½3ï¿½\u0018!Oï¿½}\u001fï¿½ï¿½#ï¿½ï¿½Þï¿½ï¿½<.\u0013ï¿½)M\u0010@ï¿½ï¿½lï¿½pÉ€ï¿½6?ï¿½cVL{ï¿½|ï¿½|Ý»ï¿½ï¿½\tï¿½ï¿½\\ï¿½ï¿½=\u0014X9\u0006ï¿½ï¿½ï¿½*\u0015ï¿½e\u0016ï¿½ï¿½ï¿½'|Ó±ï¿½ï¿½ï¿½ï¿½yï¿½\u001dï¿½ï¿½w(ï¿½ï¿½8ï¿½ï¿½l2kï¿½8ï¿½xï¿½ï¿½\\Ã®v>jï¿½ï¿½NÍ“\u000fï¿½\u000f\u001f\u0003zï¿½iï¿½#\u000b*\bï¿½'Wï¿½\u0000ï¿½qJD:ï¿½fï¿½ï¿½\u0007ï¿½z4`ï¿½\u000b+ï¿½ï¿½ï¿½ó·ˆŸï¿½ï¿½Js6ï¿½ï¿½.UKï¿½7ï¿½7ï¿½\u0001ï¿½ï¿½Ë€ï¿½iï¿½Bwï¿½ï¿½qï¿½\fï¿½ï¿½&ï¿½aï¿½ï¿½aï¿½ï¿½/zï¿½7ï¿½ï¿½\u000e|Jï¿½é•]ï¿½ï¿½\\ï¿½\u0014ï¿½_ï¿½)Mï¿½+Ð•\u001cï¿½ï¿½7Gï¿½Ë¨:sï¿½ï¿½ï¿½8ï¿½Rï¿½ï¿½L\u0012=\u0004MË¹ï¿½ \u00057ï¿½/ï¿½dï¿½\u0003ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½zï¿½ï¿½ï¿½M\\)vCï¿½\u0019ï¿½*\u0002ï¿½ï¿½@!Fï¿½ï¿½v^ÍŸ\\$ï¿½Sï¿½,9Ltï¿½ï¿½ï¿½ï¿½\u0018,×¥qï¿½@ï¿½ï¿½ Hï¿½Sï¿½4Pï¿½ï¿½Þ ï¿½ï¿½ï¿½ï¿½Aï¿½\u0017ï¿½ï¿½lÅ€ï¿½\u0011pï¿½Bï¿½ ï¿½ï¿½ï¿½)\u0003ï¿½]ï¿½f`ï¿½ï¿½Mï¿½ï¿½Bï¿½=B\u0005ï¿½ï¿½+Ù‡ä¨ªï¿½ï¿½,7ï¿½Aï¿½g=$-4ï¿½*ï¿½ï¿½h\u0017'>Vï¿½Ê‘-ï¿½ï¿½\u0013\u0003ï¿½-+ï¿½ï¿½ï¿½\u0007\tï¿½ï¿½2Zï¿½ï¿½
+$\u0014YmBï¿½\u000b\u0000*2\u000bï¿½\u0004Htï¿½ï¿½1'Cï¿½ï¿½ï¿½>xVï¿½Oï¿½ï¿½K\u0015ï¿½s3\u0002ï¿½c
+*ï¿½=V1ï¿½^ï¿½ï¿½\u0019ï¿½ï¿½
+ï¿½ï¿½ÉŒï¿½i\u0015Ã#ï¿½ï¿½ï¿½)ï¿½ï¿½ï¿½ï¿½Ãœï¿½ï¿½mï¿½ï¿½2
+ï¿½ï¿½\\ï¿½Î²ï¿½ï¿½ï¿½\bï¿½ï¿½ï¿½ï¿½ï¿½vï¿½ï¿½sï¿½ï¿½\u001cNx\u001aï¿½Dï¿½D%ï¿½\u000f3ï¿½ï¿½}ï¿½Â‹ï¿½ï¿½ï¿½Oï¿½ï¿½Wï¿½ï¿½TÃ¨uï¿½!\u0000ï¿½H2q5ï¿½I|$w1ï¿½\u0013U\u0017\u0015ï¿½ï¿½vï¿½lAï¿½(<ï¿½\fï¿½eï¿½ï¿½Þ²Z%ï¿½\u0003ï¿½x5}Tï¿½3Zï¿½ï¿½ï¿½cï¿½ï¿½ï¿½ï¿½Ë¿\u0005ï¿½\u001dWï¿½ï¿½ï¿½\u001a<ï¿½ï¿½\u0011ï¿½jÝ¬nr
+ï¿½ï¿½ï¿½ï¿½ï¿½ Y\u0014ï¿½ï¿½/ï¿½D,k]ï¿½*\tï¿½ï¿½\u0002xï¿½&yTï¿½ï¿½ï¿½35Óµ* \u0013ï¿½\u0019#\u001fï¿½ï¿½\u000eï¿½ï¿½?&_ï¿½K\u0014ï¿½ï¿½\tï¿½\u000fï¿½&ï¿½ï¿½K;>\u001bï¿½ï¿½!ï¿½xï¿½ï¿½ ï¿½Bï¿½ï¿½ï¿½ï¿½\bï¿½3ï¿½ï¿½]\u0003ï¿½N-P\u000fxï¿½Ë›,Yï¿½ï¿½=ï¿½|>e\u001a\u0003ï¿½ï¿½-FÚ°ï¿½X?U#ï¿½\u0003u.\u0017\u001bO%ï¿½Qï¿½\u0018ï¿½ï¿½ï¿½ï¿½8{ï¿½Dï¿½ï¿½ï¿½ÙG-|Wï¿½Ö˜ï¿½ï¿½{rOsï¿½vp;;\"ï¿½Ö¼È¿Iï¿½ï¿½v\u0003ï¿½\u0014ï¿½\u0005ï¿½ï¿½ï¿½X+ï¿½Ú…Ó‡
+Eï¿½ï¿½ï¿½:ï¿½\u0010ï¿½yFy8ï¿½ï¿½eï¿½ï¿½ï¿½mï¿½ï¿½Hï¿½ï¿½Mï¿½RXdï¿½cï¿½ï¿½/ï¿½\\5ï¿½ï¿½7N-C~:ï¿½\u000eï¿½veBT)\u0006ï¿½ï¿½ï¿½ï¿½\fXP<ï¿½X%\u0016ï¿½\u0004ï¿½ï¿½dï¿½ï¿½ï¿½\u0007 ï¿½! Öˆï¿½ï¿½\u000bÒºï¿½Ö˜ï¿½\u0006ï¿½(ï¿½ï¿½y\u0006ï¿½\u0001Q9W\u0019d\u0017\u0005=ï¿½>ï¿½ï¿½\u0001^ï¿½ï¿½5,ï¿½ï¿½Aï¿½Xï¿½\u0004w\u0014\u001d3ï¿½ï¿½\u001f\u0017.oï¿½ï¿½uï¿½[ï¿½F
+\u001fï¿½ï¿½8*ï¿½ï¿½ï¿½ï¿½pï¿½\tbCÎœï¿½Ä†[Qï¿½pï¿½PZï¿½ï¿½ï¿½ï¿½Qï¿½ï¿½ï¿½ï¿½\u0010+Tï¿½ï¿½ï¿½Ö“ï¿½wï¿½ï¿½6\u0000ï¿½ï¿½-ï¿½>\\ï¿½ï¿½ï¿½\u0002ï¿½ï¿½ï¿½ï¿½\u0013ï¿½Uï¿½$\fï¿½ï¿½ï¿½
+\u001a&ï¿½ï¿½~'ï¿½lGM_ï¿½\u001eÖï¿½ï¿½ï¿½0\":ï¿½ï¿½ï¿½ï¿½$Dx\u0012ï¿½\u0005ï¿½RQï¿½Ð¥\u001cï¿½Ê»y_ï¿½ï¿½%ï¿½\u0004@\u001cï¿½\u0013r:uï¿½Ieï¿½ï¿½\u0010\u0018ï¿½wï¿½ï¿½\u0019ï¿½:F\u000bS\u0011ï¿½5Ç¬ï¿½;ï¿½%ï¿½ï¿½i/Fï¿½ï¿½ï¿½\u0007tï¿½{ï¿½nÓ¯ï¿½\"c\u0012tï¿½ï¿½ï¿½ï¿½ï¿½[ww\u001cï¿½ï¿½\u001e1ï¿½ï¿½*ï¿½ï¿½ï¿½6ï¿½ï¿½?ï¿½&\u000bï¿½ï¿½Î€Ë¨á†­ï¿½.ï¿½X\u0014i#cï¿½>Ì›\u001fï¿½ï¿½uTï¿½\tï¿½[ï¿½<kEï¿½ï¿½\bï¿½m=\u0011ï¿½ï¿½
+ï¿½ï¿½ï¿½ï¿½wï¿½hï¿½ï¿½4ï¿½ï¿½ï¿½^5ï¿½\u001fiï¿½ï¿½ï¿½ï¿½ï¿½\u0018ï¿½J
+0ï¿½ï¿½ï¿½5\u0016ï¿½ï¿½aï¿½\u000eï¿½?Fï¿½ï¿½r{&ï¿½ï¿½ï¿½7ï¿½\u0015ï¿½ï¿½QSXï¿½#Q\u0018(\u0006<ï¿½]\u001dï¿½?ï¿½26f&\fï¿½ï¿½tuï¿½\u0017ï¿½\tï¿½\u0011ï¿½ï¿½\u001cÍŽï¿½ ï¿½ï¿½\u000byï¿½ï¿½ï¿½\u0007ï¿½ï¿½ï¿½Æ¾m&!ï¿½d\tï¿½\u0010Wï¿½niï¿½3ï¿½U=\u0015ï¿½ï¿½ï¿½CUï¿½ï¿½Ø¤ï¿½ï¿½>28k\u0018ï¿½ï¿½ï¿½\u000bï¿½ï¿½é‡‰ï¿½ï¿½ï¿½ï¿½!ï¿½\u0010vUï¿½ï¿½~qï¿½ï¿½ï¿½_wBï¿½\u0004ï¿½
+ï¿½%ÏÈ‘\u0019Z^\u000eï¿½sï¿½<ï¿½8ï¿½^Jï¿½)ï¿½ï¿½ï¿½\u0012ì«ï¿½0H\u0003\u000fD'o\u0003\u001bevKï¿½ï¿½ï¿½\u0017ï¿½D:Þ·ï¿½\u0000ï¿½ï¿½WÒ„pï¿½Lï¿½jï¿½.ï¿½3ï¿½ï¿½2`\u001a\u0013Ò„\u0010\u001b_\u0018\u0019ï¿½1ï¿½ï¿½ï¿½ï¿½Zï¿½Gï¿½ï¿½\u0006ï¿½ï¿½\u0015_\u0011\u001bl{ï¿½\u001epï¿½ï¿½t4Bï¿½86ï¿½({\u001bmï¿½\u000fï¿½{ï¿½\u0016ï¿½+ï¿½bï¿½ï¿½ï¿½ï¿½$ï¿½Çº\u0006&2ï¿½\u0019Eï¿½ï¿½Õ.2ï¿½ï¿½ï¿½\u001a\u0010Ø´ï¿½=tï¿½_~ï¿½ï¿½ï¿½ï¿½Sï¿½ï¿½$ï¿½juï¿½ï¿½ï¿½ï¿½ï¿½ï¿½?J1W>Ð­ï¿½=Kï¿½ï¿½x~ ï¿½*ï¿½'
+ï¿½\u0019ï¿½!\u001cï¿½\f/ï¿½\u000fN$/ï¿½ï¿½\u0011\t[G9ï¿½!ï¿½\u0018ï¿½eï¿½ï¿½ï¿½\u0001\u0017ï¿½,\u000fTï¿½Nï¿½gÉ­0ï¿½ï¿½Ð­`\u001fï¿½ï¿½tw7\u001eï¿½ï¿½ï¿½1dï¿½F\u0015ï¿½ï¿½p,zï¿½ï¿½ï¿½$eï¿½(|ï¿½È½\u000fï¿½ï¿½z\u000bJï¿½cï¿½ï¿½\u001b$?ï¿½mï¿½kï¿½ï¿½VÕ–ï¿½ï¿½Aï¿½ï¿½\tUL\u0012ï¿½ï¿½ï¿½\u0006ï¿½)eï¿½ï¿½ï¿½\u0001Y.ï¿½Qï¿½ï¿½ï¿½\u0004ï¿½ï¿½ï¿½?Cmï¿½LEï¿½H\u0016=\u000eï¿½ï¿½ï¿½{2_S\u000bï¿½qï¿½ï¿½ï¿½ï¿½p\u00064\u0013r/ï¿½]hï¿½h
+2ï¿½=>cgGuï¿½yï¿½kQ,&ï¿½ï¿½Ï²ï¿½Vï¿½ï¿½~f\u0010ï¿½ï¿½Hï¿½ï¿½
+ï¿½[Jï¿½ï¿½ï¿½\u000bï¿½^\u001bï¿½.ï¿½`ï¿½Ýªï¿½ï¿½(p\"ï¿½* ï¿½=ï¿½)ï¿½\u0010`ï¿½ï¿½ï¿½uï¿½ï¿½eï¿½Rï¿½ï¿½ï¿½Hï¿½oï¿½ï¿½Toï¿½sï¿½ï¿½ï¿½\\)ï¿½Ê¶hY6ï¿½\u0010\u0015ï¿½45\u0013iï¿½ï¿½Yfï¿½\u001cï¿½\u001e`ï¿½\u001aï¿½\u0003ï¿½O\u0005ï¿½ï¿½æ‡¼ï¿½ï¿½jJï¿½ï¿½[rKï¿½ï¿½Xï¿½8Úšï¿½ï¿½\u001aï¿½ï¿½ï¿½ï¿½|$ï¿½}ï¿½XG%ï¿½ï¿½Ñ»Gï¿½Ì’+ï¿½ï¿½nï¿½9ï¿½7ï¿½Uï¿½NI\u0005ï¿½i^ó„†¨}ï¿½7ï¿½ï¿½\u0010ï¿½\u0004ï¿½ï¿½ï¿½Þ\u0013ï¿½ï¿½\u0019ï¿½sï¿½ï¿½ï¿½ï¿½1ld8ï¿½ï¿½o\u0018ï¿½Ð„ï¿½(tï¿½ï¿½\u001a\u0002\u001e+ï¿½ï¿½ï¿½=\u001c)\t3ï¿½yQ\tMTï¿½Xï¿½ks^\u0014Â„\tï¿½8Rï¿½ï¿½rÏ†ï¿½ï¿½
+Jï¿½V,Äœï¿½\u0000ï¿½\u001c\u0017nï¿½ï¿½)ï¿½ï¿½B\u0019Mï¿½ï¿½3Byï¿½\\ï¿½
+ï¿½ã¯¬zYï¿½\u0017ï¿½?\u0018q>2ï¿½<
+ï¿½bï¿½ï¿½ï¿½|ï¿½iß•k\u0013ï¿½L|ï¿½ï¿½Gï¿½ï¿½3<#Ixï¿½ï¿½ï¿½!ï¿½ï¿½ï¿½[\" ï¿½
+ï¿½e\u0006ï¿½ï¿½r\u0007ï¿½ï¿½\u000eï¿½ï¿½B]ï¿½ï¿½ï¿½h!mï¿½}ï¿½\u0012ï¿½ï¿½ï¿½ï¿½ï¿½:ï¿½ï¿½:Xï¿½Å¥ï¿½Ö«\bï¿½ï¿½|7Å‚ï¿½nï¿½ï¿½ï¿½0F}ï¿½gï¿½ï¿½ï¿½GX8\u000e\u0019zï¿½ï¿½
+_Hï¿½ï¿½ï¿½ï¿½Qï¿½ï¿½Aqï¿½4ï¿½qï¿½N7ï¿½oSï¿½R[ï¿½m#ï¿½\u0002ï¿½gï¿½Ðœ_#|\u000bï¿½#ï¿½ï¿½eï¿½}ï¿½ï¿½Hï¿½\u0012ï¿½ï¿½wï¿½ï¿½ï¿½Aï¿½ï¿½\u0010Qï¿½\u0019kï¿½];ï¿½Bï¿½rUg\u0017^\u0007<ï¿½Mvï¿½ï¿½H3ï¿½@nQï¿½\u0013ï¿½ï¿½8ï¿½Hï¿½pï¿½Xï¿½4\u0015.8ï¿½ï¿½pï¿½Ä©\u0002ï¿½Eï¿½\u0014_ï¿½ï¿½jï¿½MZï¿½ï¿½ï¿½ï¿½ï¿½%[\u001e=ï¿½\u000e\u0010{ï¿½ï¿½.ï¿½]ï¿½=ï¿½ï¿½:\u0013\fwï¿½ï¿½\bï¿½tï¿½`Zï¿½=\u001dï¿½naXï¿½ï¿½\u0002@Hï¿½Gï¿½ï¿½=ï¿½Hï¿½ï¿½jï¿½ï¿½ï¿½Hï¿½ï¿½çˆ‘ï¿½vï¿½ï¿½ï¿½\u001eï¿½Äï¿½ï¿½!ï¿½\u0015\b:ï¿½(ß€+Zï¿½ï¿½ï¿½ï¿½cï¿½ï¿½jOÑ¤_ï¿½\boHï¿½<^;ï¿½ï¿½%v|ï¿½gï¿½\u0018ï¿½\u0018Dï¿½w\u001eï¿½ï¿½\u0006ï¿½Öªw}M\bï¿½\\\u0005ï¿½CYDNï¿½ï¿½\u0010ï¿½ï¿½Zï¿½ï¿½ï¿½ï¿½ï¿½yï¿½ï¿½Vï¿½ï¿½\u001eï¿½ï¿½$ï¿½\u0015ï¿½N\u001ciPï¿½ï¿½87ï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½/N\t-ï¿½ï¿½6\u0013ï¿½dï¿½MG]t\u0017Ñ—)ï¿½\tï¿½5
+\u0002ï¿½2:\bï¿½ï¿½ï¿½\u000fï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Jï¿½Cï¿½q1\u0017ï¿½`Aï¿½\u0000ï¿½eï¿½ï¿½\u0019QÞ®ï¿½{ï¿½ï¿½cï¿½ï¿½\u0007ï¿½ï¿½ï¿½ï¿½ï¿½\u0000ï¿½eï¿½ï¿½n\\ï¿½u?)rnï¿½(ï¿½ï¿½Ó³ï¿½ï¿½ï¿½ï¿½\u001dquï¿½sï¿½\u0017ï¿½ï¿½Kï¿½ï¿½oï¿½ï¿½?ï¿½ï¿½ï¿½!$ï¿½a=ï¿½\u0000Aï¿½gï¿½dOhÌ˜ï¿½ï¿½ï¿½e`ï¿½FDE\u0017ï¿½ï¿½yï¿½1aGï¿½?7\u0017 ï¿½\tï¿½tï¿½Ûµqê‰ ï¿½$
+ßªï¿½Ç¼Qï¿½ï¿½ëµŒï¿½\u001d\u0016!ï¿½ï¿½\u001bï¿½ï¿½ï¿½ï¿½8>%2ï¿½7ï¿½ï¿½'gRqï¿½ï¿½ï¿½\u001d×¾<ï¿½ï¿½ï¿½Rï¿½ï¿½\u001eï¿½ï¿½a)ï¿½ï¿½Wï¿½uï¿½ï¿½4ï¿½ï¿½(\u0011\u000fï¿½jPtQï¿½ï¿½ï¿½ï¿½\\P
+ï¿½T\tï¿½
+ï¿½:ï¿½%Ñ¯?
+Ô®gï¿½Fï¿½AV\u000fZï¿½ï¿½ï¿½\u001fxXï¿½ï¿½ï¿½'ï¿½)ï¿½ï¿½ï¿½\u001dï¿½mï¿½\u000bï¿½ï¿½ï¿½fï¿½Jï¿½\u001fï¿½ï¿½Gï¿½tï¿½tHï¿½a+ï¿½ï¿½ï¿½8\u0004ï¿½ï¿½ï¿½\u0010~$ï¿½oï¿½&ï¿½ï¿½Îï¿½ï¿½ï¿½oï¿½@ï¿½\u0011ï¿½Vlï¿½p7Bmï¿½49ï¿½Ö†tï¿½ï¿½ï¿½%ï¿½ï¿½ï¿½m\u0013ï¿½ï¿½ç¬¶ï¿½wï¿½\u0000<wï¿½Ë¢ï¿½0~ï¿½G,W[ï¿½\u001d\u000fï¿½\u0014ï¿½\u001fÑ„\u0003nï¿½ï¿½'ï¿½\u0006ï¿½_ï¿½;:ï¿½\u001bgï¿½\u0006bï¿½\u0010ï¿½(\u001cï¿½ï¿½-ï¿½Yï¿½\u0012sXï¿½\u001f$6ï¿½ï¿½Þ¯ï¿½~ï¿½ï¿½*3zï¿½\u0005ï¿½Wï¿½ï¿½^ï¿½K\u0014Aceï¿½8ï¿½ï¿½R{ï¿½ï¿½Hï¿½á†Žï¿½aï¿½ï¿½Q\u00102-?^Í±ï¿½qï¿½Nyï¿½ï¿½\u001cï¿½ï¿½ï¿½>F9c1*ï¿½zï¿½ï¿½aï¿½7ï¿½hï¿½ï¿½Ô§ï¿½zï¿½ï¿½ï¿½ï¿½,ï¿½{ï¿½ï¿½ï¿½\u001fï¿½nï¿½?ï¿½ï¿½ï¿½\u0015ï¿½$ï¿½ï¿½ï¿½c\u0019ï¿½ï¿½ï¿½\u000eï¿½ï¿½ÑŽ
+ï¿½\u0012ï¿½ï¿½^ï¿½ï¿½ï¿½eÈ«\u0012\u00047J\b\u001fï¿½\fï¿½5ï¿½ï¿½9ï¿½\u000bï¿½Ä´\u0015oï¿½ï¿½Fnï¿½sy\u0016)Oï¿½Tï¿½ï¿½ï¿½ï¿½?YVï¿½t
+!ï¿½\"ï¿½ï¿½ï¿½ï¿½wï¿½a<ï¿½ï¿½ï¿½^ï¿½ï¿½ï¿½U'ï¿½ï¿½\u0015\t\u0003MÌ¢ï¿½9ï¿½qpï¿½ï¿½ï¿½ï¿½A=ï¿½ï¿½ ï¿½\u001aLï¿½ï¿½8(\u0012gf\u000eXnï¿½ï¿½Pï¿½\u0014Xï¿½bï¿½Z%Zï¿½]fJï¿½ï¿½ï¿½ï¿½rï¿½H\fï¿½ï¿½%\u0016ï¿½h\u0015\u0011ï¿½ï¿½\u001d\u001e)ï¿½\u001a\u000e5ï¿½Kï¿½<\bï¿½Iï¿½yvpï¿½~\u0004JNï¿½ï¿½\u0000ï¿½ï¿½ï¿½Cï¿½vï¿½e\u0000Bï¿½ï¿½5ï¿½ï¿½g4ï¿½RVï¿½K\u001f;\"ï¿½Ï‘ï¿½-\u0015~;ï¿½\u0012ï¿½ï¿½X!M6ï¿½ï¿½ï¿½]ï¿½ï¿½^\u0017ï¿½YHï¿½ï¿½\u001aï¿½ï¿½*6w\u0004o\u000bï¿½Ö®bï¿½Ü°ï¿½ï¿½Iï¿½qï¿½\u001a\u001dZ×·ï¿½`ï¿½ï¿½.Iï¿½ï¿½Æ¿ï¿½~Pï¿½é‚¦ï¿½%?ï¿½fï¿½\u0000ï¿½ï¿½fï¿½7\u0016sï¿½\u0019ï¿½qï¿½\u001bï¿½w0bï¿½
+ï¿½l\u0001}ï¿½ï¿½\u000f\u000fï¿½^dï¿½ï¿½ï¿½$\u0011\u001aï¿½ï¿½ï¿½ï¿½\"ï¿½ï¿½\u001b<~
+\u0012ï¿½Éƒï¿½eï¿½ï¿½\u000fNï¿½ï¿½\u0006\u0014|ï¿½ï¿½ï¿½~ï¿½ï¿½Z\u0007Dï¿½ï¿½d-\u0010\u0000ï¿½ï¿½eTï¿½|Qï¿½Bï¿½:\u0006eï¿½ï¿½yï¿½,ï¿½_ï¿½ï¿½T\"Qï¿½ï¿½ï¿½ï¿½ï¿½ÓUï¿½;W=$ï¿½\u001b$ï¿½'ï¿½Iï¿½\u001cï¿½\u0003KYï¿½ï¿½ï¿½ï¿½ï¿½:*.ï¿½-}vï¿½ï¿½is\u0004Q7uï¿½S\u0012ï¿½\u0012\u0018ï¿½\u0007ï¿½Dï¿½7Jaï¿½ï¿½\u0002ZÊï¿½ï¿½Jï¿½d6ï¿½$\u001e\u0004@\u0019ï¿½ï¿½\u001aqï¿½ï¿½Ö°ï¿½(ï¿½~lï¿½ï¿½\u0014
+ï¿½ï¿½ï¿½ï¿½ï¿½1ï¿½ï¿½\u00049ï¿½\u0011ï¿½\u0017×™ï¿½2\u0005ï¿½~ï¿½Ò‡ï¿½P[s\u0017ï¿½Tï¿½j!sqï¿½\u000bï¿½ï¿½ï¿½u%ï¿½!ï¿½\u0016E\u0018Ý ï¿½'\u0000ï¿½Eï¿½ï¿½ï¿½ï¿½ï¿½g^Fï¿½-ï¿½ï¿½:bï¿½\tï¿½4ï¿½ï¿½#\u0002\u001aï¿½\u00040ï¿½ï¿½\u0001t.ï¿½$ï¿½ï¿½ï¿½ï¿½Vï¿½ï¿½qf!ï¿½ï¿½Ö˜ï¿½
+Ôº\u0004vï¿½sttï¿½77Wï¿½sXï¿½ï¿½åŒ£ï¿½ï¿½\u0019IGbï¿½ï¿½dï¿½ï¿½ß\u0000ï¿½ï¿½\u0016ï¿½f8ï¿½ï¿½Oï¿½ï¿½\u001a\u000bMï¿½Ú‡ï¿½\u0013ï¿½ï¿½ï¿½5<mñˆŽ€ï¿½ï¿½rï¿½\u0004
+yï¿½ï¿½qï¿½ï¿½\u0003ï¿½f\u000eï¿½ï¿½Öƒiroï¿½JmØ“!ï¿½!ï¿½ï¿½1Ó®I\u001bï¿½\u000eï¿½gï¿½ï¿½ï¿½ï¿½\u0005ï¿½\u00192\u0005Üï¿½ï¿½ï¿½ï¿½1ï¿½}lï¿½7Ë¹ï¿½ï¿½\u0000eG)ï¿½^Jï¿½ï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½P\u0000ï¿½#ï¿½y4ï¿½Oï¿½ï¿½pï¿½(Oï¿½ï¿½ï¿½*\u0004yï¿½BF=.a(dÃ»J?ï¿½ï¿½ï¿½ï¿½\u001aï¿½Â©Imf\u0004jOWï¿½ï¿½<)4'#ï¿½ï¿½ï¿½t\u001f$eÆ½ï¿½39+ï¿½ï¿½\u0004ï¿½
+Ê®(lï¿½Zï¿½ï¿½ï¿½ï¿½*iCt\u0006ï¿½ï¿½ï¿½#\u0001ï¿½Úƒ\u0017ï¿½B(cï¿½ï¿½'C\u001704\u000f`OiZï¿½ï¿½ï¿½0zï¿½\u0007ï¿½ï¿½hï¿½ï¿½ï¿½\u001d:ï¿½kJï¿½\u001dï¿½ï¿½\\ï¿½Hï¿½ï¿½Q9\u0006ï¿½ï¿½Hrï¿½\u001cï¿½ï¿½\u0013ï¿½ï¿½ï¿½@Gï¿½g\u001f,ï¿½ï¿½(\"`ï¿½ï¿½ï¿½.ï¿½LS+sJï¿½\u0013\\ï¿½4'/ï¿½>ï¿½ï¿½ï¿½Uï¿½ï¿½ï¿½j\u001637O$ï¿½kï¿½Qï¿½
+ï¿½lï¿½+Sï¿½rCGï¿½ï¿½ï¿½x =ï¿½\u001fï¿½ Aï¿½\u0013ï¿½ï¿½vd\u0000ï¿½G\u001fï¿½ï¿½ï¿½ï¿½hï¿½]ï¿½ï¿½
+ï¿½ï¿½ï¿½p\u0014ï¿½}Eï¿½ï¿½|ï¿½imï¿½\t|ï¿½ï¿½HO\u001cï¿½xï¿½\b[ï¿½ï¿½\u001dï¿½;ï¿½ï¿½\u0017ï¿½ï¿½@\u0019ï¿½ï¿½ï¿½1ï¿½#vï¿½rï¿½=ï¿½rLï¿½ï¿½:ï¿½ï¿½ï¿½ï¿½2\u00115F0\u000bï¿½\u0012ï¿½ï¿½ï¿½ï¿½\u0016ï¿½tï¿½DÔ ï¿½wï¿½Lï¿½`hH=SMqD\u0013ï¿½ï¿½ï¿½~ï¿½\u0005ï¿½ï¿½ï¿½\u0017ï¿½ï¿½5ï¿½\u0011Uï¿½nï¿½ï¿½ï¿½ï¿½ï¿½D\u0005&ï¿½Gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½7Nï¿½<ï¿½ï¿½ï¿½8gï¿½\u001dï¿½ï¿½ï¿½ï¿½á‚P1Loï¿½ï¿½ï¿½fï¿½.Ä½ï¿½ï¿½\u0007ï¿½\bï¿½*^\u0012 ï¿½9ï¿½ï¿½2ï¿½ï¿½@\"ï¿½?ï¿½ï¿½ï¿½ï¿½ï¿½Ö¯&\u001avï¿½\fï¿½\u0003\u00133pFï¿½Î‡uï¿½Aï¿½IYï¿½\u0011Cï¿½\u00028cï¿½O\u000fu\u0014ï¿½OXRï¿½n?<ï¿½qiC
+9\u001dd|Vï¿½\u000fï¿½S\u0016ï¿½\u0016,ï¿½8\u001eE5ï¿½ï¿½ï¿½Wï¿½O+1ï¿½aï¿½ï¿½m)Rï¿½Yï¿½*ï¿½ï¿½ï¿½ï¿½hï¿½6\u001dJ\u00172ï¿½\u0005,ï¿½ï¿½ï¿½(T
+ï¿½ï¿½-\u0014cSï¿½ï¿½T\u0000ï¿½ï¿½\u0015r\u00196ï¿½\u0012zï¿½\tÞ’osï¿½ï¿½\u001bï¿½lï¿½ï¿½ï¿½\u000fï¿½^ï¿½Nï¿½ï¿½ï¿½Mï¿½ï¿½'\u001c3qï¿½\u0017eï¿½ï¿½{Aï¿½\u0016ï¿½ï¿½41ï¿½ÚŽ*ï¿½\\yï¿½Yï¿½ÓŠï¿½7/Óžï¿½\u0002ï¿½ï¿½pKï¿½ï¿½ï¿½\"ï¿½\u0015!ï¿½ï¿½ï¿½/Rä‹—dï¿½ï¿½Ïˆ\u001cï¿½\u001eEï¿½,n\u0006\u0007!ï¿½ï¿½ï¿½bï¿½|ï¿½Oï¿½\u000f\u001eEï¿½`Xï¿½ï¿½qvï¿½\u0001Ú¬j\u00004ï¿½cÂ­\bï¿½)(ï¿½ï¿½L\u001dÏ]mï¿½ï¿½ï¿½\u0003Cï¿½ï¿½rÅ™ï¿½\"Pï¿½\\ï¿½ï¿½ï¿½ï¿½XSï¿½pï¿½ß±ï¿½6@ï¿½Iï¿½8ï¿½ï¿½ï¿½\u0019ï¿½ï¿½\t)ï¿½ï¿½Ahï¿½Î€Fï¿½3ï¿½ï¿½=^ï¿½a`\u0018Æ†ï¿½ï¿½vÔ’ï¿½ï¿½7/Yï¿½ï¿½t6D]P\u001eï¿½ï¿½sï¿½ï¿½jP\u0007Ñ¸`ï¿½ï¿½ï¿½ï¿½ï¿½9Ä\u0000ï¿½ï¿½E\u0003ï¿½~nï¿½ï¿½*ï¿½0CZï¿½ï¿½ÙŒ ï¿½\u0004Lï¿½Wï¿½ï¿½ï¿½}ï¿½\u0011\u00147ï¿½ï¿½cï¿½ï¿½7Jï¿½ï¿½#ï¿½lï¿½\u001cï¿½GÓ¥\u001dyï¿½ï¿½= ï¿½4iï¿½dï¿½Qï¿½ï¿½ï¿½ï¿½Eï¿½ï¿½G\u0007ï¿½lj^ï¿½Â¼^ï¿½$ï¿½\u0017\u001c'%\u001aï¿½ï¿½ï¿½ï¿½e)W\u001aï¿½Âï¿½ï¿½0*Tï¿½ï¿½#ï¿½_tï¿½ï¿½\u0011#ï¿½&G7ï¿½ï¿½ï¿½ï¿½\u001f\u001a`*ï¿½ï¿½0Ozï¿½ï¿½8ï¿½ï¿½\u0011ï¿½]ï¿½ï¿½rï¿½c{oc\u000e6ï¿½ï¿½\u0004ï¿½ï¿½ï¿½ï¿½\u0000ï¿½jï¿½4ï¿½\u001b,b-×˜\u0014ï¿½\u0011ï¿½ï¿½!ï¿½ï¿½\u0007Q\u0012ï¿½qï¿½ï¿½ï¿½ï¿½*Yï¿½ï¿½_ï¿½ï¿½
+T\u0004ï¿½'(\u001eï¿½ï¿½ï¿½ï¿½ï¿½[Êšï¿½y\u000eï¿½\bÇ¨ï¿½2 ï¿½4ï¿½ï¿½>ï¿½pØ‰ï¿½ï¿½$ï¿½B\u0015ï¿½ï¿½pï¿½ï¿½ï¿½ï¿½ï¿½ï¿½&ï¿½ï¿½\u000f\fSï¿½\u0005ï¿½Xï¿½\u0002ï¿½\u001fuï¿½Gï¿½Qï¿½\fQ\u0000ï¿½ï¿½%ï¿½\t,Qï¿½ï¿½\u0017\u000f_Vï¿½@
+`ï¿½ï¿½s}ï¿½ï¿½HCï¿½9ï¿½1ï¿½f\u0017ï¿½ï¿½ï¿½\u0014Zï¿½ï¿½ï¿½r2$\u0018\fï¿½ï¿½Fï¿½ï¿½;ï¿½rï¿½5\u0007ï¿½JÜž\u001bVï¿½`ï¿½z\u0011ï¿½BÞ¢u%b1ï¿½ï¿½/%\u0012\u0011;~ï¿½iï¿½Bzï¿½}ï¿½ï¿½T/ï¿½\u0019ï¿½%OOï¿½ï¿½ 9ï¿½ï¿½ï¿½ï¿½a\u0004ï¿½ï¿½ï¿½uï¿½ï¿½J\u0012ï¿½#ï¿½9\u0010ï¿½=ï¿½erï¿½<ï¿½\u0002G}\u0019ï¿½ï¿½Gï¿½6ï¿½_ï¿½\u0010?ï¿½ï¿½ï¿½$ï¿½Fm~ï¿½ï¿½\fVK\u0007ï¿½ï¿½\u001626ï¿½ï¿½\u0013ï¿½ï¿½v6wï¿½ï¿½ï¿½Mï¿½ï¿½tï¿½}ï¿½\u0012\u0018ï¿½W(#Ä´ï¿½Ô¾ï¿½*Kï¿½Õªiï¿½\b6bï¿½ï¿½-)sï¿½W7ï¿½{aÄŽï¿½ï¿½Bï¿½nï¿½]Rï¿½qcHï¿½2ï¿½ï¿½ï¿½Ë’?m\u000f2wï¿½ï¿½gï¿½ï¿½Sï¿½ï¿½\u0006\u0010ï¿½ï¿½ï¿½\u0006ï¿½ï¿½O\u001bï¿½ï¿½ï¿½\u0015Wï¿½ï¿½QK]ï¿½ï¿½ *ï¿½F#j-ï¿½ï¿½ï¿½Pï¿½ï¿½ï¿½oï¿½`ï¿½
+np/Aï¿½vï¿½ï¿½ï¿½ï¿½>ï¿½\u0017ï¿½Kï¿½Ç½ï¿½Zï¿½ï¿½ï¿½ï¿½\u0016Eï¿½._[ï¿½fï¿½+ï¿½ï¿½~\u0010Â”ï¿½ï¿½,Bq>4>ï¿½ï¿½qï¿½vï¿½ï¿½\u0002oï¿½ï¿½\u0003kï¿½\u000eï¿½\u0014p\u0016ï¿½ï¿½\u0011AAYï¿½ï¿½rï¿½\u0002Vb\\\u000bï¿½v7L\u000bOï¿½ï¿½Mï¿½ï¿½iï¿½ï¿½?ï¿½ï¿½lï¿½ï¿½ï¿½\u0002ï¿½kaï¿½wï¿½ï¿½jnï¿½\u0000ï¿½TË­ï¿½ï¿½O+ï¿½\u0010iï¿½ï¿½tï¿½/\u001ahH|ï¿½;ï¿½jLï¿½\"
+ï¿½\",ï¿½\u0018@ï¿½XHï¿½Bï¿½|ï¿½í™¯ï¿½ï¿½ï¿½ï¿½ï¿½çƒ k4ï¿½dï¿½ï¿½ï¿½ã”»{ï¿½ï¿½|ï¿½.ï¿½\\f\\ï¿½\u0011ï¿½ï¿½j@ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Þ²ï¿½ï¿½wï¿½Qï¿½ï¿½\u0012y\u0019.ï¿½F\u001fRï¿½ï¿½ï¿½\u0011ï¿½ï¿½ï¿½Øˆ^ï¿½ï¿½J
+e
+ï¿½\u0000\u0010iï¿½ï¿½ï¿½ï¿½mï¿½t$ï¿½MBï¿½ï¿½ï¿½?ï¿½-ï¿½7M\u0001$ï¿½ï¿½Vï¿½eï¿½ï¿½ï¿½^ï¿½\u000e|\u0007ï¿½k\u0005ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½b>ï¿½\"qJï¿½Wï¿½\u000eï¿½^ï¿½E6ï¿½ï¿½\f0\u0002)ï¿½mï¿½ï¿½Sï¿½!-ï¿½ï¿½Jï¿½ ï¿½vÉªlU@oï¿½ï¿½{w\"['ï¿½ï¿½ï¿½\u0015ï¿½_\u0012uï¿½ï¿½C\u0016ï¿½\u0017ï¿½Cï¿½;ï¿½ï¿½ï¿½\u000e\u0002NL5ï¿½ï¿½oQï¿½<ï¿½Ü¦^HX>ï¿½|ï¿½\bï¿½y\u001eï¿½ï¿½ï¿½y7\u0016ï¿½fï¿½ï¿½rï¿½ï¿½\u0000eGHï¿½ï¿½Æ‡ï¿½1ï¿½zï¿½bOï¿½Bdï¿½\u0013ï¿½ï¿½|\u0014ï¿½\u00140w)ï¿½\u0003{dï¿½[ï¿½\u001aIrï¿½un'ï¿½qsH8ï¿½ï¿½\u0005ï¿½tï¿½ï¿½cï¿½ï¿½ï¿½[ï¿½~*+ï¿½.ï¿½ï¿½ï¿½Tï¿½ï¿½\u001f./\u0000Zwszï¿½lFï¿½ï¿½p\u0007ï¿½ï¿½3ï¿½b}\u000e\fï¿½!^ï¿½At\u001agï¿½2\u001de\u0017ï¿½\u0010ï¿½ï¿½'ï¿½ï¿½ï¿½ï¿½\u0004:\u001cï¿½ï¿½ï¿½ï¿½ï¿½o!d\tï¿½ï¿½\u001d<ï¿½ï¿½jï¿½$ï¿½\u0003ï¿½qkï¿½oBcï¿½Hï¿½ï¿½gï¿½sï¿½ï¿½>ï¿½\"\u0018rï¿½`ï¿½ï¿½^ï¿½~ï¿½\u0015ï¿½(ï¿½ï¿½ï¿½\u0015ï¿½ï¿½\u0014I1`ï¿½ï¿½4ï¿½1\u0010ï¿½Jï¿½?ï¿½ï¿½w58\u0006\u000e\u0011ï¿½ï¿½ï¿½Ï“ï¿½>ï¿½ï¿½q\u0007ï¿½\u0004ï¿½ï¿½ï¿½jï¿½\u001fï¿½ï¿½^ï¿½wb\u0019jy\u0015ï¿½;2!ï¿½Òª)\u0018ï¿½\u000eï¿½UYï¿½ï¿½,ï¿½Ê¦ï¿½uï¿½~[ï¿½\u0015F`ï¿½ï¿½.Xï¿½Ü‰Nï¿½Dgï¿½ï¿½|ï¿½ï¿½\fï¿½ï¿½TLV|ï¿½ï¿½hï¿½^ï¿½
+Ðï¿½ï¿½ï¿½\u0013\u0015ï¿½{ï¿½Èœï¿½ï¿½EÌ¥ï¿½ï¿½9'{L\u0010h9ï¿½Tï¿½ï¿½Tï¿½_\u000f[ï¿½ï¿½mï¿½ï¿½uï¿½jï¿½5\u0001\fï¿½ï¿½ï¿½
+ï¿½eu-ï¿½ï¿½\u0000ï¿½:\u0015\u0000ï¿½k8Eï¿½ï¿½B\u0007ï¿½ï¿½Xï¿½sÄ€aï¿½lï¿½×†alP?ï¿½tï¿½ï¿½ï¿½\fÛƒï¿½ï¿½\u0000ï¿½\u0016gï¿½ï¿½ï¿½+ï¿½\u0014\u0007ï¿½ï¿½ï¿½ï¿½\fï¿½ï¿½4ï¿½\tï¿½ï¿½\u001e4\u0016\u001cï¿½ï¿½!ï¿½(ï¿½\u0013ï¿½-qï¿½qï¿½ï¿½yï¿½~\u0007ï¿½ï¿½ï¿½ï¿½ï¿½\u0004LÍ§ï¿½\u001aï¿½\u000bï¿½L5pAï¿½ï¿½ï¿½>Cï¿½\u0018\u0010\u0011Sï¿½|ï¿½bç¢šï¿½}ï¿½\u001bÊ³ï¿½mï¿½\u0013Ý˜>r+ï¿½ß”ï¿½ï¿½ï¿½\u0002ï¿½\u0017ï¿½ï¿½ï¿½*xï¿½ï¿½\"ï¿½\u0007Pï¿½O\u0004ï¿½ï¿½\u0014Ý®ï¿½ï¿½'ï¿½ï¿½5
+ï¿½Üˆï¿½ï¿½ï¿½Ö¨ï¿½ï¿½ï¿½Ï©
+ï¿½sHï¿½pï¿½ï¿½h\fï¿½(ï¿½ï¿½\u000fybï¿½\u0015hï¿½ï¿½C\u0019ï¿½\u001caï¿½ï¿½]ï¿½_,9\u0014\\*\\`Ì‘ï¿½Mf\u0016hï¿½ï¿½~ï¿½ï¿½\u000fï¿½ï¿½\fï¿½C.\u0005ï¿½*?ï¿½\u0013ï¿½ï¿½uRï¿½nï¿½\u001a(&3Qï¿½ï¿½\u000bï¿½)Ø¶1ï¿½pï¿½g\u0002ï¿½ï¿½ï¿½Yï¿½Oï¿½ï¿½ï¿½\u001bGSï¿½\u0011ß©ï¿½ï¿½7i?%u\u0018ï¿½ßºï¿½ ï¿½Bï¿½ï¿½\u001bCï¿½\u001fï¿½1F(Ê¬ï¿½ï¿½@\u0001ï¿½ï¿½5ï¿½2j2VË£\u001e90ï¿½ï¿½F\u001bgrï¿½e`i*.Qï¿½iÙ„
+>.ï¿½=ï¿½6ï¿½ï¿½\\=ï¿½ï¿½(ï¿½Oï¿½ï¿½Êï¿½|Tï¿½ï¿½Sï¿½ï¿½ï¿½kï¿½ï¿½yï¿½3ï¿½ï¿½ï¿½ï¿½$#ï¿½Ñ2\u0015]ï¿½g\u0007ï¿½\u0011ï¿½,>ï¿½ï¿½
+Mï¿½ï¿½Ü‡ï¿½ï¿½ï¿½ï¿½Â”ï¿½ï¿½ï¿½7\u0004ï¿½\u0000/ï¿½PÎ³j\u0010i/A3?DSï¿½ï¿½,Û©ï¿½sC|Qï¿½\u001dwYï¿½0ï¿½+ï¿½ï¿½ï¿½Aï¿½&O\u0007Mï¿½ï¿½/ï¿½\u0004Sï¿½bï¿½È†Gï¿½ï¿½ï¿½l_ï¿½ï¿½ï¿½1ï¿½ï¿½`\u001bQQï¿½i\bï¿½ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½R\u0001_Te\u000få¾—ï¿½ï¿½GÙ˜ï¿½\u0006ï¿½4Iï¿½:ï¿½xï¿½ï¿½s,ï¿½+ï¿½fï¿½\u0017/\u0005(ï¿½\u0014Yï¿½RB>ï¿½ï¿½M\fDï¿½ï¿½\u0007ï¿½n(ï¿½ï¿½
+lï¿½ï¿½=ï¿½ï¿½{ï¿½ï¿½Þw×¨\u001f\u001a>ï¿½ï¿½ï¿½[ï¿½0ï¿½ï¿½6\u000fï¿½9vï¿½yï¿½ï¿½(8ï¿½Íœï¿½ï¿½9\u001b{n\t\twï¿½ï¿½ï¿½[(Õ„!\u001eï¿½%ï¿½ï¿½Y*c_3\bï¿½ï¿½ï¿½o\u0001 Hï¿½ï¿½WFï¿½M\u0010ï¿½%Hï¿½vnï¿½å¬·Ç ï¿½ï¿½ï¿½ï¿½ï¿½oRï¿½ï¿½\u0000ï¿½o>ï¿½ë«©\u0007ï¿½ï¿½ï¿½*Lï¿½ï¿½.ï¿½ï¿½ÕŒOï¿½ï¿½9ï¿½ï¿½Uï¿½\u0000ï¿½ï¿½\u0005dï¿½ï¿½ï¿½\u001aqï¿½Ç„Iï¿½ï¿½ï¿½ï¿½?\u001f6Fï¿½>`\bï¿½ï¿½ï¿½Õ¾R5R6[ï¿½kï¿½\u0013\u0005hï¿½fNlï¿½ï¿½&ï¿½i7ï¿½kï¿½1ï¿½ï¿½v\u0006Oï¿½ï¿½nï¿½ï¿½ï¿½ï¿½eï¿½ï¿½\u0018\\dC8\u0004ï¿½ï¿½ï¿½ï¿½\f62ï¿½ï¿½Ioï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½ï¿½wï¿½\u0017ï¿½`Kï¿½KF'ï¿½4ï¿½~Oï¿½pï¿½ï¿½ï¿½Tqï¿½vï¿½|ï¿½\u001e,ï¿½#\u0007ï¿½ }V!Lï¿½ï¿½aHiï¿½R=ì•ï¿½6G.\tï¿½WS\u0019uï¿½ï¿½\u0005ï¿½%\u0003ï¿½.ï¿½ï¿½1\u0003\u0015f\u0013M
+ï¿½_}ï¿½Aï¿½`ï¿½ï¿½ï¿½ï¿½'\tï¿½ï¿½9ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½C,Vï¿½ï¿½HE\u0019ï¿½ï¿½gz|$>;ï¿½0ï¿½ï¿½l-ï¿½ï¿½^\u001br=|\u0019 ï¿½ï¿½=0ï¿½ï¿½@Jñ£¤°ï¿½ï¿½ï¿½aï¿½\u001aï¿½O]s}ï¿½\u001fï¿½\u0012Vk\u001aï¿½tv;ï¿½nï¿½Be\u00118]ï¿½XQï¿½3ï¿½i-ï¿½ï¿½#ï¿½rï¿½iï¿½ï¿½Jï¿½cGnO\frï¿½ï¿½0ï¿½G\u0014ï¿½xï¿½TEï¿½ï¿½ï¿½\b\u000fwï¿½ï¿½ï¿½dyLï¿½d\u0004ï¿½Dï¿½X\u000bï¿½ï¿½ï¿½ï¿½\\s_xï¿½\u0003dLï¿½\u001a8ï¿½Þ±ï¿½\u0018ï¿½ï¿½iï¿½Nï¿½Iï¿½MMï¿½ï¿½Ií–®v\u0006tï¿½ï¿½!ï¿½pï¿½ï¿½Ø¶\u001cX\fï¿½ï¿½\u001eï¿½ï¿½jMï¿½
+Dwï¿½Z\u0012@r\u001fsÔ¤f)ï¿½ï¿½ï¿½ï¿½\u0015_ÉŠï¿½Ô´ï¿½ï¿½W!ï¿½ï¿½\t\u0016\u0001ï¿½VGfnï¿½>fï¿½\u001bï¿½_ï¿½ï¿½ï¿½?\u0018Tï¿½\bï¿½ï¿½ï¿½\u001fï¿½=qï¿½ï¿½DG\u001eï¿½\u0018ï¿½ï¿½ï¿½ï¿½<tï¿½ï¿½5ï¿½#0Kï¿½mÕ¹ï¿½ï¿½d\u0006ï¿½ï¿½ï¿½ï¿½\u0012ï¿½(w\\~9ï¿½yï¿½ï¿½ï¿½ï¿½ï¿½5Åºï¿½X\u0004jï¿½ï¿½ï¿½\u001e\u0004ï¿½+ï¿½b\u001c\"ï¿½ï¿½ï¿½ï¿½aG\u001bï¿½sï¿½^\u001asï¿½g!ï¿½eï¿½Vï¿½5gï¿½\u001erï¿½3Ï¯Iï¿½ï¿½Gï¿½-\b'ï¿½Þ¥\u0012ï¿½QK\\\u0003Lï¿½\u0002_ï¿½*cï¿½ï¿½ï¿½ï¿½Peï¿½ê¥¸Aï¿½ï¿½ï¿½?Òµ%
+ï¿½\u0005g9ï¿½0qe(*\u0000ÊœPu>ï¿½ï¿½|ï¿½C\u0005ï¿½ï¿½\bK7Tï¿½<\u001a:\tï¿½ï¿½Â„z\u0011ï¿½@ï¿½ï¿½\u001eï¿½cï¿½ï¿½/ï¿½^ï¿½ï¿½Ìœ>ï¿½\u001aï¿½Ì¯ï¿½u=ï¿½qx\u0016\u001aoï¿½ï¿½\u0017Ë¡O6ï¿½F\\\fï¿½F(\u0019ï¿½ï¿½jï¿½0ï¿½ \u0018<ï¿½ï¿½ï¿½\u001fX1ï¿½{ï¿½ï¿½x&U53Õ¼ï¿½ï¿½]ï¿½.
+ï¿½qï¿½cZï¿½(pï¿½_ï¿½,ï¿½ï¿½Sï¿½!ï¿½Bï¿½ï¿½/Jï¿½ï¿½ï¿½V|ï¿½sB.ï¿½ï¿½ï¿½/Mzï¿½V?ï¿½bï¿½\u0006VEï¿½
+Â˜\t4ï¿½\u0007
+ï¿½ï¿½ï¿½ ï¿½*ï¿½%ï¿½ï¿½\u0001hï¿½\\Qï¿½/ï¿½{fÐ®ï¿½oï¿½Jï¿½ï¿½ï¿½\u0018ï¿½ï¿½Sï¿½(`\u001eXï¿½T\u000fï¿½Ocï¿½\u001cï¿½Zï¿½y$+ï¿½ï¿½@\u001d\fï¿½{Ó¡Fcï¿½rï¿½qXï¿½ï¿½\u0006iï¿½ï¿½'$rï¿½ï¿½\u0006ï¿½\u0016ï¿½]5ï¿½ï¿½ï¿½On1ï¿½Ö…\u0015ï¿½ï¿½1\u0014\u0004Â½ï¿½ï¿½ï¿½ï¿½.\\ï¿½ï¿½ï¿½;ï¿½v:[ï¿½kï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½ï¿½\u0010ï¿½ï¿½Eï¿½Zï¿½ï¿½ï¿½Admï¿½/N+H\u001cC/\u0002ï¿½ï¿½ï¿½nï¿½\\ï¿½(ï¿½ï¿½Kï¿½1ï¿½ï¿½ï¿½0Cï¿½qï¿½Ê£\u0005AÞ½ï¿½Gdjï¿½\u0010\\ï¿½\u000eï¿½\u0006ï¿½Úœ*ï¿½_\bï¿½\u0014ï¿½
+<ï¿½\u001eUï¿½6ï¿½\u0004ï¿½y3\u0011ï¿½[lqï¿½\u001fï¿½<ï¿½Cu\u0017ï¿½\\ï¿½<7ï¿½&ï¿½6ï¿½\u000f]\u0014!uï¿½\u0006ï¿½_ï¿½O;ï¿½1ï¿½!\u001c&ï¿½ï¿½ï¿½Mï¿½ï¿½|ï¿½ï¿½Yï¿½ï¿½ï¿½5;\u0004ï¿½]ï¿½ï¿½ K\u001bï¿½ï¿½\u000b<\"ï¿½$%yï¿½ï¿½)ï¿½!0[ï¿½ï¿½ï¿½Ùï¿½ï¿½`ï¿½N6ï¿½\u00004ï¿½Ee9{ï¿½ï¿½4Ø€ï¿½ n(ï¿½ï¿½Xï¿½ï¿½+Âµï¿½
+\u0016ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½:ï¿½ï¿½Xï¿½ï¿½gï¿½2rï¿½ï¿½Bï¿½\u0018ï¿½Yï¿½<ï¿½ï¿½%ï¿½ï¿½\u0005!ï¿½ï¿½Sï¿½4ï¿½ï¿½ï¿½=ï¿½ï¿½ï¿½d3tï¿½.=ï¿½`(ï¿½
+dï¿½n\u0000Vï¿½iï¿½;Vï¿½\tbBqPï¿½7ï¿½í‡‘ï¿½EIï¿½\fxï¿½ï¿½ï¿½\u0010
+ï¿½<ï¿½ï¿½ï¿½ï¿½ï¿½\u0011ï¿½bX^g[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\u001be]ï¿½\"ï¿½l\"O@ï¿½\u0007ï¿½ï¿½ï¿½}\u0012ï¿½({ï¿½ï¿½ï¿½ï¿½ï¿½a9ï¿½ï¿½}ï¿½Iï¿½>ï¿½ï¿½l7ï¿½ï¿½sï¿½ï¿½Gï¿½xï¿½rï¿½&,\u0014/\u0017ï¿½ï¿½\u0018>ï¿½\u0018ï¿½z'ï¿½#ï¿½ï¿½gï¿½@\u0007ï¿½n \u001dï¿½%*ï¿½ï¿½ï¿½\u001fï¿½4ï¿½*
+ï¿½YT\u0018ï¿½ï¿½ï¿½ï¿½\u001eï¿½sï¿½'ï¿½Þ¦
+\u001eï¿½ï¿½P\u0016\u0004@09U)ï¿½?ï¿½\u001aï¿½=QÏŠï¿½iM\u0019ï¿½0\"ï¿½vï¿½ï¿½ï¿½a5Dï¿½ï¿½#\fË…ï¿½ï¿½ï¿½ï¿½@ßªï¿½ï¿½ï¿½ï¿½EI7N\u0012TWï¿½ï¿½ï¿½ï¿½Kï¿½ï¿½@ï¿½ï¿½D^ï¿½ï¿½2ï¿½9c6ï¿½Irq\u0000Oï¿½8zï¿½aï¿½ï¿½\u000b*cï¿½ï¿½ï¿½\"'&ï¿½ï¿½ï¿½ï¿½ï¿½Pï¿½'ï¿½ï¿½)\u000eï¿½G\u0003O,^ï¿½`zï¿½ï¿½ï¿½ï¿½5i|\u001c\u0014*ï¿½ï¿½\u0017ï¿½'\u001fï¿½ï¿½qï¿½ï¿½ï¿½ï¿½OÏ›ï¿½\f_nï¿½\u001fMJï¿½.^ï¿½ï¿½1ï¿½=ï¿½,WIï¿½vY1ï¿½\\ï¿½ \u0002ï¿½3ï¿½ï¿½â¯»ï¿½ï¿½ï¿½;ï¿½ï¿½q1Ô¨.NlZï¿½3ï¿½jXs{6\\vuï¿½ï¿½é™¿$ï¿½\u0016\u001cï¿½ï¿½j.ï¿½Uï¿½d2\u0004) ï¿½~WÛ”ï¿½ï¿½NoW\u001dÐ²ï¿½\u001bï¿½Bï¿½2ï¿½ï¿½ï¿½T\u000e)ï¿½HOi3ï¿½\u0018ï¿½\u001fï¿½ï¿½lï¿½~\u0016Å¿Usï¿½\u0000Ö©ï¿½ï¿½ï¿½\u0005Ö­\u0001Fï¿½#+ï¿½ï¿½\u0002\u00052ï¿½xmvNï¿½ï¿½\u0000ß°\u0000\"Q\u0003\u001bï¿½\\JÐµDï¿½ï¿½)\u0017;\u0004ï¿½ï¿½\u0004ï¿½ï¿½ï¿½ï¿½Hï¿½ï¿½
+ï¿½w5ï¿½sï¿½
+&%P^ï¿½(pï¿½\u0000!\u0004ï¿½ï¿½ï¿½\u001aï¿½rï¿½iS$ï¿½'1Ú©ï¿½ï¿½\u000e#(ï¿½ï¿½ï¿½mï¿½ï¿½J~|BIï¿½ï¿½ï¿½ ï¿½7svï¿½ï¿½ï¿½\u0004ï¿½!o\u0006Kï¿½ï¿½#ï¿½ï¿½ï¿½\u001d^}ï¿½$yNï¿½+Ä\u0005ï¿½Cï¿½ï¿½ï¿½(lï¿½ï¿½U\u0007ï¿½}ï¿½ï¿½'ï¿½'\u0000\u0001Bï¿½ï¿½{ï¿½ï¿½ï¿½ï¿½dï¿½Qcï¿½Wrï¿½È›\u0003ï¿½ï¿½s\u0011a\u00071ï¿½ï¿½ï¿½+9ï¿½%OTï¿½ï¿½\u0018K2ï¿½i~\u0007ï¿½w S\u0019ï¿½ï¿½;2t-ï¿½=Bï¿½ï¿½'ï¿½qï¿½>p^ï¿½\"Cï¿½Eï¿½O[4ï¿½ï¿½\u0019ï¿½ï¿½pK\u0010ï¿½8ï¿½Hï¿½DX\u0013Kï¿½ï¿½*%ï¿½Vï¿½\"$Hï¿½\u0004ï¿½(ï¿½\u0017\u0006ï¿½ï¿½\u0011oï¿½Ê–E\u001bÄ„2M\u0006}ï¿½<ï¿½ï£®D\u0003ï¿½hï¿½ï¿½tï¿½@9Uï¿½9\u0014Ä’ï¿½*7\u0000dq\u0003ï¿½ï¿½ï¿½{ï¿½m\u0012ï¿½Uï¿½ï¿½ï¿½)Lmï¿½\u0012s[ï¿½ï¿½tï¿½ï¿½&\u001bï¿½
+pcï¿½ï¿½\tÞ¬Pï¿½PRï¿½!Rï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\u0006 y*\u0007p-~ï¿½/ï¿½\u001dï¿½ï¿½\t\u001cï¿½ï¿½ï¿½gï¿½ï¿½;ï¿½{!Gï¿½nï¿½?2ï¿½ï¿½*{ï¿½ï¿½Gï¿½\u0003ï¿½ï¿½nï¿½\u001a\u001d:nVxï¿½ï¿½ï¿½\u0018ï¿½}nï¿½ï¿½ï¿½PTï¿½ï¿½Û¼ï¿½ï¿½Zrgï¿½\u000eï¿½#ï¿½{ï¿½lï¿½ï¿½R}ï¿½?\u0004\u0013f:ï¿½ï¿½tqï¿½ï¿½^\u0005ï¿½EV(\u0004\u0013ï¿½Q.Vï¿½\u0013ï¿½\u0017[ï¿½ï¿½ï¿½ï¿½\u001chÛ¢ï¿½ï¿½ï¿½\"ï¿½#ï¿½ï¿½ï¿½\u0010ï¿½j8\u0003Fï¿½ï¿½ï¿½ï¿½ï¿½kXï¿½]ï¿½^ï¿½\u0017\u001cï¿½dï¿½'ï¿½{ï¿½ï¿½?ï¿½?ï¿½{Z\u001aï¿½ï¿½ï¿½ÉÖ‚ï¿½Ê•ï¿½ï¿½|xÛŒLï¿½ï¿½ï¿½X\u0005ï¿½tï¿½\u0011HQA\bï¿½&ï¿½-ï¿½ï¿½xï¿½ï¿½&bï¿½Y:A9ï¿½Ø¦BJï¿½\u0018ï¿½C\u000bï¿½:/Wgï¿½ï¿½Ä¹ï¿½ï¿½Cï¿½\u0002ï¿½\u0014ï¿½ï¿½ï¿½Zï¿½#h\u0014ï¿½ï¿½}Ø¾ï¿½aï¿½dJï¿½ï¿½ï¿½4ï¿½ï¿½ï¿½ï¿½1ï¿½LP2bï¿½ï¿½\u00015bï¿½ï¿½Oï¿½ï¿½ï¿½\u001f\u0002Y&Mï¿½*Dï¿½ï¿½F+ï¿½t}i\u000bï¿½Ê£ï¿½ï¿½ï¿½E.ï¿½ï¿½ï¿½_ï¿½ï¿½\u0003;,\u0014ï¿½Mï¿½\fp\u0019ï¿½\\ï¿½ï¿½Y{\fï¿½ï¿½\u001bï¿½]ï¿½.ï¿½\u000ej!ê¨²ï¿½yï¿½\u001ek\u0016\u0007ï¿½.ï¿½nPï¿½ï¿½,Y<ï¿½g
+.%ï¿½ï¿½ï¿½0sï¿½ï¿½Lï¿½ï¿½ï¿½o\"ï¿½;O\u0000ï¿½\u0000ï¿½ï¿½ÂŸwx\u000fï¿½ï¿½ï¿½ï¿½ï¿½gwå‡ºU\bï¿½]ï¿½ï¿½\u001eï¿½ï¿½1GZ\u000e\u001fVï¿½\u0018ï¿½\u001e
+Fï¿½ï¿½\u0004Uï¿½SFa(gï¿½uï¿½ï¿½ï¿½ï¿½[\u000eï¿½<ï¿½;ï¿½
+ï¿½ï¿½ï¿½!y$\u000eÑ•ï¿½,nï¿½ï¿½Tï¿½|?(ï¿½?ï¿½ï¿½]ï¿½F<ï¿½y\u0007ï¿½\u0014@ï¿½&ï¿½ï¿½ï¿½2ï¿½ï¿½ï¿½&mï¿½Üƒ'\bï¿½EGï¿½ï¿½xï¿½\u001fï¿½ï¿½aUï¿½Rgï¿½/ï¿½Fï¿½4ï¿½ï¿½nï¿½jï¿½xï¿½ï¿½ï¿½Fï¿½ï¿½d\u000fm\u001amï¿½y0+N7ï¿½+\u0003ï¿½\u0016\u0003
+
+FW\u0015ï¿½f\u000bÑ°:ï¿½ï¿½ï¿½Ø¦ï¿½
+\u00181ï¿½Sï¿½ï¿½ï¿½*ï¿½ï¿½0?ï¿½\u0000ï¿½\u0007ï¿½I\u001cï¿½ï¿½eÌœï¿½^ï¿½OY\u0005ï¿½eï¿½'^ï¿½atï¿½ï¿½ï¿½2rï¿½}ï¿½ï¿½.ï¿½\u0005ï¿½Aï¿½ï¿½\u0006ï¿½ï¿½ï¿½\u0001\u0006\tK\"\u0002ï¿½:ï¿½Qï¿½\t,nï¿½ï¿½ï¿½ï¿½\u001bh6ï¿½dï¿½\u0012Zï¿½Fï¿½8Y\"ï¿½Fï¿½ï¿½/ï¿½ï¿½Rï¿½A\u0003,ï¿½ï¿½ï¿½oï¿½ï¿½\u0011ï¿½ï¿½:-ï¿½H6!ï¿½`\fï¿½\u00134ï¿½\u0004\u001bï¿½\u001bï¿½ï¿½^8\"ï¿½mï¿½S~R-ï¿½ï¿½ï¿½~\u0002'x;Eï¿½04ï¿½|=$ï¿½jï¿½A\"F!ï¿½\u001eï¿½\u0002ï¿½dK\bBï¿½ï¿½s\u0006Zxï¿½\u00073ï¿½ï¿½\u001bv[b*~ï¿½\u0012ï¿½
+ï¿½ydï¿½k\u0016Syï¿½Ò¾ï¿½Ë’3ï¿½\u0000\u0014&6Þ¼Gjï¿½ï¿½X\bï¿½ï¿½[ï¿½ï¿½ï¿½_ï¿½Bcï¿½ï¿½zï¿½ï¿½ï¿½W\u0018ï¿½\u000eï¿½\bï¿½
+3ï¿½|^ï¿½ï¿½)Uï¿½rï¿½\u0013\u0010\u0007ï¿½ï¿½\u0000
+]8ï¿½$Jï¿½\u0016\u000eï¿½r^ï¿½<YW,Ä…6<7+ï¿½ï¿½|ï¿½ï¿½\\%:ï¿½ï¿½ï¿½h\bS[ï¿½\u0002ï¿½V\u0012Oï¿½glï¿½\"~Ý‘ï¿½)ï¿½$ï¿½\u0013ï¿½ï¿½ï¿½ï¿½ï¿½\":ï¿½ï¿½)ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½/ï¿½Wï¿½\u001c
+ï¿½ï¿½ï¿½ï¿½:$ï¿½ï¿½ï¿½\u000f\u0002ï¿½\u0019*lï¿½ï¿½REï¿½Uï¿½%ï¿½ï¿½ï¿½ï¿½L_ï¿½1%ï¿½ï¿½ï¿½#ï¿½\u0010^ï¿½^Xï¿½\u0007%ï¿½~bQ\u001f\u0005,yï¿½\u0019z*ï¿½Ö“\u001f\u000b\u001ckï¿½h\u001dMï¿½ï¿½ï¿½ï¿½\u0010\u0012nï¿½ï¿½ï¿½azAï¿½\"Í\u001d\u000b.a;Ì¼ï¿½tï¿½1ï¿½ï¿½\u0000\tVï¿½ï¿½ï¿½ï¿½2ï¿½ï¿½ï¿½\tï¿½dï¿½\u0019ï¿½ï¿½\u001f-ï¿½ï¿½6ï¿½m*CJï¿½ï¿½ï¿½ï¿½ï¿½q/ï¿½\b%\\Dï¿½x(ï¿½ï¿½#_ï¿½nï¿½_0=ï¿½[ï¿½ï¿½Ú‹\\}\u000bKï¿½ï¿½{ï¿½TË¢ï¿½:z0
+mYï¿½eï¿½n\bx\u0005\u001a]<ï¿½\u0019ï¿½\u0001ï¿½ï¿½'ï¿½fÎ”\u001cGï¿½ï¿½ï¿½ï¿½\u0006\u001aÖ¶i\u001bMï¿½Fncï¿½aï¿½\u001aKï¿½2ï¿½\u0002ï¿½ï¿½ï¿½oN\u0003ï¿½ï¿½\u0006\u001aD;ï¿½wï¿½\u0014n\u0019\u0006Üï¿½yXï¿½IOWï¿½ï¿½ï¿½\u0002_ï¿½\u001eï¿½ï¿½MTï¿½\u0006=D&ï¿½ï¿½[ï¿½Éï¿½k~\u0000ï¿½`ï¿½\u0011ï¿½ \\ï¿½ï¿½\u0018ï¿½ï¿½ï¿½ï¿½qï¿½f\u0012x,\u0012ï¿½cï¿½wï¿½FCï¿½ï¿½{Y=*@É—\u000b\u0014ï¿½ï¿½ï¿½`<~ï¿½4|ï¿½\u001aï¿½\u0015:ï¿½GÙ™ï¿½ï¿½<ï¿½>~9lGA\u001eï¿½p%^ï¿½ï¿½ï¿½ï¿½\u0017J
+ï¿½ï¿½.}ï¿½ï¿½?ï¿½\\ï¿½ï¿½Ë–ï¿½Wï¿½Ê¦h6j\u001e=ï¿½ï¿½4( )B/`ï¿½ï¿½hï¿½wï¿½ï¿½å›”ï¿½jï¿½ï¿½\\ï¿½ï¿½?I\u0007ß³aï¿½2Sï¿½\u000e
+ï¿½dï¿½2\u001eï¿½ï¿½:\u001aï¿½_b~S\u0012H\u0005ï¿½ï¿½ï¿½?BI,ï¿½b\u0006ï¿½ï¿½#6ï¿½ï¿½sï¿½Q\u0016\u0002ï¿½!ï¿½T*ï¿½
+ï¿½Dï¿½0ï¿½\u0011ï¿½ï¿½ï¿½ï¿½<+\u000e=cï¿½|\u000e\b}Ì¥ï¿½+ï¿½\b2ï¿½Dï¿½(ZWï¿½\u0010\u001cOï¿½ï¿½fU\u0012hï¿½CW7ï¿½&ï¿½~ï¿½ï¿½1ï¿½ï¿½ï¿½âš\u0004ï¿½Qm\u0011~kLï¿½ï¿½&5\u0006\u001a\u0000`\u001aï¿½ï¿½)ï¿½\u0005\tï¿½ï¿½\u001aJï¿½ï¿½ï¿½Ö»È¶I\u0007ï¿½lï¿½ï¿½ï¿½ï¿½i<lï¿½ï¿½!Gï¿½ï¿½:ï¿½ï¿½\u0007ï¿½ï¿½×¯ï¿½Dï¿½Xï¿½ï¿½D'wï¿½eï¿½ï¿½uï¿½ï¿½4\u0000x\u000f
+Lï¿½8ï¿½brï¿½\u0016ï¿½ï¿½.ï¿½\u001bï¿½Í¨#ï¿½\u0011xï¿½ï¿½ï¿½qC\"\u0002Gï¿½\u0003:ï¿½eï¿½-ï¿½Ýˆï¿½ï¿½ï¿½ï¿½\u0002\u0019OA%ï¿½AUï¿½eHUswï¿½ï¿½ï¿½Uï¿½F/\u000fï¿½
+ï¿½ï¿½ï¿½\t\u0002ï¿½Mï¿½ï¿½cï¿½ï¿½jï¿½=ï¿½Iï¿½/ï¿½&ï¿½-dqgVï¿½V5\u001cï¿½Qf,ï¿½9\u0019>ï¿½ï¿½ï¿½\u0017-\u0013\u0004*ï¿½ï¿½ï¿½ï¿½ï¿½_Nï¿½4ï¿½ï¿½G7]jm%ï¿½ï¿½Nï¿½6\u0011 \u000b\u0000ï¿½
+tï¿½(ï¿½ï¿½ï¿½ï¿½^%ï¿½\u0019\bï¿½2ï¿½/Yï¿½ï¿½!Yï¿½\u0000Ä­ï¿½^ï¿½ï¿½\tï¿½!ï¿½ï¿½ï¿½5ï¿½ï¿½ï¿½6\u0001tï¿½\\ï¿½ÊŒnI.ï¿½\u0003oï¿½Ö @sÇ»ï¿½ï¿½*ï¿½Mï¿½o5Oï¿½ï¿½`ï¿½\u000fï¿½ÔªIpï¿½ï¿½ï¿½]ï¿½dï¿½ï¿½`ï¿½ï¿½jï¿½ï¿½\u001f\u0016ï¿½^ï¿½\f\u0014\u0005ï¿½I}\u0001Í‚\u000eVï¿½Â¸mvï¿½Ð¦;\u000fï¿½Ä±Pï¿½ï¿½\u001aï¿½bï¿½[%\u0006\fï¿½\u0006Goï¿½ï¿½ï¿½O\fZï¿½ch\"ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ce>[\u0019Oï¿½&1\u001aï¿½Ý˜oXQg Ãœ\u0017Ö¢\u0003ï¿½ï¿½ï¿½P,m ï¿½ï¿½\u001eï¿½hï¿½ï¿½ï¿½ï¿½tï¿½#ï¿½ï¿½ï¿½] \u001eï¿½ï¿½ï¿½ï¿½Æ¾ï¿½ï¿½ï¿½F\u001a`ï¿½ï¿½ï¿½ï¿½Pï¿½\u001e$.ï¿½<ï¿½Bï¿½ï¿½EV
+Î›ï¿½tï¿½AXRvï¿½\fÜ˜ï¿½ï¿½ï¿½iï¿½\u001fï¿½jFPï¿½\u001dï¿½Kq^<Û‡ï¿½\u0000ï¿½ï¿½6ï¿½)\u0007\"ï¿½ï¿½Ïºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½3ï¿½\u0007é´¦ï¿½ï¿½\u000b3ï¿½ï¿½ï¿½'ï¿½\u0012ï¿½ï¿½\u001aï¿½4\\ï¿½k#ï¿½ï¿½8yï¿½ï¿½ï¿½\u0015ï¿½ï¿½q\u0005\tï¿½RRï¿½Ó‚91Iï¿½ï¿½/\u000eZ;ï¿½%ï¿½ï¿½`Ì¦ï¿½ï¿½-ï¿½(<%Fï¿½Kï¿½i<ï¿½ï¿½ï¿½ï¿½=ï¿½Dï¿½ï¿½m4m\u001e=ï¿½$Ú™v)ï¿½\u0006Mï¿½ï¿½9ï¿½wï¿½Uï¿½Sï¿½\u0010ï¿½)ï¿½[ï¿½ï¿½ï¿½*ï¿½ï¿½Q?ï¿½kxï¿½ï¿½T=ï¿½qnï¿½iï¿½ï¿½\u000f\tPÏœH7ï¿½.ï¿½ï¿½j\u0012ï¿½ï¿½vï¿½ï¿½G8b\f\u0006ï¿½ï¿½{Zï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Oï¿½Lï¿½\"ï¿½Ð€ï¿½ï¿½ï¿½ï¿½Wï¿½
+ï¿½?\u0016ï¿½
+ï¿½9ï¿½Q,ï¿½ï¿½k~Sï¿½Cï¿½\u00101\u0003Í¤@@,;ï¿½ï¿½fï¿½Xï¿½Cï¿½ï¿½*ï¿½Hï¿½g\u001dï¿½fï¿½yï¿½Æ¢ï¿½2\u0003ï¿½ï¿½ï¿½×€ï¿½\u0000\u000fo'ï¿½ï¿½ï¿½Zkï¿½nÞ²3u,ï¿½Æ‡2 Å’M,\u0013ï¿½a\u0014`Â…\u000btv\u0002ï¿½\u0011Eï¿½\u0013ï¿½2ï¿½2Þ¢&\"ï¿½ï¿½ï¿½ï¿½Dï¿½ï¿½ï¿½\t&%m\u001dï¿½Hï¿½\bï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\u0015ï¿½*ï¿½ï¿½W<tï¿½H$ï¿½\"ï¿½ï¿½ï¿½qï¿½ï¿½ï¿½ï¿½ï¿½.ï¿½ï¿½ï¿½Vwï¿½ï¿½sï¿½\fï¿½ï¿½×˜.jjï¿½ï¿½ï¿½ï¿½rn:\u0018QMï¿½ï¿½ï¿½4\u0013jï¿½aï¿½v\u0019ï¿½[ï¿½ï¿½N9ï¿½ï¿½Ü®wdï¿½A\u000eï¿½gTï¿½u\u0018\u0018ï¿½\b&ï¿½aï¿½Ð¹\u0004ï¿½ï¿½hï¿½R\u0014\u0015cï¿½ï¿½Gï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½\t\u0017ï¿½ï¿½$\u001dS\u0017ï¿½ï¿½ï¿½p#ï¿½ï¿½ ï¿½ï¿½
+Mï¿½\u0001dï¿½\u001cï¿½\u0017ï¿½Gï¿½K\u0011\u0013\u001dXï¿½3ï¿½ï¿½Bï¿½zï¿½\u001a$_ï¿½#ï¿½\u0005/\u0003ï¿½<Z\u001dï¿½\\Þ°Aï¿½ï¿½^\u0013/[Mï¿½ï¿½\u0003ï¿½O\u001eï¿½\u001a5)\u001cï¿½ï¿½qï¿½\u0012ï¿½ï¿½ï¿½\u0002\u0011ï¿½\u0010`ï¿½.ï¿½ï¿½ï¿½\u0018ï¿½'Ø¢Yï¿½\u0010ï¿½ï¿½y\u0016ï¿½\bAJï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\u0012ï¿½Þ†Sï¿½:|\u001cï¿½-ï¿½ï¿½ï¿½\u001fYï¿½ \u0000@ï¿½ï¿½ï¿½ï¿½2Õ½D^\u0017\"s'ï¿½yï¿½Cï¿½'ï¿½m_Í¹ï¿½(ï¿½Iï¿½meï¿½ï¿½\u0012;ï¿½P\u0006O\\\u0014:\u0016ï¿½~ï¿½T+ï¿½\u0016:\u001f\u0013ï¿½y2\u001bï¿½7~Cï¿½ï¿½Zï¿½zï¿½U1ï¿½Aï¿½Wï¿½\u001c!f ï¿½ï¿½9Oï¿½Ñ¾ï¿½ï¿½Ø°ï¿½zï¿½ï¿½ï¿½\u0016ï¿½ï¿½\u0000ï¿½g:ï¿½ï¿½ï¿½ï¿½ï¿½\u0001\\ï¿½ï¿½2ï¿½w\\\u0005ï¿½ï¿½V\u0012ï¿½ï¿½;ï¿½\u0000Vï¿½Wzï¿½R\u0000[ï¿½\u0010ï¿½QJq\"ÂŠï¿½E^ï¿½nrï¿½\fï¿½+\u0002ï¿½pï¿½ï¿½\u001bï¿½\u0001\u001e\u0018+ï¿½fï¿½hï¿½cï¿½Cï¿½ï¿½ï¿½\"&ï¿½Wï¿½Nï¿½ï¿½\u0011+2\u0000ï¿½ï¿½I\u0006#yH\u0002\u001cï¿½! o*ï¿½zï¿½;7\bï¿½*ï¿½ï¿½ï¿½^Uï¿½
+ï¿½ï¿½ï¿½Iï¿½ï¿½
+\u001dï¿½9\u0006ï¿½lIï¿½Zmï¿½7ï¿½ï¿½ï¿½\u0014ï¿½ï¿½gï¿½GN0ï¿½=zï¿½ï¿½Eï¿½ca\u0004bï¿½ï¿½ï¿½:tï¿½Xï¿½ï¿½UbfVï¿½ï¿½Tï¿½ï¿½ï¿½ï¿½'à´¿,4qoï¿½ï¿½ï¿½#ï¿½OV|ï¿½b^1ï¿½ï¿½\u0016ï¿½DV\u0015}Aï¿½ï¿½Ç‘Q\u0002Ï¹Üƒï¿½[ï¿½\u0003ï¿½ï¿½kï¿½Ð•Fï¿½Eï¿½\u001fE*ï¿½ï¿½ï¿½\u001d\u0002oï¿½\u000eï¿½Ì­Wï¿½[ï¿½Í–ï¿½ï¿½\u001b9ï¿½)-\u001c+Ê¢ï¿½Okï¿½ï¿½ï¿½ï¿½Ä¸
+ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½E)ï¿½ï¿½\u0016\u0013~ï¿½x\u0011\u001azï¿½ÉŸï¿½ï¿½<ï¿½mï¿½\u000fï¿½A`e\u001e Ôï¿½,zï¿½ï¿½\u001b\u0015ï¿½ï¿½ï¿½\u001dï¿½Zï¿½ï¿½×‚ï¿½ï¿½ï¿½iTï¿½j>4&ï¿½\u0019ï¿½\u0007ï¿½ï¿½ï¿½6ï¿½*ï¿½ï¿½ï¿½ï¿½nv@(ï¿½ï¿½ï¿½\u0019ï¿½ï¿½BpS
+ï¿½ï¿½XZ\u001aL ï¿½ï¿½&ï¿½\u001cï¿½ï¿½|*nt\u0000|Ïª5\u0012ï¿½af>ï¿½}'ï¿½ï¿½\u0011ï¿½ï¿½(aFï¿½R\u001ah#=ï¿½%Zï¿½kï¿½ï¿½ÖµlBï¿½G×€ï¿½Jï¿½\u001fï¿½ï¿½5Cï¿½ï¿½Eï¿½zNï¿½iï¿½Rï¿½]hï¿½~ï¿½Yï¿½e\fï¿½ï¿½>ï¿½
+\u0003Ô¶ï¿½Qï¿½ï¿½Mï¿½\u0015pï¿½ï¿½ï¿½\u001cu\u0010ï¿½@ï¿½\u0010\u0016\u0005ï¿½ï¿½ï¿½ï¿½\u0017ï¿½<Tï¿½ï¿½ï¿½KLï¿½\u0018\tï¿½N<-ï¿½\u0012ï¿½g/caï¿½ï¿½ï¿½ï¿½\u000fï¿½?ï¿½ï¿½ï¿½#\u0001Wï¿½ï¿½ï¿½\u0003%ï¿½ï¿½nï¿½hï¿½ï¿½_1ï¿½ï¿½ï¿½#vï¿½5ï¿½\\\fï¿½I\u0002ï¿½\u0010|ï¿½-ï¿½>ï¿½0\u001dï¿½?\u0019yï¿½\u001e($ï¿½<ï¿½<ï¿½Mï¿½ï¿½hjï¿½;ï¿½ï¿½/ï¿½ï¿½ï¿½\u0018ï¿½ï¿½ï¿½ï¿½UF[ï¿½\u0003Mï¿½ï¿½8/\u0005\u001fï¿½Rï¿½ï¿½Cuï¿½\tDPQ\u000bï¿½ï¿½\u0001Rkï¿½ï¿½9\u0014h(eC|×¥ï¿½mï¿½ï¿½ÙŽeï¿½\u001fï¿½ï¿½ï¿½Rï¿½(
+ï¿½ï¿½\u001b'oï¿½ï¿½Vï¿½ï¿½ï¿½ï¿½\u0001ï¿½: (WP@ï¿½++ï¿½cï¿½Bï¿½O02=ï¿½ï¿½BTï¿½ï¿½ï¿½8\u0007ï¿½=0
+ï¿½\u0000z}ï¿½ï¿½ï¿½7\u0013}Np
+\u001dï¿½f#>nLï¿½&ï¿½\"\u001a\u0003ï¿½\u0019I'@cï¿½ï¿½y\u0007ï¿½`Eï¿½ï¿½'ï¿½\u0013PN\\ï¿½Sï¿½3~hï¿½}ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½+Hï¿½ï¿½\u001cP#ï¿½\"ï¿½ï¿½ï¿½Iï¿½ï¿½ï¿½\u00143
+ï¿½\t/A}ï¿½ï¿½0iï¿½`(Aï¿½\u0015ï¿½\u0007ï¿½/\bï¿½\u0011ï¿½ï¿½~s\u0003ï¿½aï¿½!qï¿½@ï¿½Ytï¿½ï¿½ßŸï¿½eï¿½ï¿½G\u0015ï¿½ï¿½ï¿½KLï¿½kï¿½ï¿½aï¿½\u001fï¿½ï¿½ï¿½ï¿½H\tï¿½ï¿½\\Ø¨)ï¿½ï¿½S\u000bï¿½\u0004$ï¿½ï¿½Ó¶ï¿½ï¿½\u0012ï¿½A\u001eï¿½ï¿½\u0001ï¿½7~ï¿½-ï¿½ï¿½cï¿½xï¿½\u0014ß°ï¿½Ujï¿½\u001c\u001e^DAÍ¹ï¿½\u0006t^ï¿½ï¿½ï¿½\u000fvï¿½75ï¿½î¸¢\u0016\u001dsï¿½(ZDï¿½sï¿½\tï¿½ï¿½gï¿½ï¿½<ï¿½é²‹\u000fï¿½Q\u0016eï¿½ï¿½ï¿½jMï¿½$ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½:ï¿½3iAï¿½ï¿½\u0017ï¿½Lï¿½ï¿½Eï¿½xï¿½{yï¿½lï¿½c(ï¿½pCï¿½ï¿½[\u0017gt=ï¿½ï¿½r.ï¿½}$ï¿½å”®ï¿½ï¿½iï¿½\u0006>ï¿½ï¿½\u0005ï¿½ï¿½
+Bï¿½ï¿½Gï¿½ï¿½S\u0006ï¿½:|\u0017\u0002\\W[ï¿½\u0012hï¿½Q.,?Fì¾ï¿½&ÎŒï¿½gï¿½ï¿½ï¿½Lï¿½ï¿½3ï¿½G&ï¿½\u0000ï¿½aï¿½zï¿½EFï¿½SpRxï¿½\u001d \u001bKï¿½\u0017ï¿½ß¸Cï¿½\u0003ï¿½3\u001cï¿½}mï¿½s:\u0002ï¿½z4Pï¿½Wï¿½uï¿½zï¿½Zï¿½ï¿½tï¿½\"ï¿½ï¿½ï¿½oZXï¿½c\u001b8ï¿½u\u001cï¿½ï¿½ï¿½|ï¿½\u0016L{_ï¿½ï¿½ï¿½ï¿½ï¿½2)ï¿½ð¦…±\byK×ˆï¿½ï¿½\u001dï¿½\u0002ï¿½\u001bï¿½/ï¿½\u001fcï¿½^ï¿½ï¿½\u001exï¿½ï¿½\u001eï¿½ï¿½\u000eï¿½ZjBï¿½\ty\u0018ï¿½;\u0004ï¿½ï¿½ï¿½ï¿½5+ï¿½ï¿½ï¿½`ihï¿½\u0013ï¿½\tï¿½\u001aIï¿½ï¿½ï¿½ï¿½ï¿½9\f[ÕŠï¿½\u001aï¿½\u0011ï¿½ï¿½ï¿½iï¿½Mï¿½G
+4ï¿½ï¿½Gc\u000eï¿½ï¿½N+ï¿½\u001b<ï¿½6Q;ï¿½ï¿½ï¿½aBzï¿½}ï¿½9ï¿½Uï¿½J\u001fÇ‘ï¿½ï¿½ï¿½ï¿½_zdX\u0012]vBs\u001cï¿½ï¿½\u0007=f\u0015ï¿½ï¿½ï¿½ï¿½\u0007P
+ï¿½Y\u0007ï¿½ï¿½YSï¿½tï¿½#Cï¿½ï¿½{ï¿½ï¿½ï¿½jqTSiï¿½mï¿½hï¿½.;>n\u00160ï¿½\u0014ï¿½0\u001fï¿½+\u000e.\u0011)å½Šï¿½uDmï¿½-Iï¿½wÝ•*\u0014`ï¿½Kï¿½Ó¬vï¿½ï¿½ï¿½ï¿½5ï¿½\u0007ï¿½\u0006ï¿½ï¿½: ï¿½ï¿½ï¿½*`Oï¿½mï¿½\u0012g\u000fï¿½nï¿½sï¿½cï¿½\u0011ï¿½#aW\"\u0014Gï¿½xp*\u0006gï¿½hï¿½\u0018ï¿½\u001d!\u0013ktï¿½>ï¿½N66}Éï¿½ï¿½cï¿½ï¿½\u0016ï¿½ixxï¿½\u0012Cï¿½ï¿½Hï¿½eï¿½ï¿½
+ï¿½\u0003r*#82ï¿½ï¿½\u0004)\u000b\b\u0015Kï¿½M-ï¿½ï¿½\u0001Ë†bï¿½%,ï¿½\u0011\u0003dKï¿½6\f \u0003Ìž\u000eYï¿½ï¿½Jï¿½\u0010ï¿½|}&ï¿½'ï¿½ï¿½ï¿½ï¿½ï¿½e\u001cï¿½8ï¿½ï¿½\u0000Peï¿½{Ð™\u0010ï¿½ï¿½Hï¿½k\u001eXï¿½ï¿½ï¿½ï¿½Fï¿½;6=ï¿½ï¿½{ï¿½|&ï¿½Aï¿½Wï¿½ï¿½6k!tlï¿½]ï¿½\u0014\u001arDCOÓ´å›ˆ<Qï¿½ï¿½ï¿½
+
+1ï¿½ï¿½hï¿½ï¿½%ï¿½lï¿½\u001f&ï¿½3Xï¿½9ï¿½\u0018nï¿½Jhaï¿½ylï¿½:ï¿½ï¿½\tï¿½|bï¿½ï¿½æ°‰X\u0014ï¿½^hgwï¿½ï¿½Aï¿½}hï¿½ï¿½ï¿½5+uOP:Ky\bï¿½Ãï¿½t,Rï¿½Xï¿½pKï¿½ï¿½!:ï¿½ï¿½#8ï¿½sÎ‘krï¿½Yï¿½ï¿½ï¿½c.ï¿½\u0011{/ï¿½ï¿½Ë¾ï¿½ï¿½:ï¿½ï¿½mï¿½\u0003ï¿½\u000eï¿½\tGNhï¿½}ï¿½~\u0016ï¿½^ï¿½Fï¿½ï¿½#ÊŸï¿½ï¿½\u0018ï¿½Tï¿½.ï¿½ï¿½ï¿½ï¿½ï¿½P\u00042ï¿½\u001bï¿½idnaï¿½ï¿½$\u001d/ï¿½ï¿½ï¿½ï¿½`ï¿½ï¿½aï¿½ï¿½ÃÎ¡ï¿½Mï¿½× \u0000'$ï¿½ï¿½prï¿½\u000eï¿½\u0003ï¿½ï¿½=ï¿½\u0016ï¿½\"ï¿½mï¿½Ã_C
+YuXï¿½ï¿½\tMï¿½\u0004ï¿½ï¿½\u001c^ï¿½ï¿½Jï¿½xssï¿½ELï¿½8gï¿½ï¿½2?Y\u0019+\u001c;\u0013ï¿½Z+\u00124ï¿½ï¿½ï¿½ï¿½\\{w%ï¿½ï¿½4kRï¿½cï¿½ï¿½ï¿½\tï¿½m=ï¿½ï¿½`ï¿½ï¿½Z5;ï¿½ï¿½\u0004b\u0012ï¿½ï¿½ï¿½ï¿½6ï¿½
+\u000fÞœ>È§&ï¿½qï¿½ï¿½Qï¿½2\u0019\u000eI\u0018?ï¿½\u0005ï¿½;\tdï¿½ï¿½ï¿½\u0004\u0018ï¿½Tï¿½;\u000f~\u000e=_ï¿½ï¿½\u0002Mï¿½\u0016ï¿½gï¿½|ï¿½6\u0016?B\u000eï¿½`ï¿½ï¿½ï¿½_Â­ï¿½fK\u000bï¿½E\u001b`#
+f(ï¿½#ï¿½cï¿½Q[ï¿½aï¿½ï¿½S$\u0003ï¿½ï¿½%ï¿½ï¿½ï¿½ï¿½5-ï¿½9Ø§ï¿½ï¿½,ï¿½Oï¿½(Jï¿½6ï¿½\u0004C\u0016\u0007Yx*r\fï¿½ï¿½Aï¿½ï¿½(ï¿½ï¿½dUï¿½ï¿½B\u0016\u001fT\u0012ÝŠÉ²ï¿½\u001bï¿½;Uï¿½W\u0004ï¿½gDï¿½:\u000bï¿½\u001d$4\u0014ï¿½ï¿½ï¿½\u0012ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\u001e-\u0015ï¿½\b\u0010i.Fï¿½ï¿½=|Lï¿½ï¿½Dï¿½b\u0014.}ï¿½ï¿½ï¿½ï¿½
+ï¿½\u0007ï¿½\u0007ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½]tRï¿½\u001fï¿½\u000bgï¿½aï¿½ï¿½É…ï¿½ï¿½ï¿½ï¿½Iï¿½ï¿½kï¿½\u0007ï¿½ï¿½9Bï¿½ï¿½3ï¿½clv\bï¿½
+\u0002ï¿½^Gï¿½Nï¿½\u001c7ï¿½1ï¿½[ï¿½s}FTï¿½)\u0002ï¿½.\u0011ï¿½~ï¿½Fzï¿½ï¿½rSï¿½\u0002qï¿½;Öª(%\u001b_ï¿½ï¿½ï¿½7ï¿½)ï¿½ï¿½\tfï¿½\u0015ï¿½:\u000f_\u0018\u000fGHr\u000e:$\u0010ï¿½\u0005ï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\u0006ï¿½ï¿½\u0000\tnFï¿½ï¿½B;ï¿½0j4ï¿½\u0014ï¿½TX \u001eï¿½\u001dï¿½`ï¿½Dï¿½ï¿½ï¿½jï¿½^'ï¿½ï¿½ï¿½*ï¿½8\u000eN>l6Ïœ`ï¿½ï¿½JF%}ï¿½ï¿½ï¿½ï¿½4/ï¿½\t]\u0000Wï¿½6\"*ï¿½~=\u000f$ï¿½ï¿½\u0013\u000b\"hï¿½ï¿½%ï¿½ï¿½lVï¿½Xï¿½:ï¿½ï¿½ï¿½\u0007yÔ·5ÙœFï¿½\u0019 {?ï¿½(\u0010>ï¿½4Ý¬{\u000bAOï¿½ï¿½\u000fï¿½ï¿½ï¿½ÈŽ\u0011ï¿½s\u001dï¿½0ï¿½\u001dï¿½ï¿½ï¿½ï¿½\u0018L\u0018ï¿½ï¿½\u0003Fï¿½ï¿½ï¿½\u0011=ï¿½ï¿½ï¿½ï¿½\u0019ï¿½C\u0013\u0005ï¿½ï¿½T\u0000ï¿½Ë¥\u0013ï¿½ï¿½ï¿½7ï¿½Xï¿½ï¿½ï¿½kï¿½gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½M7ï¿½ï¿½a9ï¿½\"g\u0011_ï¿½Ãgï¿½Wï¿½sÆ…-ï¿½ï¿½ak\u0000ï¿½ï¿½×1]ï¿½2bï¿½\\ï¿½\\\u0001ï¿½+|2Mï¿½ï¿½@
+ï¿½S\u0016\u001fUï¿½ï¿½Â«ï¿½ï¿½ï¿½bï¿½ï¿½-\u000e\u0012ï¿½Hï¿½*k\u0017V9dï¿½ï¿½ï¿½Aï¿½+S3dï¿½$fï¿½ï¿½Iï¿½Y\\\u0000/\u00174\"ï¿½kAï¿½6ï¿½(ï¿½pï¿½\u0004qï¿½ï¿½`Y\u001dï¿½Z<ï¿½\u0015Ø„ï¿½ï¿½Pmï¿½Ìï¿½\u001cï¿½
+
++ï¿½ï¿½ï¿½9ï¿½ï¿½\u0012\u001ej\bï¿½ï¿½\u0014hï¿½p\u001cR9*4D\u0018\u0006ï¿½ï¿½×—ï¿½Oï¿½\u001d@zwï¿½Ô™V1ï¿½3td6ï¿½ï¿½Â±ï¿½R\u001cfï¿½iï¿½ï¿½w!ï¿½l^ï¿½a\u000eï¿½ï¿½ï¿½ï¿½\u000e\u0000+ï¿½%6Q\u0007\u0016\u001eï¿½ï¿½KCï¿½m\u0001{\"ï¿½ï¿½ï¿½Zï¿½ï¿½ï¿½N3ï¿½ï¿½\u0002ï¿½ï¿½+ï¿½ï¿½cÜ§Eï¿½cg0\u0014[ï¿½+
+ï¿½Òžï¿½ï¿½ï¿½ï¿½\u0015ï¿½ï¿½pï¿½Â¶ï¿½A83l\u0013ï¿½rï¿½ï¿½[\u0017\u000bï¿½ï¿½ï¿½n1K\u001fï¿½,H_<\"pï¿½&\u001eï¿½ï¿½ï¿½xÍ¢ï¿½~0Uï¿½ï¿½66ï¿½-\u001bï¿½ï¿½ï¿½á˜\u0014×žï¿½\u001e<.Mï¿½ï¿½ï¿½ï¿½KEï¿½ï¿½ï¿½\u0010@\f\u0003ï¿½7ï¿½mï¿½62ï¿½&\\\"Q9@ï¿½ï¿½sï¿½Ù—!ï¿½_vLï¿½ï¿½-'ï¿½Lï¿½ï¿½\u0015ï¿½Tï¿½ï¿½d\u0015ruQ\u000eï¿½cï¿½ï¿½Ç­ï¿½]ï¿½\u0018W`8ï¿½\u0001D1ï¿½CKK
+hzï¿½nï¿½~Çµ)\u0010:qï¿½ï¿½9[ï¿½\u000f@\u001aï¿½1\tAR\u0005Ü§|\taï¿½ÕœÖŽï¿½
+ï¿½%î¬„ï¿½ï¿½0ï¿½ï¿½ï¿½iï¿½q\u0005\u000fï¿½ï¿½ï¿½A;\\ï¿½0ï¿½ï¿½ï¿½@Õ¾ï¿½ï¿½\u000bS\u0019w\\Ab~\u0006ï¿½ï¿½ï¿½\u0019ï¿½ß¸ï¿½yï¿½ï¿½Pï¿½\u000eï¿½*Dï¿½ï¿½#ï¿½hï¿½Cqï¿½]ï¿½Hï¿½ï¿½ï¿½5ï¿½\u0002R*ï¿½ï¿½Hï¿½6w\u0019;ï¿½Ëšï¿½g\u0006ï¿½ï¿½;ï¿½I
+\f4ï¿½ï¿½;\u0011vï¿½\u000eï¿½\u0017E !ï¿½ï¿½%ï¿½ï¿½ï¿½p.yDï¿½ï¿½1xï¿½ï¿½Yï¿½
+ï¿½ï¿½\u001dï¿½ï¿½;ï¿½0ï¿½\u0007S\u0011Q<~%\u0017ï¿½sï¿½2WPï¿½3ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\u0013vXÂ™\u000eï¿½^ï¿½<ï¿½t,\u0014
+ï¿½\u0003ï¿½W\u0019|Bï¿½%ï¿½Wï¿½%'zï¿½ï¿½ï¿½ï¿½`R&ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Gï¿½%ï¿½\u0006\u001cNï¿½]wï¿½ï¿½Zï¿½yï¿½ï¿½UXs15\"@ï¿½ï¿½rï¿½ \u001dï¿½ï¿½\b8ï¿½ï¿½ï¿½ï¿½BZï¿½VN.ï¿½ï¿½TPï¿½*ï¿½)}ï¿½\u0015ï¿½\u0015\u0015ï¿½ï¿½\u0000Sï¿½\u001bLï¿½\u0003ï¿½Tï¿½3ï¿½5<ï¿½Fï¿½\bï¿½ï¿½F`tï¿½ï¿½3ï¿½ï¿½ï¿½\u0004ï¿½\"ï¿½ï¿½ï¿½\u001d7\u0010\u001fï¿½Òª\"\u00041$ï¿½ï¿½ï¿½\u001aï¿½!ï¿½ï¿½ï¿½]ï¿½Oï¿½Fdï¿½Rï¿½45Aï¿½ï¿½\u001f\u0019ï¿½+^/ï¿½Gï¿½ï¿½ï¿½ï¿½É•ï¿½Aï¿½ï¿½ï¿½L3x&ï¿½ï¿½>\u0010]^ï¿½mï¿½\u0012KU~ó†žƒï¿½Ì¢2]ï¿½ï¿½ï¿½ï¿½ï¿½\u0005Jï¿½wï¿½Y×£ï¿½ï¿½(ï¿½ï¿½pUaï¿½U\u0007\u001cï¿½\u0010ï¿½\u0001Ë€y
+Qï¿½|(Aï¿½CEï¿½ï¿½\u0004#ï¿½ï¿½VJ\u0007/ï¿½Æ¯eï¿½y\u000fï¿½Ì¤ï¿½\u000bï¿½~ï¿½:iï¿½ï¿½Vï¿½\u0000ï¿½ï¿½RÖ—ï¿½Bï¿½ï¿½ï¿½ï¿½\u001dï¿½ï¿½2IPï¿½sï¿½ï¿½ï¿½Q\u0014Ç¸jï¿½kï¿½ï¿½\u0019ï¿½7\u0002ï¿½5%ï¿½\u0003ï¿½
+ï¿½?:\u000f8ï¿½\u0003ï¿½&ï¿½AÃ‹ï¿½ï¿½<ï¿½ï¿½rï¿½ï¿½ï¿½nï¿½U4\u00176ï¿½ï¿½\u001bï¿½ï¿½ï¿½ÃŸ||ï¿½|9ï¿½ï¿½'lnï¿½ï¿½\b;ï¿½v.Wï¿½ï¿½Aï¿½oxÇ¹\tï¿½ï¿½9Ý’ï¿½6\u0019<ï¿½ï¿½/\u001epï¿½\u0018ï¿½\u0013ï¿½%ï¿½<
+ï¿½kï¿½'uï¿½ï¿½Dï¿½\u0010R\u000bï¿½#ï¿½L\u0018ï¿½\u0005ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Rï¿½ï¿½QmW\u0016ï¿½dï¿½\u0003ï¿½\u0012ï¿½bï¿½&Þ¨b}\u001erï¿½ï¿½ï¿½\u0007\u0007ï¿½{uï¿½@ï¿½&ï¿½]×˜m&ï¿½:4ï¿½\u001eï¿½ï¿½E\u000b!vï¿½!Cï¿½E\u0000\u0018kE'ï¿½\fÇ…=-Yï¿½ï¿½Ñ½ï¿½Í›&I8\bï¿½?kï¿½ï¿½jï¿½ï¿½ï¿½Ä§ï¿½ï¿½\u0011LZÖ²\u001eOrï¿½\u001b\u0015\u0010=5$\u0005\u000f\u0018ï¿½ï¿½\fï¿½ï¿½\u0018Gï¿½g\u001dï¿½,ï¿½+ï¿½Ê²
+ï¿½Goï¿½m0\u001fï¿½ï¿½fï¿½@ï¿½ï¿½3l> mï¿½ï¿½bï¿½ï¿½ï¿½]ï¿½ß—\bï¿½ï¿½ï¿½sÛ¹Sï¿½ï¿½\u0006ï¿½<ï¿½ï¿½Xï¿½R:j}ï¿½\u001d\u001d
+F=\u0000ï¿½&Yï¿½ï¿½RN+\u0017\b\u0001ï¿½ï¿½ï¿½ï¿½63ï¿½\u0001sï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½bjoï¿½Eï¿½A3ï¿½ \"\u0005ï¿½ï¿½Å·~ï¿½ï¿½{ï¿½z;ï¿½bÓ¡ï¿½ï¿½Aã£„ï¿½ï¿½\u000fOï¿½Jrï¿½ï¿½4ï¿½ï¿½ï¿½cHï¿½iï¿½ï¿½%]gï¿½0ï¿½ï¿½ï¿½dï¿½ï¿½!ï¿½ï¿½ï¿½ï¿½ï¿½4%ï¿½ï¿½\u001bbï¿½ï¿½Ù²K`ï¿½HGï¿½ï¿½Sï¿½\fmï¿½ï¿½Ì‡ï¿½~Snin8*|ï¿½ï¿½Oï¿½ï¿½eï¿½ÕŠtï¿½3x/,xï¿½fKï¿½\u0001\u001b xï¿½qï¿½ï¿½(ï¿½ï¿½)ï¿½É‚\\ï¿½h\u0005ï¿½ï¿½ï¿½tï¿½ï¿½Pï¿½%eï¿½\u00050\u0011*ï¿½ï¿½ï¿½\u0019ï¿½ï¿½O\u0000ï¿½4ï¿½\u0015ï¿½\u0015ï¿½ï¿½wï¿½ï¿½ï¿½ï¿½Xï¿½\u0007[ï¿½ï¿½Hï¿½Kï¿½a\u001f%\u0014\u0014Wï¿½ï¿½\u001cï¿½eO9\baï¿½Wï¿½KI\u001bï¿½ï¿½ï¿½xï¿½<\u0011ï¿½xRï¿½ï¿½5\u0012ï¿½ï¿½\u0005]hxï¿½ï¿½\tï¿½\u0016ï¿½i>Bï¿½ï¿½B\u0017ï¿½o×´%?\bï¿½ï¿½]\u0006s\u0015Ó\u0002ï¿½U\u00066ï¿½?ï¿½ï¿½ï¿½Qï¿½ï¿½Tï¿½r\u001a\u0015;\t$_ï¿½Tï¿½++ï¿½Yâ´•4ï¿½Ù¬Eï¿½ï¿½ï¿½]ï¿½ï¿½ï¿½ï¿½ï¿½\"ï¿½\u000f ï¿½=ï¿½ï¿½Raï¿½ï¿½(9Diï¿½7xï¿½Hï¿½ï¿½6&ï¿½:Mï¿½\bï¿½nï¿½ylPï¿½ï¿½ï¿½ï¿½3ï¿½\u0012ï¿½ï¿½Jï¿½ï¿½4ï¿½ï¿½MjÎ•tï¿½ï¿½I\u0002ï¿½mhï¿½ï¿½U\u0015ï¿½{\u001e7?ï¿½\u0016]ï¿½ï¿½\u0001H\u0006ï¿½Qï¿½=ï¿½=}ï¿½@ï¿½ï¿½ï¿½Y\u001eyï¿½Ó¸g\u0018ï¿½V\fDï¿½\b`ï¿½ï¿½ï¿½Vï¿½ï¿½oï¿½\u001fve[ï¿½\u000fï¿½gï¿½ï¿½1ï¿½ï¿½nï¿½ï¿½:@ï¿½*p{7ï¿½ï¿½Tï¿½ï¿½ï¿½\u000eoVìŠblqï¿½k\u0007ï¿½Dï¿½ï¿½)\u0011ï¿½]ï¿½\u001f ï¿½X<Hï¿½E ï¿½&ï¿½\u0000ï¿½\u0013ï¿½ï¿½ï¿½u#z\u000b
+Oï¿½7ï¿½`&bï¿½Ó²ï¿½ï¿½ï¿½jï¿½ï¿½ï¿½ï¿½ï¿½Wï¿½ï¿½0ï¿½ï¿½ï¿½ï¿½bc0Xï¿½ï¿½\u0017C'ï¿½ï¿½uï¿½#ï¿½ï¿½ÂŽï¿½ï¿½&ï¿½ï¿½Ï¸ï¿½ï¿½ï¿½\u0003ï¿½Rï¿½\u001fwï¿½,.B5;Xï¿½ï¿½6=ï¿½>`gï¿½Cï¿½ï¿½ï¿½ï¿½iï¿½wï¿½\u0004ï¿½ï¿½ï¿½ï¿½;ï¿½ï¿½ï¿½ï¿½ï¿½+ï¿½;4ï¿½ï¿½J=ï¿½\u0000|ï¿½ï¿½hï¿½~Cï¿½cï¿½ï¿½\u000fhH\u000b\u0013\u001bÙ’\u001fï¿½\u0001eA\"ï¿½ï¿½#ï¿½gï¿½ï¿½2ï¿½ï¿½\u0005mï¿½Uï¿½dï¿½ï¿½\f9CÇ«6ï¿½\u0003bNï¿½ï¿½Jï¿½ï¿½ï¿½ï¿½BOï¿½ÖŠ?\u0011k<lï¿½Iï¿½\u0018ï¿½\u001fÒ±ï¿½`[}hh\u0014\tï¿½\u0007<}K0Ó¯ï¿½v_ï¿½ï¿½|\u001ePï¿½ï¿½RhT?ï¿½ï¿½z ï¿½\\ï¿½ï¿½?ï¿½Voï¿½ï¿½ï¿½bï¿½ï¿½9Ê´ï¿½ï¿½2-\u000f\u0016y[ï¿½q\u0004ï¿½\u0012i4bï¿½ï¿½Qwl\f^ï¿½\u0000ï¿½h\u0012|ï¿½&Kï¿½ï¿½ï¿½ï¿½ï¿½Vï¿½^vï¿½\u001b]Wï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\u0005ï¿½oï¿½ï¿½5\u0003Wgï¿½^\u0000ï¿½ï¿½Ô«Hï¿½Ò¶
+\u001dKï¿½`
+_ï¿½ï¿½H\u0005ï¿½@Ûžï¿½ï¿½Uï¿½}ï¿½ï¿½\u0003a\u000eqUï¿½%ï¿½\u001djï¿½ï¿½1\fÒ¹\u0005ï¿½ï¿½@!ï¿½\u001dï¿½ï¿½ï¿½ï¿½rï¿½ï¿½ï¿½\u0017ï¿½x-m.Xï¿½\u0017yï¿½ï¿½\u001at#ï¿½7cï¿½fï¿½jï¿½p\u0011$aï¿½ï¿½ï¿½eï¿½5q e\u0017{ï¿½ï¿½ï¿½ï¿½ï¿½-\u001eï¿½E\f\u0012<9ï¿½ï¿½ï¿½ï¿½iï¿½?ï¿½\u0015I\u000f^D\u000b)\u001fï¿½ï¿½ï¿½ï¿½ï¿½ï¿½iï¿½ï¿½ï¿½ï¿½ï¿½-oï¿½. \u0004ï¿½ï¿½ï¿½\u001aHï¿½\u0014=ï¿½ï¿½{Åï¿½ï¿½ï¿½ï¿½Ë#zï¿½ï¿½\u0014ï¿½ï¿½ï¿½ï¿½K5ï¿½ï¿½Minï¿½Yï¿½ï¿½w&iï¿½ï¿½z}8ï¿½ÜŽï¿½ï¿½m
+E(9Mv;qï¿½ï¿½ï¿½iï¿½ï¿½ï¿½ï¿½ï¿½0ï¿½ï¿½\u0004kï¿½ï¿½{\u0015ï¿½ï¿½=\\Nï¿½
+\u0002>ï¿½iï¿½ï¿½ï¿½$Ò£t\u0016Zï¿½ï¿½Jï¿½*;ï¿½\u000fNrmbï¿½ï¿½!%ï¿½!Þ¼ï¿½H8\u001d
+ï¿½)ï¿½\u000fï¿½ï¿½'5ï¿½ï¿½tï¿½ï¿½(ï¿½Vï‘•ï¿½4\u0002\u0012&ï¿½ï¿½ï¿½7[ï¿½ï¿½ï¿½L8Oo\u0015ï¿½ï¿½oï¿½M%ï¿½ï¿½CwtiOï¿½ï¿½ï¿½Wï¿½c-\u0017>\u001eï¿½7Qï¿½zRsï¿½\u0013j4ï¿½Ê©m-ï¿½1ï¿½ï¿½ï¿½\u0011_ï¿½\u0006Ö³3V[78\u0002ï¿½|Ð…\u0007ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\u0005\u0000ï¿½pÉ¼ï¿½v\u0005:ï¿½\u001cï¿½ï¿½ï¿½ï¿½\u0019ï¿½ï¿½ï¿½oUï¿½Xï¿½H\u0006\u0004ï¿½19\u0004ï¿½n)ï¿½ï¿½Cï¿½SÔŠ:ï¿½ï¿½ï¿½Cï¿½?Cï¿½!ï¿½ï¿½\u0010\u000fï¿½fï¿½Iï¿½8Yï¿½\u0012ï¿½Tï¿½udLï¿½ï¿½hï¿½ï¿½X^\u001dï¿½ï¿½bmï¿½=ï¿½ï¿½A\u001fDï¿½\\\u0004ï¿½ï¿½ï¿½GS)ï¿½kï¿½ï¿½ï¿½*[]ï¿½ï¿½\u0011ï¿½oï¿½ï¿½gï¿½ï¿½^eXPsï¿½YXï¿½Cï¿½=mï¿½ï¿½'ï¿½â‘¶ï¿½k\u000fï¿½Vï¿½1N\u0014-\\Lp\u000f\u000f\u0010ï¿½\"ï¿½\u000fï¿½ï¿½ï¿½Ô•ï¿½'ï¿½ï¿½\u0016ï¿½BP#ï¿½ï¿½Oï¿½p`0ï¿½+ï¿½ï¿½\u000bTï¿½\u000f+ï¿½.ï¿½ï¿½ï¿½;cï¿½wï¿½6ï¿½=ï¿½ï¿½ï¿½\u0015ï¿½ï¿½ï¿½wBï¿½ï¿½ï¿½Z\\ï¿½Ì¹\u0016zï¿½s\u0011gï¿½ï¿½>ï¿½sï¿½ï¿½\u0018ï¿½Õ®fåŸzZN;UA=ï¿½ï¿½ï¿½U)<Öï¿½\u001fï¿½eJ7ï¿½n}ï¿½me>ï¿½s'Pï¿½ï¿½ï¿½ï¿½U\u000f=YÄ\u001eï¿½ï¿½]g\u0011ï¿½ï¿½yï¿½$ï¿½
+ï¿½ï¿½ï¿½0ï¿½ï¿½>ï¿½cï¿½Ô ï¿½B+ip^%ï¿½ï¿½*/>!ï¿½\u0014ï¿½Bï¿½ï¿½ï¿½aï¿½Pï¿½S\bï¿½ï¿½K\bqï¿½ï¿½ï¿½ï¿½\u0010ï¿½ï¿½\".\u0016sï¿½?{ï¿½\u0015cï¿½tY\u0015ï¿½ï¿½È•;ï¿½r6ï¿½Gï¿½ï¿½ï¿½\u0000ï¿½V?ï¿½ï¿½<ï¿½m?C6ï¿½ï¿½8MR\u0003tï¿½sï¿½\u0000lW@fï¿½\u0017ï¿½gï¿½Ø»Bï¿½JSnï¿½ED*ï¿½ï¿½8\bï¿½\u0003J\u000fï¿½ï¿½\u001aï¿½\u0014\u0016ï¿½\"8ï¿½\u0007LAï¿½\u0018&ï¿½ï¿½Tï¿½ï¿½ï¿½\u0005ï¿½\u0019ï¿½oxï¿½jï¿½)ï¿½ï¿½$\u0016ï¿½\u000fï¿½ï¿½ï¿½qï¿½ï¿½\u0000VzÎžï¿½}<\u0018ï¿½XEï¿½ï¿½Ð¾ï¿½sa*\u0006O!Kï¿½/ï¿½ï¿½ï¿½-Sï¿½ß•Ò¬Zï¿½[*ï¿½`ï¿½ï¿½-e/ï¿½ï¿½ï¿½ï¿½kï¿½ï¿½ï¿½ HDï¿½oPï¿½\u0010ï¿½\\8ï¿½ï¿½\u0002ï¿½EÖ°\u0002ï¿½ï¿½Tê½¡ï¿½ul?Ï»ï¿½$\u0004\u0019rï¿½tï¿½X\u0012-T\fï¿½\u0017yï¿½ï¿½Kï¿½n\fVV\u0007\u0017+\\ï¿½ï¿½ï¿½\u0001ï¿½ï¿½J/ï¿½j\u0012ï¿½ï¿½Vï¿½\u001d\u0003ï¿½;oï¿½#ï¿½@_ï¿½ï¿½kG5Kï¿½ï¿½Zï¿½8Ó´ï¿½[ur\u0012ï¿½4LZsï¿½ï¿½ï¿½ï¿½{ï¿½\u000e .ï¿½ï¿½×°1ï¿½}ï¿½>yï¿½ï¿½ï¿½ï¿½eï¿½ï¿½ï¿½\u000fï¿½ï¿½Gï¿½lhï¿½dL\u0004\u0004qï¿½Xï¿½\\Fal>ï¿½\u0015 ï¿½ï¿½>ï¿½ï¿½/ï¿½ï¿½Ï sï¿½Mï¿½Z\u0000ï¿½,qfï¿½0\u0014\\\u0017ï¿½\fÔ·5\u0007Hï¿½ï¿½eZ8\u0019EMï¿½Zï¿½tï¿½$sBGï¿½\u0002ï¿½Åš\u0018ï¿½ï¿½ï¿½0ï¿½(8
+ï¿½rï¿½[4ï¿½6ï¿½oï¿½R
+Dï¿½xï¿½ï¿½ï¿½DYIï¿½\u00149ï¿½?=ï¿½\u0001\u0005ï¿½|!ï¿½Ñ£@ï¿½\u001cï¿½zï¿½1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,\u001aï¿½=I?fï¿½ï¿½ï¿½Nï¿½ï¿½ï¿½g\u001aï¿½ï¿½ï¿½cï¿½ï¿½ï¿½\u0010}ï¿½E)SÕŒï¿½ï¿½ï¿½\u001cuUï¿½Lï¿½t\fï¿½ï¿½ï¿½ï¿½ï¿½\u0004g{5\u00072|P:Mï¿½ï¿½5
+$ï¿½ï¿½ï¿½{'ï¿½Hbï¿½=
+ï¿½Nï¿½ï¿½9ï¿½Ï‚ï¿½\u001cï¿½ï¿½,ï¿½\u0010ï¿½9ÍµIIï¿½Zï¿½Dï¿½ï¿½\u001eï¿½ï¿½ï¿½Jï¿½gï¿½Í˜ÅŒ=ï¿½ï¿½\\+ï¿½gwï¿½Lv\u001a\u0004_\u000eAï¿½f\u0002Ðï¿½vï¿½ï¿½<ï¿½Gï¿½eï¿½J\u0004ï¿½3ï¿½ï¿½\u0010ï¿½Jeï¿½ï¿½ï¿½ï¿½ï¿½Rrï¿½5ï¿½\u0016ï¿½ï¿½ï¿½ï¿½fw6\u0019fï¿½)ï¿½cï¿½\u0018ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½zï¿½ï¿½ï¿½\u0017Dï¿½ï¿½$ï¿½ï¿½ï¿½ï¿½Ï»5ï¿½ï¿½-ï¿½tï¿½+5$\u001d:\u001c}4`ï¿½uï¿½ï¿½zß¿\u0005È²Pà¥šï¿½rk\u0013ï¿½\u0000
+ï¿½ï¿½ï¿½ï¿½ï¿½\u001b_ï¿½ï¿½
+<.ï¿½ï¿½ï¿½ï¿½\u0003n`ï¿½){ï¿½!{|Ñ³*Hï¿½ï¿½\tÕ—ï¿½U{ï¿½\u000eï¿½ï¿½ï¿½\u001e\u001dï¿½Vï¿½ï¿½Jï¿½hï¿½Ë›ï¿½ï¿½Zï¿½ï¿½ï¿½ï¿½B\\\tdï¿½Aï¿½}ï¿½ï¿½Äï¿½\u0005{{ï¿½8jï¿½$Oï¿½Pï¿½\u000bÄ‡Rm\\ÚÑ˜ï¿½ï¿½ï¿½Gï¿½1uvï¿½Øï¿½ï¿½ \u000fuËµï¿½3$ï¿½3GMï¿½ï¿½,ï¿½rï¿½ï¿½<xï¿½FÑ‡4ï¿½\u0005ï¿½Sï¿½
+D)ï¿½ï¿½ï¿½ï¿½ï¿½{ï¿½\u0003v\u0016ï¿½ï¿½Rï¿½f`ï¿½ï¿½/\\ï¿½ï¿½\u0012\bï¿½\u0000pï¿½ï¿½ï¿½dï¿½ï¿½ï¿½hï¿½Äœï¿½KTï¿½s1d
+}\u001eï¿½oMï¿½y?.ï¿½x,ï¿½ï¿½ï¿½c;\u0006ß®`ï¿½+ï¿½ï¿½ï¿½Dï¿½ï¿½ï¿½P`uï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½u\u0005ï¿½zï¿½)ï¿½\u001dDdÏ©9;\u001bï¿½ï¿½Lï¿½ï¿½q\u0014&95ï¿½\u0000ï¿½\u00102ï¿½Iï¿½ï¿½yï¿½ï¿½ï¿½/ï¿½ï¿½ï¿½3\u001b6ï¿½$v\\ï¿½ï¿½\u000eï¿½\u000fï¿½Fï¿½\u0014\u0000Lï¿½+Pï¿½a3ï¿½ï¿½aï¿½pï¿½\u0016ï¿½Lï¿½ï¿½ï¿½_Y\tâ­¡ï¿½ï¿½ï¿½\u001f}ÌŠKï¿½ï¿½ï¿½*eï¿½Ù£ï¿½m{nï¿½ï¿½\u0005O\"ï¿½ï¿½C\u0013ï¿½\u0010WT1ï¿½ï¿½pï¿½Dlï¿½Aï¿½icRh;nÝºc\u0001m6EbCï¿½\"?\f<iï¿½nQï¿½\u0004ï¿½GNï¿½ï¿½ï¿½ï¿½ï¿½.ï¿½iï¿½\u000euï¿½ï¿½ï¿½{z\u000bï¿½Eï¿½ï¿½ï¿½lï¿½ï¿½3JPMï¿½ï¿½ï¿½ï¿½xï¿½1ï¿½yï¿½Bï¿½7\u000f@Ã£\u001bï¿½\\\u0005ï¿½ï¿½v%|ï¿½`ï¿½s!
+/\u0018\u0019Õ¾ï¿½\"\\zdï¿½ï¿½\u0016:l#ï¿½@iï¿½Lï¿½
+8ï¿½\bï¿½\u0004ï¿½ç¸ ï¿½ï¿½\u0016ï¿½\u0018ï¿½ï¿½(ï¿½ï¿½*ï¿½\tï¿½0ï¿½ï¿½Dï¿½ï¿½ï¿½dï¿½E Ó§ï¿½tZ\u0004ï¿½\u001bdï¿½M:v<\u0014ï¿½Þ¹Êï¿½U'ï¿½\u001bWï¿½^\u0010ï¿½-ï¿½sï¿½\u000bï¿½ï¿½\u0005ï¿½m%*ï¿½\"ï¿½Dï¿½\u0000/[ï¿½Rï¿½ï¿½#ï¿½nVï¿½@ï¿½o{6ï¿½ï¿½+ï¿½ ï¿½6ï¿½ï¿½{ï¿½ï¿½Tï¿½ï¿½*ï¿½ï¿½\u0004uï¿½rï¿½ï¿½87\u001cï¿½Ü¨ï¿½ï¿½q[ï¿½\u001d ï¿½ï¿½ï¿½ï¿½-Ú©6g\\ï¿½Q6&E\u000fï¿½0ï¿½ï¿½Dï¿½ï¿½Rï¿½Rï¿½}\u00156*#ï¿½Rï¿½ï¿½ï¿½)ï¿½^ï¿½ï¿½\u001dï¿½Æ\u0004v ï¿½Õ¶ï¿½lï¿½5ï¿½foï¿½ï¿½\"?ï¿½ï¿½ï¿½`\u0015nï¿½ï¿½>#5ï¿½ï¿½Y[Ë‡-ï¿½ï¿½\"ï¿½gï¿½ï¿½\fï¿½ï¿½#ï¿½ï¿½ï¿½r\u00178ï¿½ï¿½ï¿½Fï¿½'^~\u0017bsï¿½?3\u0014\u001c\u0006F!ï¿½ï¿½Okï¿½ï¿½EXï¿½Ç–ï¿½ï¿½F\u001c\"\u0007Iï¿½\u0012ï¿½3ï¿½\u001cï¿½'{6ï¿½86ï¿½ï¿½X
+ï¿½#å¦•ï¿½\u000fï¿½;ï¿½)ï¿½Gï¿½oï¿½Aï¿½@Q*ï¿½Q\bï¿½\tCï¿½!\tï¿½qdï¿½Òœï¿½bBï¿½ï¿½tï¿½fnï¿½Tï¿½ï¿½n^ï¿½:.\u0004\u0015\u001e0ï¿½ï¿½\u0004#Gï¿½ï¿½iï¿½\u0000ï¿½LE16ï¿½ï¿½\u0001ï¿½ï¿½Aï¿½ï¿½\u0016ï¿½6\u0005\u0006Cï¿½ï¿½\u0012Rt\u0003ï¿½Ý®\u001b\u0006ï¿½\u000b\u0014\u001e\f@ï¿½\u000fï¿½ï¿½\u001ef\f7ï¿½]yï¿½nMï¿½Ú˜\tï¿½\u0011\u0015ï¿½ï¿½\u0011?ï¿½>pXï¿½ï¿½z7R\u0010r~_ï¿½ï¿½Bï¿½Y(ï¿½ï¿½6\u0011Jï¿½\u0017M×©ï¿½ï¿½ï¿½ï¿½xï¿½ï¿½ï¿½\u001fhï¿½w\u001bï¿½ï¿½6`ï¿½ï¿½ï¿½ï¿½ï¿½Y\u0018ï¿½\u0006Qï¿½Rï¿½Uï¿½-ï¿½ï¿½pN#zHcï¿½D\u001cdï¿½ï¿½ï¿½X'MpF\u0019ï¿½ï¿½^Zï¿½\u0014bï¿½ï¿½ï¿½ï¿½y;%ï¿½\"U\u001c]^ï¿½\u0011]ï¿½[Ý…R
+Æ”ï¿½ï¿½ï¿½\u0013nï¿½ï¿½qLï¿½ï¿½A
+\beï¿½{ï¿½ORsï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\u0006ï¿½!soï¿½s\u001eï¿½\u0004zï¿½ï¿½5ï¿½ï¿½}ï¿½Yjï¿½ï¿½fÖ¯\\ï¿½ï¿½G\u001d\u0001ï¿½ï¿½R6
+]ï¿½Þ ï¿½APpVVï¿½%(ï¿½vï¿½ï¿½'ï¿½Ö¹Ö©ï¿½ï¿½ï¿½\u001dÚ¸ï¿½P?\u0015;\u001cï¿½\u0016\u00011ï¿½ï¿½ï¿½@ï¿½rï¿½ï¿½ï¿½G&ï¿½A[~5ï¿½/ï¿½ï¿½ï¿½*7vÄ©HJLï¿½ASï¿½'HYï¿½ï¿½A|ï¿½3ï¿½=ï¿½J~ï¿½\u0019ï¿½ï¿½mhï¿½ï¿½ï¿½Í«ï¿½ï¿½Cï¿½9\frï¿½\u0007ï¿½\u0013\\Aï¿½ï¿½42ï¿½Ppï¿½9ï¿½aÏsn\u0000+ï¿½ï¿½ï¿½P^ï¿½&Ni{PEï¿½tï¿½]C&gï¿½L=.Uiï¿½/ï¿½ï¿½ï¿½8ï¿½\u001dï¿½JBï¿½0ï¿½mï¿½ÄŽiM\u001fï¿½6sCï¿½-ï¿½ï¿½`%ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½ï¿½;ï¿½+ï¿½\u000eï¿½ï¿½\u000fï¿½@ï¿½ï¿½ï¿½ï¿½#<^\u001dï¿½wï¿½<ï¿½wï¿½Æ‹\u0002\u000bï¿½ï¿½!Bï¿½ï¿½ï¿½\u000ea#YUHï¿½\u00127 ]\u001eï¿½mï¿½(Äš>\u0013ï¿½M\u0001ï¿½l\u0011ï¿½ï¿½uï¿½ï¿½uï¿½\fï¿½ï¿½ï¿½ï¿½\u0013ï¿½ï¿½Eï¿½ï¿½ï¿½fï¿½c6KKï¿½^Ä¤ï¿½ï¿½F\u000f|ï¿½\u0018\u0012ï¿½ï¿½\u001aN,ï¿½ï¿½MOÑ¸Eï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½[;>DwF1\u0002ï¿½ï¿½ï¿½%Ô¼\u0000ï¿½n\u0012\u0015ï¿½ï¿½xhË¬Vmfï¿½CÇ¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½:ï¿½rï¿½$\u0011ï¿½ï¿½ï¿½R\u0016ï¿½Õ½ï¿½ï¿½ï¿½\u001aï¿½.ï¿½/ÊŽï¿½mï¿½ï¿½=AKï¿½n;f.ï¿½>ï¿½>\u0010ï¿½B\u0013Ìºï¿½ï¿½\u0018;ï¿½ï¿½9ï¿½ï¿½ï¿½ï¿½^Nï¿½\u000fï¿½U q,ï¿½'Øª\u0006ï¿½ï¿½\u001e\u0012\u001eï¿½%\u000eï¿½\\t,ï¿½ï¿½uï¿½ï¿½k
+\u0003ï¿½Dï¿½ï¿½ï¿½H=IL^@ï¿½ï¿½%X+ï¿½ï¿½KZwï¿½ï¿½ï¿½ï¿½| \fï¿½bï¿½ï¿½Oiï¿½yï¿½-ï¿½ï¿½x>\u001fï¿½ï¿½\u0001\u0014ï¿½ï¿½ï¿½Ê˜Vï¿½FG\u0000\u001fmï¿½\u0011\u001b4ï¿½\bZï¿½Ë¼ 0ï¿½ï¿½ï¿½ï¿½<ï¿½E4ï¿½ï¿½ï¿½ï¿½[ï¿½ ^ï¿½\u0007ï¿½*bï¿½Cï¿½ï¿½pï¿½\u000bbï¿½?gï¿½ï¿½ï¿½\u001bï¿½ï¿½WyYï¿½Y<ï¿½t#80ï¿½(P,yeï¿½Z0ï¿½ï¿½ï¿½7ï¿½Ä‘ï¿½fmÙ‰ï¿½Ï–Rï¿½ï¿½ï¿½ï¿½ï¿½\u0018ï¿½4ï¿½ï¿½ï¿½ï¿½Vàµ“Qï¿½kï¿½16Uï¿½rï¿½ï¿½æ›¶Ñžï¿½Eï¿½ï¿½/ï¿½ï¿½\u0004\u0017\u0018ï¿½ï¿½\"8*ï¿½\u0015ï¿½\u0012\fï¿½,0A\u001eJ~\u000bï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½~ï¿½ï¿½\u0010\u001eï¿½ï¿½ï¿½Ä‰ï¿½nï¿½Cb\u000fï¿½ï¿½ï¿½kIï¿½ï¿½ï¿½\u0010\u0018ï¿½ï¿½ï¿½)P]0 \u00177ï¿½vï¿½,{ï¿½Vï¿½\u000fï¿½ï¿½ï¿½\u0019Gï¿½HV5ï¿½\u000bï¿½S\u001dï¿½f\u001c\u0016Zï¿½iï¿½ï¿½fï¿½sQ~}dï¿½\u0007ï¿½ï¿½ï¿½v\u0000TEÌ™ï¿½!)ï¿½,ï¿½ï¿½ï¿½ï¿½Gï¿½=ï¿½Ú£Ö´\bï¿½ï¿½\u0015\u0010ï¿½o#:ï¿½ï¿½fï¿½/ï¿½Q+ï¿½ï¿½ï¿½Wï¿½\u000f*ï¿½Qï¿½Qï¿½\u0013Oï¿½â–¶ï¿½_ï¿½f\u0017ï¿½Dï¿½ï¿½fï¿½Bï¿½ ï¿½ï¿½*ï¿½{6\u0013ï¿½Uï¿½Ê¬ï¿½ï¿½4ï¿½ï¿½7ï¿½rT\u0004ï¿½ï¿½ï¿½\u0004ï¿½ï¿½Í­\u001bn\u0004{ï¿½ÍŒï¿½Ôªï¿½ï¿½Ð³3ï¿½ï¿½ï¿½\u001b\u0016,Dï¿½Dï¿½ï¿½p\u0004ï¿½sï¿½&K\t)ï¿½\u001d\fï¿½zPï¿½ï¿½xï¿½bz/ï¿½.ï¿½ï¿½i\u0014ï¿½Wï¿½\u0002\\ï¿½_
+ï¿½Kï¿½|97ï¿½\u0010\u0005\u00122ï¿½ï¿½ï¿½ï¿½F\\ï¿½ï¿½c2#tï¿½qK+ï¿½ï¿½ï¿½\u001fp^\u0005ï¿½ï¿½cY/Ré˜¤\u001d|eT\u001f\u0011ï¿½&\u0006ï¿½,ï¿½ï¿½ï¿½=ï¿½ï¿½,tuï¿½\u0000\b\u000bï¿½8hi}ï¿½vï¿½Ú”Zaï¿½ï¿½Mï¿½;yï¿½ï¿½\u001dnï¿½njï¿½\u0016ï¿½1\u0019y0ï¿½Vï¿½ï¿½\u001eï¿½0pï¿½ï¿½7\u000eï¿½Ï“ï¿½2ï¿½\u0002ï¿½ï¿½ï¿½ï¿½C\u001fï¿½yï¿½xï¿½\u001cÉ®ï¿½ï¿½ï¿½\u0011ï¿½ï¿½-Jï¿½Iï¿½
+ï¿½ï¿½1rQRï¿½\u0010ï¿½ï¿½
+-fï¿½aï¿½ï¿½ï¿½%Gfï¿½#,f\u0005ï¿½ï¿½]ï¿½ %ï¿½ï¿½iÖ–Gï¿½&9kï¿½(ï¿½ï¿½Tï¿½ÛŠï¿½\u001d\\\u001eZï¿½cJï¿½Bï¿½Vï¿½ï¿½`ï¿½ï¿½ï¿½\u001dï¿½tï¿½\u0018,ï¿½`ï¿½ï¿½ï¿½ï¿½\u0013gï¿½\u0004Sï¿½\u0014ï¿½Sï¿½ï¿½fï¿½%\u0000ï¿½}ï¿½\u0012ï¿½Ýpï¿½ï¿½ï¿½LÈ¸]ï¿½b8ï¿½ï¿½ï¿½kï¿½ï¿½ï¿½ï¿½\u0019xï¿½ï¿½D4Õ¾Sï¿½ï¿½ï¿½>3\u0000ï¿½H[\"ï¿½}zï¿½_ï¿½,ï¿½f\u000f
+ï¿½ï¿½ï¿½1ï¿½ï¿½ï¿½Zï¿½ï¿½ï¿½ï¿½\u0001ï¿½fï¿½ï¿½ï¿½ï¿½+ï¿½ï¿½ï¿½sï¿½ï¿½Cï¿½ï¿½
+ï¿½ï¿½ï¿½\u0013ï¿½ï¿½ï¿½Rï¿½3\u000bIN7/ï¿½ï¿½ï¿½ï¿½;ï¿½-ßˆï¿½sï¿½ï¿½mï¿½ï¿½ï¿½OqSuï¿½>ï¿½n)ï¿½sUgï¿½ï¿½#8\u0007ï¿½\u0018J\b\u001c\u0003_ï¿½ï¿½02\u000eï¿½ß²ï¿½[ï¿½ï¿½gpï¿½2R2E\u0003Êˆï¿½ï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½Â®ï¿½ï¿½\u0012Sï¿½+ï¿½0ï¿½
+Ð”ï¿½ZFï¿½ï¿½ï¿½ï¿½\u0005\u001e0ï¿½oß«Sï¿½ï¿½\u0010XMA\u0015~Fï¿½_9ï¿½\u0003Â¾Ghï¿½\u001aï¿½ï¿½\u001fï¿½p#Ø‹Dï¿½ï¿½ï¿½vzï¿½ï¿½\"ï¿½?ï¿½ï¿½\u001fï¿½\u000fhXQï¿½ï¿½Qï¿½ï¿½Uï¿½ï¿½pï¿½vKB1}ï¿½GVï¿½ï¿½\\ï¿½ï¿½ï¿½j\u0004&ï¿½ï¿½ï¿½ï¿½ï¿½Ã°ï¿½ï¿½\u0019ï¿½\u0001ï¿½ÂŸlNIpï¿½ï¿½0ï¿½zï¿½L(\u0010ï¿½ï¿½!
+)ï¿½\u0012ï¿½\u0015ã®²\u0002\u0007xï¿½\u0012c\u0000ï¿½Dï¿½XU\u0001ï¿½ï¿½ï¿½Z\u0001Kï¿½gi\"\u001ekï¿½ï¿½×™[Õ©ï¿½ï¿½?\u000bï¿½ï¿½ï¿½Æƒï¿½Qoï¿½\u0000ï¿½v\u0004\u0007QOï¿½\u0001Ò¬ï¿½eRï¿½\u0004qï¿½yï¿½Xï¿½\u0013FSï¿½]*ï¿½ï¿½\u0016pï¿½ï¿½Bï¿½ï¿½ï¿½\u0000ï¿½Bï¿½beZ\tï¿½ï¿½%ï¿½ï¿½\fyï¿½ï¿½ï¿½Ú‡ï¿½ï¿½ï¿½P}ï¿½;&ï¿½ï¿½ZEï¿½\u0013\u0017vï¿½ï¿½
+43ï¿½ï¿½.ï¿½N\u000bï¿½-}lï¿½Jï¿½XÈ”Fï¿½ï¿½ï¿½ï¿½eï¿½ï¿½K0Dï¿½Ó½Uï¿½ï¿½~ï¿½ï¿½ï¿½\u001c<e5ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½\u0013ï¿½ï¿½Dï¿½lï¿½ï¿½\u0000ï¿½ï¿½cï¿½Mï¿½ï¿½A\u0014\u001a4ï¿½\u0003ï¿½Ã‹ï¿½jï¿½ï¿½ï¿½@Ú›ï¿½ï¿½ï¿½Î§ï¿½ï¿½ï¿½ï¿½ï¿½\fï¿½zï¿½Kï¿½ï¿½h\u0015ï¿½\u0013ï¿½Oï¿½QI(ï¿½\u0012\u0001ï¿½#ï¿½ï¿½yï¿½Ä\u001f\u0007\bï¿½ï¿½Ñª7Uï¿½ï¿½ï¿½ï¿½Mï¿½ï¿½Yï¿½Uï¿½\b\u001bï¿½\u0012\u001b\u001e\u001cU\u0012Mï¿½ï¿½\u0013=YÝ“@ï¿½ï¿½F[\u000bï¿½Ë›ï¿½Ð‚ï¿½ï¿½ï¿½ï¿½C(ï¿½@fNï¿½o+A
+P0:ï¿½Vï¿½\u0007\u0012ï¿½\u0007ï¿½Ud]\b.\u001e\u0017kï¿½\u001aï¿½Å¾pï¿½mï¿½ir_ï¿½}ï¿½×›ï¿½s\u001d>p!ï¿½uï¿½ï¿½ï¿½Rï¿½u&ï¿½ï¿½ï¿½ï¿½ï¿½\u0004>W{ï¿½Mï¿½ï¿½p\u0007O)ï¿½ï¿½ï¿½y]ï¿½9ï¿½\u001e\u0007lu\u0001ï¿½8K$ï¿½\u001f#v?\u0012bÛŠï¿½\u0017ï¿½}ï¿½Èï¿½7Nï¿½ï¿½M3\u000f%\b+R3=ï¿½F\u001eï¿½ITï¿½ï¿½\"ï¿½pï¿½ï¿½@ï¿½ï¿½gï¿½ï¿½ï¿½$Æ€c&\u001cmï¿½ï¿½iï¿½HÛ“ï¿½Õ’\u0010ï¿½\u0003\u0012\u0001ï¿½ï¿½Cn*\bï¿½\tJb`ï¿½|\u0018ï¿½ï¿½_&Tï¿½hï¿½\u0010ï¿½|'ï¿½ï¿½G)}Ë¹lï¿½Pl)uRs?1ï¿½\fï¿½ï¿½Î˜ï¿½ï¿½ï¿½ï¿½;,ï¿½ï¿½xï¿½\u0001(3ï¿½Ö„I@\u0015e`ï¿½\u001deï¿½cHï¿½\u0017ï¿½\u000bJï¿½ï¿½Upgï¿½\u0001ï¿½5ï¿½ï¿½\u0007jï¿½ï¿½$ï¿½ï¿½\u000fï¿½:\u0016ï¿½\u001cï¿½Sz&â¦‘^Cï¿½![\u0003ï¿½ï¿½cï¿½ï¿½jï¿½5TÊžï¿½ï¿½ï¿½\u0017Äžï¿½ï¿½ï¿½ï¿½ï¿½OH\u0010k7ï¿½ï¿½xï¿½@'lï¿½*ï¿½ï¿½^Aï¿½a7\u001b`ï¿½\u0015`ï¿½8}vï¿½ï¿½ï¿½Fï¿½Uï¿½Uï¿½Ñ¡\u0018ï¿½ï¿½ï¿½ï¿½ï¿½_ï¿½|ï¿½vï¿½ï¿½Vï¿½ï¿½xï¿½fq'ï¿½ï¿½ï¿½ï¿½ï¿½6ï¿½ï¿½ï¿½ÐŒÒŸ\\;ï¿½ï¿½È¹\bï¿½ï¿½ï¿½{\u00109[\u0001ï¿½\u0003z_ï¿½ï¿½\u0014É„.H(eï¿½ï¿½
+Ö–;ï¿½\u0006\u0012J\u0005ï¿½ï¿½ï¿½.ï¿½VEï¿½\u0001\b5ï¿½ï¿½\\ï¿½ï¿½ï¿½&\u0011;ï¿½$\u001e>xï¿½\u0017ï¿½\u0017Yï¿½ï¿½Ç‚\tï¿½8\u0012|~ï¿½ï¿½\u0018ï¿½ï¿½ï¿½\u001eï¿½dï¿½ï¿½0ï¿½ë•–\u000e\u00187ï¿½ï¿½'\u001bï¿½ï¿½ï¿½\tfGï¿½\u0007ï¿½ï¿½\u001aaï¿½rï¿½ï¿½ï¿½ï¿½ã’ï¿½,ï¿½ï¿½Uï¿½P\u0012ï¿½nvï¿½XqÄ²Q:\u0018ï¿½\u0000<ï¿½ï¿½ï¿½*ï¿½\u000fï¿½\"qï¿½lï¿½\u000e:æ—œ-ï¿½%ozKN
+ï¿½ï¿½^ï¿½O/ï¿½ï¿½ï¿½\u001dï¿½ï¿½-ï¿½bZï¿½\u0004\u0019SM5`ï¿½Õµ!wï¿½=(1ï¿½v\u0006 twU\u001eï¿½ï¿½ï¿½\u001aï¿½då³‰\u000bï¿½\u0005ï¿½ï¿½ï¿½\u0019X_ï¿½!yï¿½ ï¿½gï¿½Û¬Lï¿½T%ï¿½>ï¿½>\u0004Gï¿½ï¿½cï¿½ï¿½ï¿½
+ï¿½fï¿½ï¿½ï¿½ï¿½\u001dï¿½ï¿½Ê“\u0000\u001eï¿½ï¿½?ï¿½4ï¿½\u0003yï¿½]ï¿½eï¿½A\u0014\u001dï¿½eï¿½ï¿½ï¿½*\u0006Rï¿½]ï¿½\u0015ï¿½\u0016Tï¿½G[ï¿½ï¿½KJsÕ„ï¿½ï¿½\u000bï¿½ï¿½'ï¿½\bï¿½oÉ·æ’‹zJï¿½iï¿½ï¿½m/ï¿½ï¿½\u0019ï¿½ï¿½|ï¿½iÉ¢$ï¿½\u0013Jï¿½ÌŸwï¿½\u0000O$ï¿½ï¿½ï¿½ï¿½\u0000V+|3Z\u0015ï¿½ï¿½\t\u001f\u0018\u0014ï¿½Njv!ï¿½[ï¿½ï¿½5Ñ¼ï¿½ï¿½(hï¿½ï¿½\u0010+8Xï¿½Ì¿>ï¿½\u0012\fw&ï¿½np\u001d?~ï¿½OIï¿½ï¿½-9ï¿½Z2doD\u001c-\u0012ï¿½\u0019r|mnUï¿½Gï¿½ï¿½ï¿½\u001e?7Sï¿½|_Nb-ï¿½ï¿½\\ï¿½[ï¿½ï¿½Pï¿½ï¿½Tï¿½9aï¿½1ï¿½uw\u000bï¿½w\u0006ï¿½ï¿½spsï¿½`ï¿½ï¿½Þï¿½ï¿½[Zï¿½ï¿½8V\u0004QHï¿½ï¿½mï¿½Lï¿½ï¿½ï¿½&ï¿½ï¿½2ï¿½ï¿½ï¿½ï¿½,s8T*ï¿½n-i
+ï¿½c!\u0013dï¿½ï¿½V\u0002-#ï¿½ï¿½ï¿½U#ï¿½\tï¿½ï¿½ï¿½Ñ¤r!ï¿½ï¿½ï¿½x\u0018ï¿½\u0006\tYï¿½\u001aï¿½fï¿½ä© ï¿½ï¿½ï¿½ï¿½qXï¿½
+ï¿½ï¿½\u001cï¿½vï¿½zï¿½\u000eï¿½AFï¿½ï¿½/ï¿½ï¿½ï¿½&=rï¿½ï¿½\u0004\u0013ï¿½ï¿½hÜ• ï¿½mÑª\u001eï¿½Cï¿½\u0014\u0019ï¿½ï¿½tï¿½\u0000h\u0017ï¿½$\u000fSï¿½Mï¿½\u0013ï¿½ï¿½cï¿½ï¿½ï¿½wï¿½>ï¿½ï¿½\u0010ï¿½Vï¿½îžï¿½\u0003ï¿½3ï¿½\bï¿½\"\u0001ï¿½ï¿½]ï¿½2ï¿½ï¿½D]ï¿½\u0012Ý¾ï¿½iLï¿½Z\u0015ï¿½\u001fï¿½\u0004Tï¿½\\>ï¿½yï¿½ï¿½Jï¿½ï¿½\"ï¿½>t\u001cï¿½\u0016wkï¿½ï¿½ï¿½ï¿½ï¿½\u001dï¿½\"ï¿½(ï¿½R\u001b;M(,mï¿½{\u001d\u0002I<ï¿½ptt@'P7\u0007\u0004ï¿½Kï¿½ï¿½\u0019ï¿½\u000bï¿½\u001aMï¿½ï¿½Iy\u0011ï¿½ï¿½ï¿½|nK7?ï¿½Q,ï¿½v\\L\u0002ï¿½ï¿½ï¿½\u000eï¿½
+ï¿½M37\u000bzï¿½\tï¿½\u0017\u0016ï¿½ï¿½ï¿½ï¿½d4\u0005\bï¿½ï¿½\u0007ï¿½\u0003Ä¨0ï¿½ï¿½2ï¿½\tÛ‚ï¿½_ix\u0000ï¿½ï¿½ï¿½#6V\u0002ï¿½Dï¿½ï¿½a\u001d@ï¿½ï¿½Q!ï¿½DUï¿½ï¿½,ï¿½\fg-
+\u0015ï¿½a[nï¿½ï¿½.ï¿½AVWï¿½\u0013ï¿½ï¿½ï¿½%jMï¿½\"ï¿½Uï¿½\u0002Z?4ï¿½'ï¿½\u001cï¿½ï¿½9ï¿½^ÔŒS\u000bkï¿½L\u000fï¿½ï¿½ï¿½\u0017{XeÝ¶$hï¿½ï¿½()ï¿½ r\u0010\u0007ï¿½!ï¿½.ï¿½ï¿½!ï¿½ï¿½kï¿½ï¿½G\u001fï¿½\u0007[ï¿½ï¿½8@ï¿½ï¿½:ï¿½[ï¿½ï¿½Deï¿½uzï¿½ï¿½kï¿½ï¿½Aï¿½ï¿½:`ï¿½\u000b2#\u0005\u0003ï¿½\u0017ï¿½<\u0005ï¿½ï¿½ï¿½p\u0017ï¿½ï¿½ï¿½\\\u00057\u0003bwAï¿½,ï¿½$)\u0005ï¿½\tqï¿½ï¿½.ï¿½ã›‡\t6ï¿½ï¿½'ï¿½~ï¿½nt}fVï¿½\u0005ï¿½ï¿½\u000bï¿½ï¿½M.\u000eï¿½ï¿½ï¿½\u001c9ï¿½ï¿½×Œï¿½ï¿½ï¿½Zï¿½Òªï¿½+3ï¿½\u0002y
+X_ï¿½ï¿½ï¿½fï¿½u\u0000\u0014\u001eï¿½Tï¿½ï¿½]pï¿½\t_Å…ï¿½hï¿½ï¿½É¿\u0017dï¿½ï¿½7ï¿½\u0003ï¿½ï¿½ï¿½OÌ¨\u0002ï¿½ï¿½~xï¿½sï¿½ï¿½ï¿½ï¿½)ï¿½ï¿½ï¿½ï¿½ï¿½)ï¿½ï¿½ï¿½Bï¿½{ï¿½ï¿½ï¿½\u0019ï¿½mGiiï¿½\u000f|ï¿½Jï¿½ï¿½Oï¿½\u0006ï¿½ï¿½ï¿½q
+\\ï¿½ï¿½caï¿½=ï¿½ï¿½+ï¿½q@ï¿½\u001dï¿½&ï¿½ï¿½9ï¿½ï¿½ï¿½\u0016_å¿Aï¿½?Æ¾ï¿½[ï¿½ï¿½\u0013ï¿½y(*\u0001ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\u001c\u000eï¿½ï¿½<\u00192]ï¿½ï¿½%Jï¿½ÕŠ{\u0001.ï¿½\u0018>\u001eï¿½\u001aï¿½ï¿½ï¿½ï¿½Aï¿½ï¿½É™ï¿½\u001dï¿½\u001b
+}ï¿½ï¿½ï¿½ï¿½QL_ï¿½ï¿½q9ï¿½\u0016ï¿½Yï¿½\u001e:14a\u001a:G-?Yï¿½ï¿½%ï¿½ï¿½ï¿½J\u0017Zngï¿½ï¿½ï¿½ï¿½\u0006\u000f&ï¿½_]ï¿½\u0014ï¿½1\u0006ï¿½ï¿½|\u0003B\fï¿½ï¿½Xï¿½H0ï¿½ï¿½|{ï¿½^t\u0000ï¿½ï¿½ï¿½Sï¿½ï¿½&zg6Õ¯\u0003ï¿½H-\u0015jï¿½\u001e1ï¿½jï¿½ï¿½ryrD<'Xï¿½ï¿½pï¿½/ï¿½3p)\u0004Pï¿½ï¿½Lï¿½ï¿½+Rï¿½ï¿½ï¿½ï¿½ï¿½\u0014SVdï¿½Nvï¿½\u0012\u001dï¿½F\tï¿½ï¿½uï¿½Eï¿½ï¿½Maï¿½ï¿½\u001cC\u0015ï¿½ï¿½ÎµJ}-ï¿½ï¿½h9ï¿½Eï¿½ï¿½%wï¿½<ï¿½3rBï¿½\u0006ï¿½.ï¿½\u0003Wï¿½8pï¿½uv1\u0003ÎŽï¿½\u0005Lï¿½h\u001chï¿½ï¿½ï¿½+3ï¿½\u001aï¿½hb][ï¿½6ï¿½È¸ï¿½ï¿½\u0016yï¿½ï¿½Mï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô›rï¿½ï¿½yï¿½ï¿½ï¿½Fï¿½\\ï¿½\u001dï¿½ï¿½\u0003ï¿½F\u0005CN4ï¿½ï¿½ï¿½\u0016\u0018^\u0000ï¿½ï¿½;\u0010Fï¿½:Wï¿½cï¿½kAÄ Aï¿½ï¿½ï¿½{ï¿½)ï¿½ï¿½ï¿½eï¿½HMï¿½ï¿½Î¢|\u0013ï¿½\u0007>ï¿½;Õ§m ï¿½ï¿½ï¿½ï¿½=ï¿½ï¿½ï¿½\u0006ï¿½}Ä­ï¿½\u0001\u000f\u0005ï¿½2`È¬ï¿½ï¿½\u0005,!a2\u0006pSTÏ¡ï¿½ï¿½k\u000fHï¿½rï¿½C\u001b\u000bn/\\O1Aï¿½\u0010\u0017ï¿½ï¿½;\u0016\u000eï¿½\u0018ï¿½\u0002Kï¿½ï¿½ï¿½ï¿½I\u000b+ï¿½ï¿½ï¿½oL?ï¿½\u0016xï¿½\u0001ï¿½Wï¿½ï¿½ï¿½\u001biï¿½}Õ–\u0007ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*Ê«ï¿½{ï¿½YdHï¿½7Lï¿½7\u0004ï¿½Ú€2ï¿½ï¿½ï¿½#Ê°|RYJ\"n*\u0004ï¿½ï¿½ï¿½ï¿½ï¿½5;ï¿½~ï¿½1.\tï¿½ï¿½\u0015ï¿½S\u0011ï¿½,Èˆ\u0005ï¿½R~NyHï¿½ ï¿½ï¿½Pï¿½ï¿½\u001fRï¿½ï¿½_Pï¿½ï¿½ï¿½ï¿½\u0006ï¿½\u0007hï¿½+ï¿½0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\u0014-)ï¿½1`
+ï¿½ï¿½B'ï¿½ï¿½ï¿½n7ï¿½ï¿½ï¿½ï¿½>ï¿½ï¿½\u0011+ï¿½3ï¿½8\u0018,ï¿½\u001aï¿½ï¿½ï¿½ï¿½\u0013ï¿½ï¿½\u0017ï¿½Ñ¼lï¿½ï¿½ï¿½\u0011Ëƒq\u0003ï¿½ï¿½ï¿½\tjï¿½0ï¿½#,ï¿½4.ï¿½ï¿½&&\b\u0019\u0016Sï¿½F\u0018ï¿½ï¿½>vï¿½2rï¿½6>\bb(ï¿½F\u0006y1ï¿½%\u0000N\\ï¿½\u001fï¿½ï¿½_ï¿½ï¿½R\u0019\u00001Udï¿½3ï¿½ï¿½ï¿½O/ï¿½Tï¿½ï¿½&ï¿½
+ï¿½Z\u0003ï¿½(/ï¿½;i#ï¿½Ï¾Dï¿½ï¿½|ï¿½xï¿½ï¿½ï¿½ï¿½\u0005*4\u001aß£kï¿½b<\u000eï¿½x\\ï¿½Æ¡~ï¿½ï¿½#?ï¿½>ï¿½à°”^ï¿½ï¿½2ï¿½E;Dï¿½~ï¿½[\u0015ï¿½=ï¿½b\u0018ï¿½2kï¿½ ï¿½upY`ï¿½^odï¿½ï¿½ï¿½&ï¿½ï¿½ï¿½aï¿½iï¿½\u0006ï¿½ï¿½\fyÐ®q\u000eSï¿½Ý™Hz0ï¿½\u000fJï¿½/n@ï¿½ï¿½ï¿½ï¿½ï¿½3ï¿½\u0010uï¿½ï¿½\u001fï¿½'ï¿½ï¿½ï¿½^\u0006`ï¿½'d}dï¿½ï¿½ï¿½ï¿½ï¿½!ï¿½~
+9ï¿½Mï¿½&Pï¿½ï¿½
+<q>Ä•\u0015\u0014&\u0014[[\u0018ï¿½c\\ï¿½\u000fï¿½ï¿½\u000bRï¿½ï¿½ï¿½\"ï¿½p1ï¿½ï¿½qmk|ï¿½ï¿½
+ï¿½=-\u001ews(yLiuUï¿½ï¿½ï¿½M$Gï¿½ï¿½ï¿½eï¿½<ï¿½\tï¿½Yï¿½ï¿½ï¿½ï¿½aï¿½ï¿½!sD\\dï¿½\u0004ï¿½%A?ï¿½+ï¿½|ï¿½t^K\u001a>ï¿½ï¿½ï¿½ï¿½y\u001fï¿½ï¿½Z\u001cSB\bï¿½Qï¿½`ï¿½ï¿½[G&lï¿½ï¿½'
+ï¿½Ö·ï¿½ï¿½ï¿½ï¿½\u0013ï¿½ï¿½2.\u001fï¿½Jï¿½Lï¿½`ï¿½b\u001c%ï¿½ï¿½\u0002\"1ï¿½ï¿½Q9ï¿½ï¿½/ï¿½Ñ¬ï¿½ï¿½\u0001\u0018rï¿½ï¿½H\u000eï¿½\u0016ï¿½ï¿½\u0007nï¿½ï¿½6\u0004'F^ï¿½\u0019ï¿½ï¿½Xï¿½
+=hD<bÝ´É±ï¿½\u0002zï¿½ï¿½
+Y\u001dï¿½\u001e\u001b\u001fï¿½!ï¿½\u0002'ï¿½\u001fï¿½Ì™\u001d_!ï¿½5ï¿½
+Jï¿½3\u001dï¿½\u0004ï¿½%\u001dï¿½ï¿½Dï¿½ï¿½ï¿½ï¿½<ï¿½ï¿½gï¿½sï¿½pï¿½ï¿½Rï¿½ï¿½\u0001ï¿½a\u001bï¿½ï¿½ï¿½\u0001+%7ï¿½5jnï¿½ï¿½wï¿½yPJï¿½lï¿½XVï¿½7ï¿½ï¿½\u000b6ï¿½Ý®ï¿½Vï¿½\u0013TE\\{\u0003kzï¿½cï¿½ï¿½,i\fï¿½ï¿½
+ï¿½zï¿½oï¿½6\u001fï¿½ï¿½ï¿½ï¿½
+ï¿½XKï¿½M.\u001ar8\u001bl\u000eï¿½ï¿½ï¿½ï¿½Óï¿½È¿T_ï¿½ï¿½ï¿½\u0005u\u0015Qï¿½2ï¿½JyUï¿½:|\u0000o0ï¿½\u0005\u0014@ï¿½Shï¿½ï¿½ï¿½ï¿½\u0017ï¿½ÊŠZ~lï¿½ï¿½9'Kï¿½\u0006ï¿½ï¿½S(\u00185\u001dï¿½ï¿½! bÊï¿½ï¿½ï¿½$ï¿½ï¿½ï¿½ï¿½:ï¿½\u0007\u0001ï¿½M\u001eï¿½ï¿½ZH
+\u0007|ï¿½zW\u0010\u0019ï¿½ï¿½\u0002DOF,ò‹½¨ï¿½ï¿½6ï¿½ï¿½!oï¿½ï¿½\u001dï¿½ï¿½ï¿½mï¿½ï¿½<\u0011ï¿½7ï¿½ï¿½;M\u001fï¿½!\"Iï¿½\fï¿½4ï¿½ï¿½\u0019ï¿½ï¿½4ï¿½ï¿½ï¿½Qï¿½ï¿½\u0002Ôœï¿½\u0007ï¿½<Mï¿½ï¿½ï¿½\u0019n\u0017ï¿½\u0003ï¿½ï¿½\u0012-pï¿½ï¿½ï¿½ï¿½ï¿½\u0014Wï¿½!|{ï¿½ï¿½L4Oï¿½Ý®~\u000e\u001eï¿½\u0010ï¿½Iï¿½ï¿½c{\u0017}ï¿½?ï¿½PWï¿½34ï¿½\u0007^ï¿½ï¿½ï¿½\u001fï¿½Bï¿½hï¿½ï¿½ï¿½ï¿½nrï¿½ï¿½\u0006,ï¿½ï¿½\u0015!K\u0013ï¿½!ï¿½ï¿½ï¿½ï¿½16ï¿½\u0017ï¿½hiï¿½)=\bï¿½{ï¿½ï¿½~ ï¿½\u0017ï¿½Ì¨#\u0011ï¿½=ï¿½ï¿½Ä³9Kï¿½
+3Mï¿½mÕ¹)q\u00003.ï¿½ï¿½ï¿½ï¿½ï¿½Ïƒï¿½('Ï zï¿½ï¿½\u001f\\\u0002ï¿½=ï¿½\\6ï¿½ï¿½\u0015N\u0003ï¿½:7ï¿½ï¿½eï¿½ï¿½q\u00037ï¿½ï¿½\u0015ï¿½Wï¿½!ï¿½ï¿½\f6ï¿½U6ï¿½oï¿½Y?ï¿½ï¿½
+9>Zï¿½\u0016ï¿½ï¿½ï¿½wï¿½ï¿½\tï¿½ï¿½ï¿½ï¿½djï¿½ï¿½QP:/XA\u001cï¿½{ï¿½|ï¿½È¶R\u0014ï¿½pAï¿½2lï¿½ß¯KÈžGï¿½ï¿½\u001dØ¥ï¿½\tï¿½ï¿½ï¿½\u0007ï¿½ï¿½ ï¿½ï¿½/ï¿½Eï¿½?\u0019\u001eï¿½#yï¿½\u001bï¿½VË¾ï¿½ï¿½\u0010ï¿½ï¿½uï¿½ï¿½qï¿½fï¿½tï¿½Szï¿½ï¿½ï¿½ï¿½ï¿½\u0006ï¿½ï¿½ï¿½E?ï¿½ï¿½ï¿½ï¿½ï¿½xG\u0007ï¿½ï¿½È•\u0012ï¿½ï¿½ï¿½ï¿½Fnh\u001943ll'ï¿½)ï¿½y=ï¿½?:ï¿½ï¿½ï¿½è·¥ï¿½\u001aï¿½E0\"ï¿½ï¿½5\u0006\u0007ï¿½n\u001b\tNï¿½&ï¿½\u0000Zï¿½Q\u001fï¿½ï¿½ï¿½\u0016ï¿½ï¿½ï¿½ï¿½\b'ï¿½hU)\u0014I@ï¿½êž§ï¿½ï¿½f0ï¿½ï¿½ï¿½`!\u000b=ï¿½\u0006ï¿½È»xï¿½L|\u0005ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½?6ï¿½!xï¿½ï¿½fï¿½ï¿½ï¿½ï¿½NTe]ï¿½jRï¿½\u000bï¿½ï¿½\u001aï¿½ï¿½ï¿½`ï¿½i\bï¿½ï¿½ï¿½\\\u0005ï¿½H\u001a2ï¿½ï¿½ï¿½ï¿½Bï¿½ï¿½ï¿½tÊ¢ï¿½ï¿½\u0001ï¿½\tï¿½Xï¿½ï¿½zï¿½|\u000fï¿½ï¿½ï¿½ï¿½ï¿½Ë¨ï¿½ï¿½ï¿½cï¿½Y/ï¿½~aï¿½^ï¿½m\u0006|ï¿½kï¿½ï¿½~\f]ï¿½ï¿½C]Hï¿½ï¿½ ï¿½5ï¿½ï¿½ï¿½ï¿½' Çï¿½ï¿½ï¿½L\u001bï¿½ï¿½+Ç¼X9ï¿½ï¿½ï¿½Õ‹ï¿½ï¿½mï¿½\u000e\u001aL\u000ecï¿½ï¿½Hï¿½/ï¿½n{ï¿½XÃRQï¿½`Sy\u000evï¿½ï¿½ï¿½mï¿½\u0002GtiE}ï¿½iË¶\u0016ï¿½E\\ï¿½hï¿½ï¿½\u001bï¿½ï¿½ï¿½Bï¿½ï¿½ï¿½Xï¿½ï¿½Lï¿½|.ï¿½\u0016@ï¿½ï¿½ï¿½ï¿½\u0014ï¿½-ï¿½Afï¿½vï¿½ï¿½\u0007lï¿½\u000eh\u0004\u0002\u0014ï¿½ï¿½ï¿½_ï¿½f{rï¿½;.ï¿½dï¿½ï¿½Xzï¿½m\u001f_tï¿½=lNà¯®]ï¿½ï¿½\u0019ï¿½9ï¿½ï¿½ï¿½Tï¿½ï¿½Aï¿½I4ï¿½\u000b3ï¿½26aï¿½\u001eï¿½ï¿½Gï¿½lï¿½\u0018eï¿½ï¿½Ó‘ï¿½|qï¿½ï¿½4ëµ¹\u0010ï¿½'pGï¿½.ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½M*ï¿½$68ï¿½ï¿½/ï¿½ï¿½&'ï¿½\fï¿½Rbï¿½ï¿½_\u0012|ï¿½ }$WQv6ï¿½\u0003ï¿½ï¿½\u0010weGï¿½z<ï¿½hï¿½4\\P:ï¿½Ñ¤G\u0003}ï¿½ï¿½ï¿½ï¿½^Lï¿½ï¿½\u000f\u0002ï¿½ï¿½\u0016Ó†{\u001cÞ¿ï¿½\u001fGï¿½ï¿½\u0013V\u0013ï¿½ï¿½y\u0002ï¿½;ï¿½\u0007\u000eOï¿½\u0013(bMï¿½ï¿½ï¿½ï¿½ï¿½\u00073ï¿½Rï¿½ï¿½ï¿½\u001b\t\u0011\u001a
+ß…s
+\u00103|3ï¿½ï¿½ï¿½\u000bï¿½mï¿½Ð£yï¿½ï¿½aAãº„ï¿½ï¿½?ï¿½loï¿½ï¿½*ï¿½sï¿½lï¿½\u0019ï¿½ï¿½\u0019ï¿½)ï¿½eï¿½Vï¿½\"ï¿½ï¿½ï¿½xï¿½\u000fï¿½Cï¿½\tï¿½\u0019c5\u001aï¿½kÝƒï¿½\u0001ï¿½0Nï¿½*8ï¿½ï¿½9ï¿½ï¿½`ï¿½sï¿½ï¿½\u001bï¿½\u0013ï¿½ï¿½rï¿½ï¿½ï¿½ujuï¿½ï¿½ï¿½\u0002Oï¿½mï¿½\u0003!ï¿½ï¿½N\u001b.\u0001ß™ï¿½ï¿½ï¿½ï¿½~PG#!ï¿½ï¿½f\u0012ï¿½ï¿½jï¿½]\"Cï¿½SA\f>É¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½4*dzï¿½*'aï¿½ï¿½o\u0000Y(L ï¿½ï¿½r8<{\u001fï¿½'\u0001ï¿½ï¿½}ï¿½\u0013ï¿½<S1Ê¤\u0004ï¿½Iï¿½C!0(Ø‹ï¿½ï¿½\u0011\u0005`lÉŒï¿½ï¿½ï¿½ï¿½Cï¿½ï¿½Hï¿½ï¿½9cï¿½8Ã²|ï¿½eï¿½]ï¿½tï¿½ï¿½b;ï¿½ï¿½ï¿½\u0005uï¿½ï¿½-jfï¿½á‰\u001dï¿½\u000eï¿½ï¿½ï¿½Eï¿½ï¿½\t2ï¿½wï¿½p\u0000ï¿½ï¿½ï¿½\u0017\bï¿½VWï¿½ï¿½ï¿½ ï¿½ï¿½0ï¿½{ï¿½^ï¿½\u0005\u0018\u0002uXï¿½(ï¿½ï¿½x\u001aï¿½/ï¿½Vï¿½ï¿½5e\u0014ï¿½ï¿½\u0005ï¿½ï¿½_ï¿½T\u0019ï¿½ï¿½ï¿½ï¿½ï¿½#:ï¿½@/ï¿½ï¿½ï¿½\u000f*ï¿½ï¿½Ì€ï¿½lï¿½U)a&ï¿½`5ï¿½\u0013+3ï¿½ï¿½\u0006ï¿½Uï¿½_vï¿½ï¿½,\u000elï¿½ï¿½s\u001eï¿½ï¿½ï¿½J@ï¿½yï¿½\u0002ï¿½cï¿½B;Sï¿½i')%ï¿½\u0011Nï¿½\u0010:;ï¿½Wï¿½HrQï¿½ï¿½ï¿½IW4ï¿½ï¿½^jï¿½\u0010ï¿½ï¿½767çˆ§ï¿½jï¿½ï¿½ï¿½ÎŠï¿½å±’5gï¿½\u001fStï¿½' \u00075ï¿½\u0005}\u0013ï¿½ï¿½ï¿½\"ï¿½F\u001dï¿½È²ï¿½ï¿½.ï¿½Hï¿½ï¿½6ï¿½ï¿½sï¿½a;ï¿½ÒŽï¿½ï¿½\u0003ï¿½ï¿½fï¿½MW%vï¿½T4ï¿½ï¿½ï¿½~+ï¿½b:yï¿½ï¿½Ô€ï¿½hï¿½^ï¿½mßŽ2_{ï¿½\u0001ï¿½ï¿½cï¿½\u0007f>ï¿½ï¿½nï¿½\u0015@~(ï¿½\u001ahï¿½Å…\u0018ï¿½ï¿½ï¿½\u000eï¿½\fï¿½7\u0004ï¿½ï¿½ï¿½2ï¿½\u001fï¿½z*ï¿½ï¿½ï¿½Zï¿½ï¿½ï¿½Ä¹ï¿½ï¿½ï¿½ï¿½ï¿½R@ï¿½`ï¿½%-ï¿½4G\u001dNï¿½ï¿½Gakï¿½ï¿½8QAhï¿½ï¿½x\tï¿½\u0017j0Vï¿½}ï¿½B\u0015ï¿½ï¿½Uï¿½ï¿½9\fï¿½ï¿½^\u0019\u0011Ó‡ï¿½
+ï¿½ï¿½5ï¿½>Eï¿½QÈ°\u001dï¿½ï¿½B9ï¿½Nï¿½ï¿½Xï¿½ï¿½ï¿½3ï¿½ï¿½-ï¿½ï¿½.ï¿½ï¿½\u0005ï¿½\u001bï¿½kï¿½ï¿½7ï¿½N7+ï¿½ï¿½ï¿½\u001c
+ï¿½r\u0013/ï¿½.\u0003ï¿½ï¿½51yUï¿½\u0002^ï¿½\u0011ï¿½\u0007ï¿½a$\u0018ï¿½+ll\u001e=nXï¿½,
+ï¿½\u000eï¿½W!ï¿½ï¿½r\u000bi\bï¿½ ?UÃï¿½Uï¿½ï¿½79kï¿½ï¿½ï¿½njÍ¬ï¿½\u001c\"hï¿½tï¿½ï¿½,ï¿½\f^ï¿½ï¿½aï¿½5Nï¿½ï¿½ï¿½Dï¿½ï¿½Ê”ï¿½~ï¿½\u0014ï¿½5ï¿½ï¿½[ï¿½Nï¿½ï¿½\u00113ï¿½Kcï¿½$Ö­ï¡ï¿½,ï¿½ï¿½W9tï¿½Kï¿½ï¿½~-{\u001d\u0004ï¿½L4P@pï¿½\u001bØ¨ï¿½bWï¿½(ï¿½\f9ï¿½Zi[ï¿½+-\u0016\u0011'ï¿½ï¿½3\"\u000b\u0018{nï¿½kï¿½ï¿½Lu/ï¿½\u0012ï¿½ßœï¿½Ú‡ï¿½\u0014h3\u0017ï¿½\u0002ï¿½\u0003ï¿½ï¿½ï¿½\u0016dï¿½Yo\u000bï¿½ï¿½ï¿½:bï¿½ï¿½hï¿½ï¿½ï¿½ï¿½ï¿½\u0019ï¿½\u000eh4+ï¿½ï¿½A\u001eï¿½/ï¿½\u0007Q\u0011J\u000bï¿½ï¿½Ù¢ï¿½\tï¿½k\"\"ï¿½\u0012/ï¿½^ï¿½ï¿½jï¿½ï¿½Sï¿½ï¿½I@ï¿½ï¿½ï¿½ï¿½_}ï¿½.!9\bï¿½ï¿½Ws5ï¿½ï¿½nlï¿½/ï¿½ï¿½'u`ibï¿½Wï¿½\u001dL#ï¿½ï¿½ 1gï¿½|ï¿½X\u001bï¿½oÆ­,a\u000fï¿½'ï¿½)\u000fï¿½?ï¿½ï¿½\u0000Bï¿½Ey+ï¿½\u001cï¿½ï¿½ï¿½ï¿½HNï¿½ï¿½Ê•%ï¿½Aï¿½n[ï¿½x\u000eï¿½ï¿½$ï¿½cï¿½?ï¿½m\u0006ï¿½ï¿½ï¿½ï¿½\u0010ï¿½mï¿½ï¿½&ï¿½Tlï¿½ï¿½uï¿½ï¿½ï¿½\u0001*ï¿½ï¿½D\u000fï¿½ï¿½Jï¿½\u0007ï¿½Fï¿½ï¿½ï¿½&ï¿½ï¿½ï¿½\u0012vï¿½'ï¿½ \u0007ï¿½\u0015Pï¿½`Cï¿½vYï¿½^ï¿½ï¿½ï¿½y6\u0017{\u0001e|ï¿½yï¿½\u0010\u001f/ï¿½ï¿½(ï¿½e<yï¿½ï¿½ï¿½\bï¿½GÓ·]ï¿½o7]ï¿½ï¿½\u001cWOï¿½ï¿½ï¿½ï¿½,C:5;ï¿½ï¿½ï¿½\bw\u0019M
+ \t|#ï¿½ï¿½xvmo\u0003\u0018ï¿½&+ï¿½Q3ï¿½}ï¿½ï¿½\"ï¿½ï¿½à®ˆï¿½\u001aï¿½Wï¿½ï¿½ï¿½\u0010ï¿½ï¿½ï¿½Iï¿½ï¿½mï¿½ï¿½5ï¿½\u0014ï¿½^\bi[ï¿½ï¿½?ï¿½ï¿½\"Ð¥\u0005ï¿½\u001fsï¿½?ï¿½ï¿½ï¿½Cqwï¿½fï¿½ï¿½\u001dnt\bQÌœï¿½\u0000sQuï¿½ï¿½\u000e\u0000ï¿½\u000b-ï¿½ï¿½cï¿½8ÌµLWï¿½ï¿½}uï¿½]ï¿½ï¿½*.\u0003Oï¿½\u0016ï¿½\u000f{uï¿½ï¿½Rï¿½a\u0010tï¿½`ï¿½!ï¿½ï¿½\u0011ï¿½<ï¿½Fï¿½qmï¿½%\u000f\u0004ï¿½ï¿½:%ï¿½8]ï¿½!S4^æ±—ï¿½Qï¿½ï¿½:ï¿½ï¿½ï¿½ï¿½ï¿½@ï¿½S\u0001ï¿½ï¿½O\u001c G\tb&xï¿½\u0006\t\u0001ï¿½^ï¿½jï¿½ï¿½0ï¿½-O\"ï¿½ï¿½Llï¿½ï¿½Õª\u001cnÚ
+\u0018ï¿½>ejï¿½ï¿½\u000fï¿½ï¿½Xï¿½ï¿½ï¿½\u001dï¿½\u0013Sï¿½ï¿½Sï¿½ØªZï¿½ï¿½{ï¿½ï¿½hçº\u000bs\u0018\t
+ï¿½
+ï¿½Nï¿½cï¿½z\u000bÔ´Vï¿½\u001e.ï¿½ÕºAï¿½ï¿½ï¿½~hiKÊ”ï¿½dï¿½$ï¿½ï¿½gï¿½ï¿½{ï¿½ï¿½ï¿½:ï¿½ï¿½É˜-ï¿½xï¿½ï¿½Ý—\u0002Eï¿½sB\u0010\u0005ï¿½\u0000=Ckyï¿½Y04ï¿½ï¿½ï¿½\u0018ï¿½ï¿½ï¿½*\tï¿½*ï¿½\u0019W19ï¿½\u0002ï¿½'\tï¿½\u000e$Jï¿½i&ï¿½Iï¿½ï¿½ï¿½(vï¿½%ï¿½+ï¿½ï¿½Zï¿½Sï¿½`\u0011ï¿½ï¿½WSPu*\u0018>H_!\u001eÖ¹ï¿½xï¿½Uï¿½ï¿½)hï¿½\u0013\u0018u\u0015t\u0010\u001bu>ï¿½ï¿½\b)ï¿½ï¿½ï¿½JAï¿½\u0004Õ©56\u0015ï¿½%Hï¿½ï¿½.1ï¿½7ï¿½ï¿½
+ï¿½\u000b\u0006ï¿½kxï¿½ï¿½ï¿½QXï¿½ï¿½ï¿½>ï¿½ï¿½\u0004ï¿½'Rï¿½Ë¡ï¿½fß¶ï¿½Mï¿½\u0015ï¿½\u0001-ï¿½ï¿½Iï¿½7ï¿½\u000e\u0015ï¿½\u0001ï¿½1ï¿½73w|0ï¿½oï¿½H2
+\tï¿½ÌŸ?\u001e\u001bï¿½ï¿½É´v'ï¿½:Fï¿½*ï¿½\u0007ï¿½ï¿½#ï¿½#ï¿½2/ï¿½Vï¿½ï¿½Ü¸ï¿½E-\u0012ï¿½ï¿½_ï¿½ï¿½\u0014\u001bï¿½lï¿½ï¿½&\u0015Iï¿½ï¿½4ï¿½gï¿½\u0000Eï¿½ï¿½\u0002ï¿½\u0016$ï¿½ï¿½\b\u0010\u000fZÆ«ï¿½FS\u001eï¿½~ï¿½Lï¿½ï¿½Iï¿½dbï¿½DbKï¿½5ï¿½ï¿½ï¿½\u001aï¿½Õ…\u0006ï¿½\u00006iï¿½ï¿½+\u0005ï¿½s\tuï¿½ï¿½jï¿½tN0\bKï¿½ï¿½.Ð–@L\b\u000bJQï¿½ï¿½0wï¿½bï¿½ï¿½\u0001ï¿½Bs+#_ï¿½ï¿½18ï¿½Vï¿½ï¿½ï¿½GÞ©ï¿½ï¿½Aï¿½ï¿½ï¿½Eï¿½ï¿½\u0005[wï¿½6pï¿½ï¿½tË¢ï¿½\u000eï¿½ï¿½g@1\u0012z'ï¿½N3@ï¿½ï¿½9dd4$^fï¿½}8Mï¿½\t5ï¿½Eï¿½ï¿½ï¿½ïŽŸï¿½n\u001eï¿½Aï¿½mï¿½\u00115\bï¿½$ï¿½ï¿½\u0016ï¿½ï¿½\u000eåº»ï¿½\u001dSï¿½-ï¿½eï¿½ï¿½\\ï¿½D)xup\u0006ï¿½%Iï¿½ï¿½Ü‚ï¿½Q}ï¿½Cï¿½$ï¿½9ï¿½ï¿½ï¿½ï¿½)ï¿½\u0016\u0004
+ñ“¸ï¿½ï¿½\u001fï¿½\u001d\u0011*)ï¿½|ï¿½G\u0003)ï¿½Kï¿½\u0006ï¿½ï¿½h'ï¿½Il]1]ï¿½,ï¿½]\u0013ï¿½ï¿½Kï¿½lï¿½ï¿½`ï¿½)\t
+cï¿½4U^P\b\u0000ï¿½|ï¿½ï¿½ï¿½ï¿½ï¿½\u00157\u001bï¿½ï¿½ï¿½\u0014Jï¿½ï¿½\u0003[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½nHï¿½\u0014ï¿½ï¿½\u0005ï¿½l8ï¿½ï¿½j2ï¿½y\"ï¿½rï¿½V\u0005ï¿½\u0005m,\\jï¿½N\u00112L83\u0010fï¿½ï¿½Sï¿½ï¿½ï¿½rï¿½ï¿½ï¿½ï¿½ï¿½Bw{?E'ZBï¿½ï¿½.ï¿½ê‚žï¿½CyÝµ@ï¿½%ï¿½\u0000Í±ï¿½ï¿½e\u0013 Ýï¿½ï¿½ï¿½,ï¿½\"ï¿½aï¿½ï¿½ï¿½ï¿½^ï¿½}2ï¿½ï¿½Sgï¿½\u000b\u001amï¿½<Zï¿½ï¿½Ek\u00055;rï¿½ï¿½ï¿½ï¿½ï¿½\u001fï¿½Kï¿½ï¿½\u0018ï¿½7ï¿½hï¿½yZXk\u0015ï¿½nï¿½ï¿½/ï¿½Jï¿½hg4ï¿½ï¿½ï¿½ï¿½=ï¿½ï¿½_ï¿½ï¿½,ï¿½7fï¿½ï¿½\u0015ï¿½ï¿½ï¿½5\u0003ï¿½ï¿½\u000fï¿½ï¿½ï¿½Õ¿Hï¿½ï¿½/\u0002ï¿½Tï¿½{ï¿½X\u0011ï¿½4ï¿½4ï¿½2ï¿½ï¿½ï¿½:9Qï¿½ï¿½ï¿½\u0003ï¿½$ï¿½ï¿½zï¿½ï¿½ï¿½Tï¿½Ò—ï¿½a\u001b{,
+ï¿½ï¿½ï¿½,|tï¿½ï¿½N\"ï¿½\u0011ï¿½~Zï¿½ï¿½ï¿½!@Þœï¿½1hï¿½ï¿½ï¿½\u001d`ï¿½<ï¿½Lï¿½=%\u001d<&<ï¿½ï¿½
+ï¿½\u0014ï¿½ï¿½ï¿½N{ï¿½~\u0018ï¿½\u001dï¿½B|xï¿½ï¿½gH\u001dï¿½Q7ï¿½\\7\u0004'.ï¿½Iï¿½ï¿½ï¿½wï¿½ï¿½oï¿½\u0018ï¿½q\u001bï¿½ï¿½\u000bï¿½ï¿½pÏŽ;ï¿½+7ï¿½ï¿½ï¿½ï¿½4~\u001dï¿½\fï¿½ï¿½ï¿½ï¿½ï¿½V\u0014ï¿½\u001aï¿½ï¿½gMr;\u0002ï¿½uï¿½P\u0006^Dï¿½]ï¿½ï¿½ï¿½FÖK.)Jï¿½Fï¿½bï¿½ï¿½ï¿½ï¿½Pyï¿½-\u0019è•Œ]dï¿½\u0018V>\\ï¿½Lï¿½V7Uï¿½\u0019ï¿½Wï¿½Hï¿½ï¿½x\u0014ï¿½!Tï¿½ï¿½uï¿½ï¿½\u0013ï¿½Pï¿½ï¿½ï¿½Mï¿½\b\u000f+ï¿½ï¿½ï¿½ï¿½E[ï¿½Qï¿½\"lpï¿½(\u0018ï¿½\u001dr>ï¿½\u000bï¿½ï¿½ï¿½ï¿½\u0016Jï¿½ï¿½w\u001dkï¿½`s{ï¿½ï¿½Dï¿½Xï¿½ï¿½ï¿½&Seï¿½ï¿½ï¿½ï¿½3ï¿½zp\u000e\tï¿½<ï¿½ï¿½ï¿½ï¿½Gï¿½ï¿½fï¿½@h\u001bï¿½ï¿½Q8ï¿½ï¿½_YD\u0013ï¿½ï¿½ï¿½;ï¿½hï¿½=\u0012ï¿½ï¿½oï¿½Hï¿½ï¿½ï¿½\u0001G\u00028ï¿½ï¿½ï¿½B+ï¿½ï¿½\u0019`?3L^ï¿½ï¿½\u0003ï¿½\"ï¿½K\u001eï¿½3\t\u0017
+ï¿½3aï¿½ï¿½ï¿½eï¿½ï¿½<-ï¿½\u00062(pjoï¿½ï¿½ï¿½.XBï¿½gï¿½s\tkA\u0014@ï¿½ï¿½9ï¿½ï¿½\u0004%ï¿½Ñ…Aï¿½iK.1ï¿½ore0â–¹ï¿½sï¿½\u0000Ý©>ï¿½\u0012eï¿½))ï¿½ï¿½\u0018nHï¿½ï¿½ï¿½nï¿½Pô€–\u000bï¿½\u0012ï¿½C\fï¿½ï¿½ï¿½ï¿½
+ï¿½ï¿½ï¿½\u0003ï¿½\u0017\u00044ï¿½bï¿½ï¿½\"ï¿½ï¿½:ï¿½Ü½ï¿½[ï¿½\u0004Dï¿½ï¿½g\u000fï¿½ï¿½d\u000eï¿½ï¿½\tD2\u000fï¿½ï¿½\u001f\u0012ï¿½\u0006Ò”ï¿½ï¿½=7*ï¿½ï¿½ï¿½ï¿½\u0003?Sï¿½~ï¿½ï¿½ï¿½n\u0007ï¿½pï¿½ï¿½\u00170&iAGqï¿½ï¿½ï¿½*\u0011ï¿½FJï¿½*s*Î©n\u0018\u0005ï¿½Zï¿½ï¿½\u001fï¿½-Ý„
+ï¿½ï¿½uï¿½+ï¿½ï¿½ï¿½ï¿½ï¿½\u0013)Ý£a1ï¿½\u0003ï¿½gHï¿½ï¿½2i\u0006ï¿½ï¿½ï¿½ï¿½\u0003nï¿½~\u0002\u001eï¿½Hï¿½Iï¿½ï¿½ï¿½F\u0011,ï¿½ï¿½ï¿½ï¿½\u0001ï¿½]ï¿½È«pï¿½ï¿½Rï¿½ï¿½/ï¿½ï¿½È½\u0000\bï¿½zï¿½ï¿½ï¿½Ô³ï¿½yï¿½ï¿½3ï¿½ï¿½<ï¿½ï¿½ &O^|rï¿½)ï¿½Cï¿½ï¿½\u0015ï¿½Ð‡]ï¿½ï¿½zï¿½ï¿½ï¿½ï¿½ï¿½AÃŽdA9ï¿½
+nÙï¿½
+6ooï¿½!ï¿½ï¿½\u001f\u000frï¿½<\u0017\u001b3äš†-x,ï¿½ï¿½lÞDï¿½>ï¿½ï¿½ï¿½ï¿½Ó”ï¿½Ð«Gï¿½Duï¿½ï¿½% ï¿½nï¿½iï¿½ï¿½IKï¿½@y?Sï¿½a$ï¿½ï¿½ï¿½cï¿½Qï¿½ï¿½`ï¿½ï¿½\u0011ï¿½ï¿½'\u0014ï¿½ï¿½`ï¿½`ï¿½:5sï¿½\u001cY4^<{ï¿½ï¿½\u001aHï¿½jï¿½ï¿½:ï¿½Dhs\u0016\u000bï¿½{ï¿½ï¿½efï¿½ï¿½Eï¿½2ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½]\\'eï¿½ï¿½ï¿½\u001d
+\u0015ilQï¿½ï¿½0ï¿½|\u0007yï¿½ï¿½-Pï¿½\u0006\u0000ï¿½O{d5ï¿½ï¿½\u0004ï¿½Tï¿½Bï¿½ï¿½7xjGï¿½^>ï¿½\u0013ï¿½ï¿½ï¿½\"ï¿½ï¿½&ï¿½wï¿½8aï¿½nï¿½`ï¿½ï¿½\"ï¿½ï¿½Jï¿½Ç»ï¿½Y\\ï¿½~T\u0019ï¿½ï¿½ï¿½;ï¿½ï¿½)ï¿½,ï¿½Ksï¿½\u0018ï¿½6ï¿½wp/\u0004ï¿½ï¿½\u0012\u0013iï¿½#ï¿½ï¿½
+ï¿½ï¿½ï¿½ï¿½&&\u0007hVDï¿½T<Pï¿½Jï¿½cï¿½:ï¿½mï¿½Ì™\u00045ï¿½<ï¿½+<=ï¿½Pnï¿½ï¿½ï¿½hï¿½\u0003\u001dï¿½ï¿½7ï¿½wdï¿½\b0ï¿½ï¿½ï¿½\u0014\u000bï¿½\u0019ï¿½ï¿½ï¿½ÍŸ(4[ï¿½}ï¿½ï¿½.\u0010kï¿½\u0002ï¿½ï¿½$sgï¿½\u0003Zï¿½ï¿½ï¿½`\u0000Hï¿½\u0003ï¿½ï¿½3ï¿½$ï¿½ï¿½/\u001fï¿½3ï¿½
+ï¿½ï¿½\u0000}#|ï¿½;]\u000fï¿½8:Þ‘ï¿½y\u000bï¿½4ï¿½ï¿½ï¿½=ï¿½eï¿½waï¿½3\u0005ï¿½?\u000eKï¿½ï¿½+ï¿½Ú‰ï¿½\u0012\u00001,ï¿½ {Oï¿½g\u0004ï¿½\u000f$ï¿½ï¿½)LÄžT\u0015y=Ï±<ï¿½!ï¿½ï¿½!ï¿½ï¿½ï¿½
+)Pï¿½Oï¿½\u0014ï¿½J\u0010ï¿½ï¿½ï¿½sAï¿½ï¿½o`\fï¿½ï¿½\tlï¿½\u00059@kï¿½Âœï¿½o9ï¿½/ï¿½ï¿½ï¿½ï¿½\u0002\u0014ï¿½ï¿½dÚ€\u001aï¿½ï¿½XNï¿½Eï¿½7ï¿½ë™—$ï¿½\u0006ï¿½Zï¿½ï¿½Zkï¿½h\u0017'JX0$'ï¿½ï¿½ï¿½;ï¿½ï¿½ ï¿½ï¿½ï¿½v9\u001e=Ç¬ï¿½ï¿½ï¿½\"\bï¿½ï¿½\b\u0013%ï¿½ï¿½?\u001eï¿½lï¿½Iqoï¿½\u0014'\bï¿½ï¿½@ï¿½4ï¿½fï¿½ï¿½\"ï¿½ï¿½Kï¿½_ï¿½
+BT\u001cï¿½@&ï¿½ï¿½ï¿½ï¿½ï¿½\u0001Õ§dhï¿½ï¿½Ý€,Dï¿½ï¿½ï¿½\u001cBeï¿½ï¿½ï¿½ï¿½2ï¿½|ï¿½ï¿½Ç‰ï¿½\f)\u0011D\u0012ï¿½4Cï¿½Æ»ï¿½}Û°ï¿½ï¿½ï¿½1?aï¿½ï¿½ï¿½ï¿½ï¿½5ï¿½O1\bDï¿½Uï¿½ï¿½ï¿½\"ï¿½ï¿½IIï¿½mï¿½h\u0004ï¿½\u001fï¿½Ò“\bï¿½2Û®ï¿½\fï¿½ï¿½ï¿½nBcUTï¿½ï¿½ï¿½ï¿½\u0018ï¿½\u0006ï¿½){&i}Kï¿½ï¿½\fE\u0010ï¿½ï¿½ï¿½ï¿½b.ï¿½xï¿½Zï¿½Ð„P\u0003ï¿½ï¿½v\u001cz\u0002\u0010ï¿½ï¿½Koï¿½ï¿½Æ\u0004\u000eUZï¿½!ï¿½ï¿½ï¿½ï¿½\u0013\u001cï¿½ï¿½ï¿½tï¿½ï¿½ï¿½;V%ï¿½ï¿½{c2ï¿½\t$ï¿½BSï¿½'4IXG'lï¿½ï¿½ï¿½Yï¿½ì©­\"Ûï¿½ï¿½udï¿½ï¿½Xï¿½ï¿½bï¿½ï¿½Tï¿½d?~T>ï¿½ï¿½\\ï¿½ï¿½;hdï¿½}ï¿½}ï¿½Öºï¿½^\u0007=ï¿½ï¿½ï¿½v\u0011ï¿½vï¿½ÜŸ|ï¿½ï¿½ï¿½RNï¿½t3\u0014^ï¿½ï¿½=h.ï¿½ï¿½\u0014M;k?ï¿½ï¿½IVï¿½\u0014ï¿½ï¿½ï¿½ï¿½$9ï¿½x\tÆƒï¿½nï¿½\u0007ï¿½ï¿½1ï¿½|Ò©ï¿½Iï¿½9ï¿½ï¿½ï¿½MGpbï¿½ï¿½Â©ï¿½D×§ï¿½ï¿½Ñï¿½lW\u0010ï¿½ï¿½4ï¿½ï¿½\u0010&$(Xï¿½/ï¿½ï¿½\u0002\u0016ï¿½ï¿½[ï¿½ï¿½h\u0019ï¿½ï¿½É™ï¿½ï¿½ï¿½ï¿½Vï¿½KÍšï¿½ï¿½\u0000-\u0000ÑŒeiï¿½1%ï¿½ï¿½=ï¿½ï¿½\u0013ï¿½ï¿½Veï¿½Lï¿½*\u0003\u000fg)\u0005ï¿½ï¿½!ï¿½gï¿½\"ï¿½\u0017!\u0003Uï¿½ï¿½!ï¿½ï¿½\u0010ï¿½|ï¿½{ï¿½>(ï¿½
+Xï¿½p_\u0006ÜŸ\u001dï¿½Å¸ï¿½dï¿½ï¿½(ï¿½ï¿½ï¿½vï¿½ï¿½8Õ˜2ï¿½4=4\u0019ï¿½azï¿½V3 Gï¿½D\u0010ï¿½/>ï¿½\bq}ï¿½E\b\u0002Hï¿½ï¿½\u001c3sGï¿½1ï¿½g@\u0017ï¿½ï¿½\"ï¿½ï¿½ï¿½P\u0016h^7ï¿½ï¿½ï¿½y\u0000ï¿½:ï¿½qï¿½<C`Atï¿½fï¿½\u0016hï¿½ï¿½6eÙ›\tï¿½cï¿½*ï¿½ï¿½Fï¿½ï¿½`\u0013ï¿½\u001d\u001co9,ï¿½ï¿½ï¿½?ï¿½}ï¿½Aï¿½ï¿½ï¿½|F\tï¿½ï¿½B`ï¿½ï¿½\u00042^dï¿½bï¿½\u0010Zï¿½Eï¿½vVï¿½\t $Nï¿½/ï¿½X2ï¿½:!\u0004*ï¿½ÙŸï¿½+nu\u0016ï¿½\u0006ï¿½
+\u000e\u0004ï¿½8ï¿½/3b-pl\u0004Gyï¿½\u0007^Sï¿½1ï¿½Wï¿½Ctï¿½Xï¿½ÜŽkï¿½\u0000Iï¿½ï¿½Òï¿½ï¿½Ë¨/Rï¿½ï¿½\u0005ï¿½ï¿½Wuï¿½ï¿½Ñ¢fï¿½Eï¿½_Óƒï¿½\u0019B\u000fMjï¿½.\u0011Qï¿½vZÑ¾ï¿½ï¿½ï¿½Ç…rï¿½j\u001bï¿½ï¿½ï¿½6ï¿½ï¿½sï¿½~Rï¿½0ï¿½\u0012ï¿½S#E\u0011Qï¿½Jï¿½\u001b\u0012}uï¿½ï¿½\u0003ï¿½ï¿½ï¿½lï¿½(C\u0004ï¿½\u0000ï¿½
+\u0019[sï¿½sï¿½/ï¿½zï¿½hqaï¿½ï¿½\u0000Cï¿½]PË˜1v\u0010ï¿½ï¿½0ï¿½ï¿½\u0000ï¿½ï¿½\u001dï¿½\"ï¿½+ï¿½ï¿½ï¿½HZ'ï¿½ï¿½ï¿½\b<^ï¿½(!ï¿½F8ï¿½ï¿½NGJ\u0004\u001bï¿½ï¿½ï¿½$ï¿½:
+ï¿½|
+Eï¿½ï¿½ï¿½ï¿½ï¿½5ï¿½\u0002\u001aï¿½vï¿½\u0007.ï¿½XFxï¿½ï¿½ï¿½7ï¿½ï¿½:wï¿½ï¿½ï¿½!ï¿½\u0018c\u0001uï¿½\u0016G\u001aï¿½Hï¿½(ï¿½Y)ï¿½?ï¿½ï¿½Oeï¿½\u00103Q.ï¿½\u000eï¿½w3Uï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½h,_\u0018ï¿½ï¿½\u000eï¿½a\u0019ï¿½ï¿½ï¿½ï¿½\u0017<4(ï¿½#ï¿½uï¿½eJï¿½Èƒ\t
+Ì¾qhï¿½ï¿½\u0002#;\"ï¿½ï¿½ï¿½Jï¿½ï¿½A\u0005\\iï¿½ï¿½\"ï¿½\u0018\u0000ï¿½ï¿½ï¿½H\u001a(6ï¿½Hyï¿½\bï¿½Lï¿½\u001fcï¿½\bqveï¿½3\u0007ï¿½Y\u0004\u0015Cï¿½8ï¿½U\u0001uï¿½ï¿½_ï¿½`ï¿½FB+Lï¿½Ç®ï¿½gï¿½ï¿½ï¿½Bï¿½;ï¿½Xï¿½ï¿½eï¿½Ñxï¿½kwx|ï¿½B'\u0013ï¿½ï¿½ï¿½5(ï¿½r
+N(ï¿½c-ï¿½\u00009ï¿½!yï¿½:ï¿½Pï¿½\u0011ï¿½\"%q\"vï¿½;aï¿½ï¿½.ï¿½~ï¿½ï¿½eï¿½T_ï¿½xnï¿½ï¿½ï¿½\u000fï¿½Mï¿½\\Tï¿½Eï¿½
+\u0016vï¿½Pï¿½cï¿½tYï¿½(ï¿½Aï¿½\u001fï¿½fï¿½ï¿½\u001fï¿½\u0000ï¿½ï¿½}Nrï¿½23|\u0001ï¿½d)ï¿½ï¿½\u0000ï¿½Ã•ï¿½ï¿½ÛŽï¿½ÈŽï¿½ï¿½ï¿½\u001b\u0003ï¿½W#5Uï¿½WVï¿½\u000fï¿½ï¿½Øˆï¿½Iï¿½ï¿½5ï¿½áž”Gï¿½\u0002ï¿½ï¿½vë³šï¿½\u001bï¿½[ ï¿½ï¿½`ï¿½ï¿½dï¿½ï¿½ï¿½\u001fï¿½y\u001b</6cï¿½*ï¿½.j\u001dï¿½ï¿½ï¿½gcï¿½ï¿½ï¿½\u0013ï¿½wFï¿½\u0013Nï¿½Vï¿½Ý¯ï¿½\u0006ï¿½ï¿½\u0000ï¿½ï¿½ï¿½\u0017\u0002
+lï¿½fï¿½ï¿½ï¿½kï¿½\u000fï¿½ï¿½\u0005ï¿½ï¿½ï¿½ï¿½B-%ï¿½F\u0007xï¿½\u00178P}ï¿½ï¿½1Ý¡ï¿½\u0015&\u001epï¿½Hï¿½ï¿½ï¿½ï¿½$ï¿½C\u000bï¿½ï¿½Îï¿½\u001eï¿½ï¿½ï¿½ï¿½ï¿½3\u000frï¿½ï¿½1ï¿½\u0015ï¿½6ï¿½\u00189dÍ»\u0014ï¿½ï¿½
+ï¿½Yqï¿½ï¿½Nï¿½\f#ï¿½\u00106kï¿½3_.ï¿½aÂ<;aï¿½o?\tï¿½GIï¿½ï¿½\u0000\u0010ï¿½]ï¿½\tï¿½sMiï¿½\u0013ï¿½ï¿½ï¿½&ï¿½ï¿½ï¿½QÇ­Oï¿½ï¿½]ï¿½ï¿½ï¿½ï¿½RBï¿½?ï¿½Gï¿½Éï¿½_m\u001dï¿½Õ‚ï¿½i*\u0010ï¿½ï¿½ï¿½\u001bbï¿½n\u001bï¿½-8ï¿½ï¿½*ï¿½ï¿½ï¿½Ú¼ï¿½bï¿½%ï¿½ï¿½}ï¿½ï¿½pï¿½ï¿½\u000b'\u000bt\u000bwR\u0016qbÊ†\u001aÑšï¿½2\u0012yQgï¿½ï¿½ï¿½ï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½LFï¿½ï¿½\u001eoï¿½ï¿½?ï¿½\u0019ï¿½dH`blÏ¸ï¿½ï¿½\u0014ï¿½ZE9_ï¿½ï¿½ï¿½WÅ¥\u001a\u0000\bjï¿½}ï¿½ï¿½9ï¿½[S[cjï¿½/#ï¿½_ï¿½\u0010ï¿½zï¿½ï¿½@ï¿½Oï¿½ï¿½eï¿½ï¿½ï¿½Ê´ï¿½,ï¿½\u0012ï¿½ï¿½R_ï¿½ï¿½4o\u00066ï¿½ï¿½\u001emC\u000e/ï¿½ï¿½ï¿½ï¿½ï¿½Åˆï¿½ï¿½x\u001bï¿½0ï¿½ï¿½ï¿½Ç¥3ï¿½ï¿½~
+IUÜ¦\\ï¿½ï¿½)ï¿½\u0015ï¿½:ï¿½ï¿½Iï¿½qï¿½\u0011ï¿½+ï¿½.^\u000f#\u0001|\u0000\u0000]ï¿½Bï¿½}+ï¿½tï¿½>Gï¿½ï¿½^ï¿½dï¿½ï¿½\u0010ï¿½ï¿½\"4ï¿½ï¿½ï¿½Lï¿½ï¿½Dj\u0005LN&,ï¿½a\u000eï¿½\u0010n\u0010{uï¿½ï¿½e>ÇºBï¿½Lï¿½Mï¿½?ï¿½Nï¿½ï¿½UX
+C\u0010ï¿½^\u001aï¿½Yï¿½ï¿½\u000fï¿½ï¿½a\bï¿½_\u0006ï¿½ï¿½ï¿½mBBï¿½ï¿½\u0011~ï¿½8Nï¿½\u001fï¿½0ï¿½ï¿½\u0010y#}\u0002K\u001fPï¿½\u0003ï¿½\tb\u0012}ï¿½ï¿½ß¨å«œ~ï¿½2ï¿½j1ï¿½ï¿½Í°ï¿½Oï¿½\u001eï¿½\u0005%ï¿½ï¿½tï¿½\u001avV)ï¿½ï¿½ï¿½Eï¿½\fNï¿½Buï¿½ï¿½Rï¿½\"ï¿½ï¿½ï¿½}ï¿½Fï¿½zï¿½\u0005E\u0011ï¿½jet
+ï¿½F@ï¿½1ï¿½ï¿½\u0014\bsï¿½_Ç˜e ï¿½yhï¿½ï¿½\u00043ï¿½ï¿½\u0012-\u001cÅ¬ï¿½\u000e 9ï¿½:Ë¹ï¿½Zï¿½:H*ï¿½ï¿½ï¿½$ï¿½Xï¿½ï¿½ï¿½bcï¿½ï¿½\u001dï¿½{ï¿½ï¿½\u001fï¿½Nï¿½9C0(ï¿½Û·ï¿½ï¿½Hï¿½K8ï¿½ï¿½ï¿½ï¿½_\u001b\tmï¿½`ï¿½ï¿½ï¿½ï¿½qï¿½ï¿½\u0006ï¿½\u000f+Jï¿½ï¿½\\$!kBï¿½+ï¿½f4ï¿½ï¿½ï¿½\u000eï¿½ï¿½eï¿½ï¿½ï¿½@?Lï¿½ï¿½ï¿½ï¿½#ï¿½ï¿½ï¿½ï¿½ï¿½7ï¿½ï¿½\u001c\tï¿½ï¿½jeï¿½'7\u000fï¿½\u0013\u000e1GWZ`cï¿½ï¿½ï¿½ \u001bï¿½X)aï¿½\u0016ï¿½ï¿½ï¿½ï¿½d_)M[/i\u0006Zï¿½ï¿½\u0014ï¿½\tï¿½+ï¿½n[ï¿½ï¿½#ï¿½ï¿½\u001fï¿½ï¿½ï¿½ï¿½{Kï¿½rVLJï¿½}ï¿½ï¿½\u0007ï¿½Ö:WU\u001cï¿½ï¿½ï¿½ï¿½nï¿½vï¿½ï¿½ï¿½dï¿½ï¿½Z<z0ï¿½ï¿½sï¿½ï¿½_8ï¿½Pï¿½\u001fï¿½ï¿½ï¿½\u0000\u0012W;ï¿½ï¿½ï¿½ï¿½ï¿½\u0000\u000fLÍµï¿½ï¿½ï¿½`ï¿½ï¿½g:ï¿½Vï¿½ï¿½ï¿½L-ï¿½Wï¿½ï¿½\u0011ï¿½\u001eï¿½x_;\tï¿½o;wï¿½\u0018\u0001R\u001fï¿½a)ï¿½\u0005\u0003ï¿½ï¿½vï¿½ï¿½*ï¿½ï¿½fï¿½ï¿½ï¿½\u0014V\u0016Nï¿½(\u001fÓ¤ï¿½ï¿½kKï¿½Mï¿½\u0014ï¿½ï¿½\u001c%ï¿½6Mï¿½fï¿½.>ï¿½ï¿½Yjjï¿½ï¿½9kp+\u001a}ï¿½[cTï¿½ï¿½&È«\u001bï¿½I\u000bï¿½-ï¿½ï¿½ï¿½ï¿½lï¿½ï¿½\b+ï¿½ï¿½ï¿½=ï¿½ï¿½ï¿½ï¿½\u0015ï¿½hk\t7*MTRï¿½\u0018\u0016ï¿½ï¿½aWï¿½ï¿½\u001b\u00022ï¿½ï¿½'ï¿½ï¿½Õ¥ï¿½\bVï¿½ï¿½*#ï¿½tï¿½qï¿½ï¿½
+:\u0010Reï¿½ï¿½ï¿½ï¿½Ò¤x
+1ï¿½\u0003ZI\u000bTï¿½\u0011ï¿½E59ï¿½rï¿½ï¿½ï¿½,ï¿½ï¿½nË½\u0002ï¿½f+T\\ï¿½ï¿½+ï¿½R\u001e\u001e$\u0001\u00199\u0000ï¿½\u0016<@d4\u001dï¿½\u0004mï¿½ï¿½ï¿½;8p`
+\u000bï¿½ï¿½ï¿½A$0\u0013ï¿½ï¿½-6ï¿½Q\u0012Qï¿½ï¿½X ï¿½Ch7\fï¿½Yï¿½|V}ï¿½ï¿½\u0011ï¿½\u001cÛ²\f_T\u0019ï¿½ï¿½ï¿½3/ï¿½\u0000bï¿½Mï¿½wqï¿½×ºï¿½ï¿½\u001cï¿½tï¿½Øªï¿½\\x1ï¿½ï¿½ï¿½\u001f\u001fï¿½ï¿½ï¿½Iwï¿½ï¿½LkC/#ï¿½g\u0005(8cï¿½f\u0002ï¿½%\u0006Y1ï¿½7\u0013ï¿½ï¿½Xï¿½Fï¿½m`:\u001bï¿½ï¿½ï¿½ï¿½ï¿½ï¿½.\u0007mï¿½ï¿½ï¿½ï¿½ï¿½!Y\u000f0ï¿½^ï¿½ï¿½ï¿½ï¿½\u0019ï¿½zï¿½ï¿½ï¿½6tï¿½x\u00025ï¿½yUï¿½\u0002Yy\"\u0005Kï¿½ï¿½ï¿½rï¿½ï¿½ï¿½P\u001cï¿½ï¿½ï¿½k\u0010ï¿½\b!ï¿½iï¿½ï¿½ï¿½E5ï¿½2\u001dï¿½Oï¿½ï¿½ï¿½C\u001b\fJG%Ö’\u0010ï¿½Vï¿½}ï¿½ï¿½Ã’G\u0001\u0002rï¿½\u0001ï¿½,q4/ï¿½\u0005ï¿½ï¿½cï¿½ï¿½$2ï¿½Dï¿½\u0003\u0013ï¿½ï¿½(
+ï¿½\u00183ï¿½\u0000ï¿½:]ï¿½0H6ï¿½[ï¿½ï¿½ï¿½\u0004\u001dï¿½\u0019ï¿½mkï¿½Æ©'+ß£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½>ï¿½mï¿½ï¿½×¯_[P?ï¿½A.ï¿½ï¿½8
+lï¿½ï¿½ï¿½>Iï¿½ï¿½ï¿½d3ï¿½\u0016Lï¿½ï¿½Hï¿½\u0010\u0004ï¿½ï¿½ï¿½@yÎˆ(ï¿½ï¿½ï¿½%ï¿½T>?gnï¿½ï¿½ï¿½ï¿½0\u0000\" does not exist at D:\\Desktop\\sbd\\sidebardocs\\vendor\\symfony\\http-foundation\\File\\File.php:36)
+[stacktrace]
+#0 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Filesystem\\FilesystemAdapter.php(419): Symfony\\Component\\HttpFoundation\\File\\File->__construct('RIFF:}\\x00\\x00WEBPVP8...')
+#1 D:\\Desktop\\sbd\\sidebardocs\\app\\Http\\Controllers\\ContentController.php(29): Illuminate\\Filesystem\\FilesystemAdapter->putFile('contentImages', 'RIFF:}\\x00\\x00WEBPVP8...')
+#2 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\ControllerDispatcher.php(46): App\\Http\\Controllers\\ContentController->saveImage(Object(Illuminate\\Http\\Request))
+#3 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Route.php(262): Illuminate\\Routing\\ControllerDispatcher->dispatch(Object(Illuminate\\Routing\\Route), Object(App\\Http\\Controllers\\ContentController), 'saveImage')
+#4 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Route.php(208): Illuminate\\Routing\\Route->runController()
+#5 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(808): Illuminate\\Routing\\Route->run()
+#6 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Illuminate\\Routing\\Router->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#7 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Middleware\\SubstituteBindings.php(51): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#8 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#9 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Auth\\Middleware\\Authenticate.php(64): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#10 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Auth\\Middleware\\Authenticate->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'sanctum')
+#11 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#12 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(807): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#13 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(786): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#14 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(750): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#15 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(739): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#16 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(201): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#17 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}(Object(Illuminate\\Http\\Request))
+#18 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#19 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#20 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#21 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#22 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#23 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#24 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#25 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#26 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance.php(110): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#27 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#28 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\HandleCors.php(62): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#29 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#30 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#31 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#32 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#33 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#34 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#35 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(176): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#36 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(145): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#37 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1188): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#38 D:\\Desktop\\sbd\\sidebardocs\\public\\index.php(17): Illuminate\\Foundation\\Application->handleRequest(Object(Illuminate\\Http\\Request))
+#39 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\resources\\server.php(23): require_once('D:\\\\Desktop\\\\sbd\\\\...')
+#40 {main}
+"} 
+[2024-10-25 02:48:49] local.ERROR: Malformed UTF-8 characters, possibly incorrectly encoded {"userId":2,"exception":"[object] (InvalidArgumentException(code: 0): Malformed UTF-8 characters, possibly incorrectly encoded at D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\JsonResponse.php:90)
+[stacktrace]
+#0 D:\\Desktop\\sbd\\sidebardocs\\vendor\\symfony\\http-foundation\\JsonResponse.php(49): Illuminate\\Http\\JsonResponse->setData(Array)
+#1 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\JsonResponse.php(32): Symfony\\Component\\HttpFoundation\\JsonResponse->__construct(Array, 500, Array, false)
+#2 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Exceptions\\Handler.php(970): Illuminate\\Http\\JsonResponse->__construct(Array, 500, Array, 192)
+#3 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Exceptions\\Handler.php(703): Illuminate\\Foundation\\Exceptions\\Handler->prepareJsonResponse(Object(Illuminate\\Http\\Request), Object(Symfony\\Component\\HttpFoundation\\File\\Exception\\FileNotFoundException))
+#4 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Exceptions\\Handler.php(592): Illuminate\\Foundation\\Exceptions\\Handler->renderExceptionResponse(Object(Illuminate\\Http\\Request), Object(Symfony\\Component\\HttpFoundation\\File\\Exception\\FileNotFoundException))
+#5 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Pipeline.php(51): Illuminate\\Foundation\\Exceptions\\Handler->render(Object(Illuminate\\Http\\Request), Object(Symfony\\Component\\HttpFoundation\\File\\Exception\\FileNotFoundException))
+#6 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(146): Illuminate\\Routing\\Pipeline->handleException(Object(Illuminate\\Http\\Request), Object(Symfony\\Component\\HttpFoundation\\File\\Exception\\FileNotFoundException))
+#7 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Middleware\\SubstituteBindings.php(51): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#8 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#9 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Auth\\Middleware\\Authenticate.php(64): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#10 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Auth\\Middleware\\Authenticate->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'sanctum')
+#11 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#12 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(807): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#13 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(786): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#14 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(750): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#15 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(739): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#16 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(201): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#17 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}(Object(Illuminate\\Http\\Request))
+#18 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#19 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#20 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#21 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#22 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#23 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#24 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#25 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#26 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance.php(110): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#27 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#28 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\HandleCors.php(62): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#29 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#30 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#31 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#32 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#33 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#34 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#35 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(176): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#36 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(145): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#37 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1188): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#38 D:\\Desktop\\sbd\\sidebardocs\\public\\index.php(17): Illuminate\\Foundation\\Application->handleRequest(Object(Illuminate\\Http\\Request))
+#39 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\resources\\server.php(23): require_once('D:\\\\Desktop\\\\sbd\\\\...')
+#40 {main}
+"} 
+[2024-10-25 02:57:43] local.ERROR: Call to undefined method Intervention\Image\EncodedImage::hashName() {"userId":2,"exception":"[object] (Error(code: 0): Call to undefined method Intervention\\Image\\EncodedImage::hashName() at D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Filesystem\\FilesystemAdapter.php:421)
+[stacktrace]
+#0 D:\\Desktop\\sbd\\sidebardocs\\app\\Http\\Controllers\\ContentController.php(29): Illuminate\\Filesystem\\FilesystemAdapter->putFile('contentImages/2...', Object(Intervention\\Image\\EncodedImage))
+#1 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\ControllerDispatcher.php(46): App\\Http\\Controllers\\ContentController->saveImage(Object(Illuminate\\Http\\Request))
+#2 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Route.php(262): Illuminate\\Routing\\ControllerDispatcher->dispatch(Object(Illuminate\\Routing\\Route), Object(App\\Http\\Controllers\\ContentController), 'saveImage')
+#3 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Route.php(208): Illuminate\\Routing\\Route->runController()
+#4 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(808): Illuminate\\Routing\\Route->run()
+#5 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Illuminate\\Routing\\Router->Illuminate\\Routing\\{closure}(Object(Illuminate\\Http\\Request))
+#6 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Middleware\\SubstituteBindings.php(51): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#7 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Routing\\Middleware\\SubstituteBindings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#8 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Auth\\Middleware\\Authenticate.php(64): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#9 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Auth\\Middleware\\Authenticate->handle(Object(Illuminate\\Http\\Request), Object(Closure), 'sanctum')
+#10 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#11 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(807): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#12 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(786): Illuminate\\Routing\\Router->runRouteWithinStack(Object(Illuminate\\Routing\\Route), Object(Illuminate\\Http\\Request))
+#13 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(750): Illuminate\\Routing\\Router->runRoute(Object(Illuminate\\Http\\Request), Object(Illuminate\\Routing\\Route))
+#14 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Routing\\Router.php(739): Illuminate\\Routing\\Router->dispatchToRoute(Object(Illuminate\\Http\\Request))
+#15 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(201): Illuminate\\Routing\\Router->dispatch(Object(Illuminate\\Http\\Request))
+#16 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(144): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}(Object(Illuminate\\Http\\Request))
+#17 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#18 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#19 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#20 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#21 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#22 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#23 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#24 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\ValidatePostSize->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#25 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance.php(110): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#26 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#27 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\HandleCors.php(62): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#28 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\HandleCors->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#29 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Http\\Middleware\\TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#30 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Http\\Middleware\\TrustProxies->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#31 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#32 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(183): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle(Object(Illuminate\\Http\\Request), Object(Closure))
+#33 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Pipeline\\Pipeline.php(119): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}(Object(Illuminate\\Http\\Request))
+#34 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(176): Illuminate\\Pipeline\\Pipeline->then(Object(Closure))
+#35 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Http\\Kernel.php(145): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter(Object(Illuminate\\Http\\Request))
+#36 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\Application.php(1188): Illuminate\\Foundation\\Http\\Kernel->handle(Object(Illuminate\\Http\\Request))
+#37 D:\\Desktop\\sbd\\sidebardocs\\public\\index.php(17): Illuminate\\Foundation\\Application->handleRequest(Object(Illuminate\\Http\\Request))
+#38 D:\\Desktop\\sbd\\sidebardocs\\vendor\\laravel\\framework\\src\\Illuminate\\Foundation\\resources\\server.php(23): require_once('D:\\\\Desktop\\\\sbd\\\\...')
+#39 {main}
+"} 

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
+use Intervention\Image\Laravel\Facades\Image;
 
 class ContentController extends Controller
 {
@@ -18,23 +19,34 @@ class ContentController extends Controller
      */
     public function saveImage(Request $request)
     {
-        $path = Storage::disk("public")->putFile("contentImages", $request->file('image'));
+       
+        if($request->file('image')){
+
+
+        $path   = Image::read($request->file('image'));
+        $resize = $path->scaleDown(1024, 1024)->toWebp(90);
+        $path = "contentImages/" . Auth::user()->id . "/" . Str::random(40) . ".webp";
+        Storage::disk("public")->put($path, $resize);
         return response()->json(['success' => 1, 'file' => ['url' => URL::to('/') . "/" . $path]], 200);
+        }else if ($request->file('file')){
+            return $request->file('file');
+        }
+        
     }
     public function saveFile(Request $request)
     {
-        $path = Storage::disk("public")->putFile("contentFiles", $request->file('file'));
+        $path = Storage::disk("public")->putFile("contentFiles/".Auth::user()->id, $request->file('file'));
         return response()->json(['success' => 1, 'file' => ['url' => URL::to('/') . "/" . $path]], 200);
     }
 
     public function saveImageByUrl(Request $request)
     {
-        $contents = file_get_contents($request->url);
-        $name = explode('.', $request->url);
-        $name = 'contentImages/' . Str::random(40) . '.' . end($name);
-        Storage::disk('public')->put($name, $contents);
 
-        return response()->json(['success' => 1, 'file' => ['url' => URL::to('/') . "/" . $name]], 200);
+        $path   = Image::read(file_get_contents($request->url));
+        $resize = $path->scaleDown(1024, 1024)->toWebp(100);
+        $path = "contentImages/" . Auth::user()->id . "/" . Str::random(40) . ".webp";
+        Storage::disk("public")->put($path, $resize);
+        return response()->json(['success' => 1, 'file' => ['url' => URL::to('/') . "/" . $path]], 200);
     }
 
 
@@ -62,7 +74,7 @@ class ContentController extends Controller
             // return 1;
             // $data = file_get_contents(public_path() . $request->file);
 
-            return response()->json(data: ['success' => true, 'url' => URL::to('/') .$request->file]);
+            return response()->json(data: ['success' => true, 'url' => URL::to('/') . $request->file]);
         } else {
             return response()->json(data: ['success' => false]);
         }
@@ -81,7 +93,7 @@ class ContentController extends Controller
             ]);
             $fileId = Content::create([
                 'tree_id' => $tree->id,
-                'accessibility' => $request->accessibility?:false,
+                'accessibility' => $request->accessibility ?: false,
                 'data' => $request->data,
             ]);
 

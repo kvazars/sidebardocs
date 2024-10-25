@@ -11,7 +11,8 @@ import ace, { edit } from "ace-builds";
 import "ace-builds/esm-resolver";
 import InlineCode from "@editorjs/inline-code";
 import AttachesTool from "@editorjs/attaches";
-
+import ImageGallery from "@kiberpro/editorjs-gallery";
+import Sortable from "sortablejs";
 import modeHTMLWorker from "ace-builds/src-noconflict/worker-html?url";
 import modeJSWorker from "ace-builds/src-noconflict/worker-javascript?url";
 import modePHPWorker from "ace-builds/src-noconflict/worker-php?url";
@@ -52,7 +53,7 @@ export default {
 						res.user_id != this.user.id &&
 						this.user.role != "admin"
 					) {
-						this.$router.push({ name: "NotFound" });
+						// this.$router.push({ name: "NotFound" });
 					}
 					this.pagetitle = res.name;
 					this.dataBlock = JSON.parse(res.content.data);
@@ -97,6 +98,13 @@ export default {
 								this.server
 							)[1];
 						}
+
+						if (el.type == "gallery") {
+							el.data.files.forEach((el) => {
+								el.url = el.url.split(this.server)[1];
+							});
+						}
+
 						if (el.type == "attaches") {
 							el.data.title = el.data.title
 								? el.data.title
@@ -143,6 +151,22 @@ export default {
 			editor = new EditorJS({
 				holder: "editorjs",
 				tools: {
+					gallery: {
+						class: ImageGallery,
+
+						config: {
+							sortableJs: Sortable,
+							additionalRequestHeaders: {
+								Authorization: `Bearer ${localStorage.getItem(
+									"token"
+								)}`,
+							},
+							endpoints: {
+								byFile: this.api + "saveImage",
+							},
+						},
+					},
+
 					quote: {
 						class: Quote,
 						inlineToolbar: true,
@@ -255,6 +279,7 @@ export default {
 							Text: "Параграф",
 							Heading: "Заголовок",
 							Image: "Изображение",
+							Gallery: "Галерея",
 							"Ace Code": "Код (JS, PHP, HTML, CSS)",
 							List: "Список",
 							Warning: "Примечание",
@@ -272,6 +297,11 @@ export default {
 							InlineCode: "Моноширинный",
 						},
 						tools: {
+							gallery: {
+								"Select an Image": "Выберите изображение",
+								Delete: "Удалить",
+								"Gallery caption": "Подпись",
+							},
 							list: {
 								Ordered: "Нумерованный",
 								Unordered: "Маркированный",
@@ -352,6 +382,13 @@ export default {
 						) {
 							element.data.file.url =
 								this.server + element.data.file.url;
+						}
+						if (
+							element.type == "gallery" 
+						){
+							element.data.files.forEach((el) => {
+								el.url = this.server+el.url;
+							});
 						}
 						editor.blocks.insert(element.type, element.data);
 					});

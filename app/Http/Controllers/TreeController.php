@@ -87,7 +87,7 @@ class TreeController extends Controller
             return response()->json(['success' => true, 'message' => 'Название папки изменено']);
         } else {
             $user = explode( "user_", $request->tree_id);
-            $user1 = count($user)>1?$user[1]:Tree::where('id', $request->tree_id)->first()->user_id;
+            $user1 = count($user)>1?$user[1]:($request->tree_id == 'new'?Auth::user()->id:Tree::where('id', $request->tree_id)->first()->user_id);
             Tree::create([
                 "name" => $request->name,
                 'tree_id' => $request->tree_id == 'new' || count($user)>1  ? null : $request->tree_id,
