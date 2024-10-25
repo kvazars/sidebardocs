@@ -20,6 +20,7 @@ ace.config.setModuleUrl("ace/mode/javascript_worker", modeJSWorker);
 ace.config.setModuleUrl("ace/mode/php_worker", modePHPWorker);
 import { computed } from "vue";
 import { useRouter } from "vue-router";
+import { useAuthIdStore } from "../stores/authId";
 
 let editor;
 export default {
@@ -40,9 +41,19 @@ export default {
 		"api",
 	],
 	mounted() {
+		if (!this.user.id) {
+			this.$router.push({ name: "Home" });
+		}
+
 		if (this.id) {
 			this.datasend("resource/" + this.id, "GET", {})
 				.then((res) => {
+					if (
+						res.user_id != this.user.id &&
+						this.user.role != "admin"
+					) {
+						this.$router.push({ name: "NotFound" });
+					}
 					this.pagetitle = res.name;
 					this.dataBlock = JSON.parse(res.content.data);
 					this.createEditor();
@@ -59,6 +70,7 @@ export default {
 			dataBlock: [],
 			pagetitle: "",
 			router: useRouter(),
+			user: useAuthIdStore(),
 			// server: ''
 		};
 	},
@@ -91,7 +103,6 @@ export default {
 								: "Скачать файл";
 						}
 					});
-					console.log(outputData.blocks);
 
 					form.append("data", JSON.stringify(outputData.blocks));
 					form.append("name", this.pagetitle ?? "");
@@ -339,10 +350,8 @@ export default {
 							element.type == "image" ||
 							element.type == "attaches"
 						) {
-							// console.log(element);
 							element.data.file.url =
 								this.server + element.data.file.url;
-							// console.log(element.data.file.url);
 						}
 						editor.blocks.insert(element.type, element.data);
 					});

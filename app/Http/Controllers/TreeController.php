@@ -41,32 +41,29 @@ class TreeController extends Controller
                 $tree = Tree::where("user_id", Auth::user()->id)->get();
                 break;
             case 'admin':
-                $tree = Tree::where("user_id", Auth::user()->id)->get();
+                // $c = Tree::->pluck('tree_id')->toArray();
+                //  if (count($c) > 0) {
+                // $all = array_merge($c, $this->uploadTree($c));
+                $tree = Tree::get();
+                $users = User::whereIn('id', $tree->pluck("user_id")->toArray())->get()->keyBy("id");
+                $userArray = [];
+                foreach ($users as $user) {
+                    $userArray[] = ['id' => "user_" . $user->id, 'name' => $user->name, 'type' => 'folder', 'tree_id' => null];
+                }
+                $new_collection = collect($tree)->map(function ($arr) use ($users) {
+                    $arr['tree_id'] = $arr['tree_id'] ?: "user_" . $users[$arr->user_id]['id'];
+                    return $arr;
+                });
+                $tree = array_merge($userArray, $new_collection->toArray());
+                // } else {
+                //     $tree = [];
+                // }
                 break;
             case 'user':
                 # code...
                 break;
         }
         return response()->json(['success' => true, 'user' => ["id" => Auth::user()->id, "name" => Auth::user()->name, "role" => $role], 'menu' => $tree]);
-
-        $c = Content::where('accessibility', true)->pluck('tree_id')->toArray();
-        if (count($c) > 0) {
-            $all = array_merge($c, $this->uploadTree($c));
-            $tree = Tree::whereIn('id', $all)->get();
-            $users = User::whereIn('id', $tree->pluck("user_id")->toArray())->get()->keyBy("id");
-            $userArray = [];
-            foreach ($users as $user) {
-                $userArray[] = ['id' => "user_" . $user->id, 'name' => $user->name, 'type' => 'folder', 'tree_id' => null];
-            }
-            $new_collection = collect($tree)->map(function ($arr) use ($users) {
-                $arr['tree_id'] = $arr['tree_id'] ?: "user_" . $users[$arr->user_id]['id'];
-                return $arr;
-            });
-            $tree = array_merge($userArray, $new_collection->toArray());
-            return response()->json(['success' => true, 'user' => ["id" => Auth::user()->id, "name" => Auth::user()->name, "role" => $role], 'menu' => $tree]);
-        } else {
-            return [];
-        }
     }
     protected $fatherChild = [];
     public function uploadTree($childTree)
@@ -89,10 +86,12 @@ class TreeController extends Controller
             Tree::find($request->id)->update(["name" => $request->name]);
             return response()->json(['success' => true, 'message' => 'Название папки изменено']);
         } else {
+            $user = explode( "user_", $request->tree_id);
+            $user1 = count($user)>1?$user[1]:Tree::where('id', $request->tree_id)->first()->user_id;
             Tree::create([
                 "name" => $request->name,
-                'tree_id' => $request->tree_id == 'new' ? null : $request->tree_id,
-                'user_id' => Auth::user()->id,
+                'tree_id' => $request->tree_id == 'new' || count($user)>1  ? null : $request->tree_id,
+                'user_id' => $user1,
                 'type' => 'folder',
             ]);
             return response()->json(['success' => true, 'message' => 'Новая папка успешно создана']);

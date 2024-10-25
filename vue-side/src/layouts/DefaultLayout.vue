@@ -51,20 +51,28 @@ export default {
 				requestOptions.body = JSON.stringify(object);
 			}
 
-			let response = await fetch(this.api + path, requestOptions);
-			if (response.status == 403 || response.status == 401) {
-				localStorage.removeItem("token");
-				this.auths.changeUser(null,null,null,null);
+			try {
+				let response = await fetch(this.api + path, requestOptions);
+				if (response.status == 403 || response.status == 401) {
+					this.logoutFun();
+				}
+				return await response.json();
+			} catch (error) {
+				this.$router.push({ name: "Page500" });
 			}
-			return await response.json();
 		},
 		catchError(error) {
-			// console.log(error, Object.keys.length);
 			for (let index = 0; index < Object.keys(error).length; index++) {
 				Object.values(error)[index].forEach((element) => {
 					this.showToast(false, element);
 				});
 			}
+		},
+		logoutFun() {
+			localStorage.removeItem("token");
+			this.auths.changeUser(null, null, null, null);
+			this.getMenu();
+			this.$router.push({ name: "Home" });
 		},
 		getMenu() {
 			this.datasend(
@@ -74,21 +82,15 @@ export default {
 			)
 				.then((res) => {
 					let menus = res.menu;
+
 					if (localStorage.getItem("token")) {
 						let user = res.user;
 						this.auths.changeUser(user.id, user.name, user.role);
 					}
-					// console.log(menus);
 
-					// let r = JSON.parse(a);
 					function menucreateparent() {
 						let rrr = [];
 						menus.forEach((e) => {
-							//console.log(e);
-							// let uNames = [];
-							// if (typeof $) {
-
-							// }
 							if (e.tree_id == null) {
 								e.title = e.name;
 								e.icon = "fa fa-folder";
@@ -177,7 +179,11 @@ export default {
 			:getMenu="getMenu"
 		/>
 		<div class="wrapper d-flex flex-column">
-			<AppHeader :openWindowFunction="openWindowFunction" />
+			<AppHeader
+				:openWindowFunction="openWindowFunction"
+				:datasend="datasend"
+				:logoutFun
+			/>
 			<div class="body flex-grow-1">
 				<CContainer class="px-4">
 					<router-view

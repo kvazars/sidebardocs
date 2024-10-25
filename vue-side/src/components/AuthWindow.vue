@@ -18,6 +18,9 @@
 						v-model="login"
 						name="folderName"
 						type="text"
+						v-on:keyup.enter="() => {
+							auth();
+						}"
 						placeholder="Логин"
 					/>
 				</div>
@@ -25,7 +28,10 @@
 					<CFormInput
 						v-model="password"
 						name="folderName"
-						type="text"
+						type="password"
+						v-on:keyup.enter="() => {
+							auth();
+						}"
 						placeholder="Пароль"
 					/>
 				</div>
@@ -82,7 +88,6 @@ export default {
 
 			this.datasend("auth", "POST", form)
 				.then((res) => {
-					console.log(res);
 					if (res.success) {
 						localStorage.setItem("token", res.token);
 						this.auths.changeUser(

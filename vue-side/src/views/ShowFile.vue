@@ -144,7 +144,10 @@
 					<li v-if="content">
 						<router-link
 							class="dropdown-item"
-							v-if="auths.id == content.tree.user_id"
+							v-if="
+								auths.id == content.tree.user_id ||
+								auths.role == 'admin'
+							"
 							:to="{ name: 'EditFile', params: { id: id } }"
 							>Редактировать
 							<i
@@ -154,7 +157,12 @@
 						></router-link>
 					</li>
 					<template v-if="content">
-						<li v-if="auths.id == content.tree.user_id">
+						<li
+							v-if="
+								auths.id == content.tree.user_id ||
+								auths.role == 'admin'
+							"
+						>
 							<hr class="dropdown-divider" />
 						</li>
 					</template>

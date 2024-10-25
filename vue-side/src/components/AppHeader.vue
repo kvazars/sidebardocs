@@ -5,14 +5,17 @@ import { useColorModes } from "@coreui/vue";
 import AppBreadcrumb from "@/components/AppBreadcrumb.vue";
 import { useSidebarStore } from "@/stores/sidebar.js";
 import { useAuthIdStore } from "../stores/authId";
+// import { useRouter } from "vue-router";
+
 const headerClassNames = ref("p-0");
 const { colorMode, setColorMode } = useColorModes(
 	"coreui-free-vue-admin-template-theme"
 );
 const sidebar = useSidebarStore();
 const auths = useAuthIdStore();
+// const router = useRouter();
 
-const props = defineProps(["openWindowFunction"]);
+const props = defineProps(["openWindowFunction", "datasend", "logoutFun"]);
 
 onMounted(() => {
 	document.addEventListener("scroll", () => {
@@ -25,9 +28,21 @@ onMounted(() => {
 });
 
 const modeTheme = ref(
-	localStorage.getItem("coreui-free-vue-admin-template-theme")
+	localStorage.getItem("coreui-free-vue-admin-template-theme") ?? "light"
 );
 
+function logout() {
+	props
+		.datasend("logout", "GET", {})
+		.then((res) => {
+			if (res.success) {
+				props.logoutFun();
+			}
+		})
+		.catch((error) => {
+			console.log(error);
+		});
+}
 </script>
 
 <template>
@@ -77,23 +92,36 @@ const modeTheme = ref(
 				<li class="nav-item py-1">
 					<div class="vr h-100 mx-2 text-body text-opacity-75"></div>
 				</li>
-				<CDropdown placement="bottom-end" variant="nav-item">
+				<div
+					style="padding: 0.2rem"
+					class="d-flex align-items-center justify-content-center"
+					v-if="!auths.id"
+				>
+					<div class="d-flex align-items-center">
+						<div
+							@click="openWindowFunction"
+							class="d-flex align-items-center"
+							component="button"
+							type="button"
+						>
+							<i class="fa fa-user"></i>
+						</div>
+					</div>
+				</div>
+				<CDropdown
+					placement="bottom-end"
+					variant="nav-item"
+					v-if="auths.id"
+				>
 					<CDropdownToggle class="pe-0" :caret="false">
 						<i class="fa fa-user"></i>
 					</CDropdownToggle>
 					<CDropdownMenu class="pt-0">
-						<CDropdownItem
-							@click="openWindowFunction"
-							v-if="!auths.id"
-						>
-							<i class="fa fa-lock"></i> Вход
-						</CDropdownItem>
 						<CDropdownItem v-if="auths.role == 'admin'">
 							<i class="fa fa-cog"></i> Управление
 						</CDropdownItem>
 
-						
-						<CDropdownItem v-if="auths.id">
+						<CDropdownItem v-if="auths.id" @click="logout">
 							<i class="fa fa-unlock"></i> Выход
 						</CDropdownItem>
 					</CDropdownMenu>
