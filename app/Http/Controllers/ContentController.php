@@ -80,7 +80,6 @@ class ContentController extends Controller
     {
         $fileId = null;
         if (isset($request->tree_id)) {
-            // return 1;
             $tr = Tree::find($request->tree_id);
             $tree = Tree::create([
                 'name' => $request->name,
@@ -99,13 +98,11 @@ class ContentController extends Controller
             $fileId = Content::where("tree_id", $request->id)->first();
 
             $fileId->update([
-                // 'name' => $request->name,
                 'accessibility' => false,
                 'data' => $request->data,
             ]);
             $tree->update([
                 'name' => $request->name,
-                // 'user_id' => 1,
             ]);
             return response()->json(['success' => true, 'message' => 'Данные файла обновлены', 'id' => $fileId->tree_id]);
         }
@@ -123,7 +120,6 @@ class ContentController extends Controller
 
     public function delResource($content)
     {
-        // return Tree::find($content->id);
         Tree::find($content)->delete();
         return response()->json(["success" => true, 'message' => 'Файл удален']);
     }
