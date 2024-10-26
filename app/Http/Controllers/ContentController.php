@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ResourceSaveRequest;
+use App\Http\Requests\UploadFileRequest;
 use App\Models\Available;
 use App\Models\Content;
 use App\Models\Group;
@@ -29,7 +30,7 @@ class ContentController extends Controller
             return response()->json(['success' => 1, 'file' => ['url' => URL::to('/') . "/" . $path]], 200);
         }
     }
-    public function saveFile(Request $request)
+    public function saveFile(UploadFileRequest $request)
     {
         $path = Storage::disk("public")->putFile("contentFiles/" . Auth::user()->id, $request->file('file'));
         return response()->json(['success' => 1, 'file' => ['url' => URL::to('/') . "/" . $path]], 200);

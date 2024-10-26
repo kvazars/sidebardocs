@@ -311,6 +311,8 @@ export default {
 								"Select an Image": "Выберите изображение",
 								Delete: "Удалить",
 								"Gallery caption": "Подпись",
+								Slider: "Слайдер",
+								Fit: "Галерея",
 							},
 							list: {
 								Ordered: "Нумерованный",

@@ -12,66 +12,68 @@
 				></p>
 
 				<div v-if="val.type == 'gallery'" class="my-4 py-4 border">
-					<div
-						:id="'carousel' + val.id"
-						class="carousel slide carousel-dark"
-						style="height: 400px"
-					>
-						<div class="carousel-indicators">
-							<button
-								v-for="(url, key) in val.data.files"
-								:key="key"
-								type="button"
-								data-coreui-target
-								:data-bs-target="'#carousel' + val.id"
-								:data-bs-slide-to="key"
-								:class="{ active: key == 0 }"
-								aria-current="true"
-							></button>
-						</div>
+					<div>
 						<div
-							class="carousel-inner"
-							style="height: 400px !important"
+							:id="'carousel' + val.id"
+							class="carousel slide carousel-dark"
+							style="height: 400px"
 						>
-							<div
-								class="carousel-item text-center"
-								v-for="(url, key) in val.data.files"
-								:key="key"
-								:class="{ active: key == 0 }"
-							>
-								<DataImage
-									:datasend="datasend"
-									class="mg-fluid"
-									:src="url.url"
-									style="max-height: 400px !important"
-									:alt="'slide' + key"
-								/>
+							<div class="carousel-indicators">
+								<button
+									v-for="(url, key) in val.data.files"
+									:key="key"
+									type="button"
+									data-coreui-target
+									:data-bs-target="'#carousel' + val.id"
+									:data-bs-slide-to="key"
+									:class="{ active: key == 0 }"
+									aria-current="true"
+								></button>
 							</div>
+							<div
+								class="carousel-inner"
+								style="height: 400px !important"
+							>
+								<div
+									class="carousel-item text-center"
+									v-for="(url, key) in val.data.files"
+									:key="key"
+									:class="{ active: key == 0 }"
+								>
+									<DataImage
+										:datasend="datasend"
+										class="mg-fluid"
+										:src="url.url"
+										style="max-height: 400px !important"
+										:alt="'slide' + key"
+									/>
+								</div>
+							</div>
+							<button
+								class="carousel-control-prev"
+								type="button"
+								:data-bs-target="'#carousel' + val.id"
+								data-bs-slide="prev"
+							>
+								<span
+									class="carousel-control-prev-icon"
+									aria-hidden="true"
+								></span>
+								<span class="visually-hidden">Previous</span>
+							</button>
+							<button
+								class="carousel-control-next"
+								type="button"
+								:data-bs-target="'#carousel' + val.id"
+								data-bs-slide="next"
+							>
+								<span
+									class="carousel-control-next-icon"
+									aria-hidden="true"
+								></span>
+								<span class="visually-hidden">Next</span>
+							</button>
 						</div>
-						<button
-							class="carousel-control-prev"
-							type="button"
-							:data-bs-target="'#carousel' + val.id"
-							data-bs-slide="prev"
-						>
-							<span
-								class="carousel-control-prev-icon"
-								aria-hidden="true"
-							></span>
-							<span class="visually-hidden">Previous</span>
-						</button>
-						<button
-							class="carousel-control-next"
-							type="button"
-							:data-bs-target="'#carousel' + val.id"
-							data-bs-slide="next"
-						>
-							<span
-								class="carousel-control-next-icon"
-								aria-hidden="true"
-							></span>
-							<span class="visually-hidden">Next</span>
-						</button>
 					</div>
 
 					<p
@@ -268,7 +270,6 @@ import { ExportToWord, ExportToPdf } from "vue-doc-exporter";
 import DataImage from "@/components/DataImage.vue";
 import DataFile from "@/components/DataFile.vue";
 import { useAuthIdStore } from "../stores/authId";
-
 export default {
 	components: { ExportToWord, ExportToPdf, DataImage, DataFile },
 	methods: {
