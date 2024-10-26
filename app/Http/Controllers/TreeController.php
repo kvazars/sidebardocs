@@ -44,9 +44,6 @@ class TreeController extends Controller
                 $tree = Tree::where("user_id", Auth::user()->id)->get();
                 break;
             case 'admin':
-                // $c = Tree::->pluck('tree_id')->toArray();
-                //  if (count($c) > 0) {
-                // $all = array_merge($c, $this->uploadTree($c));
                 $tree = Tree::get();
                 $users = User::whereIn('id', $tree->pluck("user_id")->toArray())->get()->keyBy("id");
                 $userArray = [];
@@ -58,9 +55,6 @@ class TreeController extends Controller
                     return $arr;
                 });
                 $tree = array_merge($userArray, $new_collection->toArray());
-                // } else {
-                //     $tree = [];
-                // }
                 break;
             case 'user':
                 $a = UserGroups::where("user_id", Auth::user()->id)->first("group_id");
@@ -91,12 +85,13 @@ class TreeController extends Controller
     {
         foreach ($childTree as $tr) {
             $trs = Tree::find($tr);
+            if($trs){
             if ($trs->tree_id) {
                 array_push($this->fatherChild, $trs->tree_id);
                 $this->uploadTree([$trs->tree_id]);
             } else {
                 array_push($this->fatherChild, 0);
-            }
+            }}
         }
         return $this->fatherChild;
     }

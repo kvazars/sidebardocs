@@ -42,34 +42,25 @@ export default {
 		"api",
 	],
 	mounted() {
-
 		if (this.id) {
-
 			this.datasend("resource/" + this.id, "GET", {})
 				.then((res) => {
-					console.log(res.content.tree.user_id, this.user.id);
-
+					if (this.user.role == "user") {
+						this.$router.push({ name: "NotFound" });
+					}
 					if (
-
-						this.user.role == 'user'
+						this.user.role == "ceo" &&
+						res.content.tree.user_id != this.user.id
 					) {
 						this.$router.push({ name: "NotFound" });
-
-					}
-					if (this.user.role == 'ceo' && res.content.tree.user_id != this.user.id) {
-						this.$router.push({ name: "NotFound" });
-
 					}
 
 					this.pagetitle = res.name;
 
-
-					this.accessibility = res.content.accessibility ? true : false;
+					this.accessibility = res.content.accessibility
+						? true
+						: false;
 					this.groupAvailables = res.groups;
-
-					console.log(res);
-					console.log(this.groupAvailables);
-
 
 					this.dataBlock = JSON.parse(res.content.data);
 					this.createEditor();
@@ -80,8 +71,6 @@ export default {
 		} else {
 			this.createEditor();
 		}
-
-
 	},
 	data() {
 		return {
@@ -91,20 +80,22 @@ export default {
 			user: useAuthIdStore(),
 			accessibility: false,
 			groupAvailables: [],
-			// server: ''
 		};
 	},
 	methods: {
 		deleteFile() {
-			this.datasend("resource/" + this.id, "DELETE", {})
-				.then((res) => {
-					if (res.success) {
-						this.getMenu();
-						this.showToast(res.success, res.message);
-						this.router.push({ name: "Home" });
-					}
-				})
-				.catch((error) => console.log(error));
+			if (!this.id) {
+				this.router.push({ name: "Home" });
+			} else {
+				this.datasend("resource/" + this.id, "DELETE", {})
+					.then((res) => {
+						if (res.success) {
+							this.getMenu();
+							this.showToast(res.success, res.message);
+						}
+					})
+					.catch((error) => console.log(error));
+			}
 		},
 		save() {
 			editor
@@ -121,8 +112,6 @@ export default {
 						if (el.type == "gallery") {
 							el.data.files.forEach((el) => {
 								el.url = el.url.split(this.server)[1];
-								//console.log(el.url);
-
 							});
 						}
 
@@ -136,9 +125,11 @@ export default {
 					form.append("data", JSON.stringify(outputData.blocks));
 					form.append("name", this.pagetitle ?? "");
 					form.append("accessibility", this.accessibility ? 1 : 0);
-					console.log(this.accessibility);
 
-					form.append('availables', JSON.stringify(this.groupAvailables));
+					form.append(
+						"availables",
+						JSON.stringify(this.groupAvailables)
+					);
 
 					if (this.parent) {
 						form.append("tree_id", this.parent);
@@ -149,17 +140,10 @@ export default {
 						.then((res) => {
 							if (res.success) {
 								this.getMenu();
-								// this.showToast(res.success, res.message);
 								this.router.push({
 									name: "ShowFile",
 									params: { id: res.id },
 								});
-								// setTimeout(() => {
-								// 	this.router.push({
-								// 		name: "ShowFile",
-								// 		params: { id: res.id },
-								// 	});
-								// }, 2000);
 							} else if (res.errors) {
 								this.catchError(res.errors);
 							}
@@ -409,9 +393,7 @@ export default {
 							element.data.file.url =
 								this.server + element.data.file.url;
 						}
-						if (
-							element.type == "gallery"
-						) {
+						if (element.type == "gallery") {
 							element.data.files.forEach((el) => {
 								el.url = this.server + el.url;
 							});
@@ -456,8 +438,13 @@ const aceConfig = {
 		<CCard class="mb-4">
 			<CCardHeader>Информация</CCardHeader>
 			<CCardBody>
-				<CFormInput type="text" id="exampleFormControlInput1" label="Название документа"
-					placeholder="Введите название документа" v-model="pagetitle" />
+				<CFormInput
+					type="text"
+					id="exampleFormControlInput1"
+					label="Название документа"
+					placeholder="Введите название документа"
+					v-model="pagetitle"
+				/>
 				<CAccordion class="mt-4">
 					<CAccordionItem :item-key="1">
 						<CAccordionHeader>
@@ -465,23 +452,41 @@ const aceConfig = {
 						</CAccordionHeader>
 						<CAccordionBody>
 							<div class="w-100 d-flex flex-column gap-3">
-								<div class="w-100 d-flex justify-content-center">
-
-									<CFormSwitch v-model="accessibility" label="Доступно всем" id="accessibility_for" />
+								<div
+									class="w-100 d-flex justify-content-center"
+								>
+									<CFormSwitch
+										v-model="accessibility"
+										label="Доступно всем"
+										id="accessibility_for"
+									/>
 								</div>
-								<div v-if="!accessibility" class="row w-100 px-2">
-
-									<div class="form-check col-lg-2" v-for="(item, key) in groupAvailables" :key="key">
-										<input class="form-check-input" type="checkbox" :value="'group_' + item.id"
-											:id="'group_' + item.id" v-model="item.checked">
-										<label style="user-select: none;" class="form-check-label"
-											:for="'group_' + item.id">
+								<div
+									v-if="!accessibility"
+									class="row w-100 px-2"
+								>
+									<div
+										class="form-check col-lg-2"
+										v-for="(item, key) in groupAvailables"
+										:key="key"
+									>
+										<input
+											class="form-check-input"
+											type="checkbox"
+											:value="'group_' + item.id"
+											:id="'group_' + item.id"
+											v-model="item.checked"
+										/>
+										<label
+											style="user-select: none"
+											class="form-check-label"
+											:for="'group_' + item.id"
+										>
 											{{ item.name }}
 										</label>
 									</div>
 								</div>
 							</div>
-
 						</CAccordionBody>
 					</CAccordionItem>
 				</CAccordion>
@@ -495,8 +500,12 @@ const aceConfig = {
 		</CCard>
 		<div class="position-fixed squared">
 			<div class="dropdown">
-				<button class="btn btn-primary border-end-0 rounded-0 rounded-start" type="button"
-					data-bs-toggle="dropdown" aria-expanded="false">
+				<button
+					class="btn btn-primary border-end-0 rounded-0 rounded-start"
+					type="button"
+					data-bs-toggle="dropdown"
+					aria-expanded="false"
+				>
 					<i class="fa fa-cog"></i>
 				</button>
 				<ul class="dropdown-menu">

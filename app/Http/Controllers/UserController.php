@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    public function reg(RegistrationRequest $request)
+    public function store(RegistrationRequest $request)
     {
 
         if ($request->role == 'user') {
@@ -53,7 +53,6 @@ class UserController extends Controller
 
     public function logout(Request $request)
     {
-        // $user = User::find(Auth::user()->id);
         $request->user()->currentAccessToken()->delete();
         return response()->json(["success" => true]);
     }
