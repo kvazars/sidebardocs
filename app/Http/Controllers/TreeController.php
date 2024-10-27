@@ -35,6 +35,35 @@ class TreeController extends Controller
             return [];
         }
     }
+    public function upanddown($operation, Tree $id)
+    {
+        $trees = Tree::where("tree_id", $id->tree_id)->get()->sortBy("position")->sortBy("id");
+        $ids = null;
+        $pos = null;
+        foreach ($trees as $num => $tr) {
+            if ($id->id == $tr->id) {
+                $newPosition = $operation == 'up' ? $num + 1 : $num - 1;
+                $newPosition = $newPosition < 0 ? 0 : ($newPosition >= count($trees) ? count($trees) - 1 : $newPosition);
+                $tr->position = $newPosition;
+                $tr->save();
+                $elem = isset($trees[$operation == 'up' ? $num + 1 : $num - 1]);
+                if ($elem) {
+                    $ids = $trees[$operation == 'up' ? $num + 1 : $num - 1]->id;
+                    $pos = $num;
+                }
+            } else {
+                if ($tr->id != $ids) {
+                    $tr->position = $num;
+                    $tr->save();
+                }
+            }
+        }
+        if ($ids) {
+            Tree::find($ids)->update(["position" => $pos]);
+        }
+
+        return response()->json(['success' => true, 'message' => "Успешно перемещено"]);
+    }
     public function userFolder()
     {
         $role = Auth::user()->role;
@@ -60,7 +89,7 @@ class TreeController extends Controller
                 $a = UserGroups::where("user_id", Auth::user()->id)->first("group_id");
                 $c = Available::where('group_id', $a->group_id)->pluck('tree_id')->toArray();
                 $cd = Content::where('accessibility', true)->pluck('tree_id')->toArray();
-                $c = array_merge($c,$cd);
+                $c = array_merge($c, $cd);
 
                 if (count($c) > 0) {
                     $all = array_merge($c, $this->uploadTree($c));
@@ -85,13 +114,14 @@ class TreeController extends Controller
     {
         foreach ($childTree as $tr) {
             $trs = Tree::find($tr);
-            if($trs){
-            if ($trs->tree_id) {
-                array_push($this->fatherChild, $trs->tree_id);
-                $this->uploadTree([$trs->tree_id]);
-            } else {
-                array_push($this->fatherChild, 0);
-            }}
+            if ($trs) {
+                if ($trs->tree_id) {
+                    array_push($this->fatherChild, $trs->tree_id);
+                    $this->uploadTree([$trs->tree_id]);
+                } else {
+                    array_push($this->fatherChild, 0);
+                }
+            }
         }
         return $this->fatherChild;
     }
@@ -106,10 +136,16 @@ class TreeController extends Controller
         } else {
             $user = explode("user_", $request->tree_id);
             $user1 = count($user) > 1 ? $user[1] : ($request->tree_id == 'new' ? Auth::user()->id : Tree::where('id', $request->tree_id)->first()->user_id);
+            //    return $request->tree_id;
+            $position = Tree::where("tree_id", $request->tree_id == 'new' ? null : $request->tree_id)->count();
+            // return $position;
+            // $position = Tree::whereIn("tree_id",$position)->count();
+
             Tree::create([
                 "name" => $request->name,
                 'tree_id' => $request->tree_id == 'new' || count($user) > 1  ? null : $request->tree_id,
                 'user_id' => $user1,
+                'position' => $position,
                 'type' => 'folder',
             ]);
             return response()->json(['success' => true, 'message' => 'Новая папка успешно создана']);

@@ -23,6 +23,7 @@ class TreeStoreRequest extends FormRequest
     {
         return [
             'name' => 'required|string|min:3',
+            'id'=>'exists:trees,id',
         ];
     }
 }

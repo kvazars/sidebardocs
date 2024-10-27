@@ -16,6 +16,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->foreignId('tree_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->tinyInteger('position')->default(0);
             $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->enum('type', ['folder', 'file'])->default('file');
             $table->softDeletes();

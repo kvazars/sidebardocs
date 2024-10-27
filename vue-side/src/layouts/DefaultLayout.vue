@@ -122,7 +122,7 @@ export default {
 								rrr.push(e);
 							}
 						});
-
+						rrr.sort((f, s) => f.position - s.position);
 						return rrr;
 					}
 

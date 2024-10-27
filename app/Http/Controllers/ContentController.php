@@ -72,10 +72,13 @@ class ContentController extends Controller
         $fileId = null;
         if (isset($request->tree_id)) {
             $tr = Tree::find($request->tree_id);
+            $position = Tree::where("tree_id",$tr->id)->count();
+            
             $tree = Tree::create([
                 'name' => $request->name,
                 'tree_id' => $request->tree_id,
                 'user_id' => $tr->user_id,
+                'position'=>$position,
             ]);
             $fileId = Content::create([
                 'tree_id' => $tree->id,

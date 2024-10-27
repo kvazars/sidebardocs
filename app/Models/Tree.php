@@ -14,6 +14,7 @@ class Tree extends Model
         "tree_id",
         "user_id",
         "type",
+        "position",
     ];
     public function child() {
         return $this->hasMany(Content::class);

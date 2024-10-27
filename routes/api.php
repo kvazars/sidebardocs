@@ -26,6 +26,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete("/folder/{del}", [TreeController::class, "delete"]);
     Route::delete("/resourcedel/{content}", [ContentController::class, "delResource"]);
     Route::post("/folder", [TreeController::class, "store"]);
+    Route::post("/doc/{operation}/{id}", [TreeController::class, "upanddown"]);
     //admin
     Route::post("/user", [UserController::class, "store"]);
     Route::put("/user/{id}", [UserController::class, "update"]);

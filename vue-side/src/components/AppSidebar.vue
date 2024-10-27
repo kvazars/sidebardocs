@@ -7,19 +7,44 @@ import { useAuthIdStore } from "../stores/authId";
 export default {
 	components: { SidebarNav, ContextMenu },
 	props: ["menu", "datasend", "getMenu", "showToast", "catchError"],
+
 	data() {
 		return {
 			folderTitle: "",
 			auths: useAuthIdStore(),
 			contextMenuActionsFolder: [
-				{ label: "Редактировать", action: "editFolder" },
-				{ label: "Создать папку", action: "newFolder" },
-				{ label: "Создать ресурс", action: "newFile" },
-				{ label: "Удалить папку", action: "deleteFolder" },
+				{
+					label: "Переименовать",
+					action: "editFolder",
+					icon: "pencil",
+				},
+				{
+					label: "Создать дочернюю папку",
+					action: "newFolder",
+					icon: "folder-open",
+				},
+				{
+					label: "Переместить ниже",
+					action: "updoc",
+					icon: "level-down",
+				},
+				{ label: "Выше", action: "downdoc", icon: "level-up" },
+				{
+					label: "Создать ресурс",
+					action: "newFile",
+					icon: "file-text",
+				},
+				{
+					label: "Удалить папку",
+					action: "deleteFolder",
+					icon: "trash",
+				},
 			],
 			contextMenuActionsFile: [
-				{ label: "Редактировать", action: "editFile" },
-				{ label: "Удалить", action: "deleteFile" },
+				{ label: "Редактировать", action: "editFile", icon: "pencil" },
+				{ label: "Ниже", action: "updoc", icon: "level-down" },
+				{ label: "Выше", action: "downdoc", icon: "level-up" },
+				{ label: "Удалить", action: "deleteFile", icon: "trash" },
 			],
 			visibleModalFolder: false,
 			sidebar: useSidebarStore(),
@@ -75,6 +100,22 @@ export default {
 		newFile(id) {
 			this.$router.push({ name: "CreateFile", params: { parent: id } });
 		},
+		updoc(id) {
+			this.datasend("doc/up/" + id, "POST", {})
+				.then((res) => {
+					this.showToast(res.success, res.message);
+					this.getMenu();
+				})
+				.catch((error) => console.log(error));
+		},
+		downdoc(id) {
+			this.datasend("doc/down/" + id, "POST", {})
+				.then((res) => {
+					this.showToast(res.success, res.message);
+					this.getMenu();
+				})
+				.catch((error) => console.log(error));
+		},
 		deleteFolder(id) {
 			this.datasend("folder/" + id, "DELETE", {})
 				.then((res) => {
@@ -108,6 +149,10 @@ export default {
 				this.newFile(this.treeId);
 			} else if (action == "deleteFolder") {
 				this.deleteFolder(this.treeId);
+			} else if (action == "updoc") {
+				this.updoc(this.treeId);
+			} else if (action == "downdoc") {
+				this.downdoc(this.treeId);
 			} else if (action == "editFile") {
 				this.$router.push({
 					name: "EditFile",
