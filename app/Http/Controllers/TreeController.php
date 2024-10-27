@@ -38,28 +38,36 @@ class TreeController extends Controller
     public function upanddown($operation, Tree $id)
     {
         $trees = Tree::where("tree_id", $id->tree_id)->get()->sortBy("position")->sortBy("id");
-        $ids = null;
-        $pos = null;
+        $idNext = null;
+        // $posNew = null;
+        $treD = [];
+        $newPosition = null;
+
         foreach ($trees as $num => $tr) {
-            if ($id->id == $tr->id) {
+
+            if ($id->id == $tr->id && !in_array($tr->id, $treD)) {
                 $newPosition = $operation == 'up' ? $num + 1 : $num - 1;
                 $newPosition = $newPosition < 0 ? 0 : ($newPosition >= count($trees) ? count($trees) - 1 : $newPosition);
+
                 $tr->position = $newPosition;
                 $tr->save();
-                $elem = isset($trees[$operation == 'up' ? $num + 1 : $num - 1]);
+                $idNext = $operation == 'up' ? $num + 1 : $num - 1;
+                // return $trees[$idNext];
+                $elem = isset($trees[$idNext]);
+                // return $num;
                 if ($elem) {
-                    $ids = $trees[$operation == 'up' ? $num + 1 : $num - 1]->id;
-                    $pos = $num;
-                }
-            } else {
-                if ($tr->id != $ids) {
-                    $tr->position = $num;
-                    $tr->save();
+                    $idNext = $trees[$idNext]->id;
+                    Tree::find($idNext)->update(["position" => $num]);
+
+                    $treD[] = $tr->id;
                 }
             }
-        }
-        if ($ids) {
-            Tree::find($ids)->update(["position" => $pos]);
+
+            if (!in_array($tr->id, $treD)) {
+                $treD[] = $tr->id;
+                $tr->position = $num;
+                $tr->save();
+            }
         }
 
         return response()->json(['success' => true, 'message' => "Успешно перемещено"]);
