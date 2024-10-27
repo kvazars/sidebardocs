@@ -12,7 +12,7 @@
 				></p>
 
 				<div v-if="val.type == 'gallery'" class="my-4 py-4 border">
-					<div>
+					<div v-if="val.data.style == 'slider'">
 						<div
 							:id="'carousel' + val.id"
 							class="carousel slide carousel-dark"
@@ -36,14 +36,14 @@
 							>
 								<div
 									class="carousel-item text-center"
-									v-for="(url, key) in val.data.files"
+									v-for="(url, key) in imgs[val.id]"
 									:key="key"
 									:class="{ active: key == 0 }"
 								>
-									<DataImage
-										:datasend="datasend"
-										class="mg-fluid"
-										:src="url.url"
+									<img
+										:src="url"
+										alt=""
+										class="img-fluid"
 										style="max-height: 400px !important"
 										:alt="'slide' + key"
 									/>
@@ -75,7 +75,28 @@
 							</button>
 						</div>
 					</div>
+					<div v-else class="row">
+						<div
+							v-for="(url, key) in imgs[val.id]"
+							:key="key"
+							class="pic col-lg-3 col-md-4 col-6 mb-4"
+						>
+							
+							<img
+								:src="url"
+								class="img-fluid  h-100 d-block img-thumbnail"
+								@click="() => showImg(val.id, key)" />
+							
+							
+						</div>
+					</div>
 
+					<vue-easy-lightbox
+						:visible="visibleRef[val.id]"
+						:imgs="imgs[val.id]"
+						:index="indexRef[val.id]"
+						@hide="onHide(val.id)"
+					></vue-easy-lightbox>
 					<p
 						v-html="val.data.caption"
 						class="text-center fst-italic"
@@ -100,10 +121,10 @@
 						editorImageBlockBackground: val.data.withBackground,
 					}"
 				>
-					<DataImage
-						:datasend="datasend"
+					<img
+						:src="imgs[val.id]"
+						alt=""
 						class="editorImage text-center"
-						:src="val.data.file.url"
 					/>
 
 					<p
@@ -113,11 +134,12 @@
 				</div>
 
 				<div v-if="val.type == 'attaches'" class="my-4">
-					<DataFile
-						:datasend="datasend"
-						:src="val.data.file.url"
-						:title="val.data.title"
-					/>
+					<span>
+						<i class="fa fa-file"></i>&nbsp;
+						<a :href="imgs[val.id].url" download>{{
+							imgs[val.id].title
+						}}</a></span
+					>
 				</div>
 
 				<div
@@ -267,11 +289,16 @@
 <script>
 import jsPDF from "jspdf";
 import { ExportToWord, ExportToPdf } from "vue-doc-exporter";
-import DataImage from "@/components/DataImage.vue";
-import DataFile from "@/components/DataFile.vue";
 import { useAuthIdStore } from "../stores/authId";
+
+import VueEasyLightbox from "vue-easy-lightbox";
+
 export default {
-	components: { ExportToWord, ExportToPdf, DataImage, DataFile },
+	components: {
+		ExportToWord,
+		ExportToPdf,
+		VueEasyLightbox,
+	},
 	methods: {
 		html2doc() {
 			let els = document.querySelector("#file").innerHTML;
@@ -304,8 +331,27 @@ export default {
 			}
 			document.body.removeChild(downloadLink);
 		},
+		showImg(ref, index) {
+			this.indexRef[ref] = index;
+			this.visibleRef[ref] = true;
+		},
+		onHide(ref) {
+			this.visibleRef[ref] = false;
+		},
 	},
-	props: ["id", "datasend", "showToast"],
+	props: ["id", "datasend", "showToast", "server"],
+	data() {
+		return {
+			pagetitle: null,
+			auths: useAuthIdStore(),
+			fileData: [],
+			content: null,
+			visibleRef: {},
+			indexRef: {},
+			imgs: {},
+		};
+	},
+
 	mounted() {
 		this.datasend("resource/" + this.id, "GET", {})
 			.then((res) => {
@@ -319,6 +365,26 @@ export default {
 				} else {
 					this.pagetitle = res.name;
 					this.fileData = JSON.parse(res.content.data);
+					this.fileData.forEach((el) => {
+						if (el.type == "gallery") {
+							this.imgs[el.id] = [];
+							this.visibleRef[el.id] = false;
+							this.indexRef[el.id] = 0;
+							el.data.files.forEach((els) => {
+								this.imgs[el.id].push(this.server + els.url);
+							});
+						}
+						if (el.type == "image") {
+							this.imgs[el.id] = this.server + el.data.file.url;
+						}
+						if (el.type == "attaches") {
+							this.imgs[el.id] = {
+								url: this.server + el.data.file.url,
+								title: el.data.title,
+							};
+						}
+					});
+
 					this.content = res.content;
 					if (document.querySelector(".sidebar.sidebar-fixed")) {
 						document
@@ -328,15 +394,6 @@ export default {
 				}
 			})
 			.catch();
-	},
-
-	data() {
-		return {
-			pagetitle: null,
-			auths: useAuthIdStore(),
-			fileData: [],
-			content: null,
-		};
 	},
 };
 </script>
