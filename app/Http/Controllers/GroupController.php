@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CreateGroupRequest;
 use App\Http\Resources\GetGroupsResource;
 use App\Models\Group;
 use Illuminate\Http\Request;
@@ -19,17 +20,14 @@ class GroupController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function store(CreateGroupRequest $request)
     {
-        //
-    }
+        Group::create([
+            'name' => $request->name,
+            'description' => '',
+        ]);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
+        return response()->json(['success' => true, 'message' => 'Группа создана']);
     }
 
     /**

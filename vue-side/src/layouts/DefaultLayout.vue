@@ -134,9 +134,9 @@ export default {
 		},
 		transformItems(items) {
 			let it = items.map((item) => {
-				if (item.type == "folder" && item.child.length == 0) {
-					item.child = [{}];
-				}
+				// if (item.type == "folder" && item.child.length == 0) {
+				// 	item.child = [{}];
+				// }
 
 				return {
 					...item,

@@ -5,7 +5,7 @@ import { useColorModes } from "@coreui/vue";
 import AppBreadcrumb from "@/components/AppBreadcrumb.vue";
 import { useSidebarStore } from "@/stores/sidebar.js";
 import { useAuthIdStore } from "../stores/authId";
-// import { useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 
 const headerClassNames = ref("p-0");
 const { colorMode, setColorMode } = useColorModes(
@@ -13,7 +13,7 @@ const { colorMode, setColorMode } = useColorModes(
 );
 const sidebar = useSidebarStore();
 const auths = useAuthIdStore();
-// const router = useRouter();
+const router = useRouter();
 
 const props = defineProps(["openWindowFunction", "datasend", "logoutFun"]);
 
@@ -43,32 +43,52 @@ function logout() {
 			console.log(error);
 		});
 }
+
+function goToAdmin() {
+	router.push({name: 'admin'})
+}
 </script>
 
 <template>
 	<CHeader position="sticky" :class="headerClassNames">
 		<CContainer class="border-bottom px-4" fluid>
-			<CHeaderToggler @click="sidebar.toggleVisible()" style="margin-inline-start: -14px">
+			<CHeaderToggler
+				@click="sidebar.toggleVisible()"
+				style="margin-inline-start: -14px"
+			>
 				<i class="fa fa-bars" aria-hidden="true"></i>
 			</CHeaderToggler>
 			<CHeaderNav>
 				<li class="nav-item py-1">
 					<div class="vr h-100 mx-2 text-body text-opacity-75"></div>
 				</li>
-				<li class="nav-item d-flex align-items-center justify-content-center">
-
-					<div v-if="modeTheme == 'light'" :active="colorMode === 'light'" class="d-flex align-items-center"
-						component="button" type="button" @click="
+				<li
+					class="nav-item d-flex align-items-center justify-content-center"
+				>
+					<div
+						v-if="modeTheme == 'light'"
+						:active="colorMode === 'light'"
+						class="d-flex align-items-center"
+						component="button"
+						type="button"
+						@click="
 							setColorMode('dark');
-						modeTheme = 'dark';
-						">
+							modeTheme = 'dark';
+						"
+					>
 						<i class="fa fa-sun-o"></i>
 					</div>
-					<div v-if="modeTheme == 'dark'" :active="colorMode === 'dark'" class="d-flex align-items-center"
-						component="button" type="button" @click="
+					<div
+						v-if="modeTheme == 'dark'"
+						:active="colorMode === 'dark'"
+						class="d-flex align-items-center"
+						component="button"
+						type="button"
+						@click="
 							setColorMode('light');
-						modeTheme = 'light';
-						">
+							modeTheme = 'light';
+						"
+					>
 						<i class="fa fa-moon-o"></i>
 					</div>
 				</li>
@@ -76,21 +96,32 @@ function logout() {
 				<li class="nav-item py-1">
 					<div class="vr h-100 mx-2 text-body text-opacity-75"></div>
 				</li>
-				<li v-if="!auths.id" class="nav-item d-flex align-items-center justify-content-center">
+				<li
+					v-if="!auths.id"
+					class="nav-item d-flex align-items-center justify-content-center"
+				>
 					<div class="d-flex align-items-center">
-						<div @click="openWindowFunction" class="ps-1 d-flex align-items-center" component="button"
-							type="button">
+						<div
+							@click="openWindowFunction"
+							class="ps-1 d-flex align-items-center"
+							component="button"
+							type="button"
+						>
 							<i class="fa fa-user"></i>
 						</div>
 					</div>
 				</li>
 				<li>
-					<CDropdown placement="bottom-end" variant="nav-item" v-if="auths.id">
+					<CDropdown
+						placement="bottom-end"
+						variant="nav-item"
+						v-if="auths.id"
+					>
 						<CDropdownToggle class="pe-0" :caret="false">
 							<i class="fa fa-user"></i>
 						</CDropdownToggle>
 						<CDropdownMenu>
-							<CDropdownItem v-if="auths.role == 'admin'">
+							<CDropdownItem @click="goToAdmin" v-if="auths.role == 'admin'">
 								<i class="fa fa-cog"></i> Управление
 							</CDropdownItem>
 
@@ -100,7 +131,6 @@ function logout() {
 						</CDropdownMenu>
 					</CDropdown>
 				</li>
-
 			</CHeaderNav>
 		</CContainer>
 		<CContainer class="px-4" fluid>
