@@ -32,7 +32,6 @@ class GroupController extends Controller
     {
         Group::create([
             'name' => $request->name,
-            'description' => '',
         ]);
 
         return response()->json(['success' => true, 'message' => 'Группа создана']);
