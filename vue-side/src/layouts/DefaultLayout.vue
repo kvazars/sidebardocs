@@ -82,10 +82,8 @@ export default {
 				{}
 			)
 				.then((res) => {
-					console.log(res);
-					
+					// console.log(res);					
 					let menus = res.menu;
-
 					if (localStorage.getItem("token")) {
 						let user = res.user;
 						this.auths.changeUser(user.id, user.name, user.role);
@@ -103,6 +101,7 @@ export default {
 								e.tree_id = 0;
 							}
 						});
+						rrr.sort((f, s) => f.position - s.position);
 						return rrr;
 					}
 
@@ -185,7 +184,7 @@ export default {
 			<AppHeader
 				:openWindowFunction="openWindowFunction"
 				:datasend="datasend"
-				:logoutFun
+				:logoutFun="logoutFun"
 			/>
 			<div class="body flex-grow-1">
 				<CContainer class="px-4">

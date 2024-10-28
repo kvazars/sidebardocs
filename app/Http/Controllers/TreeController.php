@@ -37,9 +37,8 @@ class TreeController extends Controller
     }
     public function upanddown($operation, Tree $id)
     {
-        $trees = Tree::where("tree_id", $id->tree_id)->get()->sortBy("position")->sortBy("id");
-        $idNext = null;
-        // $posNew = null;
+        $trees = Tree::where("tree_id", $id->tree_id)->where("user_id",$id->user_id)->orderBy("position")->orderBy("id")->get();
+        
         $treD = [];
         $newPosition = null;
 
@@ -52,23 +51,21 @@ class TreeController extends Controller
                 $tr->position = $newPosition;
                 $tr->save();
                 $idNext = $operation == 'up' ? $num + 1 : $num - 1;
-                // return $trees[$idNext];
                 $elem = isset($trees[$idNext]);
-                // return $num;
                 if ($elem) {
                     $idNext = $trees[$idNext]->id;
                     Tree::find($idNext)->update(["position" => $num]);
-
                     $treD[] = $tr->id;
                 }
             }
-
             if (!in_array($tr->id, $treD)) {
                 $treD[] = $tr->id;
                 $tr->position = $num;
                 $tr->save();
             }
         }
+        
+   
 
         return response()->json(['success' => true, 'message' => "Успешно перемещено"]);
     }
