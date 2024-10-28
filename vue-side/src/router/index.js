@@ -43,9 +43,10 @@ const routes = [
 				component: () => import("@/views/pages/Page500"),
 			},
 			{
-				path: "login",
-				name: "Login",
-				component: () => import("@/views/pages/Login"),
+				path: "admin",
+				name: "admin",
+				meta: { title: "Управление" },
+				component: () => import("@/views/AdminPanel"),
 			},
 		],
 	},

@@ -37,8 +37,8 @@ class TreeController extends Controller
     }
     public function upanddown($operation, Tree $id)
     {
-        $trees = Tree::where("tree_id", $id->tree_id)->where("user_id",$id->user_id)->orderBy("position")->orderBy("id")->get();
-        
+        $trees = Tree::where("tree_id", $id->tree_id)->where("user_id", $id->user_id)->orderBy("position")->orderBy("id")->get();
+
         $treD = [];
         $newPosition = null;
 
@@ -64,8 +64,8 @@ class TreeController extends Controller
                 $tr->save();
             }
         }
-        
-   
+
+
 
         return response()->json(['success' => true, 'message' => "Успешно перемещено"]);
     }
@@ -92,7 +92,10 @@ class TreeController extends Controller
                 break;
             case 'user':
                 $a = UserGroups::where("user_id", Auth::user()->id)->first("group_id");
-                $c = Available::where('group_id', $a->group_id)->pluck('tree_id')->toArray();
+                $c = [];
+                if ($a) {
+                    $c = Available::where('group_id', $a->group_id)->pluck('tree_id')->toArray();
+                }
                 $cd = Content::where('accessibility', true)->pluck('tree_id')->toArray();
                 $c = array_merge($c, $cd);
 

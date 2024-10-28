@@ -19,22 +19,26 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get("/userFolder", [TreeController::class, "userFolder"]);
     Route::get('/logout', [UserController::class, 'logout']);
     //admin,ceo
-    Route::post("/resource", [ContentController::class, "saveResource"]);
-    Route::post("/saveImageByUrl", [ContentController::class, "saveImageByUrl"]);
-    Route::post("/saveImage", [ContentController::class, "saveImage"]);
-    Route::post("/saveFile", [ContentController::class, "saveFile"]);
-    Route::delete("/folder/{del}", [TreeController::class, "delete"]);
-    Route::delete("/resourcedel/{content}", [ContentController::class, "delResource"]);
-    Route::post("/folder", [TreeController::class, "store"]);
-    Route::post("/doc/{operation}/{id}", [TreeController::class, "upanddown"]);
-    //admin
-    Route::post("/user", [UserController::class, "store"]);
-    Route::put("/user/{id}", [UserController::class, "update"]);
-    Route::delete("/user/{id}", [UserController::class, "delete"]);
-    Route::get("/user", [UserController::class, "index"]);
-    Route::get("/group", [GroupController::class, "index"]);
-    Route::post("/group", [GroupController::class, "store"]);
-    Route::put("/group/{id}", [GroupController::class, "update"]);
-    Route::delete("/group/{id}", [GroupController::class, "delete"]);  
+    Route::middleware(["role:admin|ceo"])->group(function () {
+        Route::post("/resource", [ContentController::class, "saveResource"]);
+        Route::post("/saveImageByUrl", [ContentController::class, "saveImageByUrl"]);
+        Route::post("/saveImage", [ContentController::class, "saveImage"]);
+        Route::post("/saveFile", [ContentController::class, "saveFile"]);
+        Route::delete("/folder/{del}", [TreeController::class, "delete"]);
+        Route::delete("/resourcedel/{content}", [ContentController::class, "delResource"]);
+        Route::post("/folder", [TreeController::class, "store"]);
+        Route::post("/doc/{operation}/{id}", [TreeController::class, "upanddown"]);
+    });
 
+    //admin
+    Route::middleware(["role:admin"])->group(function () {
+        Route::post("/user", [UserController::class, "store"]);
+        Route::put("/user/{id}", [UserController::class, "update"]);
+        Route::delete("/user/{id}", [UserController::class, "delete"]);
+        Route::get("/user", [UserController::class, "index"]);
+        Route::get("/group", [GroupController::class, "index"]);
+        Route::post("/group", [GroupController::class, "store"]);
+        Route::put("/group/{id}", [GroupController::class, "update"]);
+        Route::delete("/group/{id}", [GroupController::class, "delete"]);
+    });
 });

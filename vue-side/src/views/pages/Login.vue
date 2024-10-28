@@ -13,20 +13,13 @@
                     <CInputGroupText>
                       <CIcon icon="cil-user" />
                     </CInputGroupText>
-                    <CFormInput
-                      placeholder="Username"
-                      autocomplete="username"
-                    />
+                    <CFormInput placeholder="Username" autocomplete="username" />
                   </CInputGroup>
                   <CInputGroup class="mb-4">
                     <CInputGroupText>
                       <CIcon icon="cil-lock-locked" />
                     </CInputGroupText>
-                    <CFormInput
-                      type="password"
-                      placeholder="Password"
-                      autocomplete="current-password"
-                    />
+                    <CFormInput type="password" placeholder="Password" autocomplete="current-password" />
                   </CInputGroup>
                   <CRow>
                     <CCol :xs="6">
@@ -62,3 +55,18 @@
     </CContainer>
   </div>
 </template>
+
+<script>
+export default {
+  props: ['datasend'],
+
+  mounted() {
+    this.datasend('group', 'GET', {}).then(res => {
+      console.log(res);
+
+    }).catch(error => {
+      console.log(error);
+    });
+  },
+}
+</script>
