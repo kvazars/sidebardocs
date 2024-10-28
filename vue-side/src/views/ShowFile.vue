@@ -11,7 +11,7 @@
 					class="my-4"
 				></p>
 
-				<div v-if="val.type == 'gallery'" class="my-4 py-4 border">
+				<div v-if="val.type == 'gallery'" class="my-4 p-2 border">
 					<div v-if="val.data.style == 'slider'">
 						<div
 							:id="'carousel' + val.id"
@@ -42,7 +42,6 @@
 								>
 									<img
 										:src="url"
-										alt=""
 										class="img-fluid"
 										style="max-height: 400px !important"
 										:alt="'slide' + key"

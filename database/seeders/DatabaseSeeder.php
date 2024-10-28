@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\About;
 use App\Models\Content;
 use App\Models\Tree;
 use App\Models\User;
@@ -15,7 +16,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
 
         User::create([
             'name' => 'admin',
@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
             'role'=>'admin'
         ]);
         User::create([
-            'name' => 'Иванов С.С.',
+            'name' => fake()->fullname(),
             'login' => 'ivanov',
             'password' => 'ivanov',
             'role'=>'ceo'
@@ -43,6 +43,10 @@ class DatabaseSeeder extends Seeder
         Content::create([
             'tree_id' => 2,
             'accessibility' => 1,
+        ]);
+        About::create([
+            'name'=>fake()->paragraph(),
+            'logo'=>'notfound.webp',
         ]);
     }
 }

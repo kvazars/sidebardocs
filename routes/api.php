@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AvailableController;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\GroupController;
