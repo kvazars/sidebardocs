@@ -162,9 +162,19 @@
 
 <script>
 export default {
+    props: ['datasend'],
     data() {
         return {
             role: 'user',
+            userList: null,
+        }
+    },
+    mounted() {
+
+    },
+    methods: {
+        getList() {
+            this.datasend().then().catch();
         }
     },
 };
