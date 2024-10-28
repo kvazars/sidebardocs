@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateGroupRequest;
+use App\Http\Requests\GroupsUpdateRequest;
 use App\Http\Resources\GetGroupsResource;
+use App\Models\About;
 use App\Models\Group;
+use App\Models\User;
+use App\Models\UserGroups;
 use Illuminate\Http\Request;
 
 class GroupController extends Controller
@@ -14,7 +18,11 @@ class GroupController extends Controller
      */
     public function index()
     {
-        return GetGroupsResource::collection(Group::with("users")->get());
+        return ["groups" => GetGroupsResource::collection(Group::with("users")->get()), 
+        "ceo" => User::where("role", "ceo")->get(), 
+        "admin" => User::where("role", "admin")->get(),
+        "system"=> About::find(1)
+    ];
     }
 
     /**
@@ -49,16 +57,25 @@ class GroupController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Group $group)
+    public function update(GroupsUpdateRequest $request)
     {
-        //
+        Group::find($request->id)->update([
+            'name' => $request->name,
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Группа успешно обновлена']);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Group $group)
+    public function delete(Group $group)
     {
-        //
+        $all = UserGroups::where("group_id", $group->id)->count();
+        if ($all) {
+            return response()->json(["success" => false, "message" => "Нельзя удалить группу, пока в ней есть люди"]);
+        }
+        $group->delete();
+        return response()->json(["success" => true, "message" => "Группа успешно удалена"]);
     }
 }

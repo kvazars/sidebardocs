@@ -16,6 +16,10 @@ class GetUserResource extends JsonResource
     public function toArray(Request $request): array
     {
         // return parent::toArray($request);
-        return $this->user()->toArray();
+        if ($this->user()) {
+            return $this->user()->toArray();
+        } else {
+            return [];
+        }
     }
 }

@@ -179,6 +179,7 @@ export default {
 			:menu="menu"
 			:datasend="datasend"
 			:getMenu="getMenu"
+			
 		/>
 		<div class="wrapper d-flex flex-column">
 			<AppHeader

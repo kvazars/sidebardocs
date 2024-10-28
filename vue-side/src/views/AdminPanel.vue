@@ -23,7 +23,7 @@
 								role = 'ceo';
 							}
 						"
-						>Создатели</CNavLink
+						>Менеджеры</CNavLink
 					>
 				</CNavItem>
 				<CNavItem>
@@ -37,6 +37,17 @@
 						>Администраторы</CNavLink
 					>
 				</CNavItem>
+				<CNavItem>
+					<CNavLink
+						href="#"
+						@click="
+							() => {
+								role = 'system';
+							}
+						"
+						>Система</CNavLink
+					>
+				</CNavItem>
 			</CNav>
 		</CCardHeader>
 		<CCardBody>
@@ -46,32 +57,40 @@
 						? " пользователями"
 						: role == "admin"
 						? " администраторами"
-						: " создателями"
+						: role == "ceo"
+						? " менеджерами"
+						: ""
 				}}
 			</h4>
 			<div class="w-100 row">
 				<div class="col-lg-6">
 					<p class="fw-bold text-center">
-						Список
 						{{
 							role == "user"
-								? "пользователей"
+								? "Список пользователей"
 								: role == "admin"
-								? "администраторов"
-								: "создателей"
+								? "Список администраторов"
+								: role == "ceo"
+								? "Список менеджеров"
+								: ""
 						}}
 					</p>
-					<CButton
-						@click="
-							() => {
-								cardName = 'createGroup';
-							}
-						"
-						class="text-white mb-2"
-						color="success"
-						><i class="fa fa-plus"></i
-					></CButton>
+
 					<CAccordion v-if="role == 'user'">
+						<CAccordionItem>
+							<CButton
+								@click="
+									() => {
+										cardName = 'createGroup';
+										groupId = null;
+										groupName = null;
+									}
+								"
+								class="text-white m-2"
+								color="success"
+								><i class="fa fa-plus"></i
+							></CButton>
+						</CAccordionItem>
 						<CAccordionItem
 							:item-key="index"
 							v-for="(group, index) in groupList"
@@ -84,11 +103,13 @@
 								<div
 									class="d-flex flex-row justify-content-between mb-2"
 								>
-									<CButtonGroup
-										><CButton
+									<CButtonGroup>
+										<CButton
 											@click="
 												() => {
 													cardName = 'editGroup';
+													groupId = group.id;
+													groupName = group.name;
 												}
 											"
 											class=""
@@ -100,16 +121,21 @@
 										<CButton
 											class="text-white"
 											color="danger"
-											><i
-												class="fa fa-times"
-											></i></CButton
-									></CButtonGroup>
+											@click="removeGroups(group.id)"
+											><i class="fa fa-times"></i
+										></CButton>
+									</CButtonGroup>
 									<CButton
 										class="text-white"
 										color="success"
 										@click="
 											() => {
 												cardName = 'createUser';
+												groupIds = group.id;
+												fullname = null;
+												login = null;
+												password = null;
+												userId = null;
 											}
 										"
 										><i class="fa fa-user-plus"></i
@@ -121,54 +147,188 @@
 										v-for="(user, index) in group.users"
 										:key="index"
 									>
-										<span>{{ user.login }}</span>
-										<div
-											class="d-flex flex-row align-items-center gap-2"
-										>
-											<i
-												class="fa fa-pencil-square-o text-info"
-												@click="
-													() => {
-														cardName = 'editUser';
-													}
-												"
-											></i>
-											<i
-												class="fa fa-times text-danger"
-											></i>
-										</div>
+										<template v-if="user.login">
+											<span
+												>{{ user.name }} ({{
+													user.login
+												}})</span
+											>
+											<div
+												class="d-flex flex-row align-items-center gap-2"
+											>
+												<i
+													class="fa fa-pencil-square-o text-info"
+													@click="
+														() => {
+															cardName =
+																'createUser';
+															fullname =
+																user.name;
+															password = null;
+															login = user.login;
+															groupIds = null;
+															userId = user.id;
+														}
+													"
+												></i>
+												<i
+													class="fa fa-times text-danger"
+													@click="removeUser(user.id)"
+												></i>
+											</div>
+										</template>
 									</CListGroupItem>
 								</CListGroup>
 								<span v-else>Пользователи отсутствуют</span>
 							</CAccordionBody>
 						</CAccordionItem>
 					</CAccordion>
-					<CListGroup v-else>
-						<CListGroupItem
-							class="d-flex flex-row justify-content-between"
-						>
-							<span>Cras justo odio</span>
-							<div>
-								<i class="fa fa-times text-danger"></i>
-							</div>
-						</CListGroupItem>
-						<CListGroupItem
-							class="d-flex flex-row justify-content-between"
-						>
-							<span>Cras justo odio</span>
-							<div>
-								<i class="fa fa-times text-danger"></i>
-							</div>
-						</CListGroupItem>
-						<CListGroupItem
-							class="d-flex flex-row justify-content-between"
-						>
-							<span>Cras justo odio</span>
-							<div>
-								<i class="fa fa-times text-danger"></i>
-							</div>
-						</CListGroupItem>
-					</CListGroup>
+					<template v-if="role == 'ceo'">
+						<CListGroup flush v-if="ceos">
+							<CListGroupItem>
+								<CButton
+									class="text-white"
+									color="success"
+									@click="
+										() => {
+											cardName = 'createUser';
+											fullname = null;
+											login = null;
+											password = null;
+											userId = null;
+										}
+									"
+									><i class="fa fa-user-plus"></i
+								></CButton>
+							</CListGroupItem>
+							<CListGroupItem
+								class="d-flex flex-row justify-content-between"
+								v-for="(user, index) in ceos"
+								:key="index"
+							>
+								<template v-if="user.login">
+									<span
+										>{{ user.name }} ({{
+											user.login
+										}})</span
+									>
+									<div
+										class="d-flex flex-row align-items-center gap-2"
+									>
+										<i
+											class="fa fa-pencil-square-o text-info"
+											@click="
+												() => {
+													cardName = 'createUser';
+													fullname = user.name;
+													password = null;
+													login = user.login;
+													groupIds = null;
+													userId = user.id;
+												}
+											"
+										></i>
+										<i
+											class="fa fa-times text-danger"
+											@click="removeUser(user.id)"
+										></i>
+									</div>
+								</template>
+							</CListGroupItem>
+						</CListGroup>
+					</template>
+					<template v-if="role == 'admin'">
+						<CListGroup flush v-if="admins">
+							<CListGroupItem>
+								<CButton
+									class="text-white"
+									color="success"
+									@click="
+										() => {
+											cardName = 'createUser';
+											fullname = null;
+											login = null;
+											password = null;
+											userId = null;
+										}
+									"
+									><i class="fa fa-user-plus"></i
+								></CButton>
+							</CListGroupItem>
+							<CListGroupItem
+								class="d-flex flex-row justify-content-between"
+								v-for="(user, index) in admins"
+								:key="index"
+							>
+								<template v-if="user.login">
+									<span
+										>{{ user.name }} ({{
+											user.login
+										}})</span
+									>
+									<div
+										class="d-flex flex-row align-items-center gap-2"
+									>
+										<i
+											class="fa fa-pencil-square-o text-info"
+											@click="
+												() => {
+													cardName = 'createUser';
+													fullname = user.name;
+													password = null;
+													login = user.login;
+													groupIds = null;
+													userId = user.id;
+												}
+											"
+										></i>
+										<i
+											class="fa fa-times text-danger"
+											@click="removeUser(user.id)"
+										></i>
+									</div>
+								</template>
+							</CListGroupItem>
+						</CListGroup>
+					</template>
+					<template v-if="role == 'system'">
+						<div class="col-lg-12">
+							<CCard>
+								<CCardHeader class="fw-bold text-center"
+									>Управление системой</CCardHeader
+								>
+								<CCardBody>
+									<CFormInput
+										class="mb-2"
+										type="text"
+										label="Название для сайта"
+										v-model="systemName"
+										placeholder="Введите название для сайта"
+									/>
+									<CFormInput
+										type="file"
+										id="formFile"
+										label="Логотип"
+									/>
+									<img
+										:src="systemLogo"
+										style="max-width: 200px"
+										v-if="systemLogo"
+										class="my-3 img-fluid img-thumbnail"
+										alt=""
+									/>
+
+									<div class="text-center">
+										<CButton
+											color="primary"
+											@click="updateAbout"
+											>Сохранить</CButton
+										>
+									</div>
+								</CCardBody>
+							</CCard>
+						</div>
+					</template>
 				</div>
 				<div class="col-lg-6">
 					<CCard v-if="role == 'user' && cardName == 'createGroup'">
@@ -176,22 +336,18 @@
 							>Создание группы</CCardHeader
 						>
 						<CCardBody>
-							<CForm>
-								<CFormInput
-									v-model="groupName"
-									class="mb-2"
-									type="text"
-									label="Название"
-									placeholder="Введите название группы"
-								/>
-								<div class="text-center">
-									<CButton
-										@click="createGroup"
-										color="primary"
-										>Создать</CButton
-									>
-								</div>
-							</CForm>
+							<CFormInput
+								v-model="groupName"
+								class="mb-2"
+								type="text"
+								label="Название"
+								placeholder="Введите название группы"
+							/>
+							<div class="text-center">
+								<CButton @click="createGroup" color="primary"
+									>Создать</CButton
+								>
+							</div>
 						</CCardBody>
 					</CCard>
 					<CCard v-if="role == 'user' && cardName == 'editGroup'">
@@ -199,106 +355,52 @@
 							>Редактирование группы</CCardHeader
 						>
 						<CCardBody>
-							<CForm>
-								<CFormInput
-									v-model="groupName"
-									class="mb-2"
-									type="text"
-									label="Название"
-									placeholder="Введите название группы"
-								/>
-								<div class="text-center">
-									<CButton @click="editGroup" color="primary"
-										>Создать</CButton
-									>
-								</div>
-							</CForm>
+							<CFormInput
+								v-model="groupName"
+								class="mb-2"
+								type="text"
+								label="Название"
+								placeholder="Введите название группы"
+							/>
+							<div class="text-center">
+								<CButton @click="createGroup" color="primary"
+									>Сохранить</CButton
+								>
+							</div>
 						</CCardBody>
 					</CCard>
 					<CCard v-if="cardName == 'createUser'">
 						<CCardHeader class="fw-bold text-center"
-							>Создание пользователя</CCardHeader
+							>Пользователя</CCardHeader
 						>
 						<CCardBody>
-							<CForm>
-								<CFormInput
-									class="mb-2"
-									type="text"
-									label="Имя"
-									placeholder="Введите имя пользователя"
-								/>
-								<CFormInput
-									class="mb-2"
-									type="text"
-									label="Логин"
-									placeholder="Введите логин пользователя"
-								/>
-								<CFormInput
-									class="mb-2"
-									type="password"
-									label="Пароль"
-									placeholder="Введите пароль пользователя"
-								/>
-								<CFormSelect
-									v-if="role == 'user'"
-									class="mb-2"
-									label="Присваивание группы"
+							<CFormInput
+								class="mb-2"
+								type="text"
+								label="Имя"
+								v-model="fullname"
+								placeholder="Введите имя пользователя"
+							/>
+							<CFormInput
+								class="mb-2"
+								type="text"
+								label="Логин"
+								v-model="login"
+								placeholder="Введите логин пользователя"
+							/>
+							<CFormInput
+								class="mb-2"
+								type="password"
+								v-model="password"
+								label="Пароль"
+								placeholder="Введите пароль пользователя, если это необходимо"
+							/>
+
+							<div class="text-center">
+								<CButton color="primary" @click="createUser"
+									>Сохранить</CButton
 								>
-									<option disabled selected>
-										Выбор группы
-									</option>
-									<option value="1">401</option>
-									<option value="2">402</option>
-									<option value="3">403</option>
-								</CFormSelect>
-								<div class="text-center">
-									<CButton color="primary">Создать</CButton>
-								</div>
-							</CForm>
-						</CCardBody>
-					</CCard>
-					<CCard v-if="cardName == 'editUser'">
-						<CCardHeader class="fw-bold text-center"
-							>Редактирование пользователя</CCardHeader
-						>
-						<CCardBody>
-							<CForm>
-								<CFormInput
-									class="mb-2"
-									type="text"
-									label="Имя"
-									placeholder="Введите имя пользователя"
-								/>
-								<CFormInput
-									class="mb-2"
-									type="text"
-									label="Логин"
-									placeholder="Введите логин пользователя"
-								/>
-								<CFormInput
-									class="mb-2"
-									type="password"
-									label="Пароль"
-									placeholder="Введите пароль пользователя"
-								/>
-								<CFormSelect
-									v-if="role == 'user'"
-									class="mb-2"
-									label="Присваивание группы"
-								>
-									<option disabled selected>
-										Выбор группы
-									</option>
-									<option value="1">401</option>
-									<option value="2">402</option>
-									<option value="3">403</option>
-								</CFormSelect>
-								<div class="text-center">
-									<CButton color="primary"
-										>Редактировать</CButton
-									>
-								</div>
-							</CForm>
+							</div>
 						</CCardBody>
 					</CCard>
 				</div>
@@ -309,25 +411,100 @@
 
 <script>
 export default {
-	props: ["datasend", "showToast", "catchError"],
+	props: ["datasend", "showToast", "catchError", "server"],
 	data() {
 		return {
 			role: "user",
 			groupList: null,
 			groupName: "",
 			cardName: null,
+			groupId: null,
+			groupIds: null,
+			fullname: null,
+			login: null,
+			password: null,
+			userId: null,
+			admins: {},
+			ceos: {},
+			systemName: null,
+			systemLogo: null,
 		};
 	},
 	mounted() {
 		this.getList();
 	},
 	methods: {
+		removeGroups(id) {
+			if (confirm("Вы действительно хотите удалить группу?")) {
+				this.datasend(`group/${id}`, "DELETE", {})
+					.then((res) => {
+						this.showToast(res.success, res.message);
+						if (res.success) {
+							this.cardName = null;
+							this.getList();
+						} else if (res.errors) {
+							this.catchError(res.errors);
+						}
+					})
+					.catch((error) => {
+						console.log(error);
+					});
+			}
+		},
+		removeUser(id) {
+			if (confirm("Вы действительно хотите удалить пользователя?")) {
+				this.datasend(`user/${id}`, "DELETE", {})
+					.then((res) => {
+						if (res.success) {
+							this.getList();
+							this.cardName = null;
+							this.showToast(res.success, res.message);
+						} else if (res.errors) {
+							this.catchError(res.errors);
+						}
+					})
+					.catch((error) => {
+						console.log(error);
+					});
+			}
+		},
+		updateAbout() {
+			let form = new FormData();
+			form.append("name", this.systemName);
+			if (document.querySelector("#formFile").files[0]) {
+				form.append(
+					"logo",
+					document.querySelector("#formFile").files[0]
+				);
+			}
+			this.datasend("about", "POST", form)
+				.then((res) => {
+					console.log(res);
+					
+					if (res.success) {
+						this.getList();
+						this.cardName = null;
+						this.showToast(res.success, res.message);
+					} else if (res.errors) {
+						this.catchError(res.errors);
+					}
+				})
+				.catch((error) => {
+					console.log(error);
+				});
+		},
+
 		getList() {
 			this.datasend("group", "GET", {})
 				.then((res) => {
-					if (res.data) {
-						this.groupList = res.data;
-						console.log(this.groupList);
+					// console.log(res);
+
+					this.groupList = res.groups;
+					this.admins = res.admin;
+					this.ceos = res.ceo;
+					if (res.system) {
+						this.systemName = res.system.name;
+						this.systemLogo = this.server + "/" + res.system.logo;
 					}
 				})
 				.catch((error) => {
@@ -337,11 +514,43 @@ export default {
 		createGroup() {
 			let form = new FormData();
 			form.append("name", this.groupName);
+			if (this.groupId) {
+				form.append("id", this.groupId);
+			}
 
-			this.datasend("group", "POST", form)
+			this.datasend("group", this.groupId ? "PUT" : "POST", form)
 				.then((res) => {
 					if (res.success) {
 						this.getList();
+						this.cardName = null;
+						this.showToast(res.success, res.message);
+					} else if (res.errors) {
+						this.catchError(res.errors);
+					}
+				})
+				.catch((error) => {
+					console.log(error);
+				});
+		},
+		createUser() {
+			let form = new FormData();
+			form.append("name", this.fullname);
+			form.append("login", this.login);
+			form.append("id", this.userId);
+			form.append("role", this.role);
+
+			if (this.groupIds) {
+				form.append("group_id", this.groupIds);
+			}
+			if (this.password) {
+				form.append("password", this.password);
+			}
+
+			this.datasend("user", this.userId ? "PUT" : "POST", form)
+				.then((res) => {
+					if (res.success) {
+						this.getList();
+						this.cardName = null;
 						this.showToast(res.success, res.message);
 					} else if (res.errors) {
 						this.catchError(res.errors);

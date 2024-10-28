@@ -3,13 +3,14 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class StoreAboutRequest extends FormRequest
+class GroupsUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
- 
+
 
     /**
      * Get the validation rules that apply to the request.
@@ -19,7 +20,8 @@ class StoreAboutRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "name"=>"required|min:3"
+            'id'=>'required|exists:groups,id',
+            'name' => ['required','min:3', Rule::unique('groups')->ignore($this->id),]
         ];
     }
 }

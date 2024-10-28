@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\AuthRequest;
 use App\Http\Requests\RegistrationGroupRequest;
 use App\Http\Requests\RegistrationRequest;
+use App\Http\Requests\UserUpdateRequest;
 use App\Models\Group;
 use App\Models\User;
 use App\Models\UserGroups;
@@ -14,6 +15,19 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public function update(UserUpdateRequest $request)
+    {
+        $user = User::find($request->id);
+        $user->name = $request->name;
+        $user->login = $request->login;
+        if ($request->password) {
+            $user->password = $request->password;
+        }
+        $user->save();
+
+
+        return response()->json(['success' => true, 'message' => 'Пользователь успешно обновлен']);
+    }
     public function store(RegistrationRequest $request)
     {
 
@@ -56,4 +70,12 @@ class UserController extends Controller
         $request->user()->currentAccessToken()->delete();
         return response()->json(["success" => true]);
     }
+    public function delete(User $id)
+    {
+        UserGroups::where("user_id",$id->id)->delete();
+        $id->delete();
+        return response()->json(["success" => true, "message"=>"Пользователь успешно удален"]);
+    }
+
+    
 }
