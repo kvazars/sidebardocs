@@ -121,6 +121,8 @@
                     </div>
 
                     <p class="fw-bold text-center mt-4">Создание пользователя</p>
+<<<<<<< HEAD
+=======
                     <CForm>
                         <CFormInput class="mb-2" type="text" label="Имя" placeholder="Введите имя пользователя" />
                         <CFormInput class="mb-2" type="text" label="Логин" placeholder="Введите логин пользователя" />
@@ -139,6 +141,7 @@
                     <p class="fw-bold text-center mt-4">
                         Редактирование пользователя
                     </p>
+>>>>>>> 31830d8f652831910a80f044f42c003ad9911264
                     <CForm>
                         <CFormInput class="mb-2" type="text" label="Имя" placeholder="Введите имя пользователя" />
                         <CFormInput class="mb-2" type="text" label="Логин" placeholder="Введите логин пользователя" />
@@ -151,6 +154,27 @@
                             <option value="3">403</option>
                         </CFormSelect>
                         <div class="text-center">
+<<<<<<< HEAD
+                            <CButton color="primary">Создать</CButton>
+                        </div>
+                    </CForm>
+                    <p class="fw-bold text-center mt-4">
+                        Редактирование пользователя
+                    </p>
+                    <CForm>
+                        <CFormInput class="mb-2" type="text" label="Имя" placeholder="Введите имя пользователя" />
+                        <CFormInput class="mb-2" type="text" label="Логин" placeholder="Введите логин пользователя" />
+                        <CFormInput class="mb-2" type="password" label="Пароль"
+                            placeholder="Введите пароль пользователя" />
+                        <CFormSelect v-if="role == 'user'" class="mb-2" label="Присваивание группы">
+                            <option disabled selected>Выбор группы</option>
+                            <option value="1">401</option>
+                            <option value="2">402</option>
+                            <option value="3">403</option>
+                        </CFormSelect>
+                        <div class="text-center">
+=======
+>>>>>>> 31830d8f652831910a80f044f42c003ad9911264
                             <CButton color="primary">Редактировать</CButton>
                         </div>
                     </CForm>
@@ -162,9 +186,25 @@
 
 <script>
 export default {
+<<<<<<< HEAD
     data() {
         return {
             role: 'user',
+=======
+    props: ['datasend'],
+    data() {
+        return {
+            role: 'user',
+            userList: null,
+        }
+    },
+    mounted() {
+
+    },
+    methods: {
+        getList() {
+            this.datasend().then().catch();
+>>>>>>> 31830d8f652831910a80f044f42c003ad9911264
         }
     },
 };
