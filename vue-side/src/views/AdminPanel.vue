@@ -1,5 +1,4 @@
 <template>
-	<<<<<<< HEAD
 	<CCard class="my-4">
 		<CCardHeader>
 			<CNav class="justify-content-center">
