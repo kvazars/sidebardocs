@@ -10,4 +10,8 @@ class UserGroups extends Model
     use HasFactory;
 
     protected $fillable = ['user_id', 'group_id'];
+    public function user()
+    {
+        return User::find($this->user_id);
+    } 
 }
