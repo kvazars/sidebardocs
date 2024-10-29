@@ -1,0 +1,2387 @@
+{
+	"info": {
+		"_postman_id": "aec05248-11cb-42b9-9f09-c4ebf40943b3",
+		"name": "prof2024",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Регистрация",
+			"item": [
+				{
+					"name": "Регистрация не заполнены поля",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(422);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(false);\r",
+									"    pm.expect(pm.response.text()).to.include(\"field is required.\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "1",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{server}}registration",
+							"host": [
+								"{{server}}registration"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Регистрация валидация пароля - уже есть пользователь",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(422);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(false);\r",
+									"    pm.expect(jsonData.message.email[0]).to.eql(\"The email has already been taken.\");\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"email\": \"test@gmail.com\",\r\n   \"password\": \"abcde1A\",\r\n   \"first_name\": \"name\",\r\n   \"last_name\": \"last_name\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}registration",
+							"host": [
+								"{{server}}registration"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Регистрация валидация пароля - длина пароля",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(422);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(false);\r",
+									"    pm.expect(jsonData.message.password).to.include.oneOf([\"The password field must be at least 3 characters.\",\"The password field format is invalid.\"]);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"email\": \"admin@admin.ru12\",\r\n   \"password\": \"Q\",\r\n   \"first_name\": \"name\",\r\n   \"last_name\": \"last_name\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}registration",
+							"host": [
+								"{{server}}registration"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Регистрация валидация пароля - регулярные 1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(422);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(false);\r",
+									"    pm.expect(jsonData.message.password).to.include.oneOf([\"The password field format is invalid.\"]);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"email\": \"admin@admin.ru12\",\r\n   \"password\": \"abcde\",\r\n   \"first_name\": \"name\",\r\n   \"last_name\": \"last_name\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}registration",
+							"host": [
+								"{{server}}registration"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Регистрация валидация пароля - регулярные 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(422);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(false);\r",
+									"    pm.expect(jsonData.message.password).to.include.oneOf([\"The password field format is invalid.\"]);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"email\": \"admin@admin.ru12\",\r\n   \"password\": \"1fad\",\r\n   \"first_name\": \"name\",\r\n   \"last_name\": \"last_name\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}registration",
+							"host": [
+								"{{server}}registration"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Регистрация - валидация email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(422);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(false);\r",
+									"    pm.expect(jsonData.message.email).to.include.oneOf([\"The email field must be a valid email address.\"]);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"email\": \"admin\",\r\n   \"password\": \"1fadA\",\r\n   \"first_name\": \"name\",\r\n   \"last_name\": \"last_name\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}registration",
+							"host": [
+								"{{server}}registration"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Регистрация успешная",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const uuid = require('uuid')\r",
+									"let email=uuid()+'@domain.com'\r",
+									"pm.collectionVariables.set('email', email);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"    pm.expect(jsonData.message).to.eql(\"Success\");\r",
+									"    pm.expect(jsonData).to.have.property('token');\r",
+									"    pm.collectionVariables.set('token', jsonData.token);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "{{email}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "1Aa1",
+									"type": "text"
+								},
+								{
+									"key": "first_name",
+									"value": "ww",
+									"type": "text"
+								},
+								{
+									"key": "last_name",
+									"value": "wwqwq",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{server}}registration",
+							"host": [
+								"{{server}}registration"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Авторизация",
+			"item": [
+				{
+					"name": "Авторизация неуспешная не переданы поля",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(422);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(false);\r",
+									"    pm.expect(pm.response.text()).to.include(\"field is required.\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}authorization",
+							"host": [
+								"{{server}}authorization"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Авторизация неуспешная",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(401);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(false);\r",
+									"    pm.expect(jsonData.message).to.eq(\"Login failed\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"email\": \"admin@admin.ru12\",\r\n   \"password\": \"Qa1\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{server}}authorization",
+							"host": [
+								"{{server}}authorization"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Авторизация успешная для пользователя по умолчанию",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"    pm.expect(jsonData.message).to.eql(\"Success\");\r",
+									"    pm.expect(jsonData).to.have.property('token');\r",
+									"    pm.collectionVariables.set('token_admin', jsonData.token);\r",
+									"\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "test@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "test",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{server}}authorization",
+							"host": [
+								"{{server}}authorization"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "test@gmail.com",
+									"disabled": true
+								},
+								{
+									"key": "password",
+									"value": "test",
+									"disabled": true
+								},
+								{
+									"key": "first_name",
+									"value": "admin",
+									"disabled": true
+								},
+								{
+									"key": "last_name",
+									"value": "admin",
+									"disabled": true
+								},
+								{
+									"key": "file",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Авторизация успешная",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"    pm.expect(jsonData.message).to.eql(\"Success\");\r",
+									"    pm.expect(jsonData).to.have.property('token');\r",
+									"    pm.collectionVariables.set('token', jsonData.token);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "{{email}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "1Aa1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{server}}authorization",
+							"host": [
+								"{{server}}authorization"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Загрузка файлов",
+			"item": [
+				{
+					"name": "Загрузка файлов - неавторизованный пользователь",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(403);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.eql(\"Login failed\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "files[]",
+									"type": "file",
+									"src": "postman-cloud:///1eec4a8c-0c1a-44d0-b6c8-ed82ec786d8c"
+								},
+								{
+									"key": "files[]",
+									"type": "file",
+									"src": "postman-cloud:///1eec4a8c-b24a-43f0-b7ef-8ee691e81ff6"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{server}}files",
+							"host": [
+								"{{server}}files"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Загрузка файлов - не передан files",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(422);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(false);\r",
+									"    pm.expect(pm.response.text()).to.include(\"field is required.\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{server}}files",
+							"host": [
+								"{{server}}files"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Загрузка файлов - правильные и неправильные файлы как и размеры",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData[0].success).to.eql(true);\r",
+									"    pm.expect(jsonData[0].message).to.eql(\"Success\");\r",
+									"    pm.collectionVariables.set('file_id', jsonData[0].file_id);\r",
+									"    pm.collectionVariables.set('file_name_1', jsonData[0].name);    \r",
+									"    pm.expect(jsonData[2].success).to.eql(false);\r",
+									"    pm.expect(jsonData[2].message).to.eql(\"File not loaded\");\r",
+									"    pm.expect(jsonData[3].success).to.eql(false);\r",
+									"    pm.expect(jsonData[3].message).to.eql(\"File not loaded\");\r",
+									"    pm.expect(jsonData.length).to.equal(4);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "files[]",
+									"type": "file",
+									"src": "postman-cloud:///1eec4a8c-0c1a-44d0-b6c8-ed82ec786d8c"
+								},
+								{
+									"key": "files[]",
+									"type": "file",
+									"src": "postman-cloud:///1eec4a8c-b24a-43f0-b7ef-8ee691e81ff6"
+								},
+								{
+									"key": "files[]",
+									"type": "file",
+									"src": "postman-cloud:///1eec4a95-cc9f-4300-ad7a-7e6b84880ec3"
+								},
+								{
+									"key": "files[]",
+									"type": "file",
+									"src": "postman-cloud:///1eec4a98-87d1-4540-ab23-4024fd814ee3"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{server}}files",
+							"host": [
+								"{{server}}files"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Загрузка файлов - файл с тем же именем",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData[0].success).to.eql(true);\r",
+									"    pm.expect(jsonData[0].message).to.eql(\"Success\");\r",
+									"    pm.expect(jsonData[0].name).not.eql(pm.collectionVariables.get('file_name_1'));\r",
+									"    pm.collectionVariables.set('file_id', jsonData[0].file_id);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "files[]",
+									"type": "file",
+									"src": "postman-cloud:///1eec4a8c-0c1a-44d0-b6c8-ed82ec786d8c"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{server}}files",
+							"host": [
+								"{{server}}files"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Загрузка файлов - файл с тем же именем admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData[0].success).to.eql(true);\r",
+									"    pm.expect(jsonData[0].message).to.eql(\"Success\");\r",
+									"    pm.expect(jsonData[0].name).not.eql(pm.collectionVariables.get('file_name_1'));\r",
+									"    pm.collectionVariables.set('file_id_admin', jsonData[0].file_id);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "files[]",
+									"type": "file",
+									"src": "postman-cloud:///1eec4a8c-0c1a-44d0-b6c8-ed82ec786d8c"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{server}}files",
+							"host": [
+								"{{server}}files"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Download",
+			"item": [
+				{
+					"name": "Download не авторизованный",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(403);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.eql(\"Login failed\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						},
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{server}}files/{{file_id}}",
+							"host": [
+								"{{server}}files"
+							],
+							"path": [
+								"{{file_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Download нет такого файла",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.eql(\"Not found\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						},
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "files[]",
+									"type": "file",
+									"src": "/C:/projects/games-spot_api/robots.txt"
+								},
+								{
+									"key": "files[]",
+									"type": "file",
+									"src": "/C:/Users/user/Pictures/Screenshots/Снимок экрана_20240107_195359.png"
+								},
+								{
+									"key": "files[]",
+									"type": "file",
+									"src": "/C:/Users/user/Desktop/Отчет.pdf"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{server}}files/1",
+							"host": [
+								"{{server}}files"
+							],
+							"path": [
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Download",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"  pm.response.to.have.header(\"Content-Disposition\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						},
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "files[]",
+									"type": "file",
+									"src": "/C:/projects/games-spot_api/robots.txt"
+								},
+								{
+									"key": "files[]",
+									"type": "file",
+									"src": "/C:/Users/user/Pictures/Screenshots/Снимок экрана_20240107_195359.png"
+								},
+								{
+									"key": "files[]",
+									"type": "file",
+									"src": "/C:/Users/user/Desktop/Отчет.pdf"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{server}}files/{{file_id}}",
+							"host": [
+								"{{server}}files"
+							],
+							"path": [
+								"{{file_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Download недоступного файла",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(403);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.eql(\"Forbidden for you\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						},
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "files[]",
+									"type": "file",
+									"src": "/C:/projects/games-spot_api/robots.txt"
+								},
+								{
+									"key": "files[]",
+									"type": "file",
+									"src": "/C:/Users/user/Pictures/Screenshots/Снимок экрана_20240107_195359.png"
+								},
+								{
+									"key": "files[]",
+									"type": "file",
+									"src": "/C:/Users/user/Desktop/Отчет.pdf"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{server}}files/{{file_id}}",
+							"host": [
+								"{{server}}files"
+							],
+							"path": [
+								"{{file_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Добавить доступ",
+			"item": [
+				{
+					"name": "Добавить доступ неавторизованный",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(403);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.eql(\"Login failed\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "files[]",
+									"type": "file",
+									"src": "/C:/Users/user/Pictures/Screenshots/Снимок экрана_20240107_195359.png",
+									"disabled": true
+								},
+								{
+									"key": "files[]",
+									"type": "file",
+									"src": "/C:/Users/user/Desktop/Отчет.pdf",
+									"disabled": true
+								},
+								{
+									"key": "email",
+									"value": "admin@admin.ru1",
+									"type": "default"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{server}}files/123/accesses",
+							"host": [
+								"{{server}}files"
+							],
+							"path": [
+								"123",
+								"accesses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Добавить доступ без email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(422);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(false);\r",
+									"    pm.expect(pm.response.text()).to.include(\"field is required.\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{server}}files/123/accesses",
+							"host": [
+								"{{server}}files"
+							],
+							"path": [
+								"123",
+								"accesses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Добавить доступ к несуществующему файлу",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.eql(\"Not found\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "test@gmail.com",
+									"type": "default"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{server}}files/123/accesses",
+							"host": [
+								"{{server}}files"
+							],
+							"path": [
+								"123",
+								"accesses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Добавить доступ к несуществующему пользователю",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(422);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(false);\r",
+									"    pm.expect(jsonData.message.email).to.include(\"The selected email is invalid.\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "admin@admin.ru1",
+									"type": "default"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{server}}files/{{file_id}}/accesses",
+							"host": [
+								"{{server}}files"
+							],
+							"path": [
+								"{{file_id}}",
+								"accesses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Добавить доступ недоступный по правам",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(403);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.eql(\"Forbidden for you\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "test@gmail.com",
+									"type": "default"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{server}}files/{{file_id}}/accesses",
+							"host": [
+								"{{server}}files"
+							],
+							"path": [
+								"{{file_id}}",
+								"accesses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Добавить доступ",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    let jsonData = pm.response.json();\r",
+									"\r",
+									"\r",
+									"pm.expect(jsonData[0]).to.have.property('fullname');\r",
+									"pm.expect(jsonData[0]).to.have.property('email');\r",
+									"pm.expect(jsonData[0]).to.have.property('type');\r",
+									"pm.expect(jsonData[1]).to.have.property('fullname');\r",
+									"pm.expect(jsonData[1]).to.have.property('email');\r",
+									"pm.expect(jsonData[1]).to.have.property('type');\r",
+									"pm.expect(jsonData[0].type).to.include.oneOf([\"co-author\",\"author\"]);\r",
+									"pm.expect(jsonData[1].type).to.include.oneOf([\"co-author\",\"author\"]);\r",
+									"    pm.expect(jsonData.length).to.equal(2);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "test@gmail.com",
+									"type": "default"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{server}}files/{{file_id}}/accesses",
+							"host": [
+								"{{server}}files"
+							],
+							"path": [
+								"{{file_id}}",
+								"accesses"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Просмотр файлов, к которым имеет доступ пользователь",
+			"item": [
+				{
+					"name": "Просмотр файлов неавторизованный",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(403);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.eql(\"Login failed\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "{{server}}shared",
+							"host": [
+								"{{server}}shared"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Просмотр файлов",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    let jsonData = pm.response.json();\r",
+									"\r",
+									"\r",
+									"pm.expect(jsonData[0]).to.have.property('file_id');\r",
+									"pm.expect(jsonData[0]).to.have.property('name');\r",
+									"pm.expect(jsonData[0]).to.have.property('url');\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "{{server}}shared",
+							"host": [
+								"{{server}}shared"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Просмотр файлов пользователя",
+			"item": [
+				{
+					"name": "Просмотр файлов пользователя - неавторизованный",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(403);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.eql(\"Login failed\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "{{server}}files/disk",
+							"host": [
+								"{{server}}files"
+							],
+							"path": [
+								"disk"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Просмотр файлов пользователя",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    let jsonData = pm.response.json();\r",
+									"\r",
+									"\r",
+									"pm.expect(jsonData[0]).to.have.property('file_id');\r",
+									"pm.expect(jsonData[0]).to.have.property('name');\r",
+									"pm.expect(jsonData[0]).to.have.property('url');\r",
+									"\r",
+									"pm.expect(jsonData[0]).to.have.property('accesses');\r",
+									"pm.expect(jsonData[0].accesses[0]).to.have.property('fullname');\r",
+									"pm.expect(jsonData[0].accesses[0]).to.have.property('email');\r",
+									"pm.expect(jsonData[0].accesses[0]).to.have.property('type');\r",
+									"pm.expect(jsonData[0].accesses[0].type).to.include.oneOf([\"co-author\",\"author\"]);\r",
+									"\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"url": {
+							"raw": "{{server}}files/disk",
+							"host": [
+								"{{server}}files"
+							],
+							"path": [
+								"disk"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Удалить доступ",
+			"item": [
+				{
+					"name": "Удалить доступ неавторизованный",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(403);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.eql(\"Login failed\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "111",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{server}}files/{{file_id}}/accesses",
+							"host": [
+								"{{server}}files"
+							],
+							"path": [
+								"{{file_id}}",
+								"accesses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Удалить доступ без email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(422);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(false);\r",
+									"    pm.expect(pm.response.text()).to.include(\"field is required.\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{server}}files/{{file_id}}/accesses",
+							"host": [
+								"{{server}}files"
+							],
+							"path": [
+								"{{file_id}}",
+								"accesses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Удалить доступ к несуществующему файлу",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.eql(\"Not found\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{server}}files/123/accesses?email=test@gmail.com",
+							"host": [
+								"{{server}}files"
+							],
+							"path": [
+								"123",
+								"accesses"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "test@gmail.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Удалить доступ несуществуюшему пользователю",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(422);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(false);\r",
+									"    pm.expect(jsonData.message.email).to.include(\"The selected email is invalid.\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{server}}files/{{file_id}}/accesses?email=abcde@abcde.ru",
+							"host": [
+								"{{server}}files"
+							],
+							"path": [
+								"{{file_id}}",
+								"accesses"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "abcde@abcde.ru"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Удалить доступ недоступный по правам",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(403);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.eql(\"Forbidden for you\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{server}}files/{{file_id}}/accesses?email=test@gmail.com",
+							"host": [
+								"{{server}}files"
+							],
+							"path": [
+								"{{file_id}}",
+								"accesses"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "test@gmail.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Удалить доступ",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    let jsonData = pm.response.json();\r",
+									"\r",
+									"\r",
+									"pm.expect(jsonData[0]).to.have.property('fullname');\r",
+									"pm.expect(jsonData[0]).to.have.property('email');\r",
+									"pm.expect(jsonData[0]).to.have.property('type');\r",
+									"pm.expect(jsonData[0].type).to.eql(\"author\");\r",
+									"    pm.expect(jsonData.length).to.equal(1);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {
+							"accept": true
+						}
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{server}}files/{{file_id}}/accesses?email=test@gmail.com",
+							"host": [
+								"{{server}}files"
+							],
+							"path": [
+								"{{file_id}}",
+								"accesses"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "test@gmail.com"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Выход",
+			"item": [
+				{
+					"name": "Выход неавторизованного пользователя",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(403);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.eql(\"Login failed\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "123",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}logout",
+							"host": [
+								"{{server}}logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Успешный выход",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(pm.info.requestName, function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.success).to.eql(true);\r",
+									"    pm.expect(jsonData.message).to.eql(\"Logout\");\r",
+									"    pm.collectionVariables.set('token', \"\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{server}}logout",
+							"host": [
+								"{{server}}logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "server",
+			"value": "http://localhost/prof2024/api/",
+			"type": "string"
+		},
+		{
+			"key": "file_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "email",
+			"value": ""
+		},
+		{
+			"key": "file_name_1",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "token_admin",
+			"value": ""
+		},
+		{
+			"key": "file_id_admin",
+			"value": ""
+		}
+	]
+}
