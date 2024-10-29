@@ -405,13 +405,29 @@
 					</CCard>
 				</div>
 			</div>
+			<EditFile
+				ref="child"
+				v-if="role == 'system'"
+				class="mt-4"
+				:dashboard="dashboard"
+				:server="server"
+				:api="api"
+			/>
 		</CCardBody>
 	</CCard>
 </template>
 
 <script>
+import EditFile from "./EditFile.vue";
 export default {
-	props: ["datasend", "showToast", "catchError", "server"],
+	props: [
+		"datasend",
+		"showToast",
+		"catchError",
+		"dashboard",
+		"server",
+		"api",
+	],
 	data() {
 		return {
 			role: "user",
@@ -469,29 +485,54 @@ export default {
 			}
 		},
 		updateAbout() {
-			let form = new FormData();
-			form.append("name", this.systemName);
-			if (document.querySelector("#formFile").files[0]) {
-				form.append(
-					"logo",
-					document.querySelector("#formFile").files[0]
-				);
-			}
-			this.datasend("about", "POST", form)
-				.then((res) => {
-					console.log(res);
-					
-					if (res.success) {
-						this.getList();
-						this.cardName = null;
-						this.showToast(res.success, res.message);
-					} else if (res.errors) {
-						this.catchError(res.errors);
+			// console.log();
+			this.$refs.child.editor.save().then((outputData) => {
+				// console.log(outputData);
+				outputData.blocks.forEach((el) => {
+					if (el.type == "image" || el.type == "attaches") {
+						el.data.file.url = el.data.file.url.split(
+							this.server
+						)[1];
 					}
-				})
-				.catch((error) => {
-					console.log(error);
+
+					if (el.type == "gallery") {
+						el.data.files.forEach((el) => {
+							el.url = el.url.split(this.server)[1];
+						});
+					}
+
+					if (el.type == "attaches") {
+						el.data.title = el.data.title
+							? el.data.title
+							: "Скачать файл";
+					}
 				});
+
+				let form = new FormData();
+				form.append("name", this.systemName);
+				form.append("data", JSON.stringify(outputData.blocks));
+				if (document.querySelector("#formFile").files[0]) {
+					form.append(
+						"logo",
+						document.querySelector("#formFile").files[0]
+					);
+				}
+				this.datasend("about", "POST", form)
+					.then((res) => {
+						console.log(res);
+
+						if (res.success) {
+							this.getList();
+							this.cardName = null;
+							this.showToast(res.success, res.message);
+						} else if (res.errors) {
+							this.catchError(res.errors);
+						}
+					})
+					.catch((error) => {
+						console.log(error);
+					});
+			});
 		},
 
 		getList() {
@@ -560,6 +601,9 @@ export default {
 					console.log(error);
 				});
 		},
+	},
+	components: {
+		EditFile,
 	},
 };
 </script>

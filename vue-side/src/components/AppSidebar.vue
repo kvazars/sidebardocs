@@ -6,7 +6,15 @@ import { useAuthIdStore } from "../stores/authId";
 
 export default {
 	components: { SidebarNav, ContextMenu },
-	props: ["menu", "datasend", "getMenu", "showToast", "catchError", "server", "about"],
+	props: [
+		"menu",
+		"datasend",
+		"getMenu",
+		"showToast",
+		"catchError",
+		"server",
+		"about",
+	],
 
 	data() {
 		return {
@@ -62,8 +70,7 @@ export default {
 		};
 	},
 	mounted() {
-		
-		this.logo = this.server+'/'+this.about.logo;
+		this.logo = this.server + "/" + this.about.logo;
 	},
 	methods: {
 		closeContextMenu() {
@@ -107,8 +114,8 @@ export default {
 		},
 		updoc(id) {
 			this.datasend("doc/up/" + id, "POST", {})
-				.then((res) => {	
-					// console.log(res);				
+				.then((res) => {
+					// console.log(res);
 					this.showToast(res.success, res.message);
 					this.getMenu();
 				})
@@ -117,7 +124,7 @@ export default {
 		downdoc(id) {
 			this.datasend("doc/down/" + id, "POST", {})
 				.then((res) => {
-					// console.log(res);				
+					// console.log(res);
 					this.showToast(res.success, res.message);
 					this.getMenu();
 				})
@@ -200,11 +207,12 @@ export default {
 			<RouterLink custom to="/" v-slot="{ href, navigate }">
 				<CSidebarBrand
 					v-bind="$attrs"
+					class="w-100"
 					as="a"
 					:href="href"
 					@click="navigate"
 				>
-				<img :src="logo" alt="" v-if="logo">
+					<img class="w-100 object-fit-contain" :src="logo" alt="" v-if="logo" />
 				</CSidebarBrand>
 			</RouterLink>
 			<CCloseButton
