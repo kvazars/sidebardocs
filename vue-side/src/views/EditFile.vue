@@ -42,13 +42,16 @@ export default {
 		"api",
 	],
 	mounted() {
-	
 		if (this.datasend) {
 			if (this.id) {
 				this.datasend("resource/" + this.id, "GET", {})
 					.then((res) => {
 						// console.log(this.user);
-						if (this.user.role == "user" || !this.user || !localStorage.getItem("token")) {
+						if (
+							this.user.role == "user" ||
+							!this.user ||
+							!localStorage.getItem("token")
+						) {
 							this.$router.push({ name: "NotFound" });
 						}
 						if (
@@ -72,11 +75,22 @@ export default {
 						console.log(error);
 					});
 			} else {
+				this.datasend("getGroups", "GET", {})
+					.then((res) => {
+						if (res.success) {
+							this.groupAvailables = res.groups;
+						} else {
+							this.showToast(res.success, "Что-то пошло не так");
+						}
+					})
+					.catch((error) => {
+						console.log(error);
+					});
 				this.createEditor();
 			}
 		} else {
 			// console.log(this.dashboard);
-			
+
 			this.dataBlock = JSON.parse(this.dashboard.data);
 			this.createEditor();
 		}
@@ -449,7 +463,7 @@ const aceConfig = {
 
 <template>
 	<div v-if="user">
-		<CCard v-if="datasend" class="mb-4">
+		<CCard v-if="datasend" class="my-4">
 			<CCardHeader>Информация</CCardHeader>
 			<CCardBody>
 				<CFormInput
