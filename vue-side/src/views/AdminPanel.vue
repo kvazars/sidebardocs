@@ -319,10 +319,20 @@
 									/>
 
 									<div class="text-center">
-										<CButton
-											color="primary"
-											@click="updateAbout"
-											>Сохранить</CButton
+										<CButtonGroup
+											role="group"
+											aria-label="Basic example"
+											><CButton
+												color="primary"
+												@click="updateAbout"
+												>Сохранить</CButton
+											>
+											<CButton
+												class="text-white"
+												color="danger"
+												@click="clearCache"
+												>Очистить кэш</CButton
+											></CButtonGroup
 										>
 									</div>
 								</CCardBody>
@@ -450,6 +460,17 @@ export default {
 		this.getList();
 	},
 	methods: {
+		clearCache() {
+			this.datasend("checkImageResource", "GET", {})
+				.then((res) => {
+					if (res.success) {
+						this.showToast(res.success, res.message);
+					}
+				})
+				.catch((error) => {
+					console.log(error);
+				});
+		},
 		removeGroups(id) {
 			if (confirm("Вы действительно хотите удалить группу?")) {
 				this.datasend(`group/${id}`, "DELETE", {})
