@@ -29,6 +29,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete("/resourcedel/{content}", [ContentController::class, "delResource"]);
         Route::post("/folder", [TreeController::class, "store"]);
         Route::post("/doc/{operation}/{id}", [TreeController::class, "upanddown"]);
+        Route::get('/getGroups', [AvailableController::class, 'index']);
     });
     //admin
     Route::middleware(["role:admin"])->group(function () {
@@ -41,6 +42,5 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete("/group/{group}", [GroupController::class, "delete"]);
         Route::post("/about", [AboutController::class, "store"]);
         Route::get("/about", [AboutController::class, "index"]);
-
     });
 });

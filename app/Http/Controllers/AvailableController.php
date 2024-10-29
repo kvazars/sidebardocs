@@ -9,8 +9,14 @@ use Illuminate\Http\Request;
 class AvailableController extends Controller
 {
 
-    // public function getGroupsTree($tree_id)
-    // {
-    //     return response()->json(['success' => true, 'groups' => $availablesGroups]);
-    // }
+    public function index()
+    {
+        $all = Group::get();
+
+        foreach ($all as $value) {
+            $availablesGroups[] = ['id' => $value->id, 'name' => $value->name, 'checked' => false];
+        }
+
+        return response()->json(['success' => true, 'groups' => $availablesGroups]);
+    }
 }
