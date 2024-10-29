@@ -42,6 +42,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete("/group/{group}", [GroupController::class, "delete"]);
         Route::post("/about", [AboutController::class, "store"]);
         Route::get("/about", [AboutController::class, "index"]);
-        Route::post('/checkImageResource', [ContentController::class, 'checkImageResource']);
+        Route::get('/checkImageResource', [ContentController::class, 'checkImageResource']);
     });
 });

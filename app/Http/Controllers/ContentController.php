@@ -10,7 +10,9 @@ use App\Models\Group;
 use App\Models\Tree;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -195,8 +197,11 @@ class ContentController extends Controller
         //     Storage::delete()
         // }
         Storage::disk('public')->delete($del);
-        return array_diff($dirFiles, array_merge($savedImages, $savedFiles));
+        // return array_diff($dirFiles, array_merge($savedImages, $savedFiles));
+        Artisan::call('route:clear');
+        Artisan::call('cache:clear');
         
+        return response()->json(['success' => true, 'message' => 'Кэш очищен']);
 
         // return array_merge($savedImages, $savedFiles);
     }
