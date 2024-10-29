@@ -12,10 +12,10 @@ export default {
 	data() {
 		return {
 			menu: [],
-			// api: "http://172.16.1.223:8000/api/",
-			api: "http://127.0.0.1:8000/api/",
-			// server: "http://172.16.1.223:8000",
-			server: "http://127.0.0.1:8000",
+			api: "http://172.16.1.223:8000/api/",
+			// api: "http://127.0.0.1:8000/api/",
+			server: "http://172.16.1.223:8000",
+			// server: "http://127.0.0.1:8000",
 			openWindow: false,
 			auths: useAuthIdStore(),
 			dashboard: null,
