@@ -43,7 +43,7 @@ class DatabaseSeeder extends Seeder
         Content::create([
             'tree_id'=> null,
             'accessibility' => 0,
-            'data'=>'[]'
+            'data'=>'[{"id":"APpu_X75b4","type":"paragraph","data":{"text":"Тестовые данные"}}]'
         ]);
         Content::create([
             'tree_id' => 2,
