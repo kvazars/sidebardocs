@@ -463,9 +463,8 @@ export default {
 		clearCache() {
 			this.datasend("checkImageResource", "GET", {})
 				.then((res) => {
-					if (res.success) {
-						this.showToast(res.success, res.message);
-					}
+					this.showToast(res.success, res.message);
+					
 				})
 				.catch((error) => {
 					console.log(error);
@@ -492,10 +491,11 @@ export default {
 			if (confirm("Вы действительно хотите удалить пользователя?")) {
 				this.datasend(`user/${id}`, "DELETE", {})
 					.then((res) => {
+						this.showToast(res.success, res.message);
 						if (res.success) {
+							
 							this.getList();
 							this.cardName = null;
-							this.showToast(res.success, res.message);
 						} else if (res.errors) {
 							this.catchError(res.errors);
 						}
@@ -541,11 +541,10 @@ export default {
 				this.datasend("about", "POST", form)
 					.then((res) => {
 						// console.log(res);
-
+						this.showToast(res.success, res.message);
 						if (res.success) {
 							this.getList();
 							this.cardName = null;
-							this.showToast(res.success, res.message);
 						} else if (res.errors) {
 							this.catchError(res.errors);
 						}
@@ -582,10 +581,10 @@ export default {
 
 			this.datasend("group", this.groupId ? "PUT" : "POST", form)
 				.then((res) => {
+					this.showToast(res.success, res.message);
 					if (res.success) {
 						this.getList();
 						this.cardName = null;
-						this.showToast(res.success, res.message);
 					} else if (res.errors) {
 						this.catchError(res.errors);
 					}
@@ -610,10 +609,10 @@ export default {
 
 			this.datasend("user", this.userId ? "PUT" : "POST", form)
 				.then((res) => {
+					this.showToast(res.success, res.message);
 					if (res.success) {
 						this.getList();
 						this.cardName = null;
-						this.showToast(res.success, res.message);
 					} else if (res.errors) {
 						this.catchError(res.errors);
 					}
