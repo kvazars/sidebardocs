@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
             'role'=>'admin'
         ]);
         User::create([
-            'name' => fake()->fullname(),
+            'name' => fake()->name(),
             'login' => 'ivanov',
             'password' => 'ivanov',
             'role'=>'ceo'
@@ -37,7 +37,7 @@ class DatabaseSeeder extends Seeder
         Tree::create([
             'name' => 'New course2',
             'user_id' => 2,
-            'tree_id' => 2,
+            'tree_id' => 1,
             'type' => 'file',
         ]);
         Content::create([

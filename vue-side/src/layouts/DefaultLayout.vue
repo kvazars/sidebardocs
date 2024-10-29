@@ -6,6 +6,7 @@ import AuthWindow from "@/components/AuthWindow.vue";
 import { toast } from "vue3-toastify";
 import { useAuthIdStore } from "../stores/authId";
 import ShowFile from "@/views/ShowFile.vue";
+
 export default {
 	components: { AppFooter, AppHeader, AppSidebar, AuthWindow, ShowFile },
 	data() {
@@ -82,6 +83,7 @@ export default {
 			)
 				.then((res) => {
 					let menus = res.menu;
+
 					this.dashboard = res.content;
 					this.about = res.about;
 
@@ -189,7 +191,6 @@ export default {
 				:logoutFun="logoutFun"
 			/>
 			<div class="body flex-grow-1">
-				
 				<CContainer class="px-4">
 					<router-view
 						:server="server"
@@ -199,9 +200,9 @@ export default {
 						:getMenu="getMenu"
 						:showToast="showToast"
 						:key="$route.fullPath"
-						v-if="!$route.meta.requiresAuth && $route.name!='Home'"
+						v-if="$route.name != 'Home' && $route.name != 'admin'"
 					/>
-					<router-view
+					<!-- <router-view
 						:server="server"
 						:catchError="catchError"
 						:datasend="datasend"
@@ -209,12 +210,25 @@ export default {
 						:getMenu="getMenu"
 						:showToast="showToast"
 						:key="$route.fullPath"
-						v-if="$route.meta.requiresAuth && auths.id && $route.name!='Home'"
+						v-if="
+							auths.id &&
+							$route.name != 'Home' &&
+							$route.name != 'admin' &&
+							$route.name != 'showFile'
+						"
+					/> -->
+					<router-view
+						:server="server"
+						:catchError="catchError"
+						:datasend="datasend"
+						:showToast="showToast"
+						:key="$route.fullPath"
+						:dashboard="dashboard"
+						:api
+						v-if="auths.id && dashboard && $route.name == 'admin'"
 					/>
-					<template v-if="$route.name=='Home'&&dashboard">
-						
-							<ShowFile :dashboard="dashboard" :about="about" />
-						
+					<template v-if="$route.name == 'Home' && dashboard">
+						<ShowFile :server :dashboard="dashboard" :about="about" />
 					</template>
 				</CContainer>
 			</div>

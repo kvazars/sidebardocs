@@ -23,7 +23,6 @@ import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthIdStore } from "../stores/authId";
 
-let editor;
 export default {
 	setup() {
 		const postId = computed(() => route.params.id);
@@ -38,37 +37,45 @@ export default {
 		"server",
 		"getMenu",
 		"catchError",
+		"dashboard",
 		"showToast",
 		"api",
 	],
 	mounted() {
-		if (this.id) {
-			this.datasend("resource/" + this.id, "GET", {})
-				.then((res) => {
-					if (this.user.role == "user") {
-						this.$router.push({ name: "NotFound" });
-					}
-					if (
-						this.user.role == "ceo" &&
-						res.content.tree.user_id != this.user.id
-					) {
-						this.$router.push({ name: "NotFound" });
-					}
+		if (this.datasend) {
+			if (this.id) {
+				this.datasend("resource/" + this.id, "GET", {})
+					.then((res) => {
+						if (this.user.role == "user") {
+							this.$router.push({ name: "NotFound" });
+						}
+						if (
+							this.user.role == "ceo" &&
+							res.content.tree.user_id != this.user.id
+						) {
+							this.$router.push({ name: "NotFound" });
+						}
 
-					this.pagetitle = res.name;
+						this.pagetitle = res.name;
 
-					this.accessibility = res.content.accessibility
-						? true
-						: false;
-					this.groupAvailables = res.groups;
+						this.accessibility = res.content.accessibility
+							? true
+							: false;
+						this.groupAvailables = res.groups;
 
-					this.dataBlock = JSON.parse(res.content.data);
-					this.createEditor();
-				})
-				.catch((error) => {
-					console.log(error);
-				});
+						this.dataBlock = JSON.parse(res.content.data);
+						this.createEditor();
+					})
+					.catch((error) => {
+						console.log(error);
+					});
+			} else {
+				this.createEditor();
+			}
 		} else {
+			// console.log(this.dashboard);
+			
+			this.dataBlock = JSON.parse(this.dashboard.data);
 			this.createEditor();
 		}
 	},
@@ -80,6 +87,7 @@ export default {
 			user: useAuthIdStore(),
 			accessibility: false,
 			groupAvailables: [],
+			editor: null,
 		};
 	},
 	methods: {
@@ -98,9 +106,11 @@ export default {
 			}
 		},
 		save() {
-			editor
+			this.editor
 				.save()
 				.then((outputData) => {
+					console.log(outputData);
+
 					let form = new FormData();
 					outputData.blocks.forEach((el) => {
 						if (el.type == "image" || el.type == "attaches") {
@@ -158,7 +168,7 @@ export default {
 		},
 
 		createEditor() {
-			editor = new EditorJS({
+			this.editor = new EditorJS({
 				holder: "editorjs",
 				tools: {
 					gallery: {
@@ -400,7 +410,7 @@ export default {
 								el.url = this.server + el.url;
 							});
 						}
-						editor.blocks.insert(element.type, element.data);
+						this.editor.blocks.insert(element.type, element.data);
 					});
 				},
 			});
@@ -437,7 +447,7 @@ const aceConfig = {
 
 <template>
 	<div v-if="user">
-		<CCard class="mb-4">
+		<CCard v-if="datasend" class="mb-4">
 			<CCardHeader>Информация</CCardHeader>
 			<CCardBody>
 				<CFormInput
@@ -500,7 +510,7 @@ const aceConfig = {
 				<div id="editorjs"></div>
 			</CCardBody>
 		</CCard>
-		<div class="position-fixed squared">
+		<div class="position-fixed squared" v-if="datasend">
 			<div class="dropdown">
 				<button
 					class="btn btn-primary border-end-0 rounded-0 rounded-start"

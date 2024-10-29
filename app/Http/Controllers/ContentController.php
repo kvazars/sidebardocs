@@ -45,28 +45,6 @@ class ContentController extends Controller
         return response()->json(['success' => 1, 'file' => ['url' => URL::to('/') . "/" . $path]], 200);
     }
 
-
-    public function getImage(Request $request)
-    {
-        if ($request->image and  file_exists(public_path() . '/' . $request->image)) {
-            $data = file_get_contents(public_path() . $request->image);
-
-            $type = explode('.', $request->image);
-            $base64 = 'data:image/' . end(array: $type) . ';base64,' . base64_encode($data);
-            return response()->json(data: ['success' => true, 'image' =>  $base64]);
-        } else {
-            return response()->json(data: ['success' => false, 'image' =>  URL::to('/') . "/notfound.webp"]);
-        }
-    }
-    public function getFile(Request $request)
-    {
-        if ($request->file and file_exists(public_path() . '/' . $request->file)) {
-            return response()->json(data: ['success' => true, 'url' => URL::to('/') . $request->file]);
-        } else {
-            return response()->json(data: ['success' => false]);
-        }
-    }
-
     public function saveResource(ResourceSaveRequest $request)
     {
         $fileId = null;

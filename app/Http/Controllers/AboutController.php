@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\About;
 use App\Http\Requests\StoreAboutRequest;
 use App\Http\Requests\UpdateAboutRequest;
+use App\Models\Content;
 use Illuminate\Support\Facades\Storage;
 
 class AboutController extends Controller
@@ -35,6 +36,9 @@ class AboutController extends Controller
             $about->logo = $path;
         }
         $about->save();
-        return response()->json(['success' => 1, 'message' => 'Успешно обновлено']);
+
+        Content::where("id", 1)->update(['data' => $request->data]);
+
+        return response()->json(['success' => true, 'message' => 'Успешно обновлено']);
     }
 }

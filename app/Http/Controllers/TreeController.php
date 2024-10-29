@@ -17,7 +17,8 @@ class TreeController extends Controller
 {
     public function index()
     {
-        $c = Content::where('accessibility', true)->pluck('tree_id')->toArray();
+        $c = Content::where('tree_id', '!=', null)->where('accessibility', true)->pluck('tree_id')->toArray();
+
         if (count($c) > 0) {
             $all = array_merge($c, $this->uploadTree($c));
             $tree = Tree::whereIn('id', $all)->get();

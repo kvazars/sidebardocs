@@ -232,6 +232,7 @@
 					<i class="fa fa-cog"></i>
 				</button>
 				<ul class="dropdown-menu">
+				
 					<li v-if="content">
 						<router-link
 							class="dropdown-item"
@@ -296,6 +297,43 @@ export default {
 		ExportToPdf,
 		VueEasyLightbox,
 	},
+	props: ["id", "datasend", "showToast", 'dashboard', "server", "about"],
+	data() {
+		return {
+			pagetitle: null,
+			auths: useAuthIdStore(),
+			fileData: [],
+			content: null,
+			visibleRef: {},
+			indexRef: {},
+			imgs: {},
+		};
+	},
+
+	mounted() {
+		if (this.datasend && this.id) {
+			this.datasend("resource/" + this.id, "GET", {})
+				.then((res) => {
+					if (!res.content) {
+						this.showToast(res.success, res.message);
+						setTimeout(() => {
+							this.$router.push({
+								name: "NotFound",
+							});
+						}, 2000);
+					} else {
+						this.pagetitle = res.name;
+						this.parseDoc(res.content);
+					}
+				})
+				.catch();
+		} else {
+			console.log(this.dashboard);
+			
+			this.parseDoc(this.dashboard);
+			this.pagetitle = this.about.name;
+		}
+	},
 	methods: {
 		html2doc() {
 			let els = document.querySelector("#file").innerHTML;
@@ -335,44 +373,6 @@ export default {
 		onHide(ref) {
 			this.visibleRef[ref] = false;
 		},
-	},
-	props: ["id", "datasend", "showToast", "server", "dashboard", "about"],
-	data() {
-		return {
-			pagetitle: null,
-			auths: useAuthIdStore(),
-			fileData: [],
-			content: null,
-			visibleRef: {},
-			indexRef: {},
-			imgs: {},
-		};
-	},
-
-	mounted() {
-		if (this.datasend) {
-			this.datasend("resource/" + this.id, "GET", {})
-				.then((res) => {
-					if (!res.content) {
-						this.showToast(res.success, res.message);
-						setTimeout(() => {
-							this.$router.push({
-								name: "NotFound",
-							});
-						}, 2000);
-					} else {
-						this.pagetitle = res.name;
-						this.parseDoc(res.content);
-					}
-				})
-				.catch();
-		}
-		if (this.dashboard) {
-			this.parseDoc(this.dashboard);
-			this.pagetitle = this.about.name;
-		}
-	},
-	methods: {
 		parseDoc(res) {
 			this.fileData = JSON.parse(res.data);
 			this.fileData.forEach((el) => {
@@ -395,7 +395,7 @@ export default {
 				}
 			});
 
-			this.content = res.content;
+			this.content = res;
 			if (document.querySelector(".sidebar.sidebar-fixed")) {
 				document
 					.querySelector(".sidebar.sidebar-fixed")

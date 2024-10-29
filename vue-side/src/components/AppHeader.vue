@@ -15,7 +15,12 @@ const sidebar = useSidebarStore();
 const auths = useAuthIdStore();
 const router = useRouter();
 
-const props = defineProps(["openWindowFunction", "datasend", "logoutFun"]);
+const props = defineProps([
+	"openWindowFunction",
+	"datasend",
+	"logoutFun",
+	"dashboard",
+]);
 
 onMounted(() => {
 	document.addEventListener("scroll", () => {
@@ -45,7 +50,9 @@ function logout() {
 }
 
 function goToAdmin() {
-	router.push({name: 'admin'})
+	router.push({
+		name: "admin",
+	});
 }
 </script>
 
@@ -121,7 +128,10 @@ function goToAdmin() {
 							<i class="fa fa-user"></i>
 						</CDropdownToggle>
 						<CDropdownMenu>
-							<CDropdownItem @click="goToAdmin" v-if="auths.role == 'admin'">
+							<CDropdownItem
+								@click="goToAdmin"
+								v-if="auths.role == 'admin'"
+							>
 								<i class="fa fa-cog"></i> Управление
 							</CDropdownItem>
 

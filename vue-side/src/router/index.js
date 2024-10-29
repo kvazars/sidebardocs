@@ -10,7 +10,6 @@ const routes = [
 		meta: { title: "Главная" },
 		component: DefaultLayout,
 		children: [
-			
 			{
 				path: "/files/:id",
 				name: "ShowFile",
@@ -21,7 +20,7 @@ const routes = [
 			{
 				path: "/files/:id/edit",
 				name: "EditFile",
-				meta: { title: "Редактирование документа", requiresAuth: true },
+				meta: { title: "Редактирование документа" },
 				component: () => import("@/views/editFile.vue"),
 				props: true,
 			},

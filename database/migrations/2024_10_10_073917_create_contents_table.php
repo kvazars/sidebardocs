@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('contents', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tree_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('tree_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->boolean('accessibility')->default(false);
             $table->string('data');
             $table->softDeletes();
