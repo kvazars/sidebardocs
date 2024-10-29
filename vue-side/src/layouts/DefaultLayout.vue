@@ -12,8 +12,8 @@ export default {
 	data() {
 		return {
 			menu: [],
-			api: "http://localhost:8000/api/",
-			server: "http://localhost:8000",
+			api: "http://172.16.1.223:8000/api/",
+			server: "http://172.16.1.223:8000",
 			openWindow: false,
 			auths: useAuthIdStore(),
 			dashboard: null,
@@ -224,11 +224,11 @@ export default {
 						:showToast="showToast"
 						:key="$route.fullPath"
 						:dashboard="dashboard"
-						:api
+						:api="api"
 						v-if="auths.id && dashboard && $route.name == 'admin'"
 					/>
 					<template v-if="$route.name == 'Home' && dashboard">
-						<ShowFile :server :dashboard="dashboard" :about="about" />
+						<ShowFile :server="server" :dashboard="dashboard" :about="about" />
 					</template>
 				</CContainer>
 			</div>

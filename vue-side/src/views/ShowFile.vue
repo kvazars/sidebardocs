@@ -328,7 +328,7 @@ export default {
 				})
 				.catch();
 		} else {
-			console.log(this.dashboard);
+			// console.log(this.dashboard);
 			
 			this.parseDoc(this.dashboard);
 			this.pagetitle = this.about.name;

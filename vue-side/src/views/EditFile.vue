@@ -42,11 +42,13 @@ export default {
 		"api",
 	],
 	mounted() {
+	
 		if (this.datasend) {
 			if (this.id) {
 				this.datasend("resource/" + this.id, "GET", {})
 					.then((res) => {
-						if (this.user.role == "user") {
+						// console.log(this.user);
+						if (this.user.role == "user" || !this.user || !localStorage.getItem("token")) {
 							this.$router.push({ name: "NotFound" });
 						}
 						if (

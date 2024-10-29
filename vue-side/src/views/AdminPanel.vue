@@ -519,7 +519,7 @@ export default {
 				}
 				this.datasend("about", "POST", form)
 					.then((res) => {
-						console.log(res);
+						// console.log(res);
 
 						if (res.success) {
 							this.getList();
