@@ -80,13 +80,11 @@
 							:key="key"
 							class="pic col-lg-3 col-md-4 col-6 mb-4"
 						>
-							
 							<img
 								:src="url"
-								class="img-fluid  h-100 d-block img-thumbnail"
-								@click="() => showImg(val.id, key)" />
-							
-							
+								class="img-fluid h-100 d-block img-thumbnail"
+								@click="() => showImg(val.id, key)"
+							/>
 						</div>
 					</div>
 
@@ -223,7 +221,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="position-fixed squared">
+		<div class="position-fixed squared" v-if="datasend">
 			<div class="dropdown">
 				<button
 					class="btn btn-primary"
@@ -338,7 +336,7 @@ export default {
 			this.visibleRef[ref] = false;
 		},
 	},
-	props: ["id", "datasend", "showToast", "server"],
+	props: ["id", "datasend", "showToast", "server", "dashboard", "about"],
 	data() {
 		return {
 			pagetitle: null,
@@ -352,47 +350,58 @@ export default {
 	},
 
 	mounted() {
-		this.datasend("resource/" + this.id, "GET", {})
-			.then((res) => {
-				if (!res.content) {
-					this.showToast(res.success, res.message);
-					setTimeout(() => {
-						this.$router.push({
-							name: "NotFound",
-						});
-					}, 2000);
-				} else {
-					this.pagetitle = res.name;
-					this.fileData = JSON.parse(res.content.data);
-					this.fileData.forEach((el) => {
-						if (el.type == "gallery") {
-							this.imgs[el.id] = [];
-							this.visibleRef[el.id] = false;
-							this.indexRef[el.id] = 0;
-							el.data.files.forEach((els) => {
-								this.imgs[el.id].push(this.server + els.url);
+		if (this.datasend) {
+			this.datasend("resource/" + this.id, "GET", {})
+				.then((res) => {
+					if (!res.content) {
+						this.showToast(res.success, res.message);
+						setTimeout(() => {
+							this.$router.push({
+								name: "NotFound",
 							});
-						}
-						if (el.type == "image") {
-							this.imgs[el.id] = this.server + el.data.file.url;
-						}
-						if (el.type == "attaches") {
-							this.imgs[el.id] = {
-								url: this.server + el.data.file.url,
-								title: el.data.title,
-							};
-						}
-					});
-
-					this.content = res.content;
-					if (document.querySelector(".sidebar.sidebar-fixed")) {
-						document
-							.querySelector(".sidebar.sidebar-fixed")
-							.classList.remove("show");
+						}, 2000);
+					} else {
+						this.pagetitle = res.name;
+						this.parseDoc(res.content);
 					}
+				})
+				.catch();
+		}
+		if (this.dashboard) {
+			this.parseDoc(this.dashboard);
+			this.pagetitle = this.about.name;
+		}
+	},
+	methods: {
+		parseDoc(res) {
+			this.fileData = JSON.parse(res.data);
+			this.fileData.forEach((el) => {
+				if (el.type == "gallery") {
+					this.imgs[el.id] = [];
+					this.visibleRef[el.id] = false;
+					this.indexRef[el.id] = 0;
+					el.data.files.forEach((els) => {
+						this.imgs[el.id].push(this.server + els.url);
+					});
 				}
-			})
-			.catch();
+				if (el.type == "image") {
+					this.imgs[el.id] = this.server + el.data.file.url;
+				}
+				if (el.type == "attaches") {
+					this.imgs[el.id] = {
+						url: this.server + el.data.file.url,
+						title: el.data.title,
+					};
+				}
+			});
+
+			this.content = res.content;
+			if (document.querySelector(".sidebar.sidebar-fixed")) {
+				document
+					.querySelector(".sidebar.sidebar-fixed")
+					.classList.remove("show");
+			}
+		},
 	},
 };
 </script>

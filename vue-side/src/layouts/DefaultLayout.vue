@@ -3,14 +3,11 @@ import AppFooter from "@/components/AppFooter.vue";
 import AppHeader from "@/components/AppHeader.vue";
 import AppSidebar from "@/components/AppSidebar.vue";
 import AuthWindow from "@/components/AuthWindow.vue";
-// import { data } from 'autoprefixer';
-// import { useUserDataStore } from "../stores/userData";
 import { toast } from "vue3-toastify";
 import { useAuthIdStore } from "../stores/authId";
-import router from "../router";
-// const store = useUserDataStore();
+import ShowFile from "@/views/ShowFile.vue";
 export default {
-	components: { AppFooter, AppHeader, AppSidebar, AuthWindow },
+	components: { AppFooter, AppHeader, AppSidebar, AuthWindow, ShowFile },
 	data() {
 		return {
 			menu: [],
@@ -18,6 +15,8 @@ export default {
 			server: "http://localhost:8000",
 			openWindow: false,
 			auths: useAuthIdStore(),
+			dashboard: null,
+			about: null,
 		};
 	},
 	mounted() {
@@ -82,8 +81,10 @@ export default {
 				{}
 			)
 				.then((res) => {
-					// console.log(res);					
 					let menus = res.menu;
+					this.dashboard = res.content;
+					this.about = res.about;
+
 					if (localStorage.getItem("token")) {
 						let user = res.user;
 						this.auths.changeUser(user.id, user.name, user.role);
@@ -161,7 +162,6 @@ export default {
 					theme: "colored",
 					transition: toast.TRANSITIONS.ZOOM,
 					position: toast.POSITION.BOTTOM_RIGHT,
-					// multiple: false,
 					autoClose: 3000,
 				});
 			}
@@ -179,7 +179,8 @@ export default {
 			:menu="menu"
 			:datasend="datasend"
 			:getMenu="getMenu"
-			
+			:about="about"
+			:server="server"
 		/>
 		<div class="wrapper d-flex flex-column">
 			<AppHeader
@@ -188,6 +189,7 @@ export default {
 				:logoutFun="logoutFun"
 			/>
 			<div class="body flex-grow-1">
+				
 				<CContainer class="px-4">
 					<router-view
 						:server="server"
@@ -197,7 +199,7 @@ export default {
 						:getMenu="getMenu"
 						:showToast="showToast"
 						:key="$route.fullPath"
-						v-if="!$route.meta.requiresAuth"						
+						v-if="!$route.meta.requiresAuth && $route.name!='Home'"
 					/>
 					<router-view
 						:server="server"
@@ -207,8 +209,13 @@ export default {
 						:getMenu="getMenu"
 						:showToast="showToast"
 						:key="$route.fullPath"
-						v-if="$route.meta.requiresAuth&&auths.id"						
+						v-if="$route.meta.requiresAuth && auths.id && $route.name!='Home'"
 					/>
+					<template v-if="$route.name=='Home'&&dashboard">
+						
+							<ShowFile :dashboard="dashboard" :about="about" />
+						
+					</template>
 				</CContainer>
 			</div>
 			<AppFooter />

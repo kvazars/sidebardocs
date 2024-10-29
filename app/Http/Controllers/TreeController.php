@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\TreeStoreRequest;
+use App\Models\About;
 use App\Models\Available;
 use App\Models\Content;
 use App\Models\Group;
@@ -30,7 +31,10 @@ class TreeController extends Controller
                 return $arr;
             });
             $tree = array_merge($userArray, $new_collection->toArray());
-            return response()->json(['success' => true, 'menu' => $tree]);
+            $about = About::first();
+            $content = Content::first();
+
+            return response()->json(['success' => true, 'menu' => $tree, "about" => $about, "content" => $content]);
         } else {
             return [];
         }
@@ -72,6 +76,8 @@ class TreeController extends Controller
     public function userFolder()
     {
         $role = Auth::user()->role;
+        $about = About::first();
+        $content = Content::first();
         $tree = null;
         switch ($role) {
             case 'ceo':
@@ -115,7 +121,7 @@ class TreeController extends Controller
                 }
                 break;
         }
-        return response()->json(['success' => true, 'user' => ["id" => Auth::user()->id, "name" => Auth::user()->name, "role" => $role], 'menu' => $tree]);
+        return response()->json(['success' => true, 'user' => ["id" => Auth::user()->id, "name" => Auth::user()->name, "role" => $role], 'menu' => $tree, "about" => $about, "content" => $content]);
     }
     protected $fatherChild = [];
     public function uploadTree($childTree)

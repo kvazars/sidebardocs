@@ -6,7 +6,7 @@ import { useAuthIdStore } from "../stores/authId";
 
 export default {
 	components: { SidebarNav, ContextMenu },
-	props: ["menu", "datasend", "getMenu", "showToast", "catchError"],
+	props: ["menu", "datasend", "getMenu", "showToast", "catchError", "server", "about"],
 
 	data() {
 		return {
@@ -58,7 +58,12 @@ export default {
 			folderParent: null,
 			menuX: null,
 			menuY: null,
+			logo: null,
 		};
+	},
+	mounted() {
+		
+		this.logo = this.server+'/'+this.about.logo;
 	},
 	methods: {
 		closeContextMenu() {
@@ -199,6 +204,7 @@ export default {
 					:href="href"
 					@click="navigate"
 				>
+				<img :src="logo" alt="" v-if="logo">
 				</CSidebarBrand>
 			</RouterLink>
 			<CCloseButton

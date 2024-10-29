@@ -10,6 +10,7 @@ const routes = [
 		meta: { title: "Главная" },
 		component: DefaultLayout,
 		children: [
+			
 			{
 				path: "/files/:id",
 				name: "ShowFile",

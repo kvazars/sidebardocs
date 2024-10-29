@@ -41,8 +41,14 @@ class DatabaseSeeder extends Seeder
             'type' => 'file',
         ]);
         Content::create([
+            'tree_id'=> null,
+            'accessibility' => 0,
+            'data'=>'[]'
+        ]);
+        Content::create([
             'tree_id' => 2,
             'accessibility' => 1,
+            'data'=>'[]'
         ]);
         About::create([
             'name'=>fake()->paragraph(),
