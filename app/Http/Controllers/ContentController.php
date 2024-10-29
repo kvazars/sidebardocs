@@ -8,6 +8,7 @@ use App\Models\Available;
 use App\Models\Content;
 use App\Models\Group;
 use App\Models\Tree;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -50,13 +51,13 @@ class ContentController extends Controller
         $fileId = null;
         if (isset($request->tree_id)) {
             $tr = Tree::find($request->tree_id);
-            $position = Tree::where("tree_id",$tr->id)->count();
-            
+            $position = Tree::where("tree_id", $tr->id)->count();
+
             $tree = Tree::create([
                 'name' => $request->name,
                 'tree_id' => $request->tree_id,
                 'user_id' => $tr->user_id,
-                'position'=>$position,
+                'position' => $position,
             ]);
             $fileId = Content::create([
                 'tree_id' => $tree->id,
@@ -138,5 +139,65 @@ class ContentController extends Controller
 
         Tree::find($content->id)->delete();
         return response()->json(["success" => true, 'message' => 'Файл удален']);
+    }
+
+    public function checkImageResource()
+    {
+        $dirFiles = [];
+        $u = User::where('role', '!=', 'user')->pluck('id')->toArray();
+
+        $dirs = ['/contentImages/', '/contentFiles/'];
+        foreach ($dirs as $dirss) {
+            foreach ($u as $value) {
+                $dir = public_path('') . $dirss . $value;
+
+                if (is_dir($dir)) {
+                    if ($dh = opendir($dir)) {
+                        while (($file = readdir($dh)) !== false) {
+                            if ($file != '.' && $file != '..') {
+                                $dirFiles[] = $dirss . $value . '/' . $file;
+                            }
+                        }
+                        closedir($dh);
+                    }
+                }
+            }
+        }
+
+
+        $savedImages = [];
+        $savedFiles = [];
+
+        $c = Content::pluck('data');
+        foreach ($c as $value) {
+            $value = json_decode($value);
+            foreach ($value as $v) {
+                if (isset($v->type))
+                    switch ((string)$v->type) {
+                        case 'image':
+                            $savedImages[] = $v->data->file->url;
+                            break;
+                        case 'gallery':
+                            for ($i = 0; $i < count($v->data->files); $i++) {
+                                $savedImages[] = $v->data->files[$i]->url;
+                            }
+                            break;
+                        case 'attaches':
+                            $savedFiles[] = $v->data->file->url;
+                            break;
+                    }
+            }
+        }
+
+        //return $savedImages;
+        $del = array_diff($dirFiles, array_merge($savedImages, $savedFiles));
+        // foreach ($del as $value) {
+        //     Storage::delete()
+        // }
+        Storage::disk('public')->delete($del);
+        return array_diff($dirFiles, array_merge($savedImages, $savedFiles));
+        
+
+        // return array_merge($savedImages, $savedFiles);
     }
 }
