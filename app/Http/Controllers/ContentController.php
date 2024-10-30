@@ -9,6 +9,7 @@ use App\Models\Content;
 use App\Models\Group;
 use App\Models\Tree;
 use App\Models\User;
+use App\Models\UserGroups;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
@@ -113,7 +114,30 @@ class ContentController extends Controller
         if (!$tree) {
             return response()->json(['success' => false, "message" => 'Файла не существует']);
         }
+        if (!Auth::user()) {
+            $res = Content::where("tree_id", $content)->where("accessibility", true)->first();
+            if (!$res) {
+                return response()->json(['success' => false, "message" => 'Доступ к файлу запрещен']);
+            }
+        } else {
+            $user = Auth::user();
+            if ($user->role == 'user') {
+                $gr = UserGroups::where("user_id", $user->id)->first();
+                $avia = Available::where("group_id", $gr->group_id)->where("tree_id", $content)->first();
+                $access = Content::where("tree_id", $content)->where("accessibility", true)->first();
+                if (!$avia and !$access) {
+                    return response()->json(['success' => false, "message" => 'Доступ к файлу запрещен']);
+                }
+            }
+        }
+
+
+
+
+
         $res = Content::with("tree")->where("tree_id", $content)->first();
+
+
 
         $availablesGroups = [];
 
@@ -200,7 +224,7 @@ class ContentController extends Controller
         // return array_diff($dirFiles, array_merge($savedImages, $savedFiles));
         Artisan::call('route:clear');
         Artisan::call('cache:clear');
-        
+
         return response()->json(['success' => true, 'message' => 'Кэш очищен']);
 
         // return array_merge($savedImages, $savedFiles);

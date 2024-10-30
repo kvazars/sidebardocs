@@ -297,7 +297,7 @@ export default {
 		ExportToPdf,
 		VueEasyLightbox,
 	},
-	props: ["id", "datasend", "showToast", 'dashboard', "server", "about"],
+	props: ["id", "datasend", "showToast", 'dashboard', "server", "about","authss"],
 	data() {
 		return {
 			pagetitle: null,
@@ -311,8 +311,10 @@ export default {
 	},
 
 	mounted() {
+		console.log(this.authss);
+		
 		if (this.datasend && this.id) {
-			this.datasend("resource/" + this.id, "GET", {})
+			this.datasend(!this.auths.id?"resource/" + this.id:"resourceauth/" + this.id, "GET", {})
 				.then((res) => {
 					if (!res.content) {
 						this.showToast(res.success, res.message);
