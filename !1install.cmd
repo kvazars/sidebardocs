@@ -1,1 +1,1 @@
-composer i & cd vue-side & npm i
+composer i & npm i
