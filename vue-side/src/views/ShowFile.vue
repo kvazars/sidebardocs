@@ -311,7 +311,7 @@ export default {
 	},
 
 	mounted() {
-		console.log(this.authss);
+		
 		
 		if (this.datasend && this.id) {
 			this.datasend(!this.auths.id?"resource/" + this.id:"resourceauth/" + this.id, "GET", {})

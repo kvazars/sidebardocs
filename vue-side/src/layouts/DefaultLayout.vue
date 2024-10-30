@@ -20,6 +20,7 @@ export default {
 			auths: useAuthIdStore(),
 			dashboard: null,
 			about: null,
+			viewSuccess: false,
 		};
 	},
 	mounted() {
@@ -93,6 +94,7 @@ export default {
 						let user = res.user;
 						this.auths.changeUser(user.id, user.name, user.role);
 					}
+					this.viewSuccess = true;
 
 					function menucreateparent() {
 						let rrr = [];
@@ -203,7 +205,7 @@ export default {
 						:showToast="showToast"
 						:key="$route.fullPath"
 						:authss="auths.id"
-						v-if="$route.name != 'Home' && $route.name != 'admin'"
+						v-if="$route.name != 'Home' && $route.name != 'admin' && viewSuccess"
 					/>
 					<router-view
 						:server="server"

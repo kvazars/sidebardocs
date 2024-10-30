@@ -44,7 +44,7 @@ export default {
 	mounted() {
 		if (this.datasend) {
 			if (this.id) {
-				this.datasend("resource/" + this.id, "GET", {})
+				this.datasend("resourceauth/" + this.id, "GET", {})
 					.then((res) => {
 						// console.log(this.user);
 						if (
