@@ -16,7 +16,21 @@ class Tree extends Model
         "type",
         "position",
     ];
-    public function child() {
-        return $this->hasMany(Content::class);
+    public function child()
+    {
+        return $this->hasOne(Content::class, );
+    }
+    public function parent()
+    {
+        return $this->belongsTo(Tree::class, "tree_id","id");
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function available()
+    {
+        return $this->hasMany(Available::class);
     }
 }

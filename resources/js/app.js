@@ -1,10 +1,21 @@
+import { createApp } from "vue";
+import { createPinia } from "pinia";
 
-import 'bootstrap';
-import { createApp } from 'vue';
+import App from "./App.vue";
+import router from "./router/router";
 
-const app = createApp({});
+import CoreuiVue from "@coreui/vue";
+import "font-awesome/css/font-awesome.min.css";
+import "bootstrap/dist/js/bootstrap.bundle";
+import { createVCodeBlock } from "@wdns/vue-code-block";
+import "vue3-toastify/dist/index.css";
 
-import ExampleComponent from './components/ExampleComponent.vue';
-app.component('example-component', ExampleComponent);
+const VCodeBlock = createVCodeBlock({});
 
-app.mount('#app');
+const app = createApp(App);
+app.use(createPinia());
+app.use(router);
+app.use(CoreuiVue);
+app.use(VCodeBlock);
+
+app.mount("#app");

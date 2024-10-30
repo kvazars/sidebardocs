@@ -229,4 +229,17 @@ class ContentController extends Controller
 
         // return array_merge($savedImages, $savedFiles);
     }
+
+
+    public function getFiles()
+    {
+        $userRole = Auth::user()->role;
+        $files = [];
+        if ($userRole == 'ceo') {
+            $files = Tree::where('user_id', Auth::user()->id)->where('type', 'file')->with(['child', 'parent', 'available'])->get()->keyBy("id");
+        } else {
+            $files = Tree::where('type', 'file')->with(['child', 'user', 'parent', 'available'])->get()->keyBy("id");
+        }
+        return ["files" => $files,  "groups" => Group::get()->keyBy("id")];
+    }
 }
