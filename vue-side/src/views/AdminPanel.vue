@@ -398,13 +398,28 @@
 								v-model="login"
 								placeholder="Введите логин пользователя"
 							/>
-							<CFormInput
-								class="mb-2"
-								type="password"
-								v-model="password"
-								label="Пароль"
-								placeholder="Введите пароль пользователя, если это необходимо"
-							/>
+							<label for="password">Пароль</label>
+							<CInputGroup class="mb-2">
+								<CFormInput
+									v-model="password"
+									id="password"
+									placeholder="Введите пароль пользователя, если это необходимо"
+									aria-label="Пароль"
+									aria-describedby="button-addon2"
+								/>
+								<CButton
+									type="button"
+									color="secondary"
+									variant="outline"
+									id="button-addon2"
+									@click="
+										() => {
+											password = generatePassword();
+										}
+									"
+									><i class="fa fa-key"></i
+								></CButton>
+							</CInputGroup>
 
 							<div class="text-center">
 								<CButton color="primary" @click="createUser"
@@ -464,11 +479,20 @@ export default {
 			this.datasend("checkImageResource", "GET", {})
 				.then((res) => {
 					this.showToast(res.success, res.message);
-					
 				})
 				.catch((error) => {
 					console.log(error);
 				});
+		},
+		generatePassword() {
+			let length = 6,
+				charset =
+					"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+				retVal = "";
+			for (var i = 0, n = charset.length; i < length; ++i) {
+				retVal += charset.charAt(Math.floor(Math.random() * n));
+			}
+			return retVal;
 		},
 		removeGroups(id) {
 			if (confirm("Вы действительно хотите удалить группу?")) {
@@ -493,7 +517,6 @@ export default {
 					.then((res) => {
 						this.showToast(res.success, res.message);
 						if (res.success) {
-							
 							this.getList();
 							this.cardName = null;
 						} else if (res.errors) {
