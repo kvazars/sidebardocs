@@ -19,6 +19,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //admin,ceo,user
     Route::get("/userFolder", [TreeController::class, "userFolder"]);
     Route::get('/logout', [UserController::class, 'logout']);
+    Route::get("/resourceauth/{content}", [ContentController::class, "getResource"]);
+
     //admin,ceo
     Route::middleware(["role:admin|ceo"])->group(function () {
         Route::post("/resource", [ContentController::class, "saveResource"]);

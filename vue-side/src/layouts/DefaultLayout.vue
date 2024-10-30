@@ -202,23 +202,9 @@ export default {
 						:getMenu="getMenu"
 						:showToast="showToast"
 						:key="$route.fullPath"
+						:authss="auths.id"
 						v-if="$route.name != 'Home' && $route.name != 'admin'"
 					/>
-					<!-- <router-view
-						:server="server"
-						:catchError="catchError"
-						:datasend="datasend"
-						:api="api"
-						:getMenu="getMenu"
-						:showToast="showToast"
-						:key="$route.fullPath"
-						v-if="
-							auths.id &&
-							$route.name != 'Home' &&
-							$route.name != 'admin' &&
-							$route.name != 'showFile'
-						"
-					/> -->
 					<router-view
 						:server="server"
 						:catchError="catchError"
@@ -229,6 +215,7 @@ export default {
 						:api="api"
 						v-if="auths.id && dashboard && $route.name == 'admin'"
 					/>
+
 					<template v-if="$route.name == 'Home' && dashboard">
 						<ShowFile :server="server" :dashboard="dashboard" :about="about" />
 					</template>
