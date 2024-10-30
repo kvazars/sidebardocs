@@ -6,21 +6,23 @@ import AuthWindow from "@/components/AuthWindow.vue";
 import { toast } from "vue3-toastify";
 import { useAuthIdStore } from "../stores/authId";
 import ShowFile from "@/views/ShowFile.vue";
+import Page500 from "@/views/pages/Page500.vue";
 
 export default {
-	components: { AppFooter, AppHeader, AppSidebar, AuthWindow, ShowFile },
+	components: { AppFooter, AppHeader, Page500, AppSidebar, AuthWindow, ShowFile },
 	data() {
 		return {
 			menu: [],
-			// api: "http://172.16.1.223:8000/api/",
-			api: "http://127.0.0.1:8000/api/",
-			// server: "http://172.16.1.223:8000",
-			server: "http://127.0.0.1:8000",
+			api: "http://172.16.1.223:8000/api/",
+			// api: "http://127.0.0.1:8000/api/",
+			server: "http://172.16.1.223:8000",
+			// server: "http://127.0.0.1:8000",
 			openWindow: false,
 			auths: useAuthIdStore(),
 			dashboard: null,
 			about: null,
 			viewSuccess: false,
+			page500: false,
 		};
 	},
 	mounted() {
@@ -56,16 +58,22 @@ export default {
 			}
 
 			try {
-				let response = await fetch(this.api + path, requestOptions);
+				let response = await fetch(this.api + path, requestOptions).catch(()=>{
+					
+					this.page500 = true;
+				
+				});
 				if (response.status == 403 || response.status == 401) {
 					this.logoutFun();
 				}
 				return await response.json();
 			} catch (error) {
-				this.$router.push({ name: "Page500" });
+				this.page500 = true;
+				// this.$router.push({ name: "Page500" });
 			}
 		},
 		catchError(error) {
+		
 			for (let index = 0; index < Object.keys(error).length; index++) {
 				Object.values(error)[index].forEach((element) => {
 					this.showToast(false, element);
@@ -137,6 +145,7 @@ export default {
 				})
 				.catch((error) => {
 					console.log(error);
+					
 				});
 		},
 		transformItems(items) {
@@ -196,6 +205,9 @@ export default {
 			/>
 			<div class="body flex-grow-1">
 				<CContainer class="px-4">
+					<template v-if="page500">
+						<Page500 />
+					</template>
 					<router-view
 						:server="server"
 						:catchError="catchError"
@@ -205,7 +217,7 @@ export default {
 						:showToast="showToast"
 						:key="$route.fullPath"
 						:authss="auths.id"
-						v-if="$route.name != 'Home' && $route.name != 'admin' && viewSuccess"
+						v-if="!page500&&$route.name != 'Home' &&$route.name != 'Page500' && $route.name != 'admin' && viewSuccess"
 					/>
 					<router-view
 						:server="server"
@@ -221,6 +233,7 @@ export default {
 					<template v-if="$route.name == 'Home' && dashboard">
 						<ShowFile :server="server" :dashboard="dashboard" :about="about" />
 					</template>
+					
 				</CContainer>
 			</div>
 			<AppFooter />

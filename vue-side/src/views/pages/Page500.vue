@@ -5,9 +5,9 @@
         <CCol :md="6">
           <span class="clearfix">
             <h1 class="float-start display-3 me-4">500</h1>
-            <h4 class="pt-3">Хьюстон, у нас проблемы!</h4>
+            <h4 class="pt-3">Проблемы на сервере!</h4>
             <p class="text-body-secondary float-start">
-              Сайт временно не доступен
+              Сайт временно недоступен :-(
             </p>
           </span>
         </CCol>
