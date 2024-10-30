@@ -20,16 +20,17 @@
                             :id="'accessibility_for_' + val.id"
                     /></CTableDataCell>
                     <CTableDataCell>
-                        <div v-for="(g, index) in groups" :key="index">
+                        <div v-for="(g, index) in val.groups" :key="index">
                             <input
                                 class="form-check-input"
                                 type="checkbox"
-                                :id="'group_' + g.id"
+                                v-model="files[val.id].groups[index].checked"
+                                :id="'group_' + val.id+'-'+g.id"
                             />
                             <label
                                 style="user-select: none"
                                 class="form-check-label"
-                                :for="'group_' + g.id"
+                                :for="'group_'+ val.id+'-'+g.id"
                             >
                                 {{ g.name }}
                             </label>
@@ -84,7 +85,9 @@ export default {
         getFiles() {
             this.datasend("getFiles", "GET", {})
                 .then((res) => {
-                    this.files = res.files;
+                console.log(res);
+                
+                    this.files = res;
 
                     // console.log(res.groups);
                     // this.groups = res.groups;

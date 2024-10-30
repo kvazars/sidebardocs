@@ -240,21 +240,18 @@ class ContentController extends Controller
         } else {
             $files = Tree::where('type', 'file')->with(['child', 'user', 'parent', 'available'])->get()->keyBy("id");
         }
-
-        $group = Group::get()->keyBy("id");
+        $group = Group::get();
         foreach ($files as $file) {
-            // dd ($file);
             $file->child->accessibility = $file->child->accessibility == 1;
-            $file->groups = $group;
+
             $a = $file->available->pluck("group_id")->toArray();
-            // dd($a);
-            foreach ($file->groups as $g) {
-                $file->groups[$g->id]->checked =
-                in_array($g->id, $a)?'true':'false';
-                //->checked = in_array($g->id, $a);
+            $res = [];
+            foreach ($group->toArray() as $g) {
+                $res[] = array_merge($g, ["checked" => in_array($g['id'], $a) ? true : false]);
             }
+            $file->groups = $res;
         }
 
-        return ["files" => $files];
+        return $files;
     }
 }
