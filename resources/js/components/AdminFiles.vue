@@ -1,5 +1,5 @@
 <template>
-    <div v-if="files">
+    <div v-if="viewOk">
         <CTable>
             <CTableHead>
                 <CTableRow>
@@ -12,14 +12,27 @@
             </CTableHead>
             <CTableBody>
                 <CTableRow v-for="val in files">
-                    <CTableDataCell>{{ val.name }}</CTableDataCell>
+                    <CTableDataCell>{{ val.name }} </CTableDataCell>
                     <CTableDataCell>{{ val.parent.name }}</CTableDataCell>
-                    <CTableDataCell>{{
-                        val.child.accessibility
-                    }}</CTableDataCell>
+                    <CTableDataCell>
+                        <CFormSwitch
+                            v-model="files[val.id].child.accessibility"
+                            :id="'accessibility_for_' + val.id"
+                    /></CTableDataCell>
                     <CTableDataCell>
                         <div v-for="(g, index) in groups" :key="index">
-                            {{ g.name }}
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                :id="'group_' + g.id"
+                            />
+                            <label
+                                style="user-select: none"
+                                class="form-check-label"
+                                :for="'group_' + g.id"
+                            >
+                                {{ g.name }}
+                            </label>
                         </div>
                     </CTableDataCell>
                     <CTableDataCell
@@ -47,6 +60,8 @@ export default {
         return {
             files: null,
             groups: null,
+            group: [],
+            viewOk: false,
         };
     },
     mounted() {
@@ -54,7 +69,7 @@ export default {
     },
     methods: {
         save(id) {
-            
+            console.log(this.files[id]);
         },
         delete(id) {
             this.datasend("resource/" + id, "DELETE", {})
@@ -69,9 +84,46 @@ export default {
         getFiles() {
             this.datasend("getFiles", "GET", {})
                 .then((res) => {
-                    console.log(res);
                     this.files = res.files;
-                    this.groups = res.groups;
+
+                    // console.log(res.groups);
+                    // this.groups = res.groups;
+
+                    // Object.values(this.files).forEach((el) => {
+                    //     // this.group.push({'id':5});
+
+                    //     let gr = [];
+                    //     this.group[el.id] = res.groups;
+                    //     // console.log(res.groups);
+
+                    //     Object.values(el.available).forEach((els) => {
+                    //         gr.push(els.group_id);
+                    //     });
+                    //     console.log(gr);
+                    //     // console.log(this.group[el.id], el.id);
+                    //     Object.values(this.group[el.id]).forEach((elem) => {
+                    //         console.log(elem, el.id);
+                    //         // console.log(gr.includes(elem.id));
+                    //         // console.log(this.group[el.id], el.id);
+                    //         // if (gr.includes(elem.id)) {
+                    //             this.group[el.id][elem.id].checked = gr.includes(elem.id);
+                    //             //this.group[el.id] == els.group_id;
+                    //             // console.log(this.group[el.id][elem.id]);
+                    //         // } else {
+                    //             // this.group[el.id][elem.id].checked = false;
+                    //         // }
+                    //     });
+                    //     // console.log(this.group);
+
+                    //     //  this.groups.checked =
+
+                    //     el.child.accessibility = el.child.accessibility
+                    //         ? true
+                    //         : false;
+                    // });
+                    // console.log(this.group);
+
+                    this.viewOk = true;
                 })
                 .catch((error) => {
                     console.log(error);

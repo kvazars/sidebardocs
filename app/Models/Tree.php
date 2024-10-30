@@ -18,7 +18,7 @@ class Tree extends Model
     ];
     public function child()
     {
-        return $this->hasOne(Content::class, );
+        return $this->hasOne(Content::class);
     }
     public function parent()
     {
