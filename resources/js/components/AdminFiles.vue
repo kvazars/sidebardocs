@@ -25,12 +25,12 @@
                                 class="form-check-input"
                                 type="checkbox"
                                 v-model="files[val.id].groups[index].checked"
-                                :id="'group_' + val.id+'-'+g.id"
+                                :id="'group_' + val.id + '-' + g.id"
                             />
                             <label
                                 style="user-select: none"
                                 class="form-check-label"
-                                :for="'group_'+ val.id+'-'+g.id"
+                                :for="'group_' + val.id + '-' + g.id"
                             >
                                 {{ g.name }}
                             </label>
@@ -85,8 +85,8 @@ export default {
         getFiles() {
             this.datasend("getFiles", "GET", {})
                 .then((res) => {
-                console.log(res);
-                
+                    console.log(res);
+
                     this.files = res;
 
                     // console.log(res.groups);
