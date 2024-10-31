@@ -7,7 +7,8 @@ use App\Http\Requests\StoreAboutRequest;
 use App\Http\Requests\UpdateAboutRequest;
 use App\Models\Content;
 use Illuminate\Support\Facades\Storage;
-
+use Intervention\Image\Laravel\Facades\Image;
+use Illuminate\Support\Str;
 class AboutController extends Controller
 {
     /**
@@ -22,13 +23,26 @@ class AboutController extends Controller
     public function store(StoreAboutRequest $request)
     {
         // Storage::disk("public")->put($path, $resize);
+
         $path = "";
         if ($request->file('logo')) {
+
+
             $request->validate([
                 'logo' => 'image|max:512',
             ]);
-
-            $path = Storage::disk("public")->putFile("logo", $request->file("logo"));
+            
+           
+            $dir = public_path("logo");
+        if (!is_dir($dir)) {
+        mkdir($dir);
+        }
+            $image   = Image::read($request->file('logo'));
+            $resize = $image->toWebp(90);
+            $name = Str::random(40) . ".webp";
+            $path = 'logo/'.$name;
+            Storage::disk("public")->put($dir.'/'.$name, $resize);
+            // $path = Storage::disk("public")->putFile("logo/", $request->file("logo"));
         }
         $about = About::find(1);
         $about->name = $request->name;
