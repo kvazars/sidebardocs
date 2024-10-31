@@ -52,7 +52,7 @@ class DatabaseSeeder extends Seeder
         ]);
         About::create([
             'name'=>fake()->paragraph(),
-            'logo'=>'notfound.webp',
+            'logo'=>'notfound.png',
         ]);
     }
 }
