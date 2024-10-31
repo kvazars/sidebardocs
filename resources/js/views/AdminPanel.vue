@@ -571,28 +571,20 @@ export default {
             }
         },
         updateAbout() {
-            // console.log();
             this.$refs.child.editor.save().then((outputData) => {
-                console.log(outputData);
-
-                // console.log(outputData);
                 outputData.blocks.forEach((el) => {
                     if (el.type == "image" || el.type == "attaches") {
-                        // console.log( el.data.file.url);
-                        // return;
-                        if (el.data.file.url[0] == "/") {
-                            el.data.file.url = el.data.file.url;
-                        } else {
-                            let els = el.data.file.url.split(this.server);
-                            el.data.file.url = els.length > 0 ? els[1] : els[0];
+                        if (el.data.file.url[0] == "h") {
+                            el.data.file.url = el.data.file.url.split(
+                                this.server
+                            )[1];
                         }
                     }
 
                     if (el.type == "gallery") {
-                        el.data.files.forEach((el) => {
-                            if (!el.url[0] == "/") {
-                                let els = el.url.split(this.server);
-                                el.url = els.length > 0 ? els[1] : els[0];
+                        el.data.files.forEach((els) => {
+                            if (els.url[0] == "h") {
+                                els.url = els.url.split(this.server)[1];
                             }
                         });
                     }
@@ -615,7 +607,6 @@ export default {
                 }
                 this.datasend("about", "POST", form)
                     .then((res) => {
-                        // console.log(res);
                         this.showToast(res.success, res.message);
                         if (res.success) {
                             this.getList();
