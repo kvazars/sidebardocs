@@ -155,9 +155,7 @@ class ContentController extends Controller
     public function delResource(Request $request, Tree $content)
     {
 
-        if ($request->user()->role == 'user') {
-            return response()->json(["success" => false, 'message' => 'Недостаточно прав']);
-        }
+      
 
         if ($request->user()->role == 'ceo' and $request->user()->id != $content->user_id) {
             return response()->json(["success" => false, 'message' => 'Недостаточно прав']);

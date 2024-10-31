@@ -3,28 +3,37 @@
         <CTable>
             <CTableHead>
                 <CTableRow>
-                    <CTableHeaderCell scope="col">#</CTableHeaderCell>
-                    <CTableHeaderCell scope="col">Class</CTableHeaderCell>
-                    <CTableHeaderCell scope="col">Heading</CTableHeaderCell>
-                    <CTableHeaderCell scope="col">Heading</CTableHeaderCell>
-                    <CTableHeaderCell scope="col">Save</CTableHeaderCell>
+                    <CTableHeaderCell scope="col" v-if="files.user"
+                        >Менеджер</CTableHeaderCell
+                    >
+                    <CTableHeaderCell scope="col">Документ</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">Родитель</CTableHeaderCell>
+                    <CTableHeaderCell scope="col"
+                        >Доступно всем</CTableHeaderCell
+                    >
+                    <CTableHeaderCell scope="col">Группы</CTableHeaderCell>
+                    <CTableHeaderCell scope="col"></CTableHeaderCell>
                 </CTableRow>
             </CTableHead>
             <CTableBody>
-                <CTableRow v-for="val in files">
+                <CTableRow v-for="val in files" :key="val">
+                    <CTableDataCell v-if="val.user"
+                        >{{ val.user.name }}
+                    </CTableDataCell>
                     <CTableDataCell>{{ val.name }} </CTableDataCell>
                     <CTableDataCell>{{ val.parent.name }}</CTableDataCell>
                     <CTableDataCell>
                         <CFormSwitch
-                            v-model="files[val.id].child.accessibility"
+                            v-model="val.child.accessibility"
                             :id="'accessibility_for_' + val.id"
-                    /></CTableDataCell>
+                        />
+                    </CTableDataCell>
                     <CTableDataCell>
                         <div v-for="(g, index) in val.groups" :key="index">
                             <input
                                 class="form-check-input"
                                 type="checkbox"
-                                v-model="files[val.id].groups[index].checked"
+                                v-model="val.groups[index].checked"
                                 :id="'group_' + val.id + '-' + g.id"
                             />
                             <label
@@ -36,15 +45,15 @@
                             </label>
                         </div>
                     </CTableDataCell>
-                    <CTableDataCell
-                        ><CButtonGroup role="group">
+                    <CTableDataCell>
+                        <CButtonGroup role="group">
                             <CButton color="primary" @click="save(val.id)"
                                 ><i class="fa fa-floppy-o"></i
                             ></CButton>
                             <CButton
                                 class="text-white"
                                 color="danger"
-                                @click="delete val.id"
+                                @click="remove(val.id)"
                                 ><i class="fa fa-trash"></i
                             ></CButton>
                         </CButtonGroup>
@@ -71,10 +80,13 @@ export default {
     methods: {
         save(id) {
             console.log(this.files[id]);
-        },
-        delete(id) {
-            this.datasend("resource/" + id, "DELETE", {})
+            let form = new FormData();
+            form.append("id", id);
+            form.append("accessibility", this.files[id].child.accessibility?1:0);
+            form.append("groups", JSON.stringify(this.files[id].groups));
+            this.datasend("saveresourceadmin", "POST", form)
                 .then((res) => {
+                    console.log(res);
                     if (res.success) {
                         this.getFiles();
                         this.showToast(res.success, res.message);
@@ -82,50 +94,24 @@ export default {
                 })
                 .catch((error) => console.log(error));
         },
+        remove(id) {
+            if (confirm("Вы уверены?")) {
+                this.datasend("resourcedel/" + id, "DELETE", {})
+                    .then((res) => {
+                        console.log(res);
+                        if (res.success) {
+                            this.getFiles();
+                            this.showToast(res.success, res.message);
+                        }
+                    })
+                    .catch((error) => console.log(error));
+            }
+        },
         getFiles() {
             this.datasend("getFiles", "GET", {})
                 .then((res) => {
                     console.log(res);
-
                     this.files = res;
-
-                    // console.log(res.groups);
-                    // this.groups = res.groups;
-
-                    // Object.values(this.files).forEach((el) => {
-                    //     // this.group.push({'id':5});
-
-                    //     let gr = [];
-                    //     this.group[el.id] = res.groups;
-                    //     // console.log(res.groups);
-
-                    //     Object.values(el.available).forEach((els) => {
-                    //         gr.push(els.group_id);
-                    //     });
-                    //     console.log(gr);
-                    //     // console.log(this.group[el.id], el.id);
-                    //     Object.values(this.group[el.id]).forEach((elem) => {
-                    //         console.log(elem, el.id);
-                    //         // console.log(gr.includes(elem.id));
-                    //         // console.log(this.group[el.id], el.id);
-                    //         // if (gr.includes(elem.id)) {
-                    //             this.group[el.id][elem.id].checked = gr.includes(elem.id);
-                    //             //this.group[el.id] == els.group_id;
-                    //             // console.log(this.group[el.id][elem.id]);
-                    //         // } else {
-                    //             // this.group[el.id][elem.id].checked = false;
-                    //         // }
-                    //     });
-                    //     // console.log(this.group);
-
-                    //     //  this.groups.checked =
-
-                    //     el.child.accessibility = el.child.accessibility
-                    //         ? true
-                    //         : false;
-                    // });
-                    // console.log(this.group);
-
                     this.viewOk = true;
                 })
                 .catch((error) => {

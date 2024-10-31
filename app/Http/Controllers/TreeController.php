@@ -40,6 +40,30 @@ class TreeController extends Controller
             return [];
         }
     }
+
+    public function saveresourceadmin(Request $request) {
+         Content::where("tree_id",$request->id)->update(["accessibility"=>$request->accessibility]);
+         Available::where('tree_id', $request->id)->delete();
+
+         if (!$request->accessibility) {
+             foreach (json_decode($request->groups) as $available) {
+                return $available;
+                 if ($available->checked) {
+                     Available::create(
+                         [
+                             'group_id' => $available->group_id,
+                             'tree_id' => $request->id,
+                         ]
+                     );
+                 }
+             }
+         }
+        //  foreach (json_decode($request->groups);
+        return response()->json(['success' => true, 'message' => "Успешно"]);
+
+        // return $request->groups;
+    }
+
     public function upanddown($operation, Tree $id)
     {
         $trees = Tree::where("tree_id", $id->tree_id)->where("user_id", $id->user_id)->orderBy("position")->orderBy("id")->get();

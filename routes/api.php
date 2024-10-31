@@ -29,6 +29,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post("/saveFile", [ContentController::class, "saveFile"]);
         Route::delete("/folder/{del}", [TreeController::class, "delete"]);
         Route::delete("/resourcedel/{content}", [ContentController::class, "delResource"]);
+        Route::post("/saveresourceadmin", [TreeController::class, "saveresourceadmin"]);
         Route::post("/folder", [TreeController::class, "store"]);
         Route::post("/doc/{operation}/{id}", [TreeController::class, "upanddown"]);
         Route::get('/getGroups', [AvailableController::class, 'index']);
