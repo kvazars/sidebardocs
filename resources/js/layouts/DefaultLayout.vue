@@ -250,7 +250,7 @@ export default {
                     </template>
                 </CContainer>
             </div>
-            <AppFooter />
+            <AppFooter :about="about" />
         </div>
         <AuthWindow
             :openWindow="openWindow"
