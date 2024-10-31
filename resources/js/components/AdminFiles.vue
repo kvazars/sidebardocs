@@ -3,8 +3,9 @@
         <CTable>
             <CTableHead>
                 <CTableRow>
-             
-                    <CTableHeaderCell scope="col" v-if="Object.values(files)[0].user"
+                    <CTableHeaderCell
+                        scope="col"
+                        v-if="Object.values(files)[0].user"
                         >Менеджер</CTableHeaderCell
                     >
                     <CTableHeaderCell scope="col">Документ</CTableHeaderCell>
@@ -80,10 +81,12 @@ export default {
     },
     methods: {
         save(id) {
-            console.log(this.files[id]);
             let form = new FormData();
             form.append("id", id);
-            form.append("accessibility", this.files[id].child.accessibility?1:0);
+            form.append(
+                "accessibility",
+                this.files[id].child.accessibility ? 1 : 0
+            );
             form.append("groups", JSON.stringify(this.files[id].groups));
             this.datasend("saveresourceadmin", "POST", form)
                 .then((res) => {
@@ -98,7 +101,6 @@ export default {
             if (confirm("Вы уверены?")) {
                 this.datasend("resourcedel/" + id, "DELETE", {})
                     .then((res) => {
-                        console.log(res);
                         if (res.success) {
                             this.getFiles();
                             this.showToast(res.success, res.message);
@@ -110,7 +112,6 @@ export default {
         getFiles() {
             this.datasend("getFiles", "GET", {})
                 .then((res) => {
-                    console.log(res);
                     this.files = res;
                     this.viewOk = true;
                 })
