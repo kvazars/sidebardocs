@@ -226,7 +226,7 @@ export default {
 		<button
 			class="btn btn btn-light p-0"
 			@click="addFirstLevel"
-			v-if="auths.role == 'ceo'"
+			v-if="auths.role == 'ceo' || auths.role == 'admin'"
 		>
 			<i class="fa fa-plus-circle fs-4" aria-hidden="true"></i>
 		</button>

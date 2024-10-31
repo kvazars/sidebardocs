@@ -47,11 +47,11 @@ class TreeController extends Controller
 
          if (!$request->accessibility) {
              foreach (json_decode($request->groups) as $available) {
-                return $available;
+                // return $available;
                  if ($available->checked) {
                      Available::create(
                          [
-                             'group_id' => $available->group_id,
+                             'group_id' => $available->id,
                              'tree_id' => $request->id,
                          ]
                      );

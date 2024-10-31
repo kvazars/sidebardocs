@@ -86,7 +86,6 @@ export default {
             form.append("groups", JSON.stringify(this.files[id].groups));
             this.datasend("saveresourceadmin", "POST", form)
                 .then((res) => {
-                    console.log(res);
                     if (res.success) {
                         this.getFiles();
                         this.showToast(res.success, res.message);
