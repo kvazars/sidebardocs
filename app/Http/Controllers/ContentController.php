@@ -50,7 +50,7 @@ class ContentController extends Controller
         }
         $name = Str::random(40) . ".".$request->file('file')->extension();
         $pathshort = $dirshort.'/'.$name;
-        Storage::disk("public")->putFile($dir, $request->file('file'));
+        Storage::disk("public")->putFileAs($dir, $request->file('file'),$name);
         return response()->json(['success' => 1, 'file' => ['url' => URL::to('/') . "/" . $pathshort]], 200);
     }
 
