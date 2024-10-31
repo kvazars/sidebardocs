@@ -3,7 +3,8 @@
         <CTable>
             <CTableHead>
                 <CTableRow>
-                    <CTableHeaderCell scope="col" v-if="files.user"
+             
+                    <CTableHeaderCell scope="col" v-if="Object.values(files)[0].user"
                         >Менеджер</CTableHeaderCell
                     >
                     <CTableHeaderCell scope="col">Документ</CTableHeaderCell>
