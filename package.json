@@ -42,6 +42,7 @@
         "jspdf": "^2.5.2",
         "pinia": "^2.2.5",
         "sortablejs": "^1.15.3",
+        "super-vue3-tabs": "^1.2.5",
         "vue": "^3.5.12",
         "vue-doc-exporter": "^1.2.9",
         "vue-easy-lightbox": "^1.19.0",
