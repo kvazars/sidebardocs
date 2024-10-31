@@ -23,7 +23,7 @@
         'vsm--title',
         isCollapsed && isFirstLevel && !isMobileItem && 'vsm--title_hidden',
       ]" :style="isMobileItem && mobileItemStyle">
-        <span>{{ item.title }}</span>
+        <span :title="item.title">{{ item.title }}</span>
         <sidebar-menu-badge v-if="item.badge" :badge="item.badge" />
         <div v-if="hasChild" :class="['vsm--arrow', { 'vsm--arrow_open': show }]">
           <slot name="dropdown-icon" v-bind="{ isOpen: show }" />

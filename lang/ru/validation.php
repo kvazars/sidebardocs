@@ -207,6 +207,7 @@ return [
         'day' => 'День',
         'default' => 'По умолчанию',
         'description' => 'Описание',
+        'data' => 'Содержимое',
         'email' => 'E-Mail адрес',
         'enabled' => 'Включено',
         'first_name' => 'Имя',

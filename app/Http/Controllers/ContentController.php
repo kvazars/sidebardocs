@@ -13,7 +13,6 @@ use App\Models\UserGroups;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -26,27 +25,51 @@ class ContentController extends Controller
      */
     public function saveImage(Request $request)
     {
-        if ($request->file('image')) {
+        $dirshort = "contentImages/" . Auth::user()->id;
+        $dir = public_path($dirshort);
+        if (!is_dir($dir)) {
+        mkdir($dir);
+        }
+        //return $request->file('image');
+       if ($request->file('image')) {
             $path   = Image::read($request->file('image'));
             $resize = $path->scaleDown(1024, 1024)->toWebp(90);
-            $path = "contentImages/" . Auth::user()->id . "/" . Str::random(40) . ".webp";
+            $name = Str::random(40) . ".webp";
+            $path = $dir . "/" . $name;
+            $pathshort = $dirshort.'/'.$name;
             Storage::disk("public")->put($path, $resize);
-            return response()->json(['success' => 1, 'file' => ['url' => URL::to('/') . "/" . $path]], 200);
+            return response()->json(['success' => 1, 'file' => ['url' => URL::to('/') . "/" . $pathshort]], 200);
         }
     }
     public function saveFile(UploadFileRequest $request)
     {
-        $path = Storage::disk("public")->putFile("contentFiles/" . Auth::user()->id, $request->file('file'));
-        return response()->json(['success' => 1, 'file' => ['url' => URL::to('/') . "/" . $path]], 200);
+        $dirshort = "contentFiles/" . Auth::user()->id;
+        $dir = public_path($dirshort);
+        if (!is_dir(filename: $dir)) {
+        mkdir($dir);
+        }
+        $name = Str::random(40) . ".".$request->file('file')->extension();
+        $pathshort = $dirshort.'/'.$name;
+        Storage::disk("public")->putFile($dir, $request->file('file'));
+        return response()->json(['success' => 1, 'file' => ['url' => URL::to('/') . "/" . $pathshort]], 200);
     }
 
     public function saveImageByUrl(Request $request)
     {
+        $dirshort = "contentImages/" . Auth::user()->id;
+        $dir = public_path($dirshort);
+        if (!is_dir($dir)) {
+        mkdir($dir);
+        }
         $path   = Image::read(file_get_contents($request->url));
         $resize = $path->scaleDown(1024, 1024)->toWebp(100);
-        $path = "contentImages/" . Auth::user()->id . "/" . Str::random(40) . ".webp";
+
+        $name = Str::random(40) . ".webp";
+        $path = $dir . "/" . $name;
+        $pathshort = $dirshort.'/'.$name;
+
         Storage::disk("public")->put($path, $resize);
-        return response()->json(['success' => 1, 'file' => ['url' => URL::to('/') . "/" . $path]], 200);
+        return response()->json(['success' => 1, 'file' => ['url' => URL::to('/') . "/" . $pathshort]], 200);
     }
 
     public function saveResource(ResourceSaveRequest $request)
