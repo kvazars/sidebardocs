@@ -166,13 +166,15 @@
                                     v-if="num == 0 && val.data.withHeadings"
                                     v-for="tHeader in tRow"
                                     :key="tHeader"
-                                >
-                                    {{ tHeader }}
-                                </th>
+                                    v-html="tHeader"
+                                ></th>
                                 <!-- eslint-enable -->
-                                <td v-else v-for="tText in tRow" :key="tText">
-                                    {{ tText }}
-                                </td>
+                                <td
+                                    v-else
+                                    v-for="tText in tRow"
+                                    :key="tText"
+                                    v-html="tText"
+                                ></td>
                             </tr>
                         </tbody>
                     </table>
