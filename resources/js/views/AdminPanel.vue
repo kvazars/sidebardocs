@@ -479,9 +479,8 @@
 </template>
 
 <script>
-import EditFile from "./EditFile.vue";
+import EditFile from "./editFile.vue";
 import AdminFiles from "../components/AdminFiles.vue";
-import { CCard } from "@coreui/vue";
 
 export default {
     props: [

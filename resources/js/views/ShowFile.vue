@@ -16,7 +16,7 @@
 						<div
 							:id="'carousel' + val.id"
 							class="carousel slide carousel-dark"
-							style="height: 400px"
+							
 						>
 							<div class="carousel-indicators">
 								<button
@@ -32,7 +32,6 @@
 							</div>
 							<div
 								class="carousel-inner"
-								style="height: 400px !important"
 							>
 								<div
 									class="carousel-item text-center"
@@ -78,13 +77,15 @@
 						<div
 							v-for="(url, key) in imgs[val.id]"
 							:key="key"
-							class="pic col-lg-3 col-md-4 col-6 mb-4"
+							class="pic col-lg-3 col-md-4 col-sm-6 col-12 mb-4"
 						>
+						<div class="img-thumbnail h-100 d-flex">
 							<img
 								:src="url"
-								class="img-fluid h-100 d-block img-thumbnail"
+								class="img-fluid d-block "
 								@click="() => showImg(val.id, key)"
 							/>
+						</div>
 						</div>
 					</div>
 
@@ -150,7 +151,7 @@
 					<h4 v-if="val.data.level == 4" v-html="val.data.text"></h4>
 				</div>
 
-				<div class="tableBlock my-4" v-if="val.type == 'table'">
+				<div class="tableBlock my-4 table-responsive" v-if="val.type == 'table'">
 					<table
 						class="table table-bordered"
 						style="margin: auto"
