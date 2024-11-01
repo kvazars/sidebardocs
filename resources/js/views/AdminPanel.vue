@@ -479,7 +479,7 @@
 </template>
 
 <script>
-import EditFile from "./editFile.vue";
+import EditFile from "./EditFile.vue";
 import AdminFiles from "../components/AdminFiles.vue";
 
 export default {
