@@ -2,8 +2,10 @@
 // .ce-block__content,
 // .ce-toolbar__content {
 // 	max-width: calc(100% - 120px) !important;
-// }
-
+// }.v-sidebar-menu .vsm--link
+body .v-sidebar-menu .vsm--link {
+	padding: 6px;
+}
 body .ce-block__content {
 	width: 100%;
 	max-width: inherit;

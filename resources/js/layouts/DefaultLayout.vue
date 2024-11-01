@@ -7,6 +7,7 @@ import { toast } from "vue3-toastify";
 import { useAuthIdStore } from "../stores/authId";
 import ShowFile from "../views/ShowFile.vue";
 import Page500 from "../views/pages/Page500.vue";
+import AppBreadcrumb from "../components/AppBreadcrumb.vue";
 
 export default {
     components: {
@@ -16,6 +17,7 @@ export default {
         AppSidebar,
         AuthWindow,
         ShowFile,
+        AppBreadcrumb,
     },
     data() {
         return {
@@ -28,10 +30,16 @@ export default {
             about: null,
             viewSuccess: false,
             page500: false,
+            breadcrumbs: [],
         };
     },
     mounted() {
         this.getMenu();
+    },
+    watch: {
+        $route(to, from) {
+            this.getBreadcrumbs();
+        },
     },
     methods: {
         openWindowFunction() {
@@ -147,6 +155,7 @@ export default {
 
                     this.menu = menucreateparent();
                     this.menu = this.transformItems(this.menu);
+                    setTimeout(this.getBreadcrumbs, 1000);
                 })
                 .catch((error) => {
                     console.log(error);
@@ -165,6 +174,7 @@ export default {
                     }),
                 };
             });
+
             return it;
         },
         showToast(success, message) {
@@ -184,6 +194,21 @@ export default {
                     autoClose: 3000,
                 });
             }
+        },
+        getBreadcrumbs() {
+            let arr = [];
+
+            document
+                .querySelectorAll(".vsm--link_active>.vsm--title>span")
+                .forEach((el) => {
+                    arr.push(el.textContent);
+                });
+            console.log(arr);
+
+            // if (!arr.length) {
+            //     arr = [this.$router.currentRoute.value.meta.title];
+            // }
+            this.breadcrumbs = arr;
         },
     },
 };
@@ -207,6 +232,12 @@ export default {
                 :datasend="datasend"
                 :logoutFun="logoutFun"
             />
+            <CContainer
+                class="p-3 position-sticky bg-white border-bottom"
+                fluid
+            >
+                <AppBreadcrumb :breadcrumbs="breadcrumbs" />
+            </CContainer>
             <div class="body flex-grow-1">
                 <CContainer class="px-4">
                     <template v-if="page500">
