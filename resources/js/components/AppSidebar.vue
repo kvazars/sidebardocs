@@ -70,7 +70,8 @@ export default {
         };
     },
     mounted() {
-        this.logo = this.server + "/" + this.about.logo;
+        if(this.about)
+        this.logo =  this.server + "/" + this.about.logo;
     },
     methods: {
         closeContextMenu() {

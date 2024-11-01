@@ -37,8 +37,8 @@ export default {
         this.getMenu();
     },
     watch: {
-        $route(to, from) {
-            this.getBreadcrumbs();
+        $route() {
+            setTimeout(this.getBreadcrumbs, 1000);
         },
     },
     methods: {
@@ -203,11 +203,10 @@ export default {
                 .forEach((el) => {
                     arr.push(el.textContent);
                 });
-            console.log(arr);
 
-            // if (!arr.length) {
-            //     arr = [this.$router.currentRoute.value.meta.title];
-            // }
+            if (!arr.length) {
+                arr = [this.$router.currentRoute.value.meta.title];
+            }
             this.breadcrumbs = arr;
         },
     },
@@ -233,7 +232,7 @@ export default {
                 :logoutFun="logoutFun"
             />
             <CContainer
-                class="p-3 position-sticky bg-white border-bottom"
+                class="p-3 position-sticky bg-white border-bottom minh60"
                 fluid
             >
                 <AppBreadcrumb :breadcrumbs="breadcrumbs" />
