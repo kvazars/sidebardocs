@@ -72,14 +72,11 @@ class UserController extends Controller
     }
     public function delete(User $id)
     {
-        if($id->id==1){
-            return response()->json(["success" => false, "message"=>"Запрещено удалять пользователя!"]);
-
+        if ($id->id == 1) {
+            return response()->json(["success" => false, "message" => "Запрещено удалять пользователя!"]);
         }
-        UserGroups::where("user_id",$id->id)->delete();
+        UserGroups::where("user_id", $id->id)->delete();
         $id->delete();
-        return response()->json(["success" => true, "message"=>"Пользователь успешно удален"]);
+        return response()->json(["success" => true, "message" => "Пользователь успешно удален"]);
     }
-
-    
 }

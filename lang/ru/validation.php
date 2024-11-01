@@ -213,6 +213,7 @@ return [
         'first_name' => 'Имя',
         'gender' => 'Пол',
         'hour' => 'Час',
+        'logo' => 'Логотип',
         'last_name' => 'Фамилия',
         'middle_name' => 'Отчество',
         'minute' => 'Минута',

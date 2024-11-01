@@ -107,6 +107,8 @@
 						label="Пример кода"
 						:lang="val.data.language"
 						theme="monokai"
+						persistent-copy-button
+						
 					/>
 				</div>
 				<div

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ResourceSaveRequest;
 use App\Http\Requests\UploadFileRequest;
+use App\Models\About;
 use App\Models\Available;
 use App\Models\Content;
 use App\Models\Group;
@@ -28,15 +29,15 @@ class ContentController extends Controller
         $dirshort = "contentImages/" . Auth::user()->id;
         $dir = public_path($dirshort);
         if (!is_dir($dir)) {
-        mkdir($dir);
+            mkdir($dir);
         }
         //return $request->file('image');
-       if ($request->file('image')) {
+        if ($request->file('image')) {
             $path   = Image::read($request->file('image'));
             $resize = $path->scaleDown(1024, 1024)->toWebp(90);
             $name = Str::random(40) . ".webp";
-            $path = $dir . "/" . $name;
-            $pathshort = $dirshort.'/'.$name;
+            $path = "{$dir}/{$name}";
+            $pathshort = "{$dirshort}/{$name}";
             Storage::disk("public")->put($path, $resize);
             return response()->json(['success' => 1, 'file' => ['url' => URL::to('/') . "/" . $pathshort]], 200);
         }
@@ -46,11 +47,11 @@ class ContentController extends Controller
         $dirshort = "contentFiles/" . Auth::user()->id;
         $dir = public_path($dirshort);
         if (!is_dir(filename: $dir)) {
-        mkdir($dir);
+            mkdir($dir);
         }
-        $name = Str::random(40) . ".".$request->file('file')->extension();
-        $pathshort = $dirshort.'/'.$name;
-        Storage::disk("public")->putFileAs($dir, $request->file('file'),$name);
+        $name = Str::random(40) . "." . $request->file('file')->extension();
+        $pathshort = $dirshort . '/' . $name;
+        Storage::disk("public")->putFileAs($dir, $request->file('file'), $name);
         return response()->json(['success' => 1, 'file' => ['url' => URL::to('/') . "/" . $pathshort]], 200);
     }
 
@@ -59,14 +60,14 @@ class ContentController extends Controller
         $dirshort = "contentImages/" . Auth::user()->id;
         $dir = public_path($dirshort);
         if (!is_dir($dir)) {
-        mkdir($dir);
+            mkdir($dir);
         }
         $path   = Image::read(file_get_contents($request->url));
         $resize = $path->scaleDown(1024, 1024)->toWebp(100);
 
         $name = Str::random(40) . ".webp";
         $path = $dir . "/" . $name;
-        $pathshort = $dirshort.'/'.$name;
+        $pathshort = $dirshort . '/' . $name;
 
         Storage::disk("public")->put($path, $resize);
         return response()->json(['success' => 1, 'file' => ['url' => URL::to('/') . "/" . $pathshort]], 200);
@@ -178,7 +179,7 @@ class ContentController extends Controller
     public function delResource(Request $request, Tree $content)
     {
 
-      
+
 
         if ($request->user()->role == 'ceo' and $request->user()->id != $content->user_id) {
             return response()->json(["success" => false, 'message' => 'Недостаточно прав']);
@@ -212,6 +213,18 @@ class ContentController extends Controller
         }
 
 
+        $dir = public_path('logo');
+
+        if (is_dir($dir)) {
+            if ($dh = opendir($dir)) {
+                while (($file = readdir($dh)) !== false) {
+                    if ($file != '.' && $file != '..') {
+                        $dirFiles[] =   'logo/' . $file;
+                    }
+                }
+                closedir($dh);
+            }
+        }
         $savedImages = [];
         $savedFiles = [];
 
@@ -235,20 +248,15 @@ class ContentController extends Controller
                     }
             }
         }
+        $about = About::find(1);
 
-        //return $savedImages;
-        $del = array_diff($dirFiles, array_merge($savedImages, $savedFiles));
-        // foreach ($del as $value) {
-        //     Storage::delete()
-        // }
+        $del = array_diff($dirFiles, array_merge($savedImages, $savedFiles, [$about->logo]));
+
         Storage::disk('public')->delete($del);
-        // return array_diff($dirFiles, array_merge($savedImages, $savedFiles));
         Artisan::call('route:clear');
         Artisan::call('cache:clear');
 
         return response()->json(['success' => true, 'message' => 'Кэш очищен']);
-
-        // return array_merge($savedImages, $savedFiles);
     }
 
 

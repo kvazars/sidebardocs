@@ -19,7 +19,7 @@ class UploadFileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "file"=>"required|max:10240|mimes:zip,7z,json,jpg,png,7zip,ppt,pptx,doc,docx,xls,xlsx,pdf,rar"
+            "file"=>"required|max:2048|mimes:zip,7z,json,jpg,png,7zip,ppt,pptx,doc,docx,xls,xlsx,pdf,rar"
         ];
     }
 }

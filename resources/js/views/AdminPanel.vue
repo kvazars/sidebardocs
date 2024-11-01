@@ -606,7 +606,7 @@ export default {
                     );
                 }
                 this.datasend("about", "POST", form)
-                    .then((res) => {
+                    .then((res) => {                        
                         this.showToast(res.success, res.message);
                         if (res.success) {
                             this.getList();

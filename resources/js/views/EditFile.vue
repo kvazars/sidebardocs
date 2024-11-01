@@ -437,7 +437,7 @@ export default {
 const aceConfig = {
 	languages: {
 		plain: {
-			label: "Plain Text",
+			label: "Простой текст",
 			mode: "ace/mode/plain_text",
 		},
 		html: {
@@ -451,6 +451,10 @@ const aceConfig = {
 		php: {
 			label: "PHP",
 			mode: "ace/mode/php",
+		},
+		sql: {
+			label: "SQL",
+			mode: "ace/mode/sql",
 		},
 	},
 	options: {
