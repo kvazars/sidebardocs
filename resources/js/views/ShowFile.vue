@@ -138,6 +138,21 @@
                     >
                 </div>
 
+                <CAlert
+                    :color="val.data.type"
+                    v-if="val.type == 'alert'"
+                    class="my-4"
+                    :class="
+                        'text-' +
+                        (val.data.align == 'left'
+                            ? 'start'
+                            : val.data.align == 'right'
+                            ? 'end'
+                            : 'center')
+                    "
+                    >{{ val.data.message }}</CAlert
+                >
+
                 <div
                     class="headerBlock text-center my-4"
                     v-if="val.type == 'header'"

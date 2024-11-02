@@ -357,6 +357,22 @@ export default {
                             InlineCode: "Моноширинный",
                         },
                         tools: {
+                            alert: {
+                                Primary: " ",
+                                Secondary: " ",
+                                Success: " ",
+                                Danger: " ",
+                                Warning: " ",
+                                Info: " ",
+                                Light: " ",
+                                Dark: " ",
+                                Left: "Слева",
+                                Center: "По центру",
+                                Right: "Справа",
+                            },
+                            embed: {
+                                "Enter a caption": "Описание...",
+                            },
                             gallery: {
                                 "Select an Image": "Выберите изображение",
                                 Delete: "Удалить",

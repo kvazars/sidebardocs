@@ -41,23 +41,24 @@ class TreeController extends Controller
         }
     }
 
-    public function saveresourceadmin(Request $request) {
-         Content::where("tree_id",$request->id)->update(["accessibility"=>$request->accessibility]);
-         Available::where('tree_id', $request->id)->delete();
+    public function saveresourceadmin(Request $request)
+    {
+        Content::where("tree_id", $request->id)->update(["accessibility" => $request->accessibility]);
+        Available::where('tree_id', $request->id)->delete();
 
-         if (!$request->accessibility) {
-             foreach (json_decode($request->groups) as $available) {
+        if (!$request->accessibility) {
+            foreach (json_decode($request->groups) as $available) {
                 // return $available;
-                 if ($available->checked) {
-                     Available::create(
-                         [
-                             'group_id' => $available->id,
-                             'tree_id' => $request->id,
-                         ]
-                     );
-                 }
-             }
-         }
+                if ($available->checked) {
+                    Available::create(
+                        [
+                            'group_id' => $available->id,
+                            'tree_id' => $request->id,
+                        ]
+                    );
+                }
+            }
+        }
         //  foreach (json_decode($request->groups);
         return response()->json(['success' => true, 'message' => "Успешно"]);
 
@@ -170,9 +171,20 @@ class TreeController extends Controller
     public function store(TreeStoreRequest $request)
     {
         if (isset($request->id)) {
-            Tree::find($request->id)->update(["name" => $request->name]);
-            return response()->json(['success' => true, 'message' => 'Название папки изменено']);
+            $tree = Tree::find($request->id);
+            if ($tree->user_id == Auth::user()->id || Auth::user()->role == 'admin') {
+                $tree->update(["name" => $request->name]);
+                return response()->json(['success' => true, 'message' => 'Название папки изменено']);
+            } else {
+                return response()->json(['success' => false, 'message' => 'Доступ запрещен'], 403);
+            }
         } else {
+            $tree = $request->tree_id == 'new' ? null : Tree::find($request->tree_id);
+            if ($tree) {
+                if ($tree->user_id != Auth::user()->id || Auth::user()->role != 'admin') {
+                    return response()->json(['success' => false, 'message' => 'Доступ запрещен'], 403);
+                }
+            }
             $user = explode("user_", $request->tree_id);
             $user1 = count($user) > 1 ? $user[1] : ($request->tree_id == 'new' ? Auth::user()->id : Tree::where('id', $request->tree_id)->first()->user_id);
             //    return $request->tree_id;
@@ -190,6 +202,7 @@ class TreeController extends Controller
             return response()->json(['success' => true, 'message' => 'Новая папка успешно создана']);
         }
     }
+
     public function delete($del)
     {
         $tree = Tree::where('tree_id', $del)->first();

@@ -30,7 +30,7 @@ export default {
             about: null,
             viewSuccess: false,
             page500: false,
-            breadcrumbs: [],
+            breadcrumbs: ["Документы"],
         };
     },
     mounted() {
@@ -232,7 +232,7 @@ export default {
                 :logoutFun="logoutFun"
             />
             <CContainer
-                class="p-3 position-sticky bg-white border-bottom minh60"
+                class="p-3 position-sticky border-bottom breadcrumb_container"
                 fluid
             >
                 <AppBreadcrumb :breadcrumbs="breadcrumbs" />
