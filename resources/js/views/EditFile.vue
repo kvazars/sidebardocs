@@ -20,6 +20,7 @@ import LinkWithTarget from "editorjs-link-with-target";
 ace.config.setModuleUrl("ace/mode/html_worker", modeHTMLWorker);
 ace.config.setModuleUrl("ace/mode/javascript_worker", modeJSWorker);
 ace.config.setModuleUrl("ace/mode/php_worker", modePHPWorker);
+import Alert from "editorjs-alert";
 import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthIdStore } from "../stores/authId";
@@ -188,9 +189,27 @@ export default {
             this.editor = new EditorJS({
                 holder: "editorjs",
                 tools: {
-					link:{
-						class: LinkWithTarget
-					},
+                    alert: {
+                        class: Alert,
+                        inlineToolbar: true,
+                        config: {
+                            alertTypes: [
+                                "primary",
+                                "secondary",
+                                "info",
+                                "success",
+                                "warning",
+                                "danger",
+                                "light",
+                                "dark",
+                            ],
+                            defaultType: "primary",
+                            messagePlaceholder: "Добавьте текст",
+                        },
+                    },
+                    link: {
+                        class: LinkWithTarget,
+                    },
                     gallery: {
                         class: ImageGallery,
 
@@ -318,6 +337,7 @@ export default {
                         toolNames: {
                             Text: "Параграф",
                             Heading: "Заголовок",
+                            Alert: "Оповещение",
                             Image: "Изображение",
                             Gallery: "Галерея",
                             "Ace Code": "Код (JS, PHP, HTML, CSS)",
@@ -337,7 +357,6 @@ export default {
                             InlineCode: "Моноширинный",
                         },
                         tools: {
-							
                             gallery: {
                                 "Select an Image": "Выберите изображение",
                                 Delete: "Удалить",
@@ -382,9 +401,9 @@ export default {
 
                             link: {
                                 "Add a link": "Вставьте ссылку",
-								'Open in new window': 'В новом окне',
-								Save: 'Сохранить',
-								'Add a link': 'Вставить ссылку',
+                                "Open in new window": "В новом окне",
+                                Save: "Сохранить",
+                                "Add a link": "Вставить ссылку",
                             },
                             quote: {
                                 "Align Left": "По левому краю",
