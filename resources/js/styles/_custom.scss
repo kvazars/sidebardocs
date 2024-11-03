@@ -322,7 +322,11 @@ body .icon.icon--unlink {
     width: 0 !important;
     height: 0 !important;
 }
-body .pptx-preview-wrapper{width:100% !important;}
+body .pptx-preview-wrapper {
+    width: 100% !important;
+    background: none !important;
+    height: auto !important;
+}
 
 body .sidebar,
 body .sidebar .vsm-wrapper,
@@ -533,11 +537,13 @@ body .sidebar-brand > img {
 }
 
 [data-coreui-theme="light"] .breadcrumb_container {
-	background: #fff;
+    background: #fff;
 }
 
 [data-coreui-theme="dark"] .breadcrumb_container {
-	background: #212631;
+    background: #212631;
 }
 
-body .ce-popover__search {display: none;}
+body .ce-popover__search {
+    display: none;
+}
