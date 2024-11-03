@@ -1,12 +1,12 @@
 <template>
-    <div v-if="viewOk">
+    <div v-if="viewOk" class="table-responsive">
         <CTable>
             <CTableHead>
                 <CTableRow>
                     <CTableHeaderCell
                         scope="col"
-                        v-if="Object.values(files)[0].user"
-                        >Менеджер</CTableHeaderCell
+                        v-if="Object.values(files.data)[0].user"
+                        >Владелец</CTableHeaderCell
                     >
                     <CTableHeaderCell scope="col">Документ</CTableHeaderCell>
                     <CTableHeaderCell scope="col">Родитель</CTableHeaderCell>
@@ -18,7 +18,7 @@
                 </CTableRow>
             </CTableHead>
             <CTableBody>
-                <CTableRow v-for="val in files" :key="val">
+                <CTableRow v-for="val in files.data" :key="val">
                     <CTableDataCell v-if="val.user"
                         >{{ val.user.name }}
                     </CTableDataCell>
@@ -31,24 +31,26 @@
                         />
                     </CTableDataCell>
                     <CTableDataCell>
-                        <div v-for="(g, index) in val.groups" :key="index">
-                            <input
-                                class="form-check-input"
-                                type="checkbox"
-                                v-model="val.groups[index].checked"
-                                :id="'group_' + val.id + '-' + g.id"
-                            />
-                            <label
-                                style="user-select: none"
-                                class="form-check-label"
-                                :for="'group_' + val.id + '-' + g.id"
-                            >
-                                {{ g.name }}
-                            </label>
-                        </div>
+                        {{
+                            Object.keys(val.groups)
+                                .filter((i) => val.groups[i].checked)
+                                .map((aIndex) => val.groups[aIndex])
+                                .map((el) => el.name)
+                                .join(", ")
+                        }}
                     </CTableDataCell>
-                    <CTableDataCell>
+                    <CTableDataCell class="text-end">
                         <CButtonGroup role="group">
+                            <CButton
+                                color="primary"
+                                @click="
+                                    () => {
+                                        selGroups = val.id;
+                                        visibleGroups = true;
+                                    }
+                                "
+                                ><i class="fa fa-edit"></i
+                            ></CButton>
                             <CButton color="primary" @click="save(val.id)"
                                 ><i class="fa fa-floppy-o"></i
                             ></CButton>
@@ -63,10 +65,66 @@
                 </CTableRow>
             </CTableBody>
         </CTable>
+        <div class="d-flex justify-content-end">
+            <Bootstrap5Pagination
+                :data="files"
+                @pagination-change-page="setPage"
+            />
+        </div>
     </div>
+
+    <CModal
+        :visible="visibleGroups"
+        @close="
+            () => {
+                visibleGroups = false;
+            }
+        "
+        aria-labelledby="LiveDemoExampleLabel"
+    >
+        <CModalHeader>
+            <CModalTitle id="LiveDemoExampleLabel">Группы</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+            <div class="container">
+                <div class="row">
+                    <div
+                        class="form-check col-lg-2"
+                        v-for="(val, index) in this.files.data[selGroups]
+                            .groups"
+                        :key="index"
+                    >
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            v-model="val.checked"
+                            :id="'group_' + val.id + '-' + selGroups"
+                        />
+                        <label
+                            style="user-select: none"
+                            class="form-check-label"
+                            :for="'group_' + val.id + '-' + selGroups"
+                        >
+                            {{ val.name }}
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </CModalBody>
+        <CModalFooter>
+            <CButton color="primary" @click="
+            () => {
+                visibleGroups = false;
+            }
+        ">Выйти</CButton>
+        </CModalFooter>
+    </CModal>
 </template>
 <script>
+import { Bootstrap5Pagination } from "laravel-vue-pagination";
+
 export default {
+    components: { Bootstrap5Pagination },
     props: ["datasend", "catchError", "showToast"],
     data() {
         return {
@@ -74,6 +132,9 @@ export default {
             groups: null,
             group: [],
             viewOk: false,
+            selGroups: null,
+            visibleGroups: false,
+            page: 1,
         };
     },
     mounted() {
@@ -85,9 +146,9 @@ export default {
             form.append("id", id);
             form.append(
                 "accessibility",
-                this.files[id].child.accessibility ? 1 : 0
+                this.files.data[id].child.accessibility ? 1 : 0
             );
-            form.append("groups", JSON.stringify(this.files[id].groups));
+            form.append("groups", JSON.stringify(this.files.data[id].groups));
             this.datasend("saveresourceadmin", "POST", form)
                 .then((res) => {
                     if (res.success) {
@@ -109,10 +170,24 @@ export default {
                     .catch((error) => console.log(error));
             }
         },
+        setPage(page){
+            this.page = page;
+            this.getFiles();
+        },
         getFiles() {
-            this.datasend("getFiles", "GET", {})
+            
+            this.datasend(`getFiles?page=${this.page}`, "GET", {})
                 .then((res) => {
                     this.files = res;
+
+                    let resData = res.data.reduce((a, x) => {
+                        a[x.id] = x;
+                        return a;
+                    }, {});
+
+                    this.files.data = resData;
+                    console.log(this.files);
+                    
                     this.viewOk = true;
                 })
                 .catch((error) => {

@@ -154,18 +154,11 @@ class ContentController extends Controller
                 }
             }
         }
-
-
-
-
-
         $res = Content::with("tree")->where("tree_id", $content)->first();
-
-
 
         $availablesGroups = [];
 
-        $all = Group::get();
+        $all = Group::get()->sortBy("name");
         $g = Available::where('tree_id', $content)->pluck('group_id')->toArray();
 
 
@@ -265,11 +258,11 @@ class ContentController extends Controller
         $userRole = Auth::user()->role;
         $files = [];
         if ($userRole == 'ceo') {
-            $files = Tree::where('user_id', Auth::user()->id)->where('type', 'file')->with(['child', 'parent', 'available'])->get()->keyBy("id");
+            $files = Tree::where('user_id', Auth::user()->id)->where('type', 'file')->with(['child', 'parent', 'available'])->paginate(15);
         } else {
-            $files = Tree::where('type', 'file')->with(['child', 'user', 'parent', 'available'])->get()->keyBy("id");
+            $files = Tree::where('type', 'file')->with(['child', 'user', 'parent', 'available'])->paginate(15);
         }
-        $group = Group::get();
+        $group = Group::get()->sortBy("name");
         foreach ($files as $file) {
             $file->child->accessibility = $file->child->accessibility == 1;
 
