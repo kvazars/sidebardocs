@@ -181,11 +181,14 @@ class TreeController extends Controller
         } else {
             $tree = $request->tree_id == 'new' ? null : Tree::find($request->tree_id);
             if ($tree) {
-                if ($tree->user_id != Auth::user()->id || Auth::user()->role != 'admin') {
-                    return response()->json(['success' => false, 'message' => 'Доступ запрещен'], 403);
+                if ($tree->user_id != Auth::user()->id) {
+                    if (Auth::user()->role != 'admin') {
+                        return response()->json(['success' => false, 'message' => 'Доступ запрещен'], 403);
+                    }
                 }
             }
             $user = explode("user_", $request->tree_id);
+            // return Tree::where('id', $request->tree_id);
             $user1 = count($user) > 1 ? $user[1] : ($request->tree_id == 'new' ? Auth::user()->id : Tree::where('id', $request->tree_id)->first()->user_id);
             //    return $request->tree_id;
             $position = Tree::where("tree_id", $request->tree_id == 'new' ? null : $request->tree_id)->count();
