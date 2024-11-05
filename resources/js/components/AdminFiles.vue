@@ -75,7 +75,7 @@
 
     <CModal
         :visible="visibleGroups"
-        size="lgnpm"
+        size="lg"
         @close="
             () => {
                 visibleGroups = false;
