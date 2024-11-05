@@ -64,7 +64,6 @@
 
 				<div v-if="val.type == 'attaches'" class="my-4">
 					<span>
-						<i class="fa fa-file"></i>&nbsp;
 						<a :href="imgs[val.id].url" target="_blank" download>{{
 							imgs[val.id].title
 						}}</a></span>
