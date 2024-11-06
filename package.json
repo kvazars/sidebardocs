@@ -17,6 +17,7 @@
     },
     "dependencies": {
         "@coreui/coreui": "^5.2.0",
+        "@coreui/coreui-pro": "^5.6.0",
         "@coreui/utils": "^2.0.2",
         "@coreui/vue": "^5.4.1",
         "@editorjs/attaches": "^1.3.0",
@@ -57,6 +58,7 @@
         "vue-loader": "^17.3.1",
         "vue-pdf-embed": "^2.1.1",
         "vue-router": "^4.4.5",
+        "vue-select": "^4.0.0-beta.6",
         "vue3-tabs-component": "^1.3.7",
         "vue3-toastify": "^0.2.4"
     }

@@ -1,23 +1,54 @@
 <template>
     <div v-if="viewOk" class="table-responsive">
+        <div></div>
         <CTable>
             <CTableHead>
                 <CTableRow>
                     <CTableHeaderCell
                         scope="col"
                         v-if="Object.values(files.data)[0].user"
-                        >Владелец</CTableHeaderCell
+                        ><span class="d-flex flex-row align-items-baseline"
+                            >Владелец<i
+                                class="fa fa-sort-desc"
+                                aria-hidden="true"
+                            ></i>
+                        </span>
+                    </CTableHeaderCell>
+                    <CTableHeaderCell scope="col">
+                        <div class="d-flex flex-row align-items-center">
+                            <span class="sort-up">Документ</span>
+                        </div></CTableHeaderCell
                     >
-                    <CTableHeaderCell scope="col">Документ</CTableHeaderCell>
-                    <CTableHeaderCell scope="col">Родитель</CTableHeaderCell>
                     <CTableHeaderCell scope="col"
-                        >Доступно всем</CTableHeaderCell
-                    >
-                    <CTableHeaderCell scope="col">Группы</CTableHeaderCell>
-                    <CTableHeaderCell scope="col">Обновлено</CTableHeaderCell>
+                        ><span class="d-flex flex-row align-items-center"
+                            >Родитель<i
+                                class="fa fa-sort-asc"
+                                aria-hidden="true"
+                            ></i> </span
+                    ></CTableHeaderCell>
+                    <CTableHeaderCell scope="col"
+                        ><span class="d-flex flex-row align-items-center"
+                            >Доступно всем<i
+                                class="fa fa-sort-asc"
+                                aria-hidden="true"
+                            ></i> </span
+                    ></CTableHeaderCell>
+                    <CTableHeaderCell scope="col"
+                        ><span class="d-flex flex-row align-items-center"
+                            >Группы<i
+                                class="fa fa-sort-asc"
+                                aria-hidden="true"
+                            ></i> </span
+                    ></CTableHeaderCell>
+                    <CTableHeaderCell scope="col"
+                        ><span class="d-flex flex-row align-items-center"
+                            >Обновлено<i
+                                class="fa fa-sort-asc"
+                                aria-hidden="true"
+                            ></i> </span
+                    ></CTableHeaderCell>
                     <CTableHeaderCell scope="col"></CTableHeaderCell>
                 </CTableRow>
-
             </CTableHead>
             <CTableBody>
                 <CTableRow v-for="val in files.data" :key="val">
@@ -42,7 +73,11 @@
                         }}
                     </CTableDataCell>
                     <CTableDataCell>
-                        {{ new Date(val.updated_at).toLocaleDateString() + ' '+ new Date(val.updated_at).toLocaleTimeString() }}
+                        {{
+                            new Date(val.updated_at).toLocaleDateString() +
+                            " " +
+                            new Date(val.updated_at).toLocaleTimeString()
+                        }}
                     </CTableDataCell>
                     <CTableDataCell class="text-end">
                         <CButtonGroup role="group">
@@ -60,12 +95,17 @@
                                 ><i class="fa fa-floppy-o"></i
                             ></CButton>
 
-                            <router-link class="btn btn-primary" target="_blank"
-						 :to="{ name: 'ShowFile', params: { id: val.id } }">
-                        <i class="fa fa-paper-plane"></i
+                            <router-link
+                                class="btn btn-primary"
+                                target="_blank"
+                                :to="{
+                                    name: 'ShowFile',
+                                    params: { id: val.id },
+                                }"
+                            >
+                                <i class="fa fa-paper-plane"></i
                             ></router-link>
 
-                            
                             <CButton
                                 class="text-white"
                                 color="danger"
@@ -125,11 +165,15 @@
             </div>
         </CModalBody>
         <CModalFooter>
-            <CButton color="primary" @click="
-            () => {
-                visibleGroups = false;
-            }
-        ">Выйти</CButton>
+            <CButton
+                color="primary"
+                @click="
+                    () => {
+                        visibleGroups = false;
+                    }
+                "
+                >Выйти</CButton
+            >
         </CModalFooter>
     </CModal>
 </template>
@@ -137,7 +181,9 @@
 import { Bootstrap5Pagination } from "laravel-vue-pagination";
 
 export default {
-    components: { Bootstrap5Pagination },
+    components: {
+        Bootstrap5Pagination,
+    },
     props: ["datasend", "catchError", "showToast"],
     data() {
         return {
@@ -183,12 +229,11 @@ export default {
                     .catch((error) => console.log(error));
             }
         },
-        setPage(page){
+        setPage(page) {
             this.page = page;
             this.getFiles();
         },
         getFiles() {
-            
             this.datasend(`getFiles?page=${this.page}`, "GET", {})
                 .then((res) => {
                     this.files = res;
@@ -200,7 +245,7 @@ export default {
 
                     this.files.data = resData;
                     console.log(this.files);
-                    
+
                     this.viewOk = true;
                 })
                 .catch((error) => {

@@ -643,3 +643,14 @@ a[href*=".7Z"]:before {
     top: 3px;
     content: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9kEBQ4PGKXRGCYAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAAXklEQVQ4y8WSOw4AIAhDC+H+V8bBmJiq+GGwGwEeDQD8lgDwDMAAwP2NISIV0IKVogG2K4zAA6AvZhiDWl4jywycOdSTZnbRgzT7B3pzstlu7HbrDLKTW0f59Cv/VwHAoywYXCqSPAAAAABJRU5ErkJggg==") !important;
 }
+
+
+.sort-up::after {
+    font: normal normal normal 14px / 1 FontAwesome;
+    content: "\f0de";
+    padding-top: 5px;
+}
+.sort-down::after {
+    font: normal normal normal 14px / 1 FontAwesome;
+    content: "\f0dd";
+}
