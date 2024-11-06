@@ -21,7 +21,7 @@ class TreeController extends Controller
 
         if (count($c) > 0) {
             $all = array_merge($c, $this->uploadTree($c));
-            $tree = Tree::whereIn('id', $all)->get();
+            $tree = Tree::whereIn('id', $all)->whereIn('user_id', User::pluck('id')->toArray())->get();
             $users = User::whereIn('id', $tree->pluck("user_id")->toArray())->get()->keyBy("id");
             $userArray = [];
             foreach ($users as $user) {
@@ -110,7 +110,7 @@ class TreeController extends Controller
                 $tree = Tree::where("user_id", Auth::user()->id)->get();
                 break;
             case 'admin':
-                $tree = Tree::get();
+                $tree = Tree::whereIn('user_id', User::pluck('id')->toArray())->get();
                 $users = User::whereIn('id', $tree->pluck("user_id")->toArray())->get()->keyBy("id");
                 $userArray = [];
                 foreach ($users as $user) {
@@ -133,7 +133,7 @@ class TreeController extends Controller
 
                 if (count($c) > 0) {
                     $all = array_merge($c, $this->uploadTree($c));
-                    $tree = Tree::whereIn('id', $all)->get();
+                    $tree = Tree::whereIn('id', $all)->whereIn('user_id', User::pluck('id')->toArray())->get();
                     $users = User::whereIn('id', $tree->pluck("user_id")->toArray())->get()->keyBy("id");
                     $userArray = [];
                     foreach ($users as $user) {

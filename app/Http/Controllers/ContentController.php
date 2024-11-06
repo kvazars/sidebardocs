@@ -14,6 +14,7 @@ use App\Models\UserGroups;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -253,16 +254,39 @@ class ContentController extends Controller
     }
 
 
-    public function getFiles()
+    public function getFiles(Request $request)
     {
         $userRole = Auth::user()->role;
         $files = [];
+        $users = [];
         if ($userRole == 'ceo') {
-            $files = Tree::where('user_id', Auth::user()->id)->where('type', 'file')->with(['child', 'parent', 'available'])->paginate(15);
+            $files = Tree::where('user_id', Auth::user()->id)->where('type', 'file')->with(['child', 'parent', 'available'])->withTrashed();
         } else {
-            $files = Tree::where('type', 'file')->with(['child', 'user', 'parent', 'available'])->paginate(15);
+            $files = Tree::where('type', 'file')->with(['child', 'user', 'parent', 'available'])->withTrashed();
+            $users = User::where('role', '!=', 'user')->get(['id', 'name']);
         }
+
         $group = Group::get()->sortBy("name");
+
+
+
+        if (isset($request->search)) {
+            $files->where('name', 'LIKE', '%' . $request->input('search') . '%');
+        }
+
+        if (isset($request->user)) {
+            $files->where('user_id', $request->user);
+        }
+
+
+        if (isset($request->sortBy)) {
+            $files->orderBy($request->sortBy, $request->sortAsc == 'true' ? 'asc' : 'desc');
+        }
+        // DB::enableQueryLog();
+        $files = $files->paginate(15);
+
+        // dd(DB::getQueryLog());
+
         foreach ($files as $file) {
             $file->child->accessibility = $file->child->accessibility == 1;
 
@@ -274,6 +298,6 @@ class ContentController extends Controller
             $file->groups = $res;
         }
 
-        return $files;
+        return response()->json(['success' => true, 'data' => ['files' => $files, 'users' => $users]], 200);
     }
 }
