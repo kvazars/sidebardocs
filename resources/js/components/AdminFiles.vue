@@ -14,8 +14,10 @@
                         >Доступно всем</CTableHeaderCell
                     >
                     <CTableHeaderCell scope="col">Группы</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">Обновлено</CTableHeaderCell>
                     <CTableHeaderCell scope="col"></CTableHeaderCell>
                 </CTableRow>
+
             </CTableHead>
             <CTableBody>
                 <CTableRow v-for="val in files.data" :key="val">
@@ -39,6 +41,9 @@
                                 .join(", ")
                         }}
                     </CTableDataCell>
+                    <CTableDataCell>
+                        {{ new Date(val.updated_at).toLocaleDateString() + ' '+ new Date(val.updated_at).toLocaleTimeString() }}
+                    </CTableDataCell>
                     <CTableDataCell class="text-end">
                         <CButtonGroup role="group">
                             <CButton
@@ -54,6 +59,13 @@
                             <CButton color="primary" @click="save(val.id)"
                                 ><i class="fa fa-floppy-o"></i
                             ></CButton>
+
+                            <router-link class="btn btn-primary" target="_blank"
+						 :to="{ name: 'ShowFile', params: { id: val.id } }">
+                        <i class="fa fa-paper-plane"></i
+                            ></router-link>
+
+                            
                             <CButton
                                 class="text-white"
                                 color="danger"

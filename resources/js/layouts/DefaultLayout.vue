@@ -238,7 +238,7 @@ export default {
                 <AppBreadcrumb :breadcrumbs="breadcrumbs" />
             </CContainer>
             <div class="body flex-grow-1">
-                <CContainer class="px-4">
+                <CContainer>
                     <template v-if="page500">
                         <Page500 />
                     </template>

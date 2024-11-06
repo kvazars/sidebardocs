@@ -68,6 +68,7 @@
 							imgs[val.id].title
 						}}</a></span>
 						<PptxShow v-if="imgs[val.id].url.split('.').pop()=='pptx'" :file="imgs[val.id].url" :key="val.id" :id="val.id"/>
+						<PdfShow v-if="imgs[val.id].url.split('.').pop()=='pdf'" :file="imgs[val.id].url" :key="val.id" :id="val.id"/>
 				</div>
 
 				<CAlert :color="val.data.type" v-if="val.type == 'alert'" class="my-4" :class="'text-' +
@@ -171,12 +172,14 @@ import { ExportToWord, ExportToPdf } from "vue-doc-exporter";
 import { useAuthIdStore } from "../stores/authId";
 import VueEasyLightbox from "vue-easy-lightbox";
 import PptxShow from "../components/PptxShow.vue";
+import PdfShow from "../components/PdfShow.vue";
 export default {
 	components: {
 		ExportToWord,
 		ExportToPdf,
 		VueEasyLightbox,
 		PptxShow,
+		PdfShow,
 	},
 	props: [
 		"id",
