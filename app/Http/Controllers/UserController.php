@@ -70,13 +70,22 @@ class UserController extends Controller
         $request->user()->currentAccessToken()->delete();
         return response()->json(["success" => true]);
     }
-    public function delete(User $id)
+    public function delete($id)
     {
-        if ($id->id == 1) {
+        if ($id == 1) {
             return response()->json(["success" => false, "message" => "Запрещено удалять пользователя!"]);
         }
-        UserGroups::where("user_id", $id->id)->delete();
-        $id->delete();
-        return response()->json(["success" => true, "message" => "Пользователь успешно удален"]);
+        // UserGroups::where("user_id", $id)->delete();
+        $user = User::withTrashed()->find($id);
+        $mess = '';
+        if($user->trashed()){
+            $user->restore();
+            $mess="Успешно восстановлен";
+        }
+        else{
+            $user->delete();
+            $mess="Успешно удалён";
+        }
+        return response()->json(["success" => true, "message" => $mess]);
     }
 }

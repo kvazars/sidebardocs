@@ -135,7 +135,7 @@ class ContentController extends Controller
 
     public function getResource($content)
     {
-        $tree = Tree::find($content);
+        $tree = Tree::withTrashed()->find($content);
         if (!$tree) {
             return response()->json(['success' => false, "message" => 'Файла не существует']);
         }
@@ -170,7 +170,7 @@ class ContentController extends Controller
         return response()->json(["name" => $tree->name, 'content' => $res,  'groups' => $availablesGroups]);
     }
 
-    public function delResource(Request $request, Tree $content)
+    public function delResource(Request $request, $content)
     {
 
 
@@ -179,8 +179,17 @@ class ContentController extends Controller
             return response()->json(["success" => false, 'message' => 'Недостаточно прав']);
         }
 
-        Tree::find($content->id)->delete();
-        return response()->json(["success" => true, 'message' => 'Файл удален']);
+        $tree = Tree::withTrashed()->find($content);
+        $mess = '';
+        if($tree->trashed()){
+            $tree->restore();
+            $mess="Успешно восстановлен";
+        }
+        else{
+            $tree->delete();
+            $mess="Успешно удалён";
+        }
+        return response()->json(["success" => true, 'message' => $mess]);
     }
 
     public function checkImageResource()
@@ -247,6 +256,17 @@ class ContentController extends Controller
         $del = array_diff($dirFiles, array_merge($savedImages, $savedFiles, [$about->logo]));
 
         Storage::disk('public')->delete($del);
+
+
+
+        //удалим все удаленные группы
+        // User::onlyTrashed()->forceDelete();
+        // $gr = $users->pluck("id")->toArray();
+        // UserGroups::whereIn("user_id",$gr)->delete();
+        // $users->forceDelete();
+        //
+
+
         Artisan::call('route:clear');
         Artisan::call('cache:clear');
 
@@ -268,8 +288,6 @@ class ContentController extends Controller
 
         $group = Group::get()->sortBy("name");
 
-
-
         if (isset($request->search)) {
             $files->where('name', 'LIKE', '%' . $request->input('search') . '%');
         }
@@ -278,14 +296,10 @@ class ContentController extends Controller
             $files->where('user_id', $request->user);
         }
 
+        $files->orderBy($request->sortBy ?: 'name', $request->sortAsc == 'true' ? 'asc' : 'desc');
 
-        if (isset($request->sortBy)) {
-            $files->orderBy($request->sortBy, $request->sortAsc == 'true' ? 'asc' : 'desc');
-        }
-        // DB::enableQueryLog();
         $files = $files->paginate(15);
 
-        // dd(DB::getQueryLog());
 
         foreach ($files as $file) {
             $file->child->accessibility = $file->child->accessibility == 1;

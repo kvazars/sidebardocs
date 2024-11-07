@@ -9,7 +9,9 @@
                 aria-label="Default select example"
             >
                 <option value="">Все пользователи</option>
-                <option :value="u.id" v-for="u in users">{{ u.name }}</option>
+                <option :value="u.id" v-for="u in users" :key="u">
+                    {{ u.name }}
+                </option>
             </CFormSelect>
             <CFormInput
                 v-model="searchFilter.name"
@@ -40,7 +42,18 @@
                         "
                     >
                         <div class="d-flex flex-row align-items-center">
-                            <span :class="searchFilter.sortBy == 'name' && searchFilter.sortAsc ? 'sort-down' : (searchFilter.sortBy == 'name' && !searchFilter.sortAsc ? 'sort-up' : 'sort-out')">Документ</span>
+                            <span
+                                :class="
+                                    searchFilter.sortBy == 'name' &&
+                                    searchFilter.sortAsc
+                                        ? 'sort-down'
+                                        : searchFilter.sortBy == 'name' &&
+                                          !searchFilter.sortAsc
+                                        ? 'sort-up'
+                                        : 'sort-out'
+                                "
+                                >Документ</span
+                            >
                         </div></CTableHeaderCell
                     >
                     <CTableHeaderCell scope="col"
@@ -59,7 +72,16 @@
                                 getFiles();
                             }
                         "
-                        ><span :class="searchFilter.sortBy == 'updated_at' && searchFilter.sortAsc ? 'sort-down' : (searchFilter.sortBy == 'updated_at' && !searchFilter.sortAsc ? 'sort-up' : 'sort-out')"
+                        ><span
+                            :class="
+                                searchFilter.sortBy == 'updated_at' &&
+                                searchFilter.sortAsc
+                                    ? 'sort-down'
+                                    : searchFilter.sortBy == 'updated_at' &&
+                                      !searchFilter.sortAsc
+                                    ? 'sort-up'
+                                    : 'sort-out'
+                            "
                             >Обновлено</span
                         ></CTableHeaderCell
                     >
@@ -67,7 +89,7 @@
                 </CTableRow>
             </CTableHead>
             <CTableBody>
-                <CTableRow v-for="(val,key) in files.data" :key="val">
+                <CTableRow v-for="(val, key) in files.data" :key="val">
                     <CTableDataCell v-if="val.user"
                         >{{ val.user.name }}
                     </CTableDataCell>
@@ -119,9 +141,7 @@
                             ></CButton>
 
                             <router-link
-                                :class="{
-                                    disabled: !val.user || val.deleted_at,
-                                }"
+                               
                                 class="btn btn-primary"
                                 target="_blank"
                                 :to="{
@@ -268,7 +288,11 @@ export default {
         },
         remove(id) {
             if (confirm("Вы уверены?")) {
-                this.datasend("resourcedel/" + this.files.data[id].id, "DELETE", {})
+                this.datasend(
+                    "resourcedel/" + this.files.data[id].id,
+                    "DELETE",
+                    {}
+                )
                     .then((res) => {
                         if (res.success) {
                             this.getFiles();
