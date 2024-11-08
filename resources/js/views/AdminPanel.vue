@@ -200,6 +200,17 @@
                                                         }
                                                     "
                                                 ></i>
+
+                                                <i v-if='!user.deleted_at'
+                                                title="Авторизоваться"
+                                                class="fa fa-desktop text-info"
+                                                @click="
+                                                    authUser(
+                                                        user.id
+                                                    )
+                                                "
+                                            ></i>
+
                                                 <i
                                                     :class="{
                                                         'fa fa-times text-danger':
@@ -267,6 +278,15 @@
                                                 }
                                             "
                                         ></i>
+                                        <i v-if='!user.deleted_at'
+                                                title="Авторизоваться"
+                                                class="fa fa-desktop text-info"
+                                                @click="
+                                                    authUser(
+                                                        user.id
+                                                    )
+                                                "
+                                            ></i>
                                         <i
                                             :class="{
                                                 'fa fa-times text-danger':
@@ -332,6 +352,15 @@
                                                 }
                                             "
                                         ></i>
+                                        <i v-if='!user.deleted_at'
+                                                title="Авторизоваться"
+                                                class="fa fa-desktop text-info"
+                                                @click="
+                                                    authUser(
+                                                        user.id
+                                                    )
+                                                "
+                                            ></i>
                                         <i
                                             :class="{
                                                 'fa fa-times text-danger':
@@ -548,6 +577,20 @@ export default {
         }
     },
     methods: {
+        authUser(user){
+            if (confirm("Вы действительно хотите авторизоваться?")) {
+                let form = new FormData();
+                form.append("user", user);
+                this.datasend(`authUser`, "POST", form)
+                    .then((res) => {
+                        localStorage.setItem("token",res.token);
+                        location.reload();
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+            }
+        },
         clearCache() {
             this.datasend("checkImageResource", "GET", {})
                 .then((res) => {

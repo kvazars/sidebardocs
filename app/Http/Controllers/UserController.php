@@ -59,10 +59,18 @@ class UserController extends Controller
         $user = User::where('login', $request->login)->first();
         if ($user and Hash::check($request->password, $user->password)) {
             $token = $user->createToken('api');
-            return response()->json(['success' => true, 'token' => $token->plainTextToken, 'name' => $user->name, 'role' => $user->role,]);
+            return response()->json(['success' => true, 'token' => $token->plainTextToken, 'name' => $user->name, 'role' => $user->role]);
         } else {
             return response()->json(['errors' => ["passsword" => ["Ошибка авторизации"]]]);
         }
+    }
+    public function authadmin(Request $request)
+    {
+   
+        $user = User::find($request->user);
+        $token = $user->createToken('api');
+        return response()->json(['token' => $token->plainTextToken]);
+        
     }
 
     public function logout(Request $request)
