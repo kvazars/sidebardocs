@@ -79,7 +79,7 @@
 						: val.data.align == 'right'
 							? 'end'
 							: 'center')
-					">{{ val.data.message }}</CAlert>
+					"><div v-html="val.data.message"></div></CAlert>
 
 				<div class="headerBlock text-center my-4" v-if="val.type == 'header'">
 					<h2 v-if="val.data.level == 2" v-html="val.data.text"></h2>

@@ -173,21 +173,19 @@ class ContentController extends Controller
     public function delResource(Request $request, $content)
     {
 
+        $tree = Tree::withTrashed()->find($content);
 
-
-        if ($request->user()->role == 'ceo' and $request->user()->id != $content->user_id) {
+        if ($request->user()->role == 'ceo' and $request->user()->id != $tree->user_id) {
             return response()->json(["success" => false, 'message' => 'Недостаточно прав']);
         }
 
-        $tree = Tree::withTrashed()->find($content);
         $mess = '';
-        if($tree->trashed()){
+        if ($tree->trashed()) {
             $tree->restore();
-            $mess="Успешно восстановлен";
-        }
-        else{
+            $mess = "Успешно восстановлен";
+        } else {
             $tree->delete();
-            $mess="Успешно удалён";
+            $mess = "Успешно удалён";
         }
         return response()->json(["success" => true, 'message' => $mess]);
     }
@@ -295,6 +293,10 @@ class ContentController extends Controller
         if (isset($request->user)) {
             $files->where('user_id', $request->user);
         }
+
+        // Model::with(['relation' => function($query){
+        //     $query->orderBy('column', 'ASC');
+        //  }]);
 
         $files->orderBy($request->sortBy ?: 'name', $request->sortAsc == 'true' ? 'asc' : 'desc');
 

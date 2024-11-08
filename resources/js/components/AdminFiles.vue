@@ -4,9 +4,9 @@
             <span>Фильтр</span>
             <CFormSelect
                 v-if="user.role == 'admin'"
-                class="w-25"
+                class="w-25 mt-1"
                 @change="onChange($event)"
-                aria-label="Default select example"
+                v-model="seluser"
             >
                 <option value="">Все пользователи</option>
                 <option :value="u.id" v-for="u in users" :key="u">
@@ -15,7 +15,7 @@
             </CFormSelect>
             <CFormInput
                 v-model="searchFilter.name"
-                class="w-25"
+                class="w-25 mt-1"
                 @change="getFiles()"
                 type="search"
                 placeholder="Название файла"
@@ -27,9 +27,14 @@
                 <CTableRow>
                     <CTableHeaderCell
                         scope="col"
-                        v-if="Object.values(files.data)[0]"
+                        
+                        v-if="
+                            Object.values(files.data)[0] && user.role != 'ceo'
+                        "
                     >
-                        <span>Владелец</span>
+                        <span
+                            >Владелец</span
+                        >
                     </CTableHeaderCell>
                     <CTableHeaderCell
                         scope="col"
@@ -90,12 +95,15 @@
             </CTableHead>
             <CTableBody>
                 <CTableRow v-for="(val, key) in files.data" :key="val">
-                    <CTableDataCell v-if="val.user"
-                        >{{ val.user.name }}
-                    </CTableDataCell>
-                    <CTableDataCell v-else
-                        >Удаленный пользователь
-                    </CTableDataCell>
+                    <template v-if="user.role != 'ceo'">
+                        <CTableDataCell v-if="val.user"
+                            >{{ val.user.name }}
+                        </CTableDataCell>
+                        <CTableDataCell v-else
+                            >Удаленный пользователь
+                        </CTableDataCell>
+                    </template>
+
                     <CTableDataCell>{{ val.name }} </CTableDataCell>
                     <CTableDataCell>{{ val.parent.name }}</CTableDataCell>
                     <CTableDataCell>
@@ -123,7 +131,11 @@
                     <CTableDataCell class="text-end">
                         <CButtonGroup role="group">
                             <CButton
-                                :disabled="!val.user || val.deleted_at != null"
+                                :disabled="
+                                    (!val.user || val.deleted_at != null) &&
+                                    (user.role != 'ceo' ||
+                                        val.deleted_at != null)
+                                "
                                 color="primary"
                                 @click="
                                     () => {
@@ -134,14 +146,17 @@
                                 ><i class="fa fa-edit"></i
                             ></CButton>
                             <CButton
-                                :disabled="!val.user || val.deleted_at != null"
+                                :disabled="
+                                    (!val.user || val.deleted_at != null) &&
+                                    (user.role != 'ceo' ||
+                                        val.deleted_at != null)
+                                "
                                 color="primary"
                                 @click="save(key)"
                                 ><i class="fa fa-floppy-o"></i
                             ></CButton>
 
                             <router-link
-                               
                                 class="btn btn-primary"
                                 target="_blank"
                                 :to="{
@@ -153,20 +168,18 @@
                             ></router-link>
 
                             <CButton
-                                v-if="!val.deleted_at"
-                                :disabled="!val.user"
+                                :disabled="!val.user && user.role != 'ceo'"
                                 class="text-white"
-                                color="danger"
+                                :color="!val.deleted_at ? 'danger' : 'success'"
                                 @click="remove(key)"
-                                ><i class="fa fa-trash"></i
-                            ></CButton>
-                            <CButton
-                                v-else
-                                :disabled="!val.user"
-                                class="text-white"
-                                color="success"
-                                @click="remove(key)"
-                                ><i class="fa fa-check"></i
+                                ><i
+                                    class="fa"
+                                    :class="
+                                        !val.deleted_at
+                                            ? 'fa-trash'
+                                            : 'fa-check'
+                                    "
+                                ></i
                             ></CButton>
                         </CButtonGroup>
                     </CTableDataCell>
@@ -252,6 +265,7 @@ export default {
             selGroups: null,
             visibleGroups: false,
             page: 1,
+            seluser: null,
             user: useAuthIdStore(),
             searchFilter: {
                 user: "",
@@ -294,6 +308,7 @@ export default {
                     {}
                 )
                     .then((res) => {
+                        console.log(res);
                         if (res.success) {
                             this.getFiles();
                             this.showToast(res.success, res.message);
@@ -331,7 +346,7 @@ export default {
             // formHelper.forEach((el) => {
             //     form = form + "&" + el;
             // });
-            console.log(this.searchFilter.name);
+            // console.log(this.searchFilter.name);
 
             this.datasend(`getFiles?page=${this.page}&${form}`, "GET", {})
                 .then((res) => {
@@ -348,7 +363,7 @@ export default {
 
                     // this.files.data = resData;
                     this.files.data = res.data.files.data;
-                    console.log(this.files);
+                    // console.log(this.files);
 
                     this.viewOk = true;
                 })
