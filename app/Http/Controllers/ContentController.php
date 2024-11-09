@@ -192,6 +192,11 @@ class ContentController extends Controller
 
     public function checkImageResource()
     {
+        User::onlyTrashed()->forceDelete();
+        Tree::onlyTrashed()->forceDelete();
+        Content::onlyTrashed()->forceDelete();
+
+
         $dirFiles = [];
         $u = User::where('role', '!=', 'user')->pluck('id')->toArray();
 
