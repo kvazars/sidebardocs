@@ -21,14 +21,14 @@ const routes = [
                 path: "/files/:id/edit",
                 name: "EditFile",
                 meta: { title: "Редактирование документа" },
-                component: () => import("../views/editFile.vue"),
+                component: () => import("../views/EditFile.vue"),
                 props: true,
             },
             {
                 path: "/files/new/:parent",
                 name: "CreateFile",
                 meta: { title: "Создание документа" },
-                component: () => import("../views/editFile.vue"),
+                component: () => import("../views/EditFile.vue"),
                 props: true,
             },
             {

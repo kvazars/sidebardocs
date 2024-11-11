@@ -265,70 +265,10 @@
                 </div>
             </div>
         </div>
-        <div class="position-fixed squared" v-if="datasend">
-            <div class="dropdown">
-                <button
-                    class="btn btn-primary"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                >
-                    <i class="fa fa-cog"></i>
-                </button>
-                <ul class="dropdown-menu">
-                    <li v-if="content">
-                        <router-link
-                            class="dropdown-item"
-                            v-if="
-                                auths.id == content.tree.user_id ||
-                                auths.role == 'admin'
-                            "
-                            :to="{ name: 'EditFile', params: { id: id } }"
-                            >Редактировать
-                            <i
-                                class="fa fa-pencil-square-o"
-                                aria-hidden="true"
-                            ></i
-                        ></router-link>
-                    </li>
-                    <template v-if="content">
-                        <li
-                            v-if="
-                                auths.id == content.tree.user_id ||
-                                auths.role == 'admin'
-                            "
-                        >
-                            <hr class="dropdown-divider" />
-                        </li>
-                    </template>
-
-                    <!-- <li>
-                        <button class="dropdown-item" @click="html2doc">
-                            Экспорт
-                            <i class="fa fa-file-word-o" aria-hidden="true"></i>
-                        </button>
-                    </li> -->
-                    <!-- <li>
-                        <ExportToPdf
-                            :filename="pagetitle ? pagetitle : 'document'"
-                        >
-                            <button class="dropdown-item">
-                                Экспорт
-                                <i
-                                    class="fa fa-file-pdf-o"
-                                    aria-hidden="true"
-                                ></i>
-                            </button>
-                        </ExportToPdf>
-                    </li> -->
-                </ul>
-            </div>
-        </div>
     </div>
 </template>
 
 <script>
-
 import { useAuthIdStore } from "../stores/authId";
 import VueEasyLightbox from "vue-easy-lightbox";
 import PptxShow from "../components/PptxShow.vue";
@@ -395,7 +335,6 @@ export default {
         }
     },
     methods: {
-        
         showImg(ref, index) {
             this.indexRef[ref] = index;
             this.visibleRef[ref] = true;

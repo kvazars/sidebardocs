@@ -47,7 +47,11 @@ export default {
     mounted() {
         if (this.datasend) {
             if (this.$route.params.id) {
-                this.datasend("resourceauth/" + this.$route.params.id, "GET", {})
+                this.datasend(
+                    "resourceauth/" + this.$route.params.id,
+                    "GET",
+                    {}
+                )
                     .then((res) => {
                         if (
                             this.user.role == "user" ||
@@ -109,8 +113,7 @@ export default {
         };
     },
     methods: {
-        save(){
-            
+        save() {
             this.editor
                 .save()
                 .then((outputData) => {
@@ -563,34 +566,5 @@ const aceConfig = {
                 <div id="editorjs"></div>
             </CCardBody>
         </CCard>
-        <div class="position-fixed squared" v-if="datasend">
-            <div class="dropdown">
-                <button
-                    class="btn btn-primary border-end-0 rounded-0 rounded-start"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                >
-                    <i class="fa fa-cog"></i>
-                </button>
-                <ul class="dropdown-menu">
-                    <li>
-                        <button class="dropdown-item" @click="save">
-                            Сохранить
-                            <i class="fa fa-floppy-o" aria-hidden="true"></i>
-                        </button>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider" />
-                    </li>
-                    <li>
-                        <button class="dropdown-item" @click="deleteFile">
-                            Удалить
-                            <i class="fa fa-trash-o" aria-hidden="true"></i>
-                        </button>
-                    </li>
-                </ul>
-            </div>
-        </div>
     </div>
 </template>

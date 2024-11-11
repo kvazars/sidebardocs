@@ -270,6 +270,7 @@ export default {
                             !page500 &&
                             $route.name != 'Home' &&
                             $route.name != 'EditFile' &&
+                            $route.name != 'CreateFile' &&
                             $route.name != 'Page500' &&
                             $route.name != 'admin' &&
                             viewSuccess
@@ -299,6 +300,7 @@ export default {
                         v-if="$route.name == 'EditFile'||$route.name == 'CreateFile'"
                         ref="EditFile"
                         :server="server"
+                        :key="$route.fullPath"
                         :datasend="datasend"
                         :getMenu="getMenu"
                         :catchError="catchError"
