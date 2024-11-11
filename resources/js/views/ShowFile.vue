@@ -302,13 +302,13 @@
                         </li>
                     </template>
 
-                    <li>
+                    <!-- <li>
                         <button class="dropdown-item" @click="html2doc">
                             Экспорт
                             <i class="fa fa-file-word-o" aria-hidden="true"></i>
                         </button>
-                    </li>
-                    <li>
+                    </li> -->
+                    <!-- <li>
                         <ExportToPdf
                             :filename="pagetitle ? pagetitle : 'document'"
                         >
@@ -320,7 +320,7 @@
                                 ></i>
                             </button>
                         </ExportToPdf>
-                    </li>
+                    </li> -->
                 </ul>
             </div>
         </div>
@@ -328,8 +328,7 @@
 </template>
 
 <script>
-import jsPDF from "jspdf";
-import { ExportToWord, ExportToPdf } from "vue-doc-exporter";
+
 import { useAuthIdStore } from "../stores/authId";
 import VueEasyLightbox from "vue-easy-lightbox";
 import PptxShow from "../components/PptxShow.vue";
@@ -338,8 +337,6 @@ import DocxShow from "../components/DocxShow.vue";
 import ExcelShow from "../components/ExcelShow.vue";
 export default {
     components: {
-        ExportToWord,
-        ExportToPdf,
         VueEasyLightbox,
         PptxShow,
         PdfShow,
@@ -354,6 +351,7 @@ export default {
         "server",
         "about",
         "authss",
+        "setContent",
     ],
     data() {
         return {
@@ -387,6 +385,7 @@ export default {
                     } else {
                         this.pagetitle = res.name;
                         this.parseDoc(res.content);
+                        this.setContent(res.content);
                     }
                 })
                 .catch();
@@ -396,37 +395,7 @@ export default {
         }
     },
     methods: {
-        html2doc() {
-            let els = document.querySelector("#file").innerHTML;
-
-            let html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-  <head>
-  <meta charset='utf-8'>
-  <title>Export HTML To Doc</title>
-  </head>
-  <body>
-   ${els}
-  </body>
- </html>`;
-            var blob = new Blob(["\ufeff", html], {
-                type: "application/msword",
-            });
-            let url =
-                "data:application/vnd.ms-word;charset=utf-8," +
-                encodeURIComponent(html);
-
-            let filename = this.pagetitle + ".doc";
-            var downloadLink = document.createElement("a");
-            document.body.appendChild(downloadLink);
-            if (navigator.msSaveOrOpenBlob) {
-                navigator.msSaveOrOpenBlob(blob, filename);
-            } else {
-                downloadLink.href = url;
-                downloadLink.download = filename;
-                downloadLink.click();
-            }
-            document.body.removeChild(downloadLink);
-        },
+        
         showImg(ref, index) {
             this.indexRef[ref] = index;
             this.visibleRef[ref] = true;

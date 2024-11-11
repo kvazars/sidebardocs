@@ -6,6 +6,7 @@ import AuthWindow from "../components/AuthWindow.vue";
 import { toast } from "vue3-toastify";
 import { useAuthIdStore } from "../stores/authId";
 import ShowFile from "../views/ShowFile.vue";
+import EditFile from "../views/EditFile.vue";
 import Page500 from "../views/pages/Page500.vue";
 import AppBreadcrumb from "../components/AppBreadcrumb.vue";
 
@@ -17,6 +18,7 @@ export default {
         AppSidebar,
         AuthWindow,
         ShowFile,
+        EditFile,
         AppBreadcrumb,
     },
     data() {
@@ -30,6 +32,7 @@ export default {
             about: null,
             viewSuccess: false,
             page500: false,
+            content: null,
             breadcrumbs: ["Документы"],
         };
     },
@@ -42,6 +45,10 @@ export default {
         },
     },
     methods: {
+        setContent(content) {
+            this.content = content;
+        },
+
         openWindowFunction() {
             this.openWindow = !this.openWindow;
         },
@@ -195,6 +202,9 @@ export default {
                 });
             }
         },
+        saveEditFile() {
+            this.$refs.EditFile.save();
+        },
         getBreadcrumbs() {
             let arr = [];
 
@@ -232,10 +242,14 @@ export default {
                 :logoutFun="logoutFun"
             />
             <CContainer
-                class="p-3 position-sticky border-bottom breadcrumb_container"
+                class="p-3 position-sticky border-bottom breadcrumb_container d-flex justify-content-between align-items-center z1"
                 fluid
             >
-                <AppBreadcrumb :breadcrumbs="breadcrumbs" />
+                <AppBreadcrumb
+                    :breadcrumbs="breadcrumbs"
+                    :content="content"
+                    :saveEditFile="saveEditFile"
+                />
             </CContainer>
             <div class="body flex-grow-1">
                 <CContainer>
@@ -251,9 +265,11 @@ export default {
                         :showToast="showToast"
                         :key="$route.fullPath"
                         :authss="auths.id"
+                        :setContent="setContent"
                         v-if="
                             !page500 &&
                             $route.name != 'Home' &&
+                            $route.name != 'EditFile' &&
                             $route.name != 'Page500' &&
                             $route.name != 'admin' &&
                             viewSuccess
@@ -266,6 +282,7 @@ export default {
                         :showToast="showToast"
                         :key="$route.fullPath"
                         :dashboard="dashboard"
+                        :setContent="setContent"
                         :api="api"
                         :userRole="auths.role"
                         v-if="auths.id && dashboard && $route.name == 'admin'"
@@ -278,6 +295,18 @@ export default {
                             :about="about"
                         />
                     </template>
+                    <EditFile
+                        v-if="$route.name == 'EditFile'||$route.name == 'CreateFile'"
+                        ref="EditFile"
+                        :server="server"
+                        :datasend="datasend"
+                        :getMenu="getMenu"
+                        :catchError="catchError"
+                        :dashboard="dashboard"
+                        :showToast="showToast"
+                        :api="api"
+                        :setContent="setContent"
+                    />
                 </CContainer>
             </div>
             <AppFooter :about="about" />

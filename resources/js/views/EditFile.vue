@@ -35,8 +35,6 @@ export default {
         };
     },
     props: [
-        "id",
-        "parent",
         "datasend",
         "server",
         "getMenu",
@@ -44,11 +42,12 @@ export default {
         "dashboard",
         "showToast",
         "api",
+        "setContent",
     ],
     mounted() {
         if (this.datasend) {
-            if (this.id) {
-                this.datasend("resourceauth/" + this.id, "GET", {})
+            if (this.$route.params.id) {
+                this.datasend("resourceauth/" + this.$route.params.id, "GET", {})
                     .then((res) => {
                         if (
                             this.user.role == "user" ||
@@ -64,7 +63,7 @@ export default {
                             this.$router.push({ name: "NotFound" });
                         }
 
-                        this.pagetitle = res.name;
+                        this.name = res.name;
 
                         this.accessibility = res.content.accessibility
                             ? true
@@ -72,6 +71,7 @@ export default {
                         this.groupAvailables = res.groups;
 
                         this.dataBlock = JSON.parse(res.content.data);
+                        this.setContent(res.content);
                         this.createEditor();
                     })
                     .catch((error) => {
@@ -96,10 +96,11 @@ export default {
             this.createEditor();
         }
     },
+
     data() {
         return {
             dataBlock: [],
-            pagetitle: "",
+            name: null,
             router: useRouter(),
             user: useAuthIdStore(),
             accessibility: false,
@@ -108,21 +109,8 @@ export default {
         };
     },
     methods: {
-        deleteFile() {
-            if (!this.id) {
-                this.router.push({ name: "Home" });
-            } else {
-                this.datasend("resource/" + this.id, "DELETE", {})
-                    .then((res) => {
-                        if (res.success) {
-                            this.getMenu();
-                            this.showToast(res.success, res.message);
-                        }
-                    })
-                    .catch((error) => console.log(error));
-            }
-        },
-        save() {
+        save(){
+            
             this.editor
                 .save()
                 .then((outputData) => {
@@ -148,7 +136,7 @@ export default {
                     });
 
                     form.append("data", JSON.stringify(outputData.blocks));
-                    form.append("name", this.pagetitle ?? "");
+                    form.append("name", this.name ?? "");
                     form.append("accessibility", this.accessibility ? 1 : 0);
 
                     form.append(
@@ -156,11 +144,12 @@ export default {
                         JSON.stringify(this.groupAvailables)
                     );
 
-                    if (this.parent) {
-                        form.append("tree_id", this.parent);
+                    if (this.$route.params.parent) {
+                        form.append("tree_id", this.$route.params.parent);
                     } else {
-                        form.append("id", this.id);
+                        form.append("id", this.$route.params.id);
                     }
+                    // console.log(this.name);
                     this.datasend("resource", "POST", form)
                         .then((res) => {
                             if (res.success) {
@@ -519,7 +508,7 @@ const aceConfig = {
                     id="exampleFormControlInput1"
                     label="Название документа"
                     placeholder="Введите название документа"
-                    v-model="pagetitle"
+                    v-model="name"
                 />
                 <CAccordion class="mt-4">
                     <CAccordionItem :item-key="1">
