@@ -173,8 +173,8 @@
                             ? 'end'
                             : 'center')
                     "
-                    >{{ val.data.message }}</CAlert
-                >
+                    v-html="val.data.message"
+                ></CAlert>
 
                 <div
                     class="headerBlock text-center my-4"
