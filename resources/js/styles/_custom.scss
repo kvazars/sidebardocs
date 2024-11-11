@@ -663,3 +663,17 @@ a[href*=".7Z"]:before {
     position: relative;
     padding-left: 3px;
 }
+
+
+@media screen and (max-width: 800px) {
+    .vue-office-docx .docx-wrapper p{
+        padding: 0px !important;
+        text-indent: 0px !important;
+        margin: 0px !important;
+
+    }
+}
+
+.cdx-attaches__title{
+    padding:5px;
+}

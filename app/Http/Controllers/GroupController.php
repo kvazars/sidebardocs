@@ -17,8 +17,8 @@ class GroupController extends Controller
     {
         return [
             "groups" => GetGroupsResource::collection(Group::with("users")->get()->sortBy("name")),
-            "ceo" => User::where("role", "ceo")->get(),
-            "admin" => User::where("role", "admin")->get(),
+            "ceo" => User::withTrashed()->where("role", "ceo")->get(),
+            "admin" => User::withTrashed()->where("role", "admin")->get(),
             "system" => About::find(1)
         ];
     }

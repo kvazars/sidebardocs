@@ -59,10 +59,18 @@ class UserController extends Controller
         $user = User::where('login', $request->login)->first();
         if ($user and Hash::check($request->password, $user->password)) {
             $token = $user->createToken('api');
-            return response()->json(['success' => true, 'token' => $token->plainTextToken, 'name' => $user->name, 'role' => $user->role,]);
+            return response()->json(['success' => true, 'token' => $token->plainTextToken, 'name' => $user->name, 'role' => $user->role]);
         } else {
             return response()->json(['errors' => ["passsword" => ["Ошибка авторизации"]]]);
         }
+    }
+    public function authadmin(Request $request)
+    {
+   
+        $user = User::find($request->user);
+        $token = $user->createToken('api');
+        return response()->json(['token' => $token->plainTextToken]);
+        
     }
 
     public function logout(Request $request)
@@ -70,13 +78,22 @@ class UserController extends Controller
         $request->user()->currentAccessToken()->delete();
         return response()->json(["success" => true]);
     }
-    public function delete(User $id)
+    public function delete($id)
     {
-        if ($id->id == 1) {
+        if ($id == 1) {
             return response()->json(["success" => false, "message" => "Запрещено удалять пользователя!"]);
         }
-        UserGroups::where("user_id", $id->id)->delete();
-        $id->delete();
-        return response()->json(["success" => true, "message" => "Пользователь успешно удален"]);
+        // UserGroups::where("user_id", $id)->delete();
+        $user = User::withTrashed()->find($id);
+        $mess = '';
+        if($user->trashed()){
+            $user->restore();
+            $mess="Успешно восстановлен";
+        }
+        else{
+            $user->delete();
+            $mess="Успешно удалён";
+        }
+        return response()->json(["success" => true, "message" => $mess]);
     }
 }

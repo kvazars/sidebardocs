@@ -4,16 +4,18 @@
             <span>Фильтр</span>
             <CFormSelect
                 v-if="user.role == 'admin'"
-                class="w-25"
+                class="w-25 mt-1"
                 @change="onChange($event)"
-                aria-label="Default select example"
+                v-model="seluser"
             >
                 <option value="">Все пользователи</option>
-                <option :value="u.id" v-for="u in users">{{ u.name }}</option>
+                <option :value="u.id" v-for="u in users" :key="u">
+                    {{ u.name }}
+                </option>
             </CFormSelect>
             <CFormInput
                 v-model="searchFilter.name"
-                class="w-25"
+                class="w-25 mt-1"
                 @change="getFiles()"
                 type="search"
                 placeholder="Название файла"
@@ -25,7 +27,9 @@
                 <CTableRow>
                     <CTableHeaderCell
                         scope="col"
-                        v-if="Object.values(files.data)[0]"
+                        v-if="
+                            Object.values(files.data)[0] && user.role != 'ceo'
+                        "
                     >
                         <span>Владелец</span>
                     </CTableHeaderCell>
@@ -87,6 +91,7 @@
                 </CTableRow>
             </CTableHead>
             <CTableBody>
+<<<<<<< HEAD
                 <CTableRow v-for="(val, key) in files.data" :key="val">
                     <CTableDataCell v-if="val.user"
                         >{{ val.user.name }}
@@ -137,39 +142,104 @@
                                 @click="save(key)"
                                 ><i class="fa fa-floppy-o"></i
                             ></CButton>
+=======
+>>>>>>> a6c0b8a0347715393e3232100e0cbfb5d66cf186
 
-                            <router-link
-                                :class="{
-                                    disabled: !val.user || val.deleted_at,
-                                }"
-                                class="btn btn-primary"
-                                target="_blank"
-                                :to="{
-                                    name: 'ShowFile',
-                                    params: { id: this.files.data[key].id },
-                                }"
-                            >
-                                <i class="fa fa-paper-plane"></i
-                            ></router-link>
+                <CTableRow v-for="(val, key) in files.data" :key="val">
+                 
+                        <template v-if="user.role != 'ceo'">
+                            <CTableDataCell v-if="val.user"
+                                >{{ val.user.name }}
+                            </CTableDataCell>
+                            <CTableDataCell v-else
+                                >Удаленный пользователь
+                            </CTableDataCell>
+                        </template>
 
-                            <CButton
-                                v-if="!val.deleted_at"
-                                :disabled="!val.user"
-                                class="text-white"
-                                color="danger"
-                                @click="remove(key)"
-                                ><i class="fa fa-trash"></i
-                            ></CButton>
-                            <CButton
-                                v-else
-                                :disabled="!val.user"
-                                class="text-white"
-                                color="success"
-                                @click="remove(key)"
-                                ><i class="fa fa-check"></i
-                            ></CButton>
-                        </CButtonGroup>
-                    </CTableDataCell>
+                        <CTableDataCell>{{ val.name }} </CTableDataCell>
+                        <CTableDataCell
+                            >{{ val.parent.name }}</CTableDataCell
+                        >
+                        <CTableDataCell>
+                            <CFormSwitch
+                                v-model="val.child.accessibility"
+                                :id="'accessibility_for_' + val.id"
+                            />
+                        </CTableDataCell>
+                        <CTableDataCell>
+                            {{
+                                Object.keys(val.groups)
+                                    .filter((i) => val.groups[i].checked)
+                                    .map((aIndex) => val.groups[aIndex])
+                                    .map((el) => el.name)
+                                    .join(", ")
+                            }}
+                        </CTableDataCell>
+                        <CTableDataCell>
+                            {{
+                                new Date(val.updated_at).toLocaleDateString() +
+                                " " +
+                                new Date(val.updated_at).toLocaleTimeString()
+                            }}
+                        </CTableDataCell>
+                        <CTableDataCell class="text-end">
+                            <CButtonGroup role="group" v-if="val.parent">
+                                <CButton
+                                    :disabled="
+                                        (!val.user || val.deleted_at != null) &&
+                                        (user.role != 'ceo' ||
+                                            val.deleted_at != null)
+                                    "
+                                    color="primary"
+                                    @click="
+                                        () => {
+                                            selGroups = key;
+                                            visibleGroups = true;
+                                        }
+                                    "
+                                    ><i class="fa fa-edit"></i
+                                ></CButton>
+                                <CButton
+                                    :disabled="
+                                        (!val.user || val.deleted_at != null) &&
+                                        (user.role != 'ceo' ||
+                                            val.deleted_at != null)
+                                    "
+                                    color="primary"
+                                    @click="save(key)"
+                                    ><i class="fa fa-floppy-o"></i
+                                ></CButton>
+
+                                <router-link
+                                    class="btn btn-primary"
+                                    target="_blank"
+                                    :to="{
+                                        name: 'ShowFile',
+                                        params: { id: this.files.data[key].id },
+                                    }"
+                                >
+                                    <i class="fa fa-paper-plane"></i
+                                ></router-link>
+
+                                <CButton
+                                    :disabled="!val.user && user.role != 'ceo'"
+                                    class="text-white"
+                                    :color="
+                                        !val.deleted_at ? 'danger' : 'success'
+                                    "
+                                    @click="remove(key)"
+                                    ><i
+                                        class="fa"
+                                        :class="
+                                            !val.deleted_at
+                                                ? 'fa-trash'
+                                                : 'fa-check'
+                                        "
+                                    ></i
+                                ></CButton>
+                            </CButtonGroup>
+                        </CTableDataCell>
+                 
                 </CTableRow>
             </CTableBody>
         </CTable>
@@ -252,6 +322,7 @@ export default {
             selGroups: null,
             visibleGroups: false,
             page: 1,
+            seluser: null,
             user: useAuthIdStore(),
             searchFilter: {
                 user: "",
@@ -294,6 +365,7 @@ export default {
                     {}
                 )
                     .then((res) => {
+                        console.log(res);
                         if (res.success) {
                             this.getFiles();
                             this.showToast(res.success, res.message);
@@ -331,6 +403,10 @@ export default {
             // formHelper.forEach((el) => {
             //     form = form + "&" + el;
             // });
+<<<<<<< HEAD
+=======
+            // console.log(this.searchFilter.name);
+>>>>>>> a6c0b8a0347715393e3232100e0cbfb5d66cf186
 
             this.datasend(`getFiles?page=${this.page}&${form}`, "GET", {})
                 .then((res) => {
@@ -347,6 +423,10 @@ export default {
 
                     // this.files.data = resData;
                     this.files.data = res.data.files.data;
+<<<<<<< HEAD
+=======
+                    // console.log(this.files);
+>>>>>>> a6c0b8a0347715393e3232100e0cbfb5d66cf186
 
                     this.viewOk = true;
                 })

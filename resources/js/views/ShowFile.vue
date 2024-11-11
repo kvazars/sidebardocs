@@ -131,10 +131,20 @@
 
                 <div v-if="val.type == 'attaches'" class="my-4">
                     <span>
+<<<<<<< HEAD
                         <a :href="imgs[val.id].url" target="_blank" download>{{
                             imgs[val.id].title
                         }}</a></span
                     >
+=======
+                        <a
+                            :href="imgs[val.id].url"
+                            target="_blank"
+                            download
+                            v-html="imgs[val.id].title"
+                        ></a
+                    ></span>
+>>>>>>> a6c0b8a0347715393e3232100e0cbfb5d66cf186
                     <PptxShow
                         v-if="imgs[val.id].url.split('.').pop() == 'pptx'"
                         :file="imgs[val.id].url"
@@ -173,8 +183,13 @@
                             ? 'end'
                             : 'center')
                     "
+<<<<<<< HEAD
                     >{{ val.data.message }}</CAlert
                 >
+=======
+                    ><div v-html="val.data.message"></div
+                ></CAlert>
+>>>>>>> a6c0b8a0347715393e3232100e0cbfb5d66cf186
 
                 <div
                     class="headerBlock text-center my-4"
@@ -391,6 +406,7 @@ export default {
                 })
                 .catch();
         } else {
+<<<<<<< HEAD
             this.parseDoc(this.dashboard);
             this.pagetitle = this.about.name;
         }
@@ -399,6 +415,18 @@ export default {
         html2doc() {
             let els = document.querySelector("#file").innerHTML;
 
+=======
+            // console.log(this.dashboard);
+
+            this.parseDoc(this.dashboard);
+            this.pagetitle = this.about.name;
+        }
+    },
+    methods: {
+        html2doc() {
+            let els = document.querySelector("#file").innerHTML;
+
+>>>>>>> a6c0b8a0347715393e3232100e0cbfb5d66cf186
             let html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
   <head>
   <meta charset='utf-8'>

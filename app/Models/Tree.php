@@ -22,11 +22,11 @@ class Tree extends Model
     }
     public function parent()
     {
-        return $this->belongsTo(Tree::class, "tree_id","id");
+        return $this->belongsTo(Tree::class, "tree_id","id")->withTrashed();
     }
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withTrashed();
     }
 
     public function available()

@@ -12,6 +12,6 @@ class UserGroups extends Model
     protected $fillable = ['user_id', 'group_id'];
     public function user()
     {
-        return User::find($this->user_id);
+        return User::withTrashed()->find($this->user_id);
     } 
 }

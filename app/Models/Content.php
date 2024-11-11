@@ -16,6 +16,6 @@ class Content extends Model
         'data',
     ];
     public function tree(){
-        return $this->belongsTo(Tree::class)->with('user');
+        return $this->belongsTo(Tree::class)->with('user')->withTrashed();
     }
 }

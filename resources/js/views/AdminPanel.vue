@@ -185,6 +185,7 @@
                                                 class="d-flex flex-row align-items-center gap-2"
                                             >
                                                 <i
+                                                    v-if="!user.deleted_at"
                                                     class="fa fa-pencil-square-o text-info"
                                                     @click="
                                                         () => {
@@ -199,15 +200,35 @@
                                                         }
                                                     "
                                                 ></i>
+
+                                                <i v-if='!user.deleted_at'
+                                                title="Авторизоваться"
+                                                class="fa fa-desktop text-info"
+                                                @click="
+                                                    authUser(
+                                                        user.id
+                                                    )
+                                                "
+                                            ></i>
+
                                                 <i
-                                                    class="fa fa-times text-danger"
-                                                    @click="removeUser(user.id)"
+                                                    :class="{
+                                                        'fa fa-times text-danger':
+                                                            !user.deleted_at,
+                                                        'fa fa-check text-success':
+                                                            user.deleted_at,
+                                                    }"
+                                                    @click="
+                                                        removeUser(
+                                                            user.id,
+                                                            user.deleted_at
+                                                        )
+                                                    "
                                                 ></i>
                                             </div>
                                         </template>
                                     </CListGroupItem>
                                 </CListGroup>
-                                <span v-else>Пользователи отсутствуют</span>
                             </CAccordionBody>
                         </CAccordionItem>
                     </CAccordion>
@@ -244,6 +265,7 @@
                                         class="d-flex flex-row align-items-center gap-2"
                                     >
                                         <i
+                                            v-if="!user.deleted_at"
                                             class="fa fa-pencil-square-o text-info"
                                             @click="
                                                 () => {
@@ -256,9 +278,28 @@
                                                 }
                                             "
                                         ></i>
+                                        <i v-if='!user.deleted_at'
+                                                title="Авторизоваться"
+                                                class="fa fa-desktop text-info"
+                                                @click="
+                                                    authUser(
+                                                        user.id
+                                                    )
+                                                "
+                                            ></i>
                                         <i
-                                            class="fa fa-times text-danger"
-                                            @click="removeUser(user.id)"
+                                            :class="{
+                                                'fa fa-times text-danger':
+                                                    !user.deleted_at,
+                                                'fa fa-check text-success':
+                                                    user.deleted_at,
+                                            }"
+                                            @click="
+                                                removeUser(
+                                                    user.id,
+                                                    user.deleted_at
+                                                )
+                                            "
                                         ></i>
                                     </div>
                                 </template>
@@ -298,6 +339,7 @@
                                         class="d-flex flex-row align-items-center gap-2"
                                     >
                                         <i
+                                            v-if="!user.deleted_at"
                                             class="fa fa-pencil-square-o text-info"
                                             @click="
                                                 () => {
@@ -310,9 +352,28 @@
                                                 }
                                             "
                                         ></i>
+                                        <i v-if='!user.deleted_at'
+                                                title="Авторизоваться"
+                                                class="fa fa-desktop text-info"
+                                                @click="
+                                                    authUser(
+                                                        user.id
+                                                    )
+                                                "
+                                            ></i>
                                         <i
-                                            class="fa fa-times text-danger"
-                                            @click="removeUser(user.id)"
+                                            :class="{
+                                                'fa fa-times text-danger':
+                                                    !user.deleted_at,
+                                                'fa fa-check text-success':
+                                                    user.deleted_at,
+                                            }"
+                                            @click="
+                                                removeUser(
+                                                    user.id,
+                                                    user.deleted_at
+                                                )
+                                            "
                                         ></i>
                                     </div>
                                 </template>
@@ -516,6 +577,20 @@ export default {
         }
     },
     methods: {
+        authUser(user){
+            if (confirm("Вы действительно хотите авторизоваться?")) {
+                let form = new FormData();
+                form.append("user", user);
+                this.datasend(`authUser`, "POST", form)
+                    .then((res) => {
+                        localStorage.setItem("token",res.token);
+                        location.reload();
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+            }
+        },
         clearCache() {
             this.datasend("checkImageResource", "GET", {})
                 .then((res) => {
@@ -552,8 +627,14 @@ export default {
                     });
             }
         },
-        removeUser(id) {
-            if (confirm("Вы действительно хотите удалить пользователя?")) {
+        removeUser(id, del = null) {
+            if (
+                confirm(
+                    `Вы действительно хотите ${
+                        del ? "восстановить" : "удалить"
+                    } пользователя?`
+                )
+            ) {
                 this.datasend(`user/${id}`, "DELETE", {})
                     .then((res) => {
                         this.showToast(res.success, res.message);
@@ -605,7 +686,7 @@ export default {
                     );
                 }
                 this.datasend("about", "POST", form)
-                    .then((res) => {                        
+                    .then((res) => {
                         this.showToast(res.success, res.message);
                         if (res.success) {
                             this.getList();
