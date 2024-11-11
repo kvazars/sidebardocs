@@ -14,10 +14,12 @@ import AttachesTool from "@editorjs/attaches";
 import ImageGallery from "@kiberpro/editorjs-gallery";
 import Sortable from "sortablejs";
 import modeHTMLWorker from "ace-builds/src-noconflict/worker-html?url";
+import modeCSSWorker from "ace-builds/src-noconflict/worker-css?url";
 import modeJSWorker from "ace-builds/src-noconflict/worker-javascript?url";
 import modePHPWorker from "ace-builds/src-noconflict/worker-php?url";
 import LinkWithTarget from "editorjs-link-with-target";
 ace.config.setModuleUrl("ace/mode/html_worker", modeHTMLWorker);
+ace.config.setModuleUrl("ace/mode/css_worker", modeCSSWorker);
 ace.config.setModuleUrl("ace/mode/javascript_worker", modeJSWorker);
 ace.config.setModuleUrl("ace/mode/php_worker", modePHPWorker);
 import Alert from "editorjs-alert";
@@ -48,7 +50,6 @@ export default {
             if (this.id) {
                 this.datasend("resourceauth/" + this.id, "GET", {})
                     .then((res) => {
-                        // console.log(this.user);
                         if (
                             this.user.role == "user" ||
                             !this.user ||
@@ -91,8 +92,6 @@ export default {
                 this.createEditor();
             }
         } else {
-            // console.log(this.dashboard);
-
             this.dataBlock = JSON.parse(this.dashboard.data);
             this.createEditor();
         }
@@ -127,8 +126,6 @@ export default {
             this.editor
                 .save()
                 .then((outputData) => {
-                    console.log(outputData);
-
                     let form = new FormData();
                     outputData.blocks.forEach((el) => {
                         if (el.type == "image" || el.type == "attaches") {
@@ -486,6 +483,10 @@ const aceConfig = {
         html: {
             label: "HTML",
             mode: "ace/mode/html",
+        },
+        css: {
+            label: "CSS",
+            mode: "ace/mode/css",
         },
         js: {
             label: "JavaScript",

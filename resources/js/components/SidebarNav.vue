@@ -24,10 +24,10 @@
 
 <script setup>
 import { useSidebarIdStore } from "../stores/sidebarId";
-import { initSidebar } from "../tree_menu/src/use/useSidebar";
-import SidebarMenuItem from "../tree_menu/src/components/SidebarMenuItem.vue";
-import SidebarMenuScroll from "../tree_menu/src/components/SidebarMenuScroll.vue";
-import "../tree_menu/src/scss/vue-sidebar-menu.scss";
+import { initSidebar } from "vue-sidebar-menu/src/use/useSidebar";
+import SidebarMenuItem from "vue-sidebar-menu/src/components/SidebarMenuItem.vue";
+import SidebarMenuScroll from "vue-sidebar-menu/src/components/SidebarMenuScroll.vue";
+import "vue-sidebar-menu/src/scss/vue-sidebar-menu.scss";
 
 const props = defineProps([
     "menu",

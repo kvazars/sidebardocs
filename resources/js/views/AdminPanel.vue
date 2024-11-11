@@ -623,7 +623,6 @@ export default {
         getList() {
             this.datasend("group", "GET", {})
                 .then((res) => {
-                    // console.log(res);
 
                     this.groupList = res.groups;
                     this.admins = res.admin;

@@ -116,7 +116,6 @@ export default {
         updoc(id) {
             this.datasend("doc/up/" + id, "POST", {})
                 .then((res) => {
-                    // console.log(res);
                     this.showToast(res.success, res.message);
                     this.getMenu();
                 })
@@ -125,7 +124,6 @@ export default {
         downdoc(id) {
             this.datasend("doc/down/" + id, "POST", {})
                 .then((res) => {
-                    // console.log(res);
                     this.showToast(res.success, res.message);
                     this.getMenu();
                 })

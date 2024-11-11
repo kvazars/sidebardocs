@@ -40,7 +40,18 @@
                         "
                     >
                         <div class="d-flex flex-row align-items-center">
-                            <span :class="searchFilter.sortBy == 'name' && searchFilter.sortAsc ? 'sort-down' : (searchFilter.sortBy == 'name' && !searchFilter.sortAsc ? 'sort-up' : 'sort-out')">Документ</span>
+                            <span
+                                :class="
+                                    searchFilter.sortBy == 'name' &&
+                                    searchFilter.sortAsc
+                                        ? 'sort-down'
+                                        : searchFilter.sortBy == 'name' &&
+                                          !searchFilter.sortAsc
+                                        ? 'sort-up'
+                                        : 'sort-out'
+                                "
+                                >Документ</span
+                            >
                         </div></CTableHeaderCell
                     >
                     <CTableHeaderCell scope="col"
@@ -59,7 +70,16 @@
                                 getFiles();
                             }
                         "
-                        ><span :class="searchFilter.sortBy == 'updated_at' && searchFilter.sortAsc ? 'sort-down' : (searchFilter.sortBy == 'updated_at' && !searchFilter.sortAsc ? 'sort-up' : 'sort-out')"
+                        ><span
+                            :class="
+                                searchFilter.sortBy == 'updated_at' &&
+                                searchFilter.sortAsc
+                                    ? 'sort-down'
+                                    : searchFilter.sortBy == 'updated_at' &&
+                                      !searchFilter.sortAsc
+                                    ? 'sort-up'
+                                    : 'sort-out'
+                            "
                             >Обновлено</span
                         ></CTableHeaderCell
                     >
@@ -67,7 +87,7 @@
                 </CTableRow>
             </CTableHead>
             <CTableBody>
-                <CTableRow v-for="(val,key) in files.data" :key="val">
+                <CTableRow v-for="(val, key) in files.data" :key="val">
                     <CTableDataCell v-if="val.user"
                         >{{ val.user.name }}
                     </CTableDataCell>
@@ -268,7 +288,11 @@ export default {
         },
         remove(id) {
             if (confirm("Вы уверены?")) {
-                this.datasend("resourcedel/" + this.files.data[id].id, "DELETE", {})
+                this.datasend(
+                    "resourcedel/" + this.files.data[id].id,
+                    "DELETE",
+                    {}
+                )
                     .then((res) => {
                         if (res.success) {
                             this.getFiles();
@@ -307,7 +331,6 @@ export default {
             // formHelper.forEach((el) => {
             //     form = form + "&" + el;
             // });
-            console.log(this.searchFilter.name);
 
             this.datasend(`getFiles?page=${this.page}&${form}`, "GET", {})
                 .then((res) => {
@@ -324,7 +347,6 @@ export default {
 
                     // this.files.data = resData;
                     this.files.data = res.data.files.data;
-                    console.log(this.files);
 
                     this.viewOk = true;
                 })
