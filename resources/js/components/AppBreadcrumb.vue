@@ -85,10 +85,9 @@ export default {
     <div
         class="dropdown"
         v-if="
-            content &&
-            ($route.name == 'CreateFile' ||
-                $route.name == 'EditFile' ||
-                $route.name == 'ShowFile')
+            $route.name == 'CreateFile' ||
+            $route.name == 'EditFile' ||
+            $route.name == 'ShowFile'
         "
     >
         <button
@@ -105,14 +104,17 @@ export default {
             >
                 <li>
                     <button class="dropdown-item" @click="save">
-                        Сохранить
                         <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        Сохранить
                     </button>
                 </li>
-                <li v-if="$route.name == 'EditFile'">
+                <li
+                    v-if="
+                        $route.name == 'EditFile' || $route.name == 'CreateFile'
+                    "
+                >
                     <button class="dropdown-item" @click="redirectToHome(true)">
-                        Отмена
-                        <i class="fa fa-times" aria-hidden="true"></i>
+                        <i class="fa fa-times" aria-hidden="true"></i> Отмена
                     </button>
                 </li>
                 <li v-if="$route.name == 'EditFile'">
@@ -120,12 +122,11 @@ export default {
                 </li>
                 <li v-if="$route.name == 'EditFile'">
                     <button class="dropdown-item" @click="deleteFile">
-                        <span>Удалить</span>
-                        <i class="fa fa-trash-o" aria-hidden="true"></i>
+                        <i class="fa fa-trash-o" aria-hidden="true"></i> Удалить
                     </button>
                 </li>
             </template>
-            <template v-if="$route.name == 'ShowFile'">
+            <template v-if="$route.name == 'ShowFile' && content">
                 <li>
                     <router-link
                         class="dropdown-item"
@@ -137,9 +138,12 @@ export default {
                             name: 'EditFile',
                             params: { id: content.tree_id },
                         }"
-                        >Редактировать
-                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i
-                    ></router-link>
+                        ><i
+                            class="fa fa-pencil-square-o"
+                            aria-hidden="true"
+                        ></i>
+                        Редактировать
+                    </router-link>
                 </li>
                 <template v-if="content">
                     <li
@@ -154,8 +158,8 @@ export default {
 
                 <li>
                     <button class="dropdown-item" @click="html2doc">
-                        Экспорт
                         <i class="fa fa-file-word-o" aria-hidden="true"></i>
+                        Экспорт
                     </button>
                 </li>
             </template>
