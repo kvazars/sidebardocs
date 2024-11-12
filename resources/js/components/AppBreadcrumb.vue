@@ -1,12 +1,10 @@
 <script>
-import jsPDF from "jspdf";
-import { ExportToWord, ExportToPdf } from "vue-doc-exporter";
+import { ExportToPdf } from "vue-doc-exporter";
 import { useAuthIdStore } from "../stores/authId";
 
 import { useRouter } from "vue-router";
 export default {
     components: {
-        ExportToWord,
         ExportToPdf,
     },
     data() {
