@@ -2,6 +2,8 @@
 import jsPDF from "jspdf";
 import { ExportToWord, ExportToPdf } from "vue-doc-exporter";
 import { useAuthIdStore } from "../stores/authId";
+
+import { useRouter } from "vue-router";
 export default {
     components: {
         ExportToWord,
@@ -10,25 +12,38 @@ export default {
     data() {
         return {
             auths: useAuthIdStore(),
+            router: useRouter(),
         };
     },
-    props: ["breadcrumbs", "content", "saveEditFile"],
+    props: ["breadcrumbs", "content", "saveEditFile", "datasend","getMenu"],
     methods: {
         save() {
             this.saveEditFile();
         },
+        redirectToHome(mess = false) {
+            if (mess) {
+                if (!confirm("Вы уверены?")) return;
+            }
+            this.router.push({ name: "Home" });
+        },
         deleteFile() {
-            if (!this.content.tree_id) {
-                this.router.push({ name: "Home" });
-            } else {
-                this.datasend("resource/" + this.content.tree_id, "DELETE", {})
-                    .then((res) => {
-                        if (res.success) {
-                            this.getMenu();
-                            this.showToast(res.success, res.message);
-                        }
-                    })
-                    .catch((error) => console.log(error));
+            if (confirm("Вы уверены?")) {
+                if (this.$route.name == "CreateFile") {
+                    this.redirectToHome();
+                } else {
+                    this.datasend(
+                        "resourcedel/" + this.content.tree_id,
+                        "DELETE",
+                        {}
+                    )
+                        .then((res) => {
+                            if (res.success) {
+                                this.redirectToHome();
+                                this.getMenu();
+                            }
+                        })
+                        .catch((error) => console.log(error));
+                }
             }
         },
         html2doc() {
@@ -73,42 +88,72 @@ export default {
             {{ item }}
         </CBreadcrumbItem>
     </CBreadcrumb>
-    <div class="dropdown" v-if="content||$route.name == 'CreateFile'">
-        <button class="btn btn-primary btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <div
+        class="dropdown"
+        v-if="
+            content &&
+            ($route.name == 'CreateFile' ||
+                $route.name == 'EditFile' ||
+                $route.name == 'ShowFile')
+        "
+    >
+        <button
+            class="btn btn-primary btn-sm"
+            type="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+        >
             <i class="fa fa-cog"></i>
         </button>
         <ul class="dropdown-menu">
-            <template v-if="$route.name == 'EditFile'||$route.name == 'CreateFile'">
+            <template
+                v-if="$route.name == 'EditFile' || $route.name == 'CreateFile'"
+            >
                 <li>
                     <button class="dropdown-item" @click="save">
                         Сохранить
                         <i class="fa fa-floppy-o" aria-hidden="true"></i>
                     </button>
                 </li>
-                <li>
+                <li v-if="$route.name == 'EditFile'">
+                    <button class="dropdown-item" @click="redirectToHome(true)">
+                        Отмена
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                    </button>
+                </li>
+                <li v-if="$route.name == 'EditFile'">
                     <hr class="dropdown-divider" />
                 </li>
-                <li>
+                <li v-if="$route.name == 'EditFile'">
                     <button class="dropdown-item" @click="deleteFile">
-                        Удалить
+                        <span>Удалить</span>
                         <i class="fa fa-trash-o" aria-hidden="true"></i>
                     </button>
                 </li>
             </template>
             <template v-if="$route.name == 'ShowFile'">
                 <li>
-                    <router-link class="dropdown-item" v-if="auths.id == content.tree.user_id ||
-            auths.role == 'admin'
-            " :to="{
-            name: 'EditFile',
-            params: { id: content.tree_id },
-        }">Редактировать
-                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i></router-link>
+                    <router-link
+                        class="dropdown-item"
+                        v-if="
+                            auths.id == content.tree.user_id ||
+                            auths.role == 'admin'
+                        "
+                        :to="{
+                            name: 'EditFile',
+                            params: { id: content.tree_id },
+                        }"
+                        >Редактировать
+                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i
+                    ></router-link>
                 </li>
                 <template v-if="content">
-                    <li v-if="auths.id == content.tree.user_id ||
-            auths.role == 'admin'
-            ">
+                    <li
+                        v-if="
+                            auths.id == content.tree.user_id ||
+                            auths.role == 'admin'
+                        "
+                    >
                         <hr class="dropdown-divider" />
                     </li>
                 </template>
@@ -120,10 +165,13 @@ export default {
                     </button>
                 </li>
                 <li>
-                    <ExportToPdf :filename="this.breadcrumbs
-                ? this.breadcrumbs[this.breadcrumbs.length - 1]
-                : 'document'
-            ">
+                    <ExportToPdf
+                        :filename="
+                            this.breadcrumbs
+                                ? this.breadcrumbs[this.breadcrumbs.length - 1]
+                                : 'document'
+                        "
+                    >
                         <button class="dropdown-item">
                             Экспорт
                             <i class="fa fa-file-pdf-o" aria-hidden="true"></i>

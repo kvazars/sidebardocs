@@ -3,7 +3,7 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 vite build"
     },
     "devDependencies": {
         "@popperjs/core": "^2.11.8",
@@ -40,6 +40,7 @@
         "ace-code-editorjs": "^1.0.3",
         "autoprefixer": "^10.4.20",
         "bootstrap": "^5.3.3",
+        "cross-env": "^7.0.3",
         "editorjs-alert": "^1.1.4",
         "editorjs-button": "^3.0.3",
         "editorjs-codemirror": "^0.1.3",

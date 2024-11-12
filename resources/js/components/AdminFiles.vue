@@ -305,7 +305,6 @@ export default {
                     {}
                 )
                     .then((res) => {
-                        console.log(res);
                         if (res.success) {
                             this.getFiles();
                             this.showToast(res.success, res.message);

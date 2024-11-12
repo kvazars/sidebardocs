@@ -249,6 +249,8 @@ export default {
                     :breadcrumbs="breadcrumbs"
                     :content="content"
                     :saveEditFile="saveEditFile"
+                    :datasend="datasend"
+                    :getMenu="getMenu"
                 />
             </CContainer>
             <div class="body flex-grow-1">

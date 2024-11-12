@@ -130,12 +130,14 @@ export default {
                 .catch((error) => console.log(error));
         },
         deleteFolder(id) {
+            if(confirm('Вы уверены?')){
             this.datasend("folder/" + id, "DELETE", {})
                 .then((res) => {
                     this.showToast(res.success, res.message);
                     this.getMenu();
                 })
                 .catch((error) => console.log(error));
+            }
         },
         showContextMenu(event, item) {
             this.treeId = item.id;
@@ -172,6 +174,8 @@ export default {
                     params: { id: this.treeId },
                 });
             } else if (action == "deleteFile") {
+                if(confirm('Вы уверены?')){
+
                 this.datasend("resourcedel/" + this.treeId, "DELETE", {})
                     .then((res) => {
                         if (res.success) {
@@ -181,6 +185,7 @@ export default {
                         }
                     })
                     .catch((error) => console.log(error));
+                }
             }
         },
         addFirstLevel() {
