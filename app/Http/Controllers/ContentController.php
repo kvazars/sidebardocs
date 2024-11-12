@@ -14,7 +14,6 @@ use App\Models\UserGroups;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -22,17 +21,17 @@ use Intervention\Image\Laravel\Facades\Image;
 
 class ContentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function saveImage(Request $request)
     {
+        if (!is_dir(public_path("contentImages"))) {
+            mkdir(public_path("contentImages"));
+        }
+
         $dirshort = "contentImages/" . Auth::user()->id;
         $dir = public_path($dirshort);
         if (!is_dir($dir)) {
             mkdir($dir);
         }
-        //return $request->file('image');
         if ($request->file('image')) {
             $path   = Image::read($request->file('image'));
             $resize = $path->scaleDown(1024, 1024)->toWebp(90);
@@ -45,6 +44,9 @@ class ContentController extends Controller
     }
     public function saveFile(UploadFileRequest $request)
     {
+        if (!is_dir(public_path("contentFiles"))) {
+            mkdir(public_path("contentFiles"));
+        }
         $dirshort = "contentFiles/" . Auth::user()->id;
         $dir = public_path($dirshort);
         if (!is_dir(filename: $dir)) {
@@ -116,9 +118,7 @@ class ContentController extends Controller
 
     public function changeAvailables($tree, $availables, $accessibility)
     {
-
         Available::where('tree_id', $tree)->delete();
-
         if (!$accessibility) {
             foreach (json_decode($availables) as $available) {
                 if ($available->checked) {
@@ -162,7 +162,6 @@ class ContentController extends Controller
         $all = Group::get()->sortBy("name");
         $g = Available::where('tree_id', $content)->pluck('group_id')->toArray();
 
-
         foreach ($all as $value) {
             $availablesGroups[] = ['id' => $value->id, 'name' => $value->name, 'checked' => in_array($value->id, $g)];
         }
@@ -172,9 +171,7 @@ class ContentController extends Controller
 
     public function delResource(Request $request, $content)
     {
-
         $tree = Tree::withTrashed()->find($content);
-
         if ($request->user()->role == 'ceo' and $request->user()->id != $tree->user_id) {
             return response()->json(["success" => false, 'message' => 'Недостаточно прав']);
         }
@@ -195,7 +192,6 @@ class ContentController extends Controller
         User::onlyTrashed()->forceDelete();
         Tree::onlyTrashed()->forceDelete();
         Content::onlyTrashed()->forceDelete();
-
 
         $dirFiles = [];
         $u = User::where('role', '!=', 'user')->pluck('id')->toArray();
@@ -218,9 +214,7 @@ class ContentController extends Controller
             }
         }
 
-
         $dir = public_path('logo');
-
         if (is_dir($dir)) {
             if ($dh = opendir($dir)) {
                 while (($file = readdir($dh)) !== false) {
@@ -233,7 +227,6 @@ class ContentController extends Controller
         }
         $savedImages = [];
         $savedFiles = [];
-
         $c = Content::pluck('data');
         foreach ($c as $value) {
             $value = json_decode($value);
@@ -255,24 +248,10 @@ class ContentController extends Controller
             }
         }
         $about = About::find(1);
-
         $del = array_diff($dirFiles, array_merge($savedImages, $savedFiles, [$about->logo]));
-
         Storage::disk('public')->delete($del);
-
-
-
-        //удалим все удаленные группы
-        // User::onlyTrashed()->forceDelete();
-        // $gr = $users->pluck("id")->toArray();
-        // UserGroups::whereIn("user_id",$gr)->delete();
-        // $users->forceDelete();
-        //
-
-
         Artisan::call('route:clear');
         Artisan::call('cache:clear');
-
         return response()->json(['success' => true, 'message' => 'Кэш очищен']);
     }
 
@@ -299,14 +278,8 @@ class ContentController extends Controller
             $files->where('user_id', $request->user);
         }
 
-        // Model::with(['relation' => function($query){
-        //     $query->orderBy('column', 'ASC');
-        //  }]);
-
         $files->orderBy($request->sortBy ?: 'name', $request->sortAsc == 'true' ? 'asc' : 'desc');
-
         $files = $files->paginate(15);
-
 
         foreach ($files as $file) {
             $file->child->accessibility = $file->child->accessibility == 1;

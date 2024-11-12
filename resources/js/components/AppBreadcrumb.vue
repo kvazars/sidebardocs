@@ -1,19 +1,15 @@
 <script>
-import { ExportToPdf } from "vue-doc-exporter";
 import { useAuthIdStore } from "../stores/authId";
 
 import { useRouter } from "vue-router";
 export default {
-    components: {
-        ExportToPdf,
-    },
     data() {
         return {
             auths: useAuthIdStore(),
             router: useRouter(),
         };
     },
-    props: ["breadcrumbs", "content", "saveEditFile", "datasend","getMenu"],
+    props: ["breadcrumbs", "content", "saveEditFile", "datasend", "getMenu"],
     methods: {
         save() {
             this.saveEditFile();
@@ -161,20 +157,6 @@ export default {
                         Экспорт
                         <i class="fa fa-file-word-o" aria-hidden="true"></i>
                     </button>
-                </li>
-                <li>
-                    <ExportToPdf
-                        :filename="
-                            this.breadcrumbs
-                                ? this.breadcrumbs[this.breadcrumbs.length - 1]
-                                : 'document'
-                        "
-                    >
-                        <button class="dropdown-item">
-                            Экспорт
-                            <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
-                        </button>
-                    </ExportToPdf>
                 </li>
             </template>
         </ul>

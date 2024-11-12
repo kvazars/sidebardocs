@@ -22,27 +22,20 @@ class GroupController extends Controller
             "system" => About::find(1)
         ];
     }
-
     public function store(CreateGroupRequest $request)
     {
         Group::create([
             'name' => $request->name,
         ]);
-
         return response()->json(['success' => true, 'message' => 'Группа создана']);
     }
-
-
     public function update(GroupsUpdateRequest $request)
     {
         Group::find($request->id)->update([
             'name' => $request->name,
         ]);
-
         return response()->json(['success' => true, 'message' => 'Группа успешно обновлена']);
     }
-
-
     public function delete(Group $group)
     {
         $all = UserGroups::where("group_id", $group->id)->count();

@@ -131,10 +131,13 @@
 
                 <div v-if="val.type == 'attaches'" class="my-4">
                     <span>
-                        <a :href="imgs[val.id].url" target="_blank" download>{{
-                            imgs[val.id].title
-                        }}</a></span
-                    >
+                        <a
+                            :href="imgs[val.id].url"
+                            target="_blank"
+                            download
+                            v-html="imgs[val.id].title"
+                        ></a
+                    ></span>
                     <PptxShow
                         v-if="imgs[val.id].url.split('.').pop() == 'pptx'"
                         :file="imgs[val.id].url"
@@ -173,7 +176,7 @@
                             ? 'end'
                             : 'center')
                     "
-                    v-html="val.data.message"
+                    ><span v-html="val.data.message"></span
                 ></CAlert>
 
                 <div
@@ -232,9 +235,11 @@
                     class="my-4"
                     v-if="val.type == 'list' && val.data.style != 'unordered'"
                 >
-                    <li v-for="item in val.data.items" :key="item">
-                        {{ item }}
-                    </li>
+                    <li
+                        v-for="item in val.data.items"
+                        :key="item"
+                        v-html="item"
+                    ></li>
                 </ol>
                 <div class="text-center my-4" v-if="val.type == 'embed'">
                     <iframe

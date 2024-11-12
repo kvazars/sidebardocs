@@ -24,33 +24,27 @@ class UserController extends Controller
             $user->password = $request->password;
         }
         $user->save();
-
-
         return response()->json(['success' => true, 'message' => 'Пользователь успешно обновлен']);
     }
     public function store(RegistrationRequest $request)
     {
-
         if ($request->role == 'user') {
             $request->validate([
                 'group_id' => 'required|exists:groups,id',
             ]);
         }
-
         $user = User::create([
             'name' => $request->name,
             'login' => $request->login,
             'password' => $request->password,
             'role' => $request->role,
         ]);
-
         if ($user->role == 'user') {
             UserGroups::create([
                 'group_id' => $request->group_id,
                 'user_id' => $user->id,
             ]);
         }
-
         return response()->json(['success' => true, 'message' => 'Новый пользователь был создан']);
     }
 
@@ -65,14 +59,11 @@ class UserController extends Controller
         }
     }
     public function authadmin(Request $request)
-    {
-   
+    {   
         $user = User::find($request->user);
         $token = $user->createToken('api');
         return response()->json(['token' => $token->plainTextToken]);
-        
     }
-
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
@@ -83,7 +74,6 @@ class UserController extends Controller
         if ($id == 1) {
             return response()->json(["success" => false, "message" => "Запрещено удалять пользователя!"]);
         }
-        // UserGroups::where("user_id", $id)->delete();
         $user = User::withTrashed()->find($id);
         $mess = '';
         if($user->trashed()){
