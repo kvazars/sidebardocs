@@ -72,7 +72,14 @@ export default {
                         this.accessibility = res.content.accessibility
                             ? true
                             : false;
-                        this.groupAvailables = res.groups;
+
+                        res.groups.forEach((el) => {
+                            let firstletter = el.name.substr(0, 1);
+                            if (!this.groupAvailables[firstletter]) {
+                                this.groupAvailables[firstletter] = [];
+                            }
+                            this.groupAvailables[firstletter].push(el);
+                        });
 
                         this.dataBlock = JSON.parse(res.content.data);
                         this.setContent(res.content);
@@ -108,7 +115,7 @@ export default {
             router: useRouter(),
             user: useAuthIdStore(),
             accessibility: false,
-            groupAvailables: [],
+            groupAvailables: {},
             editor: null,
         };
     },
@@ -144,7 +151,11 @@ export default {
 
                     form.append(
                         "availables",
-                        JSON.stringify(this.groupAvailables)
+                        JSON.stringify(
+                            Object.values(
+                                Object.assign(this.groupAvailables)
+                            ).flat()
+                        )
                     );
 
                     if (this.$route.params.parent) {
@@ -534,24 +545,30 @@ const aceConfig = {
                                     class="row w-100 px-2"
                                 >
                                     <div
-                                        class="form-check col-lg-2"
+                                        class="col-lg-2"
                                         v-for="(item, key) in groupAvailables"
                                         :key="key"
                                     >
-                                        <input
-                                            class="form-check-input"
-                                            type="checkbox"
-                                            :value="'group_' + item.id"
-                                            :id="'group_' + item.id"
-                                            v-model="item.checked"
-                                        />
-                                        <label
-                                            style="user-select: none"
-                                            class="form-check-label"
-                                            :for="'group_' + item.id"
+                                        <div
+                                            class="d-flex form-check gap-2"
+                                            v-for="(gr, index) in item"
+                                            :key="index"
                                         >
-                                            {{ item.name }}
-                                        </label>
+                                            <input
+                                                class="form-check-input"
+                                                type="checkbox"
+                                                :value="'group_' + gr.id"
+                                                :id="'group_' + gr.id"
+                                                v-model="gr.checked"
+                                            />
+                                            <label
+                                                style="user-select: none"
+                                                class="form-check-label"
+                                                :for="'group_' + gr.id"
+                                            >
+                                                {{ gr.name }}
+                                            </label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
