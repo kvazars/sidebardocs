@@ -550,7 +550,6 @@ const aceConfig = {
                                     v-if="!accessibility"
                                     class="row w-100 px-2"
                                 >
-                                    {{ groupAvailables }}
                                     <div
                                         class="col-lg-3"
                                         v-for="(item, key) in groupAvailables"
