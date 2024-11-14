@@ -92,7 +92,13 @@ export default {
                 this.datasend("getGroups", "GET", {})
                     .then((res) => {
                         if (res.success) {
-                            this.groupAvailables = res.groups;
+                            res.groups.forEach((el) => {
+                                let firstletter = el.name.substr(0, 1);
+                                if (!this.groupAvailables[firstletter]) {
+                                    this.groupAvailables[firstletter] = [];
+                                }
+                                this.groupAvailables[firstletter].push(el);
+                            });
                         } else {
                             this.showToast(res.success, "Что-то пошло не так");
                         }
@@ -544,8 +550,9 @@ const aceConfig = {
                                     v-if="!accessibility"
                                     class="row w-100 px-2"
                                 >
+                                    {{ groupAvailables }}
                                     <div
-                                        class="col-lg-2"
+                                        class="col-lg-3"
                                         v-for="(item, key) in groupAvailables"
                                         :key="key"
                                     >
