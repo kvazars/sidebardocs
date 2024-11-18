@@ -664,18 +664,34 @@ a[href*=".7Z"]:before {
     padding-left: 3px;
 }
 
-
 @media screen and (max-width: 800px) {
-    .vue-office-docx .docx-wrapper p{
+    .vue-office-docx .docx-wrapper p {
         padding: 0px !important;
         text-indent: 0px !important;
         margin: 0px !important;
-
     }
 }
 
-.cdx-attaches__title{
-    padding:5px;
+.cdx-attaches__title {
+    padding: 5px;
 }
 
-.z1{z-index:15;}
+.z1 {
+    z-index: 15;
+}
+.iframeh100{
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    min-height: 1200px;
+    padding-top: 56.25%; /* 16:9 Aspect Ratio  */
+}
+.iframeh100 iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+}

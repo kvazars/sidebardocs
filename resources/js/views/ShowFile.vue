@@ -252,6 +252,9 @@
                         class="text-center fst-italic"
                     ></p>
                 </div>
+                <div class="text-center my-4" v-if="val.type == 'raw'">
+                    <div v-html="val.data.html" class="iframeh100"></div>
+                </div>
                 <div v-if="val.type == 'quote'" class="my-4">
                     <figure
                         class="card card-body"

@@ -22,6 +22,7 @@ ace.config.setModuleUrl("ace/mode/html_worker", modeHTMLWorker);
 ace.config.setModuleUrl("ace/mode/css_worker", modeCSSWorker);
 ace.config.setModuleUrl("ace/mode/javascript_worker", modeJSWorker);
 ace.config.setModuleUrl("ace/mode/php_worker", modePHPWorker);
+import RawTool from "@editorjs/raw";
 import Alert from "editorjs-alert";
 import { computed } from "vue";
 import { useRouter } from "vue-router";
@@ -195,6 +196,10 @@ export default {
             this.editor = new EditorJS({
                 holder: "editorjs",
                 tools: {
+                    raw: {
+                        class: RawTool,
+                        config: { placeholder: "Вставьте содержимое" },
+                    },
                     alert: {
                         class: Alert,
                         inlineToolbar: true,
