@@ -87,11 +87,13 @@
                         ? " администраторами"
                         : role == "ceo"
                         ? " менеджерами"
+                        : role == "system"
+                        ? " системой"
                         : " файлами"
                 }}
             </h4>
-            <div class="w-100 row">
-                <div class="col-lg-6">
+            <div class="row">
+                <div>
                     <p class="fw-bold text-center">
                         {{
                             role == "user"
@@ -109,6 +111,7 @@
                             <CButton
                                 @click="
                                     () => {
+                                        visibleModal = true;
                                         cardName = 'createGroup';
                                         groupId = null;
                                         groupName = null;
@@ -135,6 +138,7 @@
                                         <CButton
                                             @click="
                                                 () => {
+                                                    visibleModal = true;
                                                     cardName = 'editGroup';
                                                     groupId = group.id;
                                                     groupName = group.name;
@@ -158,6 +162,7 @@
                                         color="success"
                                         @click="
                                             () => {
+                                                visibleModal = true;
                                                 cardName = 'createUser';
                                                 groupIds = group.id;
                                                 fullname = null;
@@ -189,6 +194,7 @@
                                                     class="fa fa-pencil-square-o text-info"
                                                     @click="
                                                         () => {
+                                                            visibleModal = true;
                                                             cardName =
                                                                 'createUser';
                                                             fullname =
@@ -201,15 +207,12 @@
                                                     "
                                                 ></i>
 
-                                                <i v-if='!user.deleted_at'
-                                                title="Авторизоваться"
-                                                class="fa fa-desktop text-info"
-                                                @click="
-                                                    authUser(
-                                                        user.id
-                                                    )
-                                                "
-                                            ></i>
+                                                <i
+                                                    v-if="!user.deleted_at"
+                                                    title="Авторизоваться"
+                                                    class="fa fa-desktop text-info"
+                                                    @click="authUser(user.id)"
+                                                ></i>
 
                                                 <i
                                                     :class="{
@@ -240,6 +243,7 @@
                                     color="success"
                                     @click="
                                         () => {
+                                            visibleModal = true;
                                             cardName = 'createUser';
                                             fullname = null;
                                             login = null;
@@ -269,6 +273,7 @@
                                             class="fa fa-pencil-square-o text-info"
                                             @click="
                                                 () => {
+                                                    visibleModal = true;
                                                     cardName = 'createUser';
                                                     fullname = user.name;
                                                     password = null;
@@ -278,15 +283,12 @@
                                                 }
                                             "
                                         ></i>
-                                        <i v-if='!user.deleted_at'
-                                                title="Авторизоваться"
-                                                class="fa fa-desktop text-info"
-                                                @click="
-                                                    authUser(
-                                                        user.id
-                                                    )
-                                                "
-                                            ></i>
+                                        <i
+                                            v-if="!user.deleted_at"
+                                            title="Авторизоваться"
+                                            class="fa fa-desktop text-info"
+                                            @click="authUser(user.id)"
+                                        ></i>
                                         <i
                                             :class="{
                                                 'fa fa-times text-danger':
@@ -314,6 +316,7 @@
                                     color="success"
                                     @click="
                                         () => {
+                                            visibleModal = true;
                                             cardName = 'createUser';
                                             fullname = null;
                                             login = null;
@@ -343,6 +346,7 @@
                                             class="fa fa-pencil-square-o text-info"
                                             @click="
                                                 () => {
+                                                    visibleModal = true;
                                                     cardName = 'createUser';
                                                     fullname = user.name;
                                                     password = null;
@@ -352,15 +356,12 @@
                                                 }
                                             "
                                         ></i>
-                                        <i v-if='!user.deleted_at'
-                                                title="Авторизоваться"
-                                                class="fa fa-desktop text-info"
-                                                @click="
-                                                    authUser(
-                                                        user.id
-                                                    )
-                                                "
-                                            ></i>
+                                        <i
+                                            v-if="!user.deleted_at"
+                                            title="Авторизоваться"
+                                            class="fa fa-desktop text-info"
+                                            @click="authUser(user.id)"
+                                        ></i>
                                         <i
                                             :class="{
                                                 'fa fa-times text-danger':
@@ -381,7 +382,7 @@
                         </CListGroup>
                     </template>
                     <template v-if="role == 'system'">
-                        <div class="col-lg-12">
+                        <div class="col-lg-12 mb-3">
                             <CCard>
                                 <CCardHeader class="fw-bold text-center"
                                     >Управление системой</CCardHeader
@@ -429,95 +430,6 @@
                         </div>
                     </template>
                 </div>
-                <div class="col-lg-6">
-                    <CCard v-if="role == 'user' && cardName == 'createGroup'">
-                        <CCardHeader class="fw-bold text-center"
-                            >Создание группы</CCardHeader
-                        >
-                        <CCardBody>
-                            <CFormInput
-                                v-model="groupName"
-                                class="mb-2"
-                                type="text"
-                                label="Название"
-                                placeholder="Введите название группы"
-                            />
-                            <div class="text-center">
-                                <CButton @click="createGroup" color="primary"
-                                    >Создать</CButton
-                                >
-                            </div>
-                        </CCardBody>
-                    </CCard>
-                    <CCard v-if="role == 'user' && cardName == 'editGroup'">
-                        <CCardHeader class="fw-bold text-center"
-                            >Редактирование группы</CCardHeader
-                        >
-                        <CCardBody>
-                            <CFormInput
-                                v-model="groupName"
-                                class="mb-2"
-                                type="text"
-                                label="Название"
-                                placeholder="Введите название группы"
-                            />
-                            <div class="text-center">
-                                <CButton @click="createGroup" color="primary"
-                                    >Сохранить</CButton
-                                >
-                            </div>
-                        </CCardBody>
-                    </CCard>
-                    <CCard v-if="cardName == 'createUser'">
-                        <CCardHeader class="fw-bold text-center"
-                            >Пользователя</CCardHeader
-                        >
-                        <CCardBody>
-                            <CFormInput
-                                class="mb-2"
-                                type="text"
-                                label="Имя"
-                                v-model="fullname"
-                                placeholder="Введите имя пользователя"
-                            />
-                            <CFormInput
-                                class="mb-2"
-                                type="text"
-                                label="Логин"
-                                v-model="login"
-                                placeholder="Введите логин пользователя"
-                            />
-                            <label for="password">Пароль</label>
-                            <CInputGroup class="mb-2">
-                                <CFormInput
-                                    v-model="password"
-                                    id="password"
-                                    placeholder="Введите пароль пользователя, если это необходимо"
-                                    aria-label="Пароль"
-                                    aria-describedby="button-addon2"
-                                />
-                                <CButton
-                                    type="button"
-                                    color="secondary"
-                                    variant="outline"
-                                    id="button-addon2"
-                                    @click="
-                                        () => {
-                                            password = generatePassword();
-                                        }
-                                    "
-                                    ><i class="fa fa-key"></i
-                                ></CButton>
-                            </CInputGroup>
-
-                            <div class="text-center">
-                                <CButton color="primary" @click="createUser"
-                                    >Сохранить</CButton
-                                >
-                            </div>
-                        </CCardBody>
-                    </CCard>
-                </div>
             </div>
 
             <AdminFiles
@@ -537,11 +449,119 @@
             />
         </CCardBody>
     </CCard>
+
+    <CModal
+        :visible="visibleModal"
+        size="lg"
+        @close="
+            () => {
+                visibleModal = false;
+            }
+        "
+    >
+        <CModalHeader>
+            <CModalTitle
+                v-html="
+                    cardName == 'createGroup'
+                        ? 'Создание группы'
+                        : cardName == 'editGroup'
+                        ? 'Редактирование группы'
+                        : 'Пользователь'
+                "
+            ></CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+            <div v-if="role == 'user' && cardName == 'createGroup'">
+                <CFormInput
+                    v-model="groupName"
+                    class="mb-2"
+                    type="text"
+                    label="Название"
+                    placeholder="Введите название группы"
+                />
+            </div>
+            <div v-if="role == 'user' && cardName == 'editGroup'">
+                <CFormInput
+                    v-model="groupName"
+                    class="mb-2"
+                    type="text"
+                    label="Название"
+                    placeholder="Введите название группы"
+                />
+            </div>
+            <div v-if="cardName == 'createUser'">
+                <CFormInput
+                    class="mb-2"
+                    type="text"
+                    label="Имя"
+                    v-model="fullname"
+                    placeholder="Введите имя пользователя"
+                />
+                <CFormInput
+                    class="mb-2"
+                    type="text"
+                    label="Логин"
+                    v-model="login"
+                    placeholder="Введите логин пользователя"
+                />
+                <label for="password">Пароль</label>
+                <CInputGroup class="mb-2">
+                    <CFormInput
+                        v-model="password"
+                        id="password"
+                        placeholder="Введите пароль пользователя, если это необходимо"
+                        aria-label="Пароль"
+                        aria-describedby="button-addon2"
+                    />
+                    <CButton
+                        type="button"
+                        color="secondary"
+                        variant="outline"
+                        id="button-addon2"
+                        @click="
+                            () => {
+                                password = generatePassword();
+                            }
+                        "
+                        ><i class="fa fa-key"></i
+                    ></CButton>
+                </CInputGroup>
+            </div>
+        </CModalBody>
+        <CModalFooter>
+            <CButtonGroup>
+                <CButton
+                    color="primary"
+                    @click="
+                        () => {
+                            if (cardName == 'createUser') {
+                                createUser();
+                            } else if (role == 'user') {
+                                createGroup();
+                            }
+                        }
+                    "
+                    >Сохранить</CButton
+                >
+                <CButton
+                    color="danger"
+                    class="text-white"
+                    @click="
+                        () => {
+                            visibleModal = false;
+                        }
+                    "
+                    >Выйти</CButton
+                ></CButtonGroup
+            >
+        </CModalFooter>
+    </CModal>
 </template>
 
 <script>
 import EditFile from "./EditFile.vue";
 import AdminFiles from "../components/AdminFiles.vue";
+import { CButtonGroup } from "@coreui/vue";
 
 export default {
     props: [
@@ -569,6 +589,7 @@ export default {
             ceos: {},
             systemName: null,
             systemLogo: null,
+            visibleModal: false,
         };
     },
     mounted() {
@@ -577,13 +598,13 @@ export default {
         }
     },
     methods: {
-        authUser(user){
+        authUser(user) {
             if (confirm("Вы действительно хотите авторизоваться?")) {
                 let form = new FormData();
                 form.append("user", user);
                 this.datasend(`authUser`, "POST", form)
                     .then((res) => {
-                        localStorage.setItem("token",res.token);
+                        localStorage.setItem("token", res.token);
                         location.reload();
                     })
                     .catch((error) => {
@@ -616,6 +637,7 @@ export default {
                     .then((res) => {
                         this.showToast(res.success, res.message);
                         if (res.success) {
+                            this.visibleModal = false;
                             this.cardName = null;
                             this.getList();
                         } else if (res.errors) {
@@ -640,6 +662,7 @@ export default {
                         this.showToast(res.success, res.message);
                         if (res.success) {
                             this.getList();
+                            this.visibleModal = false;
                             this.cardName = null;
                         } else if (res.errors) {
                             this.catchError(res.errors);
@@ -690,6 +713,7 @@ export default {
                         this.showToast(res.success, res.message);
                         if (res.success) {
                             this.getList();
+                            this.visibleModal = false;
                             this.cardName = null;
                         } else if (res.errors) {
                             this.catchError(res.errors);
@@ -704,7 +728,6 @@ export default {
         getList() {
             this.datasend("group", "GET", {})
                 .then((res) => {
-
                     this.groupList = res.groups;
                     this.admins = res.admin;
                     this.ceos = res.ceo;
@@ -729,6 +752,7 @@ export default {
                     this.showToast(res.success, res.message);
                     if (res.success) {
                         this.getList();
+                        this.visibleModal = false;
                         this.cardName = null;
                     } else if (res.errors) {
                         this.catchError(res.errors);
@@ -757,6 +781,7 @@ export default {
                     this.showToast(res.success, res.message);
                     if (res.success) {
                         this.getList();
+                        this.visibleModal = false;
                         this.cardName = null;
                     } else if (res.errors) {
                         this.catchError(res.errors);

@@ -220,7 +220,7 @@
                         </tbody>
                     </table>
                 </div>
-
+                <IFrameShow :code="val.data.html" v-if="val.type == 'raw'" />
                 <ul
                     class="my-4"
                     v-if="val.type == 'list' && val.data.style == 'unordered'"
@@ -252,9 +252,6 @@
                         class="text-center fst-italic"
                     ></p>
                 </div>
-                <div class="text-center my-4" v-if="val.type == 'raw'">
-                    <div v-html="val.data.html" class="iframeh100"></div>
-                </div>
                 <div v-if="val.type == 'quote'" class="my-4">
                     <figure
                         class="card card-body"
@@ -283,6 +280,8 @@ import PptxShow from "../components/PptxShow.vue";
 import PdfShow from "../components/PdfShow.vue";
 import DocxShow from "../components/DocxShow.vue";
 import ExcelShow from "../components/ExcelShow.vue";
+import IFrameShow from "../components/IFrameShow.vue";
+
 export default {
     components: {
         VueEasyLightbox,
@@ -290,6 +289,7 @@ export default {
         PdfShow,
         DocxShow,
         ExcelShow,
+        IFrameShow,
     },
     props: [
         "id",
