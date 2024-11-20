@@ -17,14 +17,14 @@ class TreeController extends Controller
 {
     public function index()
     {
-            $about = About::first();
-            $content = Content::first();
-            return response()->json(['success' => true, 'menu' => [], "about" => $about, "content" => $content]);      
+        $about = About::first();
+        $content = Content::first();
+        return response()->json(['success' => true, 'menu' => [], "about" => $about, "content" => $content]);
     }
 
     public function saveresourceadmin(Request $request)
     {
-        Content::where("tree_id", $request->id)->update(["accessibility" => $request->accessibility]);
+        Content::where("tree_id", $request->id)->update(["accessibility" => $request->accessibility, "accessibilitymanagers" => $request->accessibilitymanagers]);
         Available::where('tree_id', $request->id)->delete();
         if (!$request->accessibility) {
             foreach (json_decode($request->groups) as $available) {
@@ -80,6 +80,27 @@ class TreeController extends Controller
         switch ($role) {
             case 'ceo':
                 $tree = Tree::where("user_id", Auth::user()->id)->get();
+                $managersFiles = [];
+                $cd = Content::where('accessibilitymanagers', true)->pluck('tree_id')->toArray();
+
+                if (count($cd) > 0) {
+                    $all = array_merge($cd, $this->uploadTree($cd));
+                    $s = Tree::whereIn('id', $all)->whereIn('user_id', User::pluck('id')->toArray())->get();
+                    $users = User::whereIn('id', $s->pluck("user_id")->toArray())->get()->keyBy("id");
+
+                    $userArray = [];
+                    foreach ($users as $user) {
+                        $userArray[] = ['id' => "user_" . $user->id, 'user_id' => $user->id, 'name' => $user->name, 'type' => 'folder', 'tree_id' => null];
+                    }
+                    $new_collection = collect($s)->map(function ($arr) use ($users) {
+                        $arr['tree_id'] = $arr['tree_id'] ?: "user_" . $users[$arr->user_id]['id'];
+                        return $arr;
+                    });
+
+                    $managersFiles = array_merge($userArray, $new_collection->toArray());
+                    // return $tree;
+                }
+                $tree = array_merge($tree->toArray(), $managersFiles);
                 break;
             case 'admin':
                 $tree = Tree::whereIn('user_id', User::pluck('id')->toArray())->get();

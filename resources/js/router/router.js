@@ -48,6 +48,12 @@ const routes = [
                 meta: { title: "Управление" },
                 component: () => import("../views/AdminPanel.vue"),
             },
+            {
+                path: "settings",
+                name: "settings",
+                meta: { title: "Настройки пользователя" },
+                component: () => import("../views/TheSettings.vue"),
+            },
         ],
     },
 ];

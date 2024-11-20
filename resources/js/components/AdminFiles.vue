@@ -62,7 +62,10 @@
                         ><span>Родитель</span></CTableHeaderCell
                     >
                     <CTableHeaderCell scope="col"
-                        ><span>Доступно всем</span></CTableHeaderCell
+                        ><span>Доступно авторизованным</span></CTableHeaderCell
+                    >
+                    <CTableHeaderCell scope="col"
+                        ><span>Доступно менеджерам</span></CTableHeaderCell
                     >
                     <CTableHeaderCell scope="col">Группы</CTableHeaderCell>
                     <CTableHeaderCell
@@ -107,6 +110,12 @@
                         <CFormSwitch
                             v-model="val.child.accessibility"
                             :id="'accessibility_for_' + val.id"
+                        />
+                    </CTableDataCell>
+                    <CTableDataCell>
+                        <CFormSwitch
+                            v-model="val.child.accessibilitymanagers"
+                            :id="'accessibilitymanagers_for_' + val.id"
                         />
                     </CTableDataCell>
                     <CTableDataCell>
@@ -286,6 +295,10 @@ export default {
             form.append(
                 "accessibility",
                 this.files.data[id].child.accessibility ? 1 : 0
+            );
+            form.append(
+                "accessibilitymanagers",
+                this.files.data[id].child.accessibilitymanagers ? 1 : 0
             );
             form.append("groups", JSON.stringify(this.files.data[id].groups));
             this.datasend("saveresourceadmin", "POST", form)
