@@ -13,6 +13,7 @@ class Content extends Model
     protected $fillable = [
         'tree_id',
         'accessibility',
+        'accessibilitymanagers',
         'data',
     ];
     public function tree(){

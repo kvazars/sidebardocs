@@ -16,6 +16,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('tree_id')->nullable()->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->boolean('accessibility')->default(false);
+            $table->boolean('accessibilitymanagers')->default(false);
             $table->string('data');
             $table->softDeletes();
             $table->timestamps();
