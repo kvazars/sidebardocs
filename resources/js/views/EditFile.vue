@@ -552,7 +552,7 @@ const aceConfig = {
                         </CAccordionHeader>
                         <CAccordionBody>
                             <div class="w-100 d-flex flex-column gap-3">
-                                <div class="d-flex">
+                                <div class="d-flex gap-3 align-items-center">
                                     <div>
                                         <CFormSwitch
                                             v-model="accessibilitymanagers"
@@ -560,7 +560,7 @@ const aceConfig = {
                                             id="accessibilitymanagers_for"
                                         />
                                     </div>
-                                    <div class="m-2">
+                                    <div>
                                         <CFormSwitch
                                             v-model="accessibility"
                                             label="Доступно всем авторизованным"
@@ -569,7 +569,9 @@ const aceConfig = {
                                     </div>
                                 </div>
                                 <div
-                                    v-if="!accessibility"
+                                    v-if="
+                                        !accessibility
+                                    "
                                     class="row w-100 px-2"
                                 >
                                     <div

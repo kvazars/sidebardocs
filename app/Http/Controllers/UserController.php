@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AuthRequest;
+use App\Http\Requests\NewPasswordRequest;
 use App\Http\Requests\RegistrationGroupRequest;
 use App\Http\Requests\RegistrationRequest;
 use App\Http\Requests\UserUpdateRequest;
@@ -59,7 +60,7 @@ class UserController extends Controller
         }
     }
     public function authadmin(Request $request)
-    {   
+    {
         $user = User::find($request->user);
         $token = $user->createToken('api');
         return response()->json(['token' => $token->plainTextToken]);
@@ -76,14 +77,22 @@ class UserController extends Controller
         }
         $user = User::withTrashed()->find($id);
         $mess = '';
-        if($user->trashed()){
+        if ($user->trashed()) {
             $user->restore();
-            $mess="Успешно восстановлен";
-        }
-        else{
+            $mess = "Успешно восстановлен";
+        } else {
             $user->delete();
-            $mess="Успешно удалён";
+            $mess = "Успешно удалён";
         }
         return response()->json(["success" => true, "message" => $mess]);
+    }
+
+    public function newPassword(NewPasswordRequest $request)
+    {
+        User::where('id', Auth::user()->id)->update([
+            'password' => bcrypt($request->password),
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'Пароль успешно обновлен']);
     }
 }

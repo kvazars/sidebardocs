@@ -61,6 +61,7 @@ export default {
             visibleModalFolder: false,
             folderId: null,
             treeId: null,
+            treeUserId: null,
             treeType: null,
             treeName: null,
             folderParent: null,
@@ -70,8 +71,7 @@ export default {
         };
     },
     mounted() {
-        if(this.about)
-        this.logo =  this.server + "/" + this.about.logo;
+        if (this.about) this.logo = this.server + "/" + this.about.logo;
     },
     methods: {
         closeContextMenu() {
@@ -130,19 +130,20 @@ export default {
                 .catch((error) => console.log(error));
         },
         deleteFolder(id) {
-            if(confirm('Вы уверены?')){
-            this.datasend("folder/" + id, "DELETE", {})
-                .then((res) => {
-                    this.showToast(res.success, res.message);
-                    this.getMenu();
-                })
-                .catch((error) => console.log(error));
+            if (confirm("Вы уверены?")) {
+                this.datasend("folder/" + id, "DELETE", {})
+                    .then((res) => {
+                        this.showToast(res.success, res.message);
+                        this.getMenu();
+                    })
+                    .catch((error) => console.log(error));
             }
         },
         showContextMenu(event, item) {
             this.treeId = item.id;
             this.treeType = item.type;
             this.treeName = item.name;
+            this.treeUserId = item.user_id;
             this.showMenu = true;
             this.menuX = event.clientX;
             this.menuY = event.clientY;
@@ -174,17 +175,16 @@ export default {
                     params: { id: this.treeId },
                 });
             } else if (action == "deleteFile") {
-                if(confirm('Вы уверены?')){
-
-                this.datasend("resourcedel/" + this.treeId, "DELETE", {})
-                    .then((res) => {
-                        if (res.success) {
-                            this.getMenu();
-                            this.showToast(res.success, res.message);
-                            this.$router.push({ name: "Home" });
-                        }
-                    })
-                    .catch((error) => console.log(error));
+                if (confirm("Вы уверены?")) {
+                    this.datasend("resourcedel/" + this.treeId, "DELETE", {})
+                        .then((res) => {
+                            if (res.success) {
+                                this.getMenu();
+                                this.showToast(res.success, res.message);
+                                this.$router.push({ name: "Home" });
+                            }
+                        })
+                        .catch((error) => console.log(error));
                 }
             }
         },
@@ -230,10 +230,7 @@ export default {
                 @click="sidebar.toggleVisible()"
             />
         </CSidebarHeader>
-        <SidebarNav
-            :showContextMenu="showContextMenu"
-            :menu="menu"
-        />
+        <SidebarNav :showContextMenu="showContextMenu" :menu="menu" />
 
         <button
             class="btn btn btn-light p-0"
@@ -306,6 +303,7 @@ export default {
             @action-clicked="handleActionClick"
             :x="menuX"
             :y="menuY"
+            :treeUserId="treeUserId"
         />
 
         <div class="overlay" @click="closeContextMenu" v-if="showMenu" />
