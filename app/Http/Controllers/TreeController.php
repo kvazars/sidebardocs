@@ -83,6 +83,15 @@ class TreeController extends Controller
                 $managersFiles = [];
                 $cd = Content::where('accessibilitymanagers', true)->pluck('tree_id')->toArray();
 
+                foreach ($cd as $key => $c) {
+                    
+                    if (
+                        Tree::where('id', $c)->where('user_id', Auth::user()->id)->first()
+                    ) {
+                        unset($cd[$key]);
+                    }
+                }
+
                 if (count($cd) > 0) {
                     $all = array_merge($cd, $this->uploadTree($cd));
                     $s = Tree::whereIn('id', $all)->whereIn('user_id', User::pluck('id')->toArray())->get();
