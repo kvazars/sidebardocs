@@ -17,27 +17,9 @@ class TreeController extends Controller
 {
     public function index()
     {
-        $c = Content::where('tree_id', '!=', null)->where('accessibility', true)->pluck('tree_id')->toArray();
-        if (count($c) > 0) {
-            $all = array_merge($c, $this->uploadTree($c));
-            $tree = Tree::whereIn('id', $all)->whereIn('user_id', User::pluck('id')->toArray())->get();
-            $users = User::whereIn('id', $tree->pluck("user_id")->toArray())->get()->keyBy("id");
-            $userArray = [];
-            foreach ($users as $user) {
-                $userArray[] = ['id' => "user_" . $user->id, 'name' => $user->name, 'type' => 'folder', 'tree_id' => null];
-            }
-            $new_collection = collect($tree)->map(function ($arr) use ($users) {
-                $arr['tree_id'] = $arr['tree_id'] ?: "user_" . $users[$arr->user_id]['id'];
-                return $arr;
-            });
-            $tree = array_merge($userArray, $new_collection->toArray());
             $about = About::first();
             $content = Content::first();
-
-            return response()->json(['success' => true, 'menu' => $tree, "about" => $about, "content" => $content]);
-        } else {
-            return [];
-        }
+            return response()->json(['success' => true, 'menu' => [], "about" => $about, "content" => $content]);      
     }
 
     public function saveresourceadmin(Request $request)

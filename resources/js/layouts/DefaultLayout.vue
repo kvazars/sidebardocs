@@ -107,66 +107,75 @@ export default {
             this.$router.push({ name: "Home" });
         },
         getMenu() {
-            this.datasend(
-                localStorage.getItem("token") ? "userFolder" : "folder",
-                "GET",
-                {}
-            )
-                .then((res) => {
-                    let menus = res.menu;
-
+            this.menu = [];
+            if (!localStorage.getItem("token")) {
+                this.datasend("homepage", "GET", {}).then((res) => {
                     this.dashboard = res.content;
                     this.about = res.about;
 
-                    if (localStorage.getItem("token")) {
-                        let user = res.user;
-                        this.auths.changeUser(user.id, user.name, user.role);
-                    }
-                    this.viewSuccess = true;
-
-                    function menucreateparent() {
-                        let rrr = [];
-                        menus.forEach((e) => {
-                            if (e.tree_id == null) {
-                                e.title = e.name;
-                                e.icon = "fa fa-folder";
-
-                                e.child = menucreate(e.id);
-                                rrr.push(e);
-                                e.tree_id = 0;
-                            }
-                        });
-                        rrr.sort((f, s) => f.position - s.position);
-                        return rrr;
-                    }
-
-                    function menucreate(i = 0) {
-                        let rrr = [];
-                        menus.forEach((e) => {
-                            if (e.tree_id == i) {
-                                if (e.type == "file") {
-                                    e.href = "/files/" + e.id;
-                                }
-                                e.title = e.name;
-                                e.icon =
-                                    e.type == "folder"
-                                        ? "fa fa-folder"
-                                        : "fa fa-file";
-                                e.child = menucreate(e.id);
-                                rrr.push(e);
-                            }
-                        });
-                        rrr.sort((f, s) => f.position - s.position);
-                        return rrr;
-                    }
-
-                    this.menu = menucreateparent();
-                    this.menu = this.transformItems(this.menu);
-                    setTimeout(this.getBreadcrumbs, 1000);
-                })
-                .catch((error) => {
-                    console.log(error);
                 });
+            } else {
+                this.datasend("userFolder", "GET", {})
+                    .then((res) => {
+                        let menus = res.menu;
+
+                        this.dashboard = res.content;
+                        this.about = res.about;
+
+                        if (localStorage.getItem("token")) {
+                            let user = res.user;
+                            this.auths.changeUser(
+                                user.id,
+                                user.name,
+                                user.role
+                            );
+                        }
+                        this.viewSuccess = true;
+
+                        function menucreateparent() {
+                            let rrr = [];
+                            menus.forEach((e) => {
+                                if (e.tree_id == null) {
+                                    e.title = e.name;
+                                    e.icon = "fa fa-folder";
+
+                                    e.child = menucreate(e.id);
+                                    rrr.push(e);
+                                    e.tree_id = 0;
+                                }
+                            });
+                            rrr.sort((f, s) => f.position - s.position);
+                            return rrr;
+                        }
+
+                        function menucreate(i = 0) {
+                            let rrr = [];
+                            menus.forEach((e) => {
+                                if (e.tree_id == i) {
+                                    if (e.type == "file") {
+                                        e.href = "/files/" + e.id;
+                                    }
+                                    e.title = e.name;
+                                    e.icon =
+                                        e.type == "folder"
+                                            ? "fa fa-folder"
+                                            : "fa fa-file";
+                                    e.child = menucreate(e.id);
+                                    rrr.push(e);
+                                }
+                            });
+                            rrr.sort((f, s) => f.position - s.position);
+                            return rrr;
+                        }
+
+                        this.menu = menucreateparent();
+                        this.menu = this.transformItems(this.menu);
+                        setTimeout(this.getBreadcrumbs, 1000);
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+            }
         },
         transformItems(items) {
             let it = items.map((item) => {
@@ -299,7 +308,10 @@ export default {
                         />
                     </template>
                     <EditFile
-                        v-if="$route.name == 'EditFile'||$route.name == 'CreateFile'"
+                        v-if="
+                            $route.name == 'EditFile' ||
+                            $route.name == 'CreateFile'
+                        "
                         ref="EditFile"
                         :server="server"
                         :key="$route.fullPath"

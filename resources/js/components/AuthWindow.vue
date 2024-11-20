@@ -1,62 +1,36 @@
 <template>
-	<CModal
-		:visible="openWindow"
-		@close="
-			() => {
-				openWindowFunction();
-			}
-		"
-		aria-labelledby="FolderLabel"
-	>
+	<CModal :visible="openWindow" @close="() => {
+		openWindowFunction();
+	}
+		" aria-labelledby="FolderLabel">
 		<CModalHeader>
 			<CModalTitle id="FolderLabel">Авторизация</CModalTitle>
 		</CModalHeader>
 		<CModalBody>
 			<div class="w-100 d-flex flex-column gap-4">
 				<div class="w-100 d-flex flex-column gap-2">
-					<CFormInput
-						v-model="login"
-						name="folderName"
-						type="text"
-						v-on:keyup.enter="() => {
-							auth();
-						}"
-						placeholder="Логин"
-					/>
+					<CFormInput v-model="login" name="folderName" type="text" v-on:keyup.enter="() => {
+		auth();
+	}" placeholder="Логин" />
 				</div>
 				<div class="w-100 d-flex flex-column gap-2">
-					<CFormInput
-						v-model="password"
-						name="folderName"
-						type="password"
-						v-on:keyup.enter="() => {
-							auth();
-						}"
-						placeholder="Пароль"
-					/>
+					<CFormInput v-model="password" name="folderName" type="password" v-on:keyup.enter="() => {
+		auth();
+	}" placeholder="Пароль" />
 				</div>
 			</div>
 		</CModalBody>
 		<CModalFooter>
-			<CButton
-				color="secondary"
-				@click="
-					() => {
-						openWindowFunction();
-					}
-				"
-			>
+			<CButton color="secondary" @click="() => {
+		openWindowFunction();
+	}
+		">
 				Отмена
 			</CButton>
-			<CButton
-				color="primary"
-				@click="
-					() => {
-						auth();
-					}
-				"
-				>Войти</CButton
-			>
+			<CButton color="primary" @click="() => {
+		auth();
+	}
+		">Войти</CButton>
 		</CModalFooter>
 	</CModal>
 </template>
@@ -79,7 +53,7 @@ export default {
 			auths: useAuthIdStore(),
 		};
 	},
-	mounted() {},
+	mounted() { },
 	methods: {
 		auth() {
 			let form = new FormData();
@@ -88,6 +62,8 @@ export default {
 
 			this.datasend("auth", "POST", form)
 				.then((res) => {
+					this.password = null;
+					this.login = null;
 					if (res.success) {
 						localStorage.setItem("token", res.token);
 						this.auths.changeUser(

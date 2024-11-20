@@ -73,6 +73,10 @@ export default {
                         this.accessibility = res.content.accessibility
                             ? true
                             : false;
+                        this.accessibilitymanagers = res.content
+                            .accessibilitymanagers
+                            ? true
+                            : false;
 
                         res.groups.forEach((el) => {
                             let firstletter = el.name.substr(0, 1);
@@ -122,6 +126,7 @@ export default {
             router: useRouter(),
             user: useAuthIdStore(),
             accessibility: false,
+            accessibilitymanagers: false,
             groupAvailables: {},
             editor: null,
             visibleGroups: false,
@@ -156,6 +161,10 @@ export default {
                     form.append("data", JSON.stringify(outputData.blocks));
                     form.append("name", this.name ?? "");
                     form.append("accessibility", this.accessibility ? 1 : 0);
+                    form.append(
+                        "accessibilitymanagers",
+                        this.accessibilitymanagers ? 1 : 0
+                    );
 
                     form.append(
                         "availables",
@@ -536,18 +545,64 @@ const aceConfig = {
                     placeholder="Введите название документа"
                     v-model="name"
                 />
-                <div class="text-center">
-                    <button
-                        class="btn btn-primary mt-3"
-                        @click="
-                            () => {
-                                visibleGroups = true;
-                            }
-                        "
-                    >
-                        Доступность документа
-                    </button>
-                </div>
+                <CAccordion class="mt-4">
+                    <CAccordionItem :item-key="1">
+                        <CAccordionHeader>
+                            Доступность документа
+                        </CAccordionHeader>
+                        <CAccordionBody>
+                            <div class="w-100 d-flex flex-column gap-3">
+                                <div class="d-flex">
+                                    <div>
+                                        <CFormSwitch
+                                            v-model="accessibilitymanagers"
+                                            label="Доступно для всех менеджеров"
+                                            id="accessibilitymanagers_for"
+                                        />
+                                    </div>
+                                    <div class="m-2">
+                                        <CFormSwitch
+                                            v-model="accessibility"
+                                            label="Доступно всем авторизованным"
+                                            id="accessibility_for"
+                                        />
+                                    </div>
+                                </div>
+                                <div
+                                    v-if="!accessibility"
+                                    class="row w-100 px-2"
+                                >
+                                    <div
+                                        class="col-lg-3"
+                                        v-for="(item, key) in groupAvailables"
+                                        :key="key"
+                                    >
+                                        <div
+                                            class="d-flex form-check gap-2"
+                                            v-for="(gr, index) in item"
+                                            :key="index"
+                                        >
+                                            <input
+                                                class="form-check-input"
+                                                type="checkbox"
+                                                :value="'group_' + gr.id"
+                                                :id="'group_' + gr.id"
+                                                v-model="gr.checked"
+                                            />
+                                            <label
+                                                style="user-select: none"
+                                                class="form-check-label"
+                                                :for="'group_' + gr.id"
+                                            >
+                                                {{ gr.name }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </CAccordionBody>
+                    </CAccordionItem>
+                </CAccordion>
             </CCardBody>
         </CCard>
         <CCard>
@@ -557,70 +612,4 @@ const aceConfig = {
             </CCardBody>
         </CCard>
     </div>
-
-    <CModal
-        :visible="visibleGroups"
-        size="lg"
-        @close="
-            () => {
-                visibleGroups = false;
-            }
-        "
-    >
-        <CModalHeader>
-            <CModalTitle>Доступность документа</CModalTitle>
-        </CModalHeader>
-        <CModalBody>
-            <div class="container">
-                <div class="w-100 d-flex flex-column gap-3">
-                    <div class="w-100 d-flex justify-content-center">
-                        <CFormSwitch
-                            v-model="accessibility"
-                            label="Доступно всем"
-                            id="accessibility_for"
-                        />
-                    </div>
-                    <div v-if="!accessibility" class="row w-100 px-2">
-                        <div
-                            class="col-lg-3"
-                            v-for="(item, key) in groupAvailables"
-                            :key="key"
-                        >
-                            <div
-                                class="d-flex form-check gap-2"
-                                v-for="(gr, index) in item"
-                                :key="index"
-                            >
-                                <input
-                                    class="form-check-input"
-                                    type="checkbox"
-                                    :value="'group_' + gr.id"
-                                    :id="'group_' + gr.id"
-                                    v-model="gr.checked"
-                                />
-                                <label
-                                    style="user-select: none"
-                                    class="form-check-label"
-                                    :for="'group_' + gr.id"
-                                >
-                                    {{ gr.name }}
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </CModalBody>
-        <CModalFooter>
-            <CButton
-                color="primary"
-                @click="
-                    () => {
-                        visibleGroups = false;
-                    }
-                "
-                >Выйти</CButton
-            >
-        </CModalFooter>
-    </CModal>
 </template>

@@ -11,9 +11,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post("/auth", [UserController::class, "auth"]);
 Route::get("/resource/{content}", [ContentController::class, "getResource"]);
-Route::get("/folder", [TreeController::class, "index"]);
-Route::post("/getImage", [ContentController::class, "getImage"]);
-Route::post("/getFile", [ContentController::class, "getFile"]);
+Route::get("/homepage", [TreeController::class, "index"]);
 
 Route::middleware(['auth:sanctum'])->group(function () {
     //admin,ceo,user

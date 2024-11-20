@@ -21,6 +21,7 @@ use Intervention\Image\Laravel\Facades\Image;
 
 class ContentController extends Controller
 {
+
     public function saveImage(Request $request)
     {
         if (!is_dir(public_path("contentImages"))) {
@@ -92,6 +93,7 @@ class ContentController extends Controller
             $fileId = Content::create([
                 'tree_id' => $tree->id,
                 'accessibility' => $request->accessibility,
+                'accessibilitymanagers' => $request->accessibilitymanagers,
                 'data' => $request->data,
             ]);
 
@@ -104,6 +106,7 @@ class ContentController extends Controller
 
             $fileId->update([
                 'accessibility' => $request->accessibility,
+                'accessibilitymanagers' => $request->accessibilitymanagers,
                 'data' => $request->data,
             ]);
             $tree->update([
@@ -283,6 +286,7 @@ class ContentController extends Controller
 
         foreach ($files as $file) {
             $file->child->accessibility = $file->child->accessibility == 1;
+            $file->child->accessibilitymanagers = $file->child->accessibilitymanagers == 1;
 
             $a = $file->available->pluck("group_id")->toArray();
             $res = [];
