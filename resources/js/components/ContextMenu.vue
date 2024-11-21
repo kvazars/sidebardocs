@@ -1,6 +1,6 @@
 <template>
     <div
-        v-if="$props.treeUserId == store.id"
+        v-if="$props.treeUserId == store.id || store.role == 'admin'"
         class="fixed h-1/3 z-50 context-menu d-flex"
         :style="{ top: y + 'px', left: x + 'px' }"
     >
