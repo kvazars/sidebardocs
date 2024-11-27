@@ -370,9 +370,7 @@ export default {
                     // }, {});
 
                     // this.files.data = resData;
-                    this.files.data = res.data.files.data;
-                    console.log(this.files.data.groups);
-                    
+                    this.files.data = res.data.files.data;                    
                     this.viewOk = true;
                 })
                 .catch((error) => {

@@ -285,9 +285,10 @@ class ContentController extends Controller
         $files = $files->paginate(15);
 
         foreach ($files as $file) {
-            $file->child->accessibility = $file->child->accessibility == 1;
-            $file->child->accessibilitymanagers = $file->child->accessibilitymanagers == 1;
-
+            if ($file->child) {
+                $file->child->accessibility = $file->child->accessibility == 1;
+                $file->child->accessibilitymanagers = $file->child->accessibilitymanagers == 1;
+            }
             $a = $file->available->pluck("group_id")->toArray();
             $res = [];
             foreach ($group->toArray() as $g) {
