@@ -1,25 +1,37 @@
 <template>
     <div v-if="viewOk" class="table-responsive">
-        <div class="d-flex flex-row align-items-center gap-3">
-            <span>Фильтр</span>
-            <CFormSelect
-                v-if="user.role == 'admin'"
-                class="w-25 mt-1"
-                @change="onChange($event)"
-                v-model="seluser"
-            >
-                <option value="">Все пользователи</option>
-                <option :value="u.id" v-for="u in users" :key="u">
-                    {{ u.name }}
-                </option>
-            </CFormSelect>
-            <CFormInput
-                v-model="searchFilter.name"
-                class="w-25 mt-1"
-                @change="getFiles()"
-                type="search"
-                placeholder="Название файла"
-            />
+        <div class="row">
+            <div class="col-md-6">
+                <div class="d-flex flex-row align-items-center gap-3">
+                    <span>Фильтр</span>
+                    <CFormSelect
+                        v-if="user.role == 'admin'"
+                        class="w-100 mt-1"
+                        @change="onChange($event)"
+                        v-model="seluser"
+                    >
+                        <option value="">Все пользователи</option>
+                        <option :value="u.id" v-for="u in users" :key="u">
+                            {{ u.name }}
+                        </option>
+                    </CFormSelect>
+                    <CFormInput
+                        v-model="searchFilter.name"
+                        class="w-100 mt-1"
+                        @change="getFiles()"
+                        type="search"
+                        placeholder="Название файла"
+                    />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex justify-content-end">
+                    <CButton color="primary" @click="clearmyaccessfiles"
+                        ><i class="fa fa-trash-o"></i> Сбросить все
+                        доступы</CButton
+                    >
+                </div>
+            </div>
         </div>
 
         <CTable v-if="Object.keys(files.data).length > 0">
@@ -255,6 +267,7 @@
 <script>
 import { Bootstrap5Pagination } from "laravel-vue-pagination";
 import { useAuthIdStore } from "../stores/authId";
+import { CButton } from "@coreui/vue";
 
 export default {
     components: {
@@ -288,6 +301,18 @@ export default {
         onChange(event) {
             this.searchFilter.user = event.target.value;
             this.getFiles();
+        },
+        clearmyaccessfiles() {
+            if (confirm("Вы уверены?")) {
+                this.datasend("clearmyaccessfiles", "POST")
+                    .then((res) => {
+                        if (res.success) {
+                            this.getFiles();
+                            this.showToast(res.success, res.message);
+                        }
+                    })
+                    .catch((error) => console.log(error));
+            }
         },
         save(id) {
             let form = new FormData();
@@ -370,7 +395,7 @@ export default {
                     // }, {});
 
                     // this.files.data = resData;
-                    this.files.data = res.data.files.data;                    
+                    this.files.data = res.data.files.data;
                     this.viewOk = true;
                 })
                 .catch((error) => {

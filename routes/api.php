@@ -22,6 +22,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //admin,ceo
     Route::middleware(["role:admin|ceo"])->group(function () {
         Route::post("/resource", [ContentController::class, "saveResource"]);
+        Route::post("/clearmyaccessfiles", [AvailableController::class, "clearmyaccessfiles"]);
         Route::post("/saveImageByUrl", [ContentController::class, "saveImageByUrl"]);
         Route::post("/saveImage", [ContentController::class, "saveImage"]);
         Route::post("/saveFile", [ContentController::class, "saveFile"]);
