@@ -2,6 +2,10 @@
     <div>
         <div id="file" class="print-container p-4">
             <h1 class="text-center" v-html="pagetitle"></h1>
+            <div class="alert alert-success p-1" v-if="groups">
+                <strong>Доступно группам: </strong>{{ groups }}
+            </div>
+
             <hr />
 
             <div v-for="val in fileData" :key="val">
@@ -310,6 +314,7 @@ export default {
             visibleRef: {},
             indexRef: {},
             imgs: {},
+            groups: null,
         };
     },
 
@@ -334,6 +339,14 @@ export default {
                         this.pagetitle = res.name;
                         this.parseDoc(res.content);
                         this.setContent(res.content);
+                        this.groups = Object.keys(res.groups)
+                            .filter((i) => res.groups[i].checked)
+                            .map((aIndex) => res.groups[aIndex])
+                            .map((el) => el.name)
+                            .join(", ");
+                        if (res.content.accessibility) {
+                            this.groups = "всем";
+                        }
                     }
                 })
                 .catch();
