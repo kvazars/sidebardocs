@@ -30,9 +30,7 @@
                 >
                     <i class="bi bi-upload"></i> Импорт теста
                 </button>
-                <button @click="exportTest" class="btn btn-success me-2">
-                    <i class="bi bi-download"></i> Экспорт теста
-                </button>
+
                 <button
                     v-if="isEditing"
                     @click="cancelEdit"
@@ -1067,19 +1065,11 @@
 </template>
 
 <script>
-import { exportTest } from "../utils/storage.js";
-
 import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
 export default {
     name: "TestCreator",
-    emits: [
-        // "test-created",
-        // "test-updated",
-        // "test-deleted",
-        // "edit-cancelled",
-        "error",
-    ],
-    props: ["editTestId", "datasend", "loadData"],
+    emits: ["error"],
+    props: ["editTestId", "datasend", "loadData", "showToast"],
     data() {
         return {
             test: {
@@ -1626,6 +1616,7 @@ export default {
                 } else {
                     const testToSend = { ...this.test };
                     delete testToSend.id;
+
                     this.datasend(`tests`, "POST", testToSend)
                         .then((response) => {
                             console.log("Тест создан:", response);
@@ -1654,9 +1645,7 @@ export default {
             }
         },
 
-        cancelEdit() {
-            this.$emit("edit-cancelled");
-        },
+        cancelEdit() {},
 
         deleteTest() {
             if (
@@ -1668,9 +1657,6 @@ export default {
                 this.error = "";
 
                 try {
-                    // await deleteTest(this.test.id);
-                    // this.$emit("test-deleted");
-                    // this.showToast("Тест успешно удален!", "success");
                     this.datasend(
                         `tests/${this.test.id}`,
                         "DELETE",
@@ -1717,26 +1703,6 @@ export default {
                 questions: [],
             };
             this.isEditing = false;
-        },
-
-        async exportTest() {
-            this.loading = true;
-            this.error = "";
-
-            try {
-                const blob = await exportTest(this.test);
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement("a");
-                link.href = url;
-                link.download = `test-${this.test.title || "export"}.json`;
-                link.click();
-                URL.revokeObjectURL(url);
-            } catch (error) {
-                this.error = error.message;
-                this.$emit("error", error.message);
-            } finally {
-                this.loading = false;
-            }
         },
 
         showImportModal() {
@@ -1951,26 +1917,6 @@ export default {
                     });
                 }
             });
-        },
-
-        showToast(message, type = "info") {
-            const toast = document.createElement("div");
-            toast.className = `alert alert-${type} alert-dismissible fade show`;
-            toast.innerHTML = `
-          ${message}
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-            toast.style.position = "fixed";
-            toast.style.top = "20px";
-            toast.style.right = "20px";
-            toast.style.zIndex = "1060";
-            document.body.appendChild(toast);
-
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.parentNode.removeChild(toast);
-                }
-            }, 3000);
         },
     },
 };

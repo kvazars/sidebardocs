@@ -478,8 +478,7 @@
 <script>
 export default {
     name: "TestResults",
-    props: ["results", "datasend"],
-    emits: ["results-cleared"],
+    props: ["results", "datasend", "showToast"],
     data() {
         return {
             searchQuery: "",
@@ -586,24 +585,8 @@ export default {
             }
 
             this.datasend("results/" + result.id, "DELETE").then((response) => {
-                // this.$emit("result-deleted", result);
                 this.showToast(response.message, "success");
-                // console.log(response);
             });
-            // const response = await fetch(`/api/test-results/${result.id}`, {
-            //     method: "DELETE",
-            //     headers: {
-            //         "Content-Type": "application/json",
-            //     },
-            // });
-            // console.log(response);
-
-            // if (response.ok) {
-            //     this.$emit("result-deleted", result);
-            //     this.showToast("Результат успешно удален", "success");
-            // } else {
-            //     throw new Error("Ошибка при удалении");
-            // }
         },
 
         formatDate(created_at) {
@@ -676,28 +659,6 @@ export default {
             if (percentage >= 75) return "bg-info";
             if (percentage >= 60) return "bg-warning";
             return "bg-danger";
-        },
-
-        showToast(message, type = "info") {
-            const toast = document.createElement("div");
-            toast.className = `alert alert-${
-                type === "error" ? "danger" : type
-            } alert-dismissible fade show`;
-            toast.innerHTML = `
-          ${message}
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-            toast.style.position = "fixed";
-            toast.style.top = "20px";
-            toast.style.right = "20px";
-            toast.style.zIndex = "1060";
-            document.body.appendChild(toast);
-
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.parentNode.removeChild(toast);
-                }
-            }, 3000);
         },
     },
 };

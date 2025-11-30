@@ -438,17 +438,9 @@
 </template>
 
 <script>
-import { saveResult } from "../utils/storage.js";
-
 export default {
     name: "TestRunner",
-    props: {
-        tests: {
-            type: Array,
-            required: true,
-        },
-    },
-    emits: ["test-completed"],
+    props: ["datasend", "loadData", "tests","showToast"],
     data() {
         return {
             selectedTest: null,
@@ -677,13 +669,15 @@ export default {
         finishTest() {
             clearInterval(this.timer);
             const result = this.calculateResult();
-            saveResult(result);
-            this.selectedTest = null;
-            this.userName = "";
-            this.tempUserName = "";
-            this.shuffledOptionsMap.clear();
-            this.shuffledPairsMap.clear();
-            this.$emit("test-completed", result);
+
+            this.datasend("results", "POST", result).then((response) => {
+                this.selectedTest = null;
+                this.userName = "";
+                this.tempUserName = "";
+                this.shuffledOptionsMap.clear();
+                this.shuffledPairsMap.clear();
+                this.showToast(response.message, "success");
+            });
         },
 
         calculateResult() {

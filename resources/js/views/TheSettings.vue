@@ -37,9 +37,11 @@ export default {
     },
     methods: {
         pass() {
-            let form = new FormData();
-            form.append("password", this.password);
-            form.append("password_confirmation", this.password_confirm);
+            let form = {
+                password: this.password,
+                password_confirmation: this.password_confirm,
+            };
+
             this.datasend("newPass", "POST", form)
                 .then((res) => {
                     if (res.success) {

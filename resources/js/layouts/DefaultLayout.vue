@@ -168,8 +168,7 @@
                 :edit-test-id="editingTestId"
                 :loadData="loadData"
                 :datasend="datasend"
-                @test-deleted="handleTestDeleted"
-                @edit-cancelled="handleEditCancelled"
+                :showToast="showToast"
             />
 
             <TestManagement
@@ -177,22 +176,22 @@
                 :tests="tests"
                 :datasend="datasend"
                 :loadData="loadData"
-                @edit-test="handleEditTest"
-                @test-deleted="handleTestDeleted"
-                @test-imported="handleTestImported"
+                :showToast="showToast"
             />
 
             <TestRunner
                 v-else-if="currentView === 'runner'"
                 :tests="tests"
-                @test-completed="handleTestCompleted"
+                :datasend="datasend"
+                :loadData="loadData"
+                :showToast="showToast"
             />
 
             <TestResults
                 v-else
                 :results="results"
                 :datasend="datasend"
-                @results-cleared="loadData"
+                :showToast="showToast"
             />
         </main>
         <AntiCopyProtection />
@@ -269,46 +268,14 @@ export default {
             this.currentView = "creator";
         },
 
-        handleEditTest(testId) {
-            this.switchToCreator(testId);
-        },
-
-        // async handleTestCreated() {
-        //await
-        // this.loadData();
-        //this.currentView = "management";
-        //this.showToast("Тест успешно создан!", "success");
+        // handleEditTest(testId) {
+        //     this.switchToCreator(testId);
         // },
 
-        /*async handleTestUpdated() {
-            await this.loadData();
-            this.currentView = "management";
-            this.editingTestId = null;
-            this.showToast("Тест успешно обновлен!", "success");
-        },*/
-
-        async handleTestDeleted() {
-            await this.loadData();
-            this.currentView = "management";
-            this.editingTestId = null;
-            this.showToast("Тест успешно удален!", "success");
-        },
-
-        async handleTestImported() {
-            await this.loadData();
-            this.showToast("Тест успешно импортирован!", "success");
-        },
-
-        handleEditCancelled() {
-            this.currentView = "management";
-            this.editingTestId = null;
-        },
-
-        async handleTestCompleted() {
-            await this.loadData();
-            this.currentView = "results";
-            this.showToast("Тест завершен!", "success");
-        },
+        // handleEditCancelled() {
+        //     this.currentView = "management";
+        //     this.editingTestId = null;
+        // },
 
         handleError(errorMessage) {
             this.error = errorMessage;
@@ -352,7 +319,13 @@ export default {
         openWindowFunction() {
             this.openWindow = !this.openWindow;
         },
-        async datasend(path, method = "POST", data = {}) {
+        async datasend(
+            path,
+            method = "POST",
+            data = {},
+            formIsData = false,
+            isBlob = false
+        ) {
             const myHeaders = new Headers();
             if (localStorage.getItem("token")) {
                 myHeaders.append(
@@ -366,12 +339,15 @@ export default {
                 headers: myHeaders,
             };
             if (method != "GET") {
-                requestOptions.body = data;
+                if (!formIsData)
+                    myHeaders.append("Content-Type", "application/json");
+                // requestOptions.body = data;
+                requestOptions.body = formIsData ? data : JSON.stringify(data);
             }
-            if (method == "PUT") {
-                myHeaders.append("Content-Type", "application/json");
-                requestOptions.body = JSON.stringify(data);
-            }
+            // if (method == "PUT") {
+            // myHeaders.append("Content-Type", "application/json");
+            // requestOptions.body = JSON.stringify(data);
+            // }
 
             try {
                 let response = await fetch(
@@ -384,7 +360,7 @@ export default {
                 if (response.status == 403 || response.status == 401) {
                     this.logoutFun();
                 }
-                return await response.json();
+                return (await !isBlob) ? response.json() : response.blob();
             } catch (error) {
                 console.log(error);
 
@@ -491,24 +467,24 @@ export default {
 
             return it;
         },
-        showToast(success, message) {
-            if (success) {
-                toast.success(message, {
-                    theme: "colored",
-                    transition: toast.TRANSITIONS.ZOOM,
-                    position: toast.POSITION.BOTTOM_RIGHT,
-                    multiple: false,
-                    autoClose: 3000,
-                });
-            } else {
-                toast.error(message, {
-                    theme: "colored",
-                    transition: toast.TRANSITIONS.ZOOM,
-                    position: toast.POSITION.BOTTOM_RIGHT,
-                    autoClose: 3000,
-                });
-            }
-        },
+        // showToast(success, message) {
+        //     if (success) {
+        //         toast.success(message, {
+        //             theme: "colored",
+        //             transition: toast.TRANSITIONS.ZOOM,
+        //             position: toast.POSITION.BOTTOM_RIGHT,
+        //             multiple: false,
+        //             autoClose: 3000,
+        //         });
+        //     } else {
+        //         toast.error(message, {
+        //             theme: "colored",
+        //             transition: toast.TRANSITIONS.ZOOM,
+        //             position: toast.POSITION.BOTTOM_RIGHT,
+        //             autoClose: 3000,
+        //         });
+        //     }
+        // },
         saveEditFile() {
             this.$refs.EditFile.save();
         },

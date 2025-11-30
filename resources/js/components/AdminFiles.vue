@@ -315,18 +315,17 @@ export default {
             }
         },
         save(id) {
-            let form = new FormData();
-            form.append("id", this.files.data[id].id);
-            form.append(
-                "accessibility",
-                this.files.data[id].child.accessibility ? 1 : 0
-            );
-            form.append(
-                "accessibilitymanagers",
-                this.files.data[id].child.accessibilitymanagers ? 1 : 0
-            );
-            form.append("groups", JSON.stringify(this.files.data[id].groups));
-            this.datasend("saveresourceadmin", "POST", form)
+            let form = {
+                id: this.files.data[id].id,
+                accessibility: this.files.data[id].child.accessibility ? 1 : 0,
+                accessibilitymanagers: this.files.data[id].child
+                    .accessibilitymanagers
+                    ? 1
+                    : 0,
+                groups: JSON.stringify(this.files.data[id].groups),
+            };
+
+            this.datasend("saveresourceadmin", "POST",  form)
                 .then((res) => {
                     if (res.success) {
                         this.getFiles();

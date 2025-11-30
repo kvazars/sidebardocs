@@ -78,7 +78,7 @@ export default {
             this.showMenu = false;
         },
         save() {
-            let form = new FormData();
+            let form ={};
             form.append("name", this.folderTitle);
 
             if (this.folderParent) {

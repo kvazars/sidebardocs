@@ -332,13 +332,12 @@
 </template>
 
 <script>
-import { importTest, exportTest } from "../utils/storage.js";
 import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
 export default {
     name: "TestManagement",
-    props: ["tests", "datasend", "loadData"],
+    props: ["tests", "datasend", "loadData", "showToast"],
 
-    emits: ["edit-test", "test-deleted", "test-imported", "error"],
+    emits: ["error"],
     data() {
         return {
             importPreview: null,
@@ -369,9 +368,7 @@ export default {
         },
     },
     methods: {
-        editTest(testId) {
-            this.$emit("edit-test", testId);
-        },
+        editTest(testId) {},
 
         async confirmDelete(test) {
             if (
@@ -417,19 +414,28 @@ export default {
             return Math.ceil(test.questions.length * 1 + 2);
         },
 
-        async exportTest(test) {
+        exportTest(test) {
             this.actionLoading = true;
             this.error = "";
 
             try {
-                const blob = await exportTest(test);
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement("a");
-                link.href = url;
-                link.download = `test-${test.title || "export"}.json`;
-                link.click();
-                URL.revokeObjectURL(url);
-                this.showToast("Тест успешно экспортирован!", "success");
+                // const blob = await exportTest(test);
+                this.datasend(
+                    `tests/${test.id}/export`,
+                    "GET",
+                    null,
+                    false,
+                    true
+                ).then((response) => {
+                    const blob = response;
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.download = `test-${test.title || "export"}.json`;
+                    link.click();
+                    URL.revokeObjectURL(url);
+                    this.showToast("Тест успешно экспортирован!", "success");
+                });
             } catch (error) {
                 this.error = error.message;
                 this.$emit("error", error.message);
@@ -529,51 +535,37 @@ export default {
             }
         },
 
-        async importTest() {
+        importTest() {
             if (!this.importPreview || this.importErrors.length > 0) return;
 
             this.actionLoading = true;
             this.error = "";
 
             try {
-                await importTest(this.selectedFile);
-                this.$emit("test-imported");
+                let formData = new FormData();
+                formData.append("file", this.selectedFile);
 
-                const modalElement = document.getElementById("importModal");
-                if (modalElement) {
-                    const modal = bootstrap.Modal.getInstance(modalElement);
-                    if (modal) {
-                        modal.hide();
+                this.datasend("tests/import", "POST", formData, true).then(
+                    (response) => {
+                        this.showToast(response.message, "success");
+                        this.loadData();
+                        const modalElement =
+                            document.getElementById("importModal");
+                        if (modalElement) {
+                            const modal =
+                                bootstrap.Modal.getInstance(modalElement);
+                            if (modal) {
+                                modal.hide();
+                            }
+                        }
                     }
-                }
-
-                this.showToast("Тест успешно импортирован!", "success");
+                );
             } catch (error) {
                 this.error = error.message;
                 this.$emit("error", error.message);
             } finally {
                 this.actionLoading = false;
             }
-        },
-
-        showToast(message, type = "info") {
-            const toast = document.createElement("div");
-            toast.className = `alert alert-${type} alert-dismissible fade show`;
-            toast.innerHTML = `
-          ${message}
-          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
-            toast.style.position = "fixed";
-            toast.style.top = "20px";
-            toast.style.right = "20px";
-            toast.style.zIndex = "1060";
-            document.body.appendChild(toast);
-
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.parentNode.removeChild(toast);
-                }
-            }, 3000);
         },
     },
 };

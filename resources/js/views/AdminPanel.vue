@@ -598,8 +598,8 @@ export default {
     methods: {
         authUser(user) {
             if (confirm("Вы действительно хотите авторизоваться?")) {
-                let form = new FormData();
-                form.append("user", user);
+                let form = { user: user };
+
                 this.datasend(`authUser`, "POST", form)
                     .then((res) => {
                         localStorage.setItem("token", res.token);
@@ -706,7 +706,7 @@ export default {
                         document.querySelector("#formFile").files[0]
                     );
                 }
-                this.datasend("about", "POST", form)
+                this.datasend("about", "POST", form, true)
                     .then((res) => {
                         this.showToast(res.success, res.message);
                         if (res.success) {
@@ -739,12 +739,9 @@ export default {
                 });
         },
         createGroup() {
-            let form;
+            let form = { name: this.groupName };
             if (this.groupId) {
-                form = { name: this.groupName, id: this.groupId };
-            } else {
-                let form = new FormData();
-                form.append("name", this.groupName);
+                form.id = this.groupId;
             }
 
             this.datasend("group", this.groupId ? "PUT" : "POST", form)
@@ -771,21 +768,17 @@ export default {
                     name: this.fullname,
                     role: this.role,
                 };
-                if (this.password) {
-                    form.password = this.password;
-                }
             } else {
-                form = new FormData();
-                form.append("name", this.fullname);
-                form.append("login", this.login);
-                form.append("role", this.role);
-                form.append("group_id", this.groupIds);
-
-                if (this.password) {
-                    form.append("password", this.password);
-                }
+                form = {
+                    name: this.fullname,
+                    login: this.login,
+                    role: this.role,
+                    group_id: this.groupIds,
+                };
             }
-
+            if (this.password) {
+                form.password = this.password;
+            }
             this.datasend("user", this.userId ? "PUT" : "POST", form)
                 .then((res) => {
                     this.showToast(res.success, res.message);

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Test;
-use App\Models\Question;
+// use App\Models\Question;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
+// use Illuminate\Http\JsonResponse;
 
 class TestController extends Controller
 {
@@ -16,8 +16,8 @@ class TestController extends Controller
     }
 
     public function store(Request $request)
-    {   
-        
+    {
+
 
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -159,7 +159,7 @@ class TestController extends Controller
             ]);
         }
 
-        return response()->json(['data' => $test->load('questions')], 201);
+        return response()->json(['message' => 'Импорт произошёл успешно!']);
     }
 
     public function export(Test $test): \Symfony\Component\HttpFoundation\BinaryFileResponse

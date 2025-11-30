@@ -28,9 +28,10 @@ class TestResultController extends Controller
             'question_results' => 'nullable|array'
         ]);
 
-        $result = TestResult::create($validated);
+        TestResult::create($validated);
 
-        return response()->json(['data' => $result], 201);
+
+        return response()->json(['message' => 'Спасибо за прохождение теста!']);
     }
 
     public function show(TestResult $result): JsonResponse

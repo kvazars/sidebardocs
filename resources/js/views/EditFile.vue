@@ -137,7 +137,6 @@ export default {
             this.editor
                 .save()
                 .then((outputData) => {
-                    let form = new FormData();
                     outputData.blocks.forEach((el) => {
                         if (el.type == "image" || el.type == "attaches") {
                             el.data.file.url = el.data.file.url.split(
@@ -157,30 +156,25 @@ export default {
                                 : "Скачать файл";
                         }
                     });
-
-                    form.append("data", JSON.stringify(outputData.blocks));
-                    form.append("name", this.name ?? "");
-                    form.append("accessibility", this.accessibility ? 1 : 0);
-                    form.append(
-                        "accessibilitymanagers",
-                        this.accessibilitymanagers ? 1 : 0
-                    );
-
-                    form.append(
-                        "availables",
-                        JSON.stringify(
+                    let form = {
+                        data: JSON.stringify(outputData.blocks),
+                        name: this.name ?? "",
+                        accessibility: this.accessibility ? 1 : 0,
+                        accessibilitymanagers: this.accessibilitymanagers
+                            ? 1
+                            : 0,
+                        availables: JSON.stringify(
                             Object.values(
                                 Object.assign(this.groupAvailables)
                             ).flat()
-                        )
-                    );
+                        ),
+                    };
 
                     if (this.$route.params.parent) {
-                        form.append("tree_id", this.$route.params.parent);
+                        form.tree_id = this.$route.params.parent;
                     } else {
-                        form.append("id", this.$route.params.id);
+                        form.id = this.$route.params.id;
                     }
-                    // console.log(this.name);
                     this.datasend("resource", "POST", form)
                         .then((res) => {
                             if (res.success) {
@@ -569,9 +563,7 @@ const aceConfig = {
                                     </div>
                                 </div>
                                 <div
-                                    v-if="
-                                        !accessibility
-                                    "
+                                    v-if="!accessibility"
                                     class="row w-100 px-2"
                                 >
                                     <div
