@@ -38,69 +38,7 @@ async function apiRequest(endpoint, options = {}) {
     }
 }
 
-// ==================== ТЕСТЫ ====================
 
-/**
- * Загрузка всех тестов
- * @returns {Promise<Array>} Массив тестов
- */
-export const loadTests = async () => {
-    try {
-        const response = await apiRequest("/tests");
-        return response.data || response;
-    } catch (error) {
-        console.error("Ошибка загрузки тестов:", error);
-        throw error;
-    }
-};
-
-/**
- * Сохранение теста (создание или обновление)
- * @param {Object} test Данные теста
- * @returns {Promise<Object>} Сохраненный тест
- */
-export const saveTest = async (test) => {
-    try {
-        // Определяем, новый это тест или существующий
-        const isNewTest = !test.id || test.id > 1000000;
-
-        if (isNewTest) {
-            // Новый тест
-            const response = await apiRequest("/tests", {
-                method: "POST",
-                body: test,
-            });
-            return response.data;
-        } else {
-            // Обновление существующего теста
-            const response = await apiRequest(`/tests/${test.id}`, {
-                method: "PUT",
-                body: test,
-            });
-            return response.data;
-        }
-    } catch (error) {
-        console.error("Ошибка сохранения теста:", error);
-        throw error;
-    }
-};
-
-/**
- * Удаление теста
- * @param {number} testId ID теста
- * @returns {Promise<boolean>} true при успешном удалении
- */
-export const deleteTest = async (testId) => {
-    try {
-        await apiRequest(`/tests/${testId}`, {
-            method: "DELETE",
-        });
-        return true;
-    } catch (error) {
-        console.error("Ошибка удаления теста:", error);
-        throw error;
-    }
-};
 
 /**
  * Получение теста по ID

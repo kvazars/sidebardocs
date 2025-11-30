@@ -96,7 +96,6 @@
 
                     <!-- Настройки теста -->
                     <div class="row">
-                        
                         <div class="col-md-6">
                             <div class="form-check form-switch mb-3">
                                 <input
@@ -1068,30 +1067,19 @@
 </template>
 
 <script>
-import {
-    saveTest,
-    deleteTest,
-    loadTests,
-    importTest,
-    exportTest,
-} from "../utils/storage.js";
+import { exportTest } from "../utils/storage.js";
 
 import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
 export default {
     name: "TestCreator",
     emits: [
-        "test-created",
-        "test-updated",
-        "test-deleted",
-        "edit-cancelled",
+        // "test-created",
+        // "test-updated",
+        // "test-deleted",
+        // "edit-cancelled",
         "error",
     ],
-    props: {
-        editTestId: {
-            type: Number,
-            default: null,
-        },
-    },
+    props: ["editTestId", "datasend", "loadData"],
     data() {
         return {
             test: {
@@ -1212,25 +1200,19 @@ export default {
             this.error = "";
 
             try {
-                const tests = await loadTests();
-                const testToEdit = tests.find((t) => t.id === testId);
-
-                if (testToEdit) {
+                this.datasend("tests/" + testId, "GET").then((response) => {
+                    const testToEdit = response.data;
                     this.test = JSON.parse(JSON.stringify(testToEdit));
                     this.isEditing = true;
 
-                    // Нормализуем данные теста (переименовываем поля и добавляем отсутствующие)
                     this.normalizeTestData(this.test);
 
-                    // Убедимся, что у всех вопросов есть ID
                     this.test.questions.forEach((question, index) => {
                         if (!question.id) {
                             question.id = Date.now() + index;
                         }
                     });
-                } else {
-                    this.error = "Тест не найден";
-                }
+                });
             } catch (error) {
                 this.error = error.message;
             } finally {
@@ -1624,41 +1606,45 @@ export default {
             }
         },
 
-        async saveTest() {
+        saveTest() {
             this.loading = true;
             this.error = "";
 
             try {
-                // Отладочный вывод для проверки структуры данных
-                console.log(
-                    "Данные перед сохранением:",
-                    JSON.stringify(this.test, null, 2)
-                );
-
-                // Проверяем вопросы типа "text"
-                this.test.questions.forEach((q, index) => {
-                    if (q.type === "text") {
-                        console.log(`Вопрос ${index + 1} (text):`, {
-                            correct_answers: q.correct_answers,
-                            hascorrect_answers: !!q.correct_answers,
-                            length: q.correct_answers
-                                ? q.correct_answers.length
-                                : 0,
-                        });
-                    }
-                });
-
                 if (this.isEditing) {
                     this.test.id = this.editTestId;
-                    await saveTest(this.test);
-                    this.$emit("test-updated");
-                    this.showToast("Тест успешно обновлен!", "success");
+
+                    this.datasend(`tests/${this.test.id}`, "PUT", this.test)
+                        .then((response) => {
+                            this.loadData();
+                            this.resetTest();
+                            this.showToast(response.message, "success");
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                        });
                 } else {
-                    this.test.id = Date.now();
-                    await saveTest(this.test);
-                    this.$emit("test-created");
-                    this.resetTest();
-                    this.showToast("Тест успешно создан!", "success");
+                    const testToSend = { ...this.test };
+                    delete testToSend.id;
+                    this.datasend(`tests`, "POST", testToSend)
+                        .then((response) => {
+                            console.log("Тест создан:", response);
+                            // this.loadData(); // Раскомментируйте эту строку
+                            // this.resetTest();
+                            // this.showToast(response.message, "success");
+
+                            // this.loadData();
+                            // this.resetTest();
+                            this.showToast(response.message, "success");
+                        })
+                        .catch((err) => {
+                            console.error("Ошибка создания теста:", err);
+                            this.error = "Ошибка при создании теста";
+                            this.showToast(
+                                "Ошибка при создании теста",
+                                "danger"
+                            );
+                        });
                 }
             } catch (error) {
                 this.error = error.message;
@@ -1672,7 +1658,7 @@ export default {
             this.$emit("edit-cancelled");
         },
 
-        async deleteTest() {
+        deleteTest() {
             if (
                 confirm(
                     "Вы уверены, что хотите удалить этот тест? Все результаты этого теста также будут удалены."
@@ -1682,9 +1668,18 @@ export default {
                 this.error = "";
 
                 try {
-                    await deleteTest(this.test.id);
-                    this.$emit("test-deleted");
-                    this.showToast("Тест успешно удален!", "success");
+                    // await deleteTest(this.test.id);
+                    // this.$emit("test-deleted");
+                    // this.showToast("Тест успешно удален!", "success");
+                    this.datasend(
+                        `tests/${this.test.id}`,
+                        "DELETE",
+                        this.test
+                    ).then((response) => {
+                        this.loadData();
+                        this.resetTest();
+                        this.showToast(response.message, "success");
+                    });
                 } catch (error) {
                     this.error = error.message;
                     this.$emit("error", error.message);

@@ -166,8 +166,8 @@
             <TestCreator
                 v-if="currentView === 'creator'"
                 :edit-test-id="editingTestId"
-                @test-created="handleTestCreated"
-                @test-updated="handleTestUpdated"
+                :loadData="loadData"
+                :datasend="datasend"
                 @test-deleted="handleTestDeleted"
                 @edit-cancelled="handleEditCancelled"
             />
@@ -175,6 +175,8 @@
             <TestManagement
                 v-else-if="currentView === 'management'"
                 :tests="tests"
+                :datasend="datasend"
+                :loadData="loadData"
                 @edit-test="handleEditTest"
                 @test-deleted="handleTestDeleted"
                 @test-imported="handleTestImported"
@@ -213,7 +215,6 @@ import TestManagement from "../components/TestManagement.vue";
 import TestRunner from "../components/TestRunner.vue";
 import TestResults from "../components/TestResults.vue";
 import AntiCopyProtection from "../components/AntiCopyProtection.vue";
-import { loadTests, loadResults } from "../utils/storage.js";
 
 export default {
     components: {
@@ -231,6 +232,7 @@ export default {
         TestResults,
         AntiCopyProtection,
     },
+
     data() {
         return {
             menu: [],
@@ -271,18 +273,19 @@ export default {
             this.switchToCreator(testId);
         },
 
-        async handleTestCreated() {
-            await this.loadData();
-            this.currentView = "management";
-            this.showToast("Тест успешно создан!", "success");
-        },
+        // async handleTestCreated() {
+        //await
+        // this.loadData();
+        //this.currentView = "management";
+        //this.showToast("Тест успешно создан!", "success");
+        // },
 
-        async handleTestUpdated() {
+        /*async handleTestUpdated() {
             await this.loadData();
             this.currentView = "management";
             this.editingTestId = null;
             this.showToast("Тест успешно обновлен!", "success");
-        },
+        },*/
 
         async handleTestDeleted() {
             await this.loadData();
@@ -311,20 +314,16 @@ export default {
             this.error = errorMessage;
         },
 
-        async loadData() {
+        loadData() {
             this.loading = true;
             this.error = "";
+            this.datasend("tests", "GET").then((response) => {
+                this.tests = response.data;
+            });
 
-            try {
-                this.tests = await loadTests();
-                this.results = await loadResults();
-            } catch (error) {
-                this.error = error.message;
-                this.tests = [];
-                this.results = [];
-            } finally {
-                this.loading = false;
-            }
+            this.datasend("results", "GET").then((response) => {
+                this.results = response.data;
+            });
         },
 
         showToast(message, type = "info") {
@@ -370,12 +369,8 @@ export default {
                 requestOptions.body = data;
             }
             if (method == "PUT") {
-                let object = {};
-                data.forEach(function (value, key) {
-                    object[key] = value;
-                });
                 myHeaders.append("Content-Type", "application/json");
-                requestOptions.body = JSON.stringify(object);
+                requestOptions.body = JSON.stringify(data);
             }
 
             try {

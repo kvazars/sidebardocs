@@ -17,8 +17,8 @@ Route::get("/homepage", [TreeController::class, "index"]);
 
 
 Route::apiResource('tests', TestController::class);
-Route::post('tests/import', [TestController::class, 'import']);
 
+Route::post('tests/import', [TestController::class, 'import']);
 Route::get('tests/{test}/export', [TestController::class, 'export']);
 Route::get('tests/{test}/results', [TestController::class, 'results']);
 

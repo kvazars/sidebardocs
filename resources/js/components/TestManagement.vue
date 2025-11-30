@@ -332,16 +332,12 @@
 </template>
 
 <script>
-import { deleteTest, importTest, exportTest } from "../utils/storage.js";
+import { importTest, exportTest } from "../utils/storage.js";
 import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
 export default {
     name: "TestManagement",
-    props: {
-        tests: {
-            type: Array,
-            required: true,
-        },
-    },
+    props: ["tests", "datasend", "loadData"],
+
     emits: ["edit-test", "test-deleted", "test-imported", "error"],
     data() {
         return {
@@ -386,16 +382,12 @@ export default {
                 this.actionLoading = true;
                 this.error = "";
 
-                try {
-                    await deleteTest(test.id);
-                    this.$emit("test-deleted", test.id);
-                    this.showToast("Тест успешно удален!", "success");
-                } catch (error) {
-                    this.error = error.message;
-                    this.$emit("error", error.message);
-                } finally {
-                    this.actionLoading = false;
-                }
+                this.datasend(`tests/${test.id}`, "DELETE", this.test).then(
+                    (response) => {
+                        this.loadData();
+                        this.showToast(response.message, "success");
+                    }
+                );
             }
         },
 

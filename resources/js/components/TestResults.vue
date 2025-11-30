@@ -588,7 +588,7 @@ export default {
             this.datasend("results/" + result.id, "DELETE").then((response) => {
                 // this.$emit("result-deleted", result);
                 this.showToast(response.message, "success");
-                console.log(response);
+                // console.log(response);
             });
             // const response = await fetch(`/api/test-results/${result.id}`, {
             //     method: "DELETE",

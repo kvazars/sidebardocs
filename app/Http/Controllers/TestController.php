@@ -9,14 +9,16 @@ use Illuminate\Http\JsonResponse;
 
 class TestController extends Controller
 {
-    public function index(): JsonResponse
+    public function index()
     {
         $tests = Test::with('questions')->get();
         return response()->json(['data' => $tests]);
     }
 
-    public function store(Request $request): JsonResponse
-    {
+    public function store(Request $request)
+    {   
+        
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -59,16 +61,18 @@ class TestController extends Controller
             }
         }
 
-        return response()->json(['data' => $test->load('questions')], 201);
+        return response()->json(['message' => 'Тест успешно создан!'], 201);
     }
 
-    public function show(Test $test): JsonResponse
+    public function show(Test $test)
     {
+
         return response()->json(['data' => $test->load('questions')]);
     }
 
-    public function update(Request $request, Test $test): JsonResponse
+    public function update(Request $request, Test $test)
     {
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -113,17 +117,19 @@ class TestController extends Controller
             }
         }
 
-        return response()->json(['data' => $test->load('questions')]);
+        return response()->json(['message' => 'Тест успешно обновлён!']);
     }
 
-    public function destroy(Test $test): JsonResponse
+    public function destroy(Test $test)
     {
+
         $test->delete();
-        return response()->json(['message' => 'Test deleted successfully']);
+        return response()->json(['message' => 'Тест успешно удалён!']);
     }
 
-    public function import(Request $request): JsonResponse
+    public function import(Request $request)
     {
+
         $request->validate([
             'file' => 'required|file|mimes:json'
         ]);
@@ -158,6 +164,7 @@ class TestController extends Controller
 
     public function export(Test $test): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {
+
         $testData = [
             'id' => $test->id,
             'title' => $test->title,

@@ -739,10 +739,12 @@ export default {
                 });
         },
         createGroup() {
-            let form = new FormData();
-            form.append("name", this.groupName);
+            let form;
             if (this.groupId) {
-                form.append("id", this.groupId);
+                form = { name: this.groupName, id: this.groupId };
+            } else {
+                let form = new FormData();
+                form.append("name", this.groupName);
             }
 
             this.datasend("group", this.groupId ? "PUT" : "POST", form)
@@ -761,17 +763,27 @@ export default {
                 });
         },
         createUser() {
-            let form = new FormData();
-            form.append("name", this.fullname);
-            form.append("login", this.login);
-            form.append("id", this.userId);
-            form.append("role", this.role);
-
-            if (this.groupIds) {
+            let form;
+            if (this.userId) {
+                form = {
+                    id: this.userId,
+                    login: this.login,
+                    name: this.fullname,
+                    role: this.role,
+                };
+                if (this.password) {
+                    form.password = this.password;
+                }
+            } else {
+                form = new FormData();
+                form.append("name", this.fullname);
+                form.append("login", this.login);
+                form.append("role", this.role);
                 form.append("group_id", this.groupIds);
-            }
-            if (this.password) {
-                form.append("password", this.password);
+
+                if (this.password) {
+                    form.append("password", this.password);
+                }
             }
 
             this.datasend("user", this.userId ? "PUT" : "POST", form)
