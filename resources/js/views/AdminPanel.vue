@@ -119,7 +119,7 @@
                                 "
                                 class="text-white m-2"
                                 color="success"
-                                ><i class="fa fa-plus"></i
+                                ><i class="bi bi-plus"></i
                             ></CButton>
                         </CAccordionItem>
                         <CAccordionItem
@@ -146,15 +146,13 @@
                                             "
                                             class=""
                                             color="primary"
-                                            ><i
-                                                class="fa fa-pencil-square-o"
-                                            ></i
+                                            ><i class="bi bi-pencil-fill"></i
                                         ></CButton>
                                         <CButton
                                             class="text-white"
                                             color="danger"
                                             @click="removeGroups(group.id)"
-                                            ><i class="fa fa-times"></i
+                                            ><i class="bi bi-x"></i
                                         ></CButton>
                                     </CButtonGroup>
                                     <CButton
@@ -171,7 +169,7 @@
                                                 userId = null;
                                             }
                                         "
-                                        ><i class="fa fa-user-plus"></i
+                                        ><i class="bi bi-person-add"></i
                                     ></CButton>
                                 </div>
                                 <CListGroup flush v-if="group.users[0]">
@@ -191,7 +189,7 @@
                                             >
                                                 <i
                                                     v-if="!user.deleted_at"
-                                                    class="fa fa-pencil-square-o text-info"
+                                                    class="bi bi-pencil-fill text-info"
                                                     @click="
                                                         () => {
                                                             visibleModal = true;
@@ -210,15 +208,15 @@
                                                 <i
                                                     v-if="!user.deleted_at"
                                                     title="Авторизоваться"
-                                                    class="fa fa-desktop text-info"
+                                                    class="bi bi-box-arrow-in-right text-info"
                                                     @click="authUser(user.id)"
                                                 ></i>
 
                                                 <i
                                                     :class="{
-                                                        'fa fa-times text-danger':
+                                                        'bi bi-x text-danger':
                                                             !user.deleted_at,
-                                                        'fa fa-check text-success':
+                                                        'bi bi-check text-success':
                                                             user.deleted_at,
                                                     }"
                                                     @click="
@@ -251,7 +249,7 @@
                                             userId = null;
                                         }
                                     "
-                                    ><i class="fa fa-user-plus"></i
+                                    ><i class="bi bi-person-add"></i
                                 ></CButton>
                             </CListGroupItem>
                             <CListGroupItem
@@ -270,7 +268,7 @@
                                     >
                                         <i
                                             v-if="!user.deleted_at"
-                                            class="fa fa-pencil-square-o text-info"
+                                            class="bi bi-pencil-fill text-info"
                                             @click="
                                                 () => {
                                                     visibleModal = true;
@@ -286,14 +284,14 @@
                                         <i
                                             v-if="!user.deleted_at"
                                             title="Авторизоваться"
-                                            class="fa fa-desktop text-info"
+                                            class="bi bi-box-arrow-in-right text-info"
                                             @click="authUser(user.id)"
                                         ></i>
                                         <i
                                             :class="{
-                                                'fa fa-times text-danger':
+                                                'bi bi-x text-danger':
                                                     !user.deleted_at,
-                                                'fa fa-check text-success':
+                                                'bi bi-check text-success':
                                                     user.deleted_at,
                                             }"
                                             @click="
@@ -324,7 +322,7 @@
                                             userId = null;
                                         }
                                     "
-                                    ><i class="fa fa-user-plus"></i
+                                    ><i class="bi bi-person-add"></i
                                 ></CButton>
                             </CListGroupItem>
                             <CListGroupItem
@@ -343,7 +341,7 @@
                                     >
                                         <i
                                             v-if="!user.deleted_at"
-                                            class="fa fa-pencil-square-o text-info"
+                                            class="bi bi-pencil-fill text-info"
                                             @click="
                                                 () => {
                                                     visibleModal = true;
@@ -359,14 +357,14 @@
                                         <i
                                             v-if="!user.deleted_at"
                                             title="Авторизоваться"
-                                            class="fa fa-desktop text-info"
+                                            class="bi bi-box-arrow-in-right text-info"
                                             @click="authUser(user.id)"
                                         ></i>
                                         <i
                                             :class="{
-                                                'fa fa-times text-danger':
+                                                'bi bi-x text-danger':
                                                     !user.deleted_at,
-                                                'fa fa-check text-success':
+                                                'bi bi-check text-success':
                                                     user.deleted_at,
                                             }"
                                             @click="
@@ -523,7 +521,7 @@
                                 password = generatePassword();
                             }
                         "
-                        ><i class="fa fa-key"></i
+                        ><i class="bi bi-key"></i
                     ></CButton>
                 </CInputGroup>
             </div>

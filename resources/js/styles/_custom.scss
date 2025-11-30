@@ -112,8 +112,8 @@ body .v-sidebar-menu .vsm--arrow .vsm--arrow_default {
 .editorImageBlockBackground.editorImageBlock {
     background-color: #cdd1e0;
 }
-.vsm--link.vsm--link_open i.fa.fa-folder:before {
-    content: "\f07c";
+.vsm--link.vsm--link_open i.bi.bi-folder2:before {
+    content: "\F3D8";
 }
 
 body .v-sidebar-menu .vsm--link_level-1.vsm--link_active {
@@ -181,31 +181,31 @@ body .v-sidebar-menu .vsm--link_level-1.vsm--link_active {
 	background: #1ad29e;
 }*/
 
-.vsm--menu i.fa.fa-folder,
-body .sidebar .v-sidebar-menu .vsm--link_active .vsm--icon.fa-folder {
+.vsm--menu i.bi.bi-folder2,
+body .sidebar .v-sidebar-menu .vsm--link_active .vsm--icon.bi-folder2 {
     color: #2759ae;
 }
-.vsm--menu i.fa.fa-file,
-body .sidebar .v-sidebar-menu .vsm--link_active .vsm--icon.fa-file {
+.vsm--menu i.bi.bi-file,
+body .sidebar .v-sidebar-menu .vsm--link_active .vsm--icon.bi-file {
     color: #1f7757;
 }
 
-[data-coreui-theme="dark"] .vsm--menu i.fa.fa-folder,
+[data-coreui-theme="dark"] .vsm--menu i.bi.bi-folder2,
 [data-coreui-theme="dark"]
     body
     .sidebar
     .v-sidebar-menu
     .vsm--link_active
-    .vsm--icon.fa-folder {
+    .vsm--icon.bi-folder2 {
     color: #fff;
 }
-[data-coreui-theme="dark"] .vsm--menu i.fa.fa-file,
+[data-coreui-theme="dark"] .vsm--menu i.bi.bi-file,
 [data-coreui-theme="dark"]
     body
     .sidebar
     .v-sidebar-menu
     .vsm--link_active
-    .vsm--icon.fa-file {
+    .vsm--icon.bi-file {
     color: #aceed6;
 }
 
@@ -692,3 +692,40 @@ a[href*=".7Z"]:before {
     width: 100%;
     height: 100%;
 }
+
+.question-card {
+    transition: all 0.3s ease;
+}
+.question-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.timer-warning {
+    animation: pulse 1s infinite;
+}
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+.copy-protection-warning {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+}
+.test-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.test-card:hover {
+    transform: translateY(-3px);
+}
+.result-excellent { border-left: 4px solid #28a745; }
+.result-good { border-left: 4px solid #17a2b8; }
+.result-satisfactory { border-left: 4px solid #ffc107; }
+.result-poor { border-left: 4px solid #dc3545; }
+.nav-link {
+    cursor: pointer;
+  }

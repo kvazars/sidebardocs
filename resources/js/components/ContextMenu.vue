@@ -10,7 +10,7 @@
             @click="emitAction(action.action)"
             :title="action.label"
         >
-            <i :class="'fa fa-' + action.icon"></i>
+            <i :class="'bi bi-' + action.icon"></i>
         </div>
     </div>
 </template>

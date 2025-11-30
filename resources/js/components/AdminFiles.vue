@@ -27,7 +27,7 @@
             <div class="col-md-6">
                 <div class="d-flex justify-content-end">
                     <CButton color="primary" @click="clearmyaccessfiles"
-                        ><i class="fa fa-trash-o"></i> Сбросить все
+                        ><i class="bi bi-trash"></i> Сбросить все
                         доступы</CButton
                     >
                 </div>
@@ -161,7 +161,7 @@
                                         visibleGroups = true;
                                     }
                                 "
-                                ><i class="fa fa-edit"></i
+                                ><i class="bi bi-pencil"></i
                             ></CButton>
                             <CButton
                                 :disabled="
@@ -171,7 +171,7 @@
                                 "
                                 color="primary"
                                 @click="save(key)"
-                                ><i class="fa fa-floppy-o"></i
+                                ><i class="bi bi-floppy2-fill"></i
                             ></CButton>
 
                             <router-link
@@ -182,7 +182,7 @@
                                     params: { id: this.files.data[key].id },
                                 }"
                             >
-                                <i class="fa fa-paper-plane"></i
+                                <i class="bi bi-binoculars-fill"></i
                             ></router-link>
 
                             <CButton
@@ -191,11 +191,11 @@
                                 :color="!val.deleted_at ? 'danger' : 'success'"
                                 @click="remove(key)"
                                 ><i
-                                    class="fa"
+                                    class="bi"
                                     :class="
                                         !val.deleted_at
-                                            ? 'fa-trash'
-                                            : 'fa-check'
+                                            ? 'bi-trash'
+                                            : 'bi-check'
                                     "
                                 ></i
                             ></CButton>

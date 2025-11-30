@@ -9,7 +9,7 @@
         "
     >
         <span>Показать файл </span>
-        <i class="fa" :class="fileShow ? 'fa-toggle-on' : 'fa-toggle-off'"></i>
+        <i class="bi" :class="fileShow ? 'bi-toggle-on' : 'bi-toggle-off'"></i>
     </div>
     <div class="vh70" v-if="fileShow">
         <vue-pdf-embed :id="id" :source="file" />

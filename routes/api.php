@@ -4,6 +4,8 @@ use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AvailableController;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\TestController;
+use App\Http\Controllers\TestResultController;
 use App\Http\Controllers\TreeController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -12,6 +14,21 @@ use Illuminate\Support\Facades\Route;
 Route::post("/auth", [UserController::class, "auth"]);
 Route::get("/resource/{content}", [ContentController::class, "getResource"]);
 Route::get("/homepage", [TreeController::class, "index"]);
+
+
+Route::apiResource('tests', TestController::class);
+Route::post('tests/import', [TestController::class, 'import']);
+
+Route::get('tests/{test}/export', [TestController::class, 'export']);
+Route::get('tests/{test}/results', [TestController::class, 'results']);
+
+
+// Route::delete('/results', [TestResultController::class, 'clear']);
+Route::apiResource('results', TestResultController::class);
+
+Route::get('tests/{testId}/results', [TestResultController::class, 'testResults']);
+// Route::delete('/test-results/{result}', [TestResultController::class, 'destroy']);
+
 
 Route::middleware(['auth:sanctum'])->group(function () {
     //admin,ceo,user

@@ -9,7 +9,7 @@
         "
     >
         <span>Показать файл </span>
-        <i class="fa" :class="fileShow ? 'fa-toggle-on' : 'fa-toggle-off'"></i>
+        <i class="bi" :class="fileShow ? 'bi-toggle-on' : 'bi-toggle-off'"></i>
     </div>
     <vue-office-pptx v-if="fileShow" :id="id" :src="file" />
 </template>

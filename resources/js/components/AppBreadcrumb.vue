@@ -96,7 +96,7 @@ export default {
             data-bs-toggle="dropdown"
             aria-expanded="false"
         >
-            <i class="fa fa-cog"></i>
+            <i class="bi bi-sliders2"></i>
         </button>
         <ul class="dropdown-menu">
             <template
@@ -104,7 +104,7 @@ export default {
             >
                 <li>
                     <button class="dropdown-item" @click="save">
-                        <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                        <i class="bi bi-floppy2-fill" aria-hidden="true"></i>
                         Сохранить
                     </button>
                 </li>
@@ -114,7 +114,7 @@ export default {
                     "
                 >
                     <button class="dropdown-item" @click="redirectToHome(true)">
-                        <i class="fa fa-times" aria-hidden="true"></i> Отмена
+                        <i class="bi bi-x" aria-hidden="true"></i> Отмена
                     </button>
                 </li>
                 <li v-if="$route.name == 'EditFile'">
@@ -122,7 +122,7 @@ export default {
                 </li>
                 <li v-if="$route.name == 'EditFile'">
                     <button class="dropdown-item" @click="deleteFile">
-                        <i class="fa fa-trash-o" aria-hidden="true"></i> Удалить
+                        <i class="bi bi-trash" aria-hidden="true"></i> Удалить
                     </button>
                 </li>
             </template>
@@ -138,10 +138,7 @@ export default {
                             name: 'EditFile',
                             params: { id: content.tree_id },
                         }"
-                        ><i
-                            class="fa fa-pencil-square-o"
-                            aria-hidden="true"
-                        ></i>
+                        ><i class="bi bi-pencil-fill" aria-hidden="true"></i>
                         Редактировать
                     </router-link>
                 </li>
@@ -158,7 +155,7 @@ export default {
 
                 <li>
                     <button class="dropdown-item" @click="html2doc">
-                        <i class="fa fa-file-word-o" aria-hidden="true"></i>
+                        <i class="bi bi-file-word" aria-hidden="true"></i>
                         Экспорт
                     </button>
                 </li>

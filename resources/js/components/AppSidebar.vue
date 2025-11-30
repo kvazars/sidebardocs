@@ -29,14 +29,14 @@ export default {
                 {
                     label: "Создать дочернюю папку",
                     action: "newFolder",
-                    icon: "folder-open",
+                    icon: "folder2  -open",
                 },
                 {
                     label: "Переместить ниже",
                     action: "updoc",
-                    icon: "level-down",
+                    icon: "arrow-bar-down",
                 },
-                { label: "Выше", action: "downdoc", icon: "level-up" },
+                { label: "Выше", action: "downdoc", icon: "arrow-bar-up" },
                 {
                     label: "Создать ресурс",
                     action: "newFile",
@@ -50,8 +50,8 @@ export default {
             ],
             contextMenuActionsFile: [
                 { label: "Редактировать", action: "editFile", icon: "pencil" },
-                { label: "Ниже", action: "updoc", icon: "level-down" },
-                { label: "Выше", action: "downdoc", icon: "level-up" },
+                { label: "Ниже", action: "updoc", icon: "arrow-bar-down" },
+                { label: "Выше", action: "downdoc", icon: "arrow-bar-up" },
                 { label: "Удалить", action: "deleteFile", icon: "trash" },
             ],
             visibleModalFolder: false,
@@ -237,7 +237,7 @@ export default {
             @click="addFirstLevel"
             v-if="auths.role == 'ceo' || auths.role == 'admin'"
         >
-            <i class="fa fa-plus-circle fs-4" aria-hidden="true"></i>
+            <i class="bi bi-plus fs-4" aria-hidden="true"></i>
         </button>
         <CSidebarFooter class="border-top d-none d-lg-flex">
             <CSidebarToggler @click="sidebar.toggleUnfoldable()" />

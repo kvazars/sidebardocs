@@ -63,7 +63,7 @@ function goToSettings() {
                 @click="sidebar.toggleVisible()"
                 style="margin-inline-start: -14px"
             >
-                <i class="fa fa-bars" aria-hidden="true" v-if="auths.id"></i>
+                <i class="bi bi-list" aria-hidden="true" v-if="auths.id"></i>
             </CHeaderToggler>
             <CHeaderNav>
                 <li class="nav-item py-1">
@@ -83,7 +83,7 @@ function goToSettings() {
                             modeTheme = 'dark';
                         "
                     >
-                        <i class="fa fa-sun-o"></i>
+                        <i class="bi bi-sun-fill"></i>
                     </div>
                     <div
                         v-if="modeTheme == 'dark'"
@@ -96,7 +96,7 @@ function goToSettings() {
                             modeTheme = 'light';
                         "
                     >
-                        <i class="fa fa-moon-o"></i>
+                        <i class="bi bi-moon-fill"></i>
                     </div>
                 </li>
 
@@ -114,7 +114,7 @@ function goToSettings() {
                             component="button"
                             type="button"
                         >
-                            <i class="fa fa-user"></i>
+                            <i class="bi bi-person-fill"></i>
                         </div>
                     </div>
                 </li>
@@ -125,24 +125,24 @@ function goToSettings() {
                         v-if="auths.id"
                     >
                         <CDropdownToggle class="pe-0" :caret="false">
-                            <i class="fa fa-user"></i>
+                            <i class="bi bi-person-fill"></i>
                         </CDropdownToggle>
                         <CDropdownMenu>
                             <CDropdownItem
                                 @click="goToAdmin"
                                 v-if="auths.role != 'user'"
                             >
-                                <i class="fa fa-cog"></i> Управление
+                                <i class="bi bi-sliders2"></i> Управление
                             </CDropdownItem>
                             <CDropdownItem
                                 @click="goToSettings"
                                 v-if="auths.role != 'user'"
                             >
-                                <i class="fa fa fa-pencil"></i> Смена пароля
+                                <i class="bi bi-pencil-fill"></i> Смена пароля
                             </CDropdownItem>
 
                             <CDropdownItem v-if="auths.id" @click="logout">
-                                <i class="fa fa-unlock"></i> Выход
+                                <i class="bi bi-box-arrow-right"></i> Выход
                             </CDropdownItem>
                         </CDropdownMenu>
                     </CDropdown>
