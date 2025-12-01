@@ -544,17 +544,54 @@ export default {
         },
 
         currentShuffledOptions() {
-            return this.shuffledOptionsMap.get(this.currentQuestionIndex) || [];
+            // Если есть перемешанные варианты - используем их
+            const shuffled = this.shuffledOptionsMap.get(
+                this.currentQuestionIndex
+            );
+            if (shuffled && shuffled.length > 0) {
+                return shuffled;
+            }
+
+            // Иначе используем оригинальные варианты
+            if (this.currentQuestion && this.currentQuestion.options) {
+                return this.currentQuestion.options.map((option, index) => ({
+                    ...option,
+                    originalIndex: index,
+                }));
+            }
+
+            return [];
         },
 
         currentShuffledPairs() {
             const data = this.shuffledPairsMap.get(this.currentQuestionIndex);
-            return data ? data.pairs : [];
+            if (data && data.pairs) {
+                return data.pairs;
+            }
+
+            // Иначе используем оригинальные пары
+            if (this.currentQuestion && this.currentQuestion.pairs) {
+                return this.currentQuestion.pairs.map((pair, index) => ({
+                    ...pair,
+                    originalIndex: index,
+                }));
+            }
+
+            return [];
         },
 
         currentShuffledRightOptions() {
             const data = this.shuffledPairsMap.get(this.currentQuestionIndex);
-            return data ? data.rightOptions : [];
+            if (data && data.rightOptions) {
+                return data.rightOptions;
+            }
+
+            // Иначе используем оригинальные правые части
+            if (this.currentQuestion && this.currentQuestion.pairs) {
+                return this.currentQuestion.pairs.map((pair) => pair.right);
+            }
+
+            return [];
         },
 
         progress() {
@@ -634,14 +671,18 @@ export default {
         initializeQuestion() {
             if (!this.currentQuestion) return;
 
-            // Перемешиваем варианты ответов если нужно
+            // Перемешиваем варианты ответов если нужно (только если shuffleAnswers = true)
             if (this.shouldShuffleAnswers()) {
                 this.shuffleQuestionOptions();
-            }
-
-            // Для вопросов на сопоставление
-            if (this.currentQuestion.type === "matching") {
-                this.shuffleMatchingOptions();
+                // Для вопросов на сопоставление также перемешиваем
+                if (this.currentQuestion.type === "matching") {
+                    this.shuffleMatchingOptions();
+                }
+            } else {
+                // Если не нужно перемешивать, очищаем мапы для текущего вопроса
+                // чтобы использовались оригинальные варианты
+                this.shuffledOptionsMap.delete(this.currentQuestionIndex);
+                this.shuffledPairsMap.delete(this.currentQuestionIndex);
             }
 
             // Сбрасываем ошибку валидации при инициализации вопроса
@@ -649,10 +690,15 @@ export default {
         },
 
         shouldShuffleAnswers() {
-            if (!this.selectedTest.settings.shuffleAnswers) return false;
+            // Основная проверка - если shuffleAnswers = false, не перемешиваем
+            if (!this.selectedTest.settings.shuffleAnswers) {
+                return false;
+            }
 
             const questionType = this.currentQuestion.type;
 
+            // Если shuffleAnswers = true, проверяем настройки для конкретных типов вопросов
+            // (если они заданы, иначе считаем что перемешивать можно)
             switch (questionType) {
                 case "single":
                     return (
@@ -666,7 +712,7 @@ export default {
                 case "matching":
                     return this.selectedTest.settings.shuffleMatching !== false;
                 default:
-                    return false;
+                    return false; // Для других типов не перемешиваем
             }
         },
 
@@ -685,6 +731,8 @@ export default {
         },
 
         shuffleMatchingOptions() {
+            if (!this.currentQuestion.pairs) return;
+
             const pairs = [...this.currentQuestion.pairs];
             const shuffledPairs = pairs
                 .map((pair, index) => ({ ...pair, originalIndex: index }))
@@ -1002,25 +1050,44 @@ export default {
 
                 switch (question.type) {
                     case "single":
-                        // Для одиночного выбора userAnswer - это originalIndex выбранного варианта
-                        const selectedOption =
-                            question.options.find(
+                        // Получаем выбранный вариант
+                        let selectedOption = null;
+                        if (this.shuffledOptionsMap.has(displayIndex)) {
+                            // Если варианты были перемешаны
+                            const shuffledOptions =
+                                this.shuffledOptionsMap.get(displayIndex);
+                            selectedOption = shuffledOptions.find(
                                 (opt) => opt.originalIndex === userAnswer
-                            ) || question.options[userAnswer];
+                            );
+                        } else {
+                            // Если варианты не перемешаны
+                            selectedOption = question.options[userAnswer];
+                        }
+
                         isCorrect = selectedOption && selectedOption.correct;
                         score = isCorrect ? question.points : 0;
                         break;
 
                     case "multiple":
-                        // Для множественного выбора userAnswer - массив originalIndex
-                        const selectedOptions = userAnswer
-                            .map(
-                                (index) =>
-                                    question.options.find(
+                        // Для множественного выбора userAnswer - массив индексов
+                        let selectedOptions = [];
+                        if (this.shuffledOptionsMap.has(displayIndex)) {
+                            // Если варианты были перемешаны
+                            const shuffledOptions =
+                                this.shuffledOptionsMap.get(displayIndex);
+                            selectedOptions = userAnswer
+                                .map((index) =>
+                                    shuffledOptions.find(
                                         (opt) => opt.originalIndex === index
-                                    ) || question.options[index]
-                            )
-                            .filter(Boolean);
+                                    )
+                                )
+                                .filter(Boolean);
+                        } else {
+                            // Если варианты не перемешаны
+                            selectedOptions = userAnswer
+                                .map((index) => question.options[index])
+                                .filter(Boolean);
+                        }
 
                         const correctOptions = question.options.filter(
                             (opt) => opt.correct
@@ -1085,8 +1152,24 @@ export default {
                                 question.points;
                             isCorrect = correctPairs === question.pairs.length;
                         } else {
-                            score = 0;
-                            isCorrect = false;
+                            // Если пары не перемешаны
+                            if (question.pairs && question.pairs.length > 0) {
+                                const correctPairs = userAnswer.filter(
+                                    (answer, idx) => {
+                                        const originalPair =
+                                            question.pairs[idx];
+                                        return answer === originalPair?.right;
+                                    }
+                                ).length;
+                                score =
+                                    (correctPairs / question.pairs.length) *
+                                    question.points;
+                                isCorrect =
+                                    correctPairs === question.pairs.length;
+                            } else {
+                                score = 0;
+                                isCorrect = false;
+                            }
                         }
                         break;
 

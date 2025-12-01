@@ -19,9 +19,11 @@ class TestResultController extends Controller
     public function resultTree(Tree $tree_id): JsonResponse
     {
         $test = Test::where("tree_id", $tree_id->id)->first();
-
-        $results = TestResult::with('test', 'user')->where("test_id", $test->id)->get();
-        return response()->json(['data' => $results]);
+        if ($test) {
+            $results = TestResult::with('test', 'user')->where("test_id", $test->id)->get();
+            return response()->json(['data' => $results]);
+        }
+        return response()->json(['data' => []]);
     }
 
 

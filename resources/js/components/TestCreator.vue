@@ -92,39 +92,6 @@
                         ></textarea>
                     </div>
 
-                    <!-- Настройки теста -->
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-check form-switch mb-3">
-                                <input
-                                    v-model="test.settings.requireUserName"
-                                    class="form-check-input"
-                                    type="checkbox"
-                                />
-                                <label class="form-check-label"
-                                    >Требовать ввод имени при прохождении</label
-                                >
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row" v-if="test.settings.requireUserName">
-                        <div class="col-md-6">
-                            <div class="form-check form-switch mb-3">
-                                <input
-                                    v-model="
-                                        test.settings.showUserNameInResults
-                                    "
-                                    class="form-check-input"
-                                    type="checkbox"
-                                />
-                                <label class="form-check-label"
-                                    >Показывать имя в результатах</label
-                                >
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Настройки перемешивания -->
                     <div class="card mt-3">
                         <div class="card-header bg-secondary text-white">
@@ -1063,12 +1030,7 @@ import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
 export default {
     name: "TestCreator",
     emits: ["error"],
-    props: [
-        "editTestId",
-        "datasend",
-        "showToast",
-        "changeCurrentView",
-    ],
+    props: ["editTestId", "datasend", "showToast", "changeCurrentView"],
     data() {
         return {
             test: {
@@ -1077,7 +1039,7 @@ export default {
                 description: "",
                 timeLimit: 30,
                 settings: {
-                    requireUserName: false,
+                    requireUserName: true,
                     showUserNameInResults: true,
                     shuffleQuestions: false,
                     shuffleAnswers: false,
@@ -1680,7 +1642,7 @@ export default {
                 description: "",
                 timeLimit: 30,
                 settings: {
-                    requireUserName: false,
+                    requireUserName: true,
                     showUserNameInResults: true,
                     shuffleQuestions: false,
                     shuffleAnswers: false,
@@ -1827,7 +1789,7 @@ export default {
             // Убедимся, что все необходимые поля существуют
             if (!test.settings) {
                 test.settings = {
-                    requireUserName: false,
+                    requireUserName: true,
                     showUserNameInResults: true,
                     shuffleQuestions: false,
                     shuffleAnswers: false,
