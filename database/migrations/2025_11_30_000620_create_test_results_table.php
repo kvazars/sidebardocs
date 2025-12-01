@@ -10,7 +10,8 @@ class CreateTestResultsTable extends Migration
     {
         Schema::create('test_results', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('test_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreignId('test_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->string('user_name')->nullable();
             $table->decimal('total_score', 8, 2);
             $table->decimal('max_score', 8, 2);

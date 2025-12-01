@@ -26,8 +26,7 @@
         </div>
 
         <div v-if="results.length === 0" class="alert alert-info text-center">
-            <i class="bi bi-info-circle"></i> Нет результатов тестов. Пройдите
-            тест, чтобы увидеть результаты.
+            <i class="bi bi-info-circle"></i> Нет результатов тестов.
         </div>
 
         <div v-else>
@@ -35,18 +34,7 @@
             <div class="card mb-4">
                 <div class="card-body">
                     <div class="row align-items-center">
-                        <div class="col-md-4">
-                            <label class="form-label"
-                                >Поиск по названию теста:</label
-                            >
-                            <input
-                                v-model="searchQuery"
-                                type="text"
-                                class="form-control"
-                                placeholder="Введите название теста..."
-                            />
-                        </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <label class="form-label">Сортировка:</label>
                             <select v-model="sortBy" class="form-select">
                                 <option value="date">
@@ -61,10 +49,9 @@
                                 <option value="score_asc">
                                     По баллам (низкие сначала)
                                 </option>
-                                <option value="name">По названию теста</option>
                             </select>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <label class="form-label">Фильтр по оценке:</label>
                             <select v-model="gradeFilter" class="form-select">
                                 <option value="">Все оценки</option>
@@ -87,7 +74,7 @@
                 <div
                     v-for="result in filteredResults"
                     :key="getResultKey(result)"
-                    class="col-lg-6 mb-4"
+                    class="col-lg-3 mb-4"
                 >
                     <div
                         class="card h-100"
@@ -97,7 +84,6 @@
                             class="card-header d-flex justify-content-between align-items-center"
                         >
                             <div>
-                                <h5 class="mb-0">{{ getTestTitle(result) }}</h5>
                                 <small class="text-muted">{{
                                     formatDate(result.created_at)
                                 }}</small>
@@ -126,7 +112,11 @@
                                 class="alert alert-info py-2 mb-3"
                             >
                                 <i class="bi bi-person"></i>
-                                <strong>{{ result.user_name }}</strong>
+                                <strong
+                                    >{{ result.user_name }} ({{
+                                        result.user.name
+                                    }})</strong
+                                >
                             </div>
 
                             <div class="row mb-3">
@@ -285,7 +275,6 @@
                 <table class="table table-striped table-hover">
                     <thead class="table-dark">
                         <tr>
-                            <th>Тест</th>
                             <th>Пользователь</th>
                             <th>Баллы</th>
                             <th>Процент</th>
@@ -301,16 +290,15 @@
                             :key="getResultKey(result)"
                         >
                             <td>
-                                <strong>{{ getTestTitle(result) }}</strong>
-                            </td>
-                            <td>
                                 <span
                                     v-if="result.user_name"
                                     class="badge bg-info"
                                 >
                                     <i class="bi bi-person"></i>
                                     {{ result.user_name }}
+                                    ({{ result.user.name }})
                                 </span>
+
                                 <span v-else class="text-muted">—</span>
                             </td>
                             <td>
@@ -478,31 +466,18 @@
 <script>
 export default {
     name: "TestResults",
-    props: ["results", "datasend", "showToast"],
+    props: ["results", "datasend", "showToast", "getResult"],
     data() {
         return {
-            searchQuery: "",
             sortBy: "date",
             gradeFilter: "",
-            viewMode: "cards", // 'cards' или 'table'
+            viewMode: "table", // 'cards' или 'table'
             expandedResults: new Set(),
         };
     },
     computed: {
         filteredResults() {
             let filtered = this.results;
-
-            // Поиск по названию теста
-            if (this.searchQuery) {
-                const query = this.searchQuery.toLowerCase().trim();
-                filtered = filtered.filter((result) => {
-                    const testTitle = this.getTestTitle(result).toLowerCase();
-                    const userName = (result.user_name || "").toLowerCase();
-                    return (
-                        testTitle.includes(query) || userName.includes(query)
-                    );
-                });
-            }
 
             // Фильтр по оценке
             if (this.gradeFilter) {
@@ -586,6 +561,7 @@ export default {
 
             this.datasend("results/" + result.id, "DELETE").then((response) => {
                 this.showToast(response.message, "success");
+                this.getResult();
             });
         },
 

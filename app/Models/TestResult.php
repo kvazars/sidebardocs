@@ -19,7 +19,8 @@ class TestResult extends Model
         'grade',
         'time_spent',
         'settings',
-        'question_results'
+        'question_results',
+        'user_id',
     ];
 
     protected $casts = [
@@ -30,5 +31,9 @@ class TestResult extends Model
     public function test(): BelongsTo
     {
         return $this->belongsTo(Test::class);
+    }
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

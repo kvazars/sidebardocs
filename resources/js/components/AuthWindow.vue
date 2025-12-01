@@ -1,13 +1,5 @@
 <template>
-    <CModal
-        :visible="openWindow"
-        @close="
-            () => {
-                openWindowFunction();
-            }
-        "
-        aria-labelledby="FolderLabel"
-    >
+    <CModal :visible="openWindow" aria-labelledby="FolderLabel">
         <CModalHeader>
             <CModalTitle id="FolderLabel">Авторизация</CModalTitle>
         </CModalHeader>
@@ -42,16 +34,6 @@
             </div>
         </CModalBody>
         <CModalFooter>
-            <CButton
-                color="secondary"
-                @click="
-                    () => {
-                        openWindowFunction();
-                    }
-                "
-            >
-                Отмена
-            </CButton>
             <CButton
                 color="primary"
                 @click="

@@ -2,20 +2,15 @@
     <div class="test-runner">
         <!-- Выбор теста -->
         <div v-if="!selectedTest" class="test-selection">
-            <h2 class="mb-4">
-                <i class="bi bi-play-circle"></i> Выберите тест для прохождения
-            </h2>
-
-            <div v-if="tests.length === 0" class="alert alert-info text-center">
-                <i class="bi bi-info-circle"></i> Нет доступных тестов. Создайте
-                тест сначала.
-            </div>
-
-            <div v-else class="row">
+            <div v-if="tests.length != 0" class="row">
+                <h2 class="mb-4">
+                    <i class="bi bi-play-circle"></i> Выберите тест для
+                    прохождения
+                </h2>
                 <div
                     v-for="test in tests"
                     :key="test.id"
-                    class="col-md-6 col-lg-4 mb-3"
+                    class="col-md-12 col-lg-12 mb-3"
                     @click="selectTest(test)"
                 >
                     <div class="test-card card h-100">
@@ -54,6 +49,10 @@
                                 >
                                     <i class="bi bi-shuffle"></i> Перемеш.
                                     ответы
+                                </small>
+                                <small class="text-danger ms-2">
+                                    <i class="bi bi-exclamation-circle"></i> Все
+                                    вопросы обязательны
                                 </small>
                             </div>
                         </div>
@@ -131,6 +130,20 @@
                 </span>
             </div>
 
+            <!-- Предупреждение о незаполненном вопросе -->
+            <div
+                v-if="validationError"
+                class="alert alert-danger alert-dismissible fade show mb-3"
+            >
+                <i class="bi bi-exclamation-circle"></i>
+                {{ validationError }}
+                <button
+                    type="button"
+                    class="btn-close"
+                    @click="validationError = ''"
+                ></button>
+            </div>
+
             <!-- Защита от копирования -->
             <div v-if="copyAttempted" class="copy-protection-warning">
                 <div
@@ -150,15 +163,47 @@
             <!-- Таймер и прогресс -->
             <div class="row mb-4">
                 <div class="col-md-8">
-                    <div class="progress mb-2" style="height: 20px">
-                        <div
-                            class="progress-bar progress-bar-striped progress-bar-animated"
-                            :style="{ width: progress + '%' }"
-                        ></div>
+                    <div class="progress-container mb-3">
+                        <div class="progress mb-2" style="height: 20px">
+                            <div
+                                class="progress-bar progress-bar-striped progress-bar-animated"
+                                :style="{ width: progress + '%' }"
+                            ></div>
+                        </div>
+                        <div class="progress-markers">
+                            <div
+                                v-for="i in selectedTest.questions.length"
+                                :key="i"
+                                class="question-marker"
+                                :style="{
+                                    left:
+                                        ((i - 0.5) /
+                                            selectedTest.questions.length) *
+                                            100 +
+                                        '%',
+                                }"
+                                :class="{
+                                    answered: answeredQuestions.has(i - 1),
+                                    current: currentQuestionIndex === i - 1,
+                                    unanswered:
+                                        !answeredQuestions.has(i - 1) &&
+                                        currentQuestionIndex !== i - 1,
+                                }"
+                                @click="goToQuestion(i - 1)"
+                                :title="`Вопрос ${i}${
+                                    answeredQuestions.has(i - 1)
+                                        ? ' (отвечен)'
+                                        : ' (не отвечен)'
+                                }`"
+                            ></div>
+                        </div>
                     </div>
                     <small class="text-muted">
                         Вопрос {{ currentQuestionIndex + 1 }} из
                         {{ selectedTest.questions.length }}
+                        (отвечено: {{ answeredQuestions.size }}/{{
+                            selectedTest.questions.length
+                        }})
                     </small>
                 </div>
                 <div class="col-md-4">
@@ -169,11 +214,29 @@
             </div>
 
             <!-- Вопрос -->
-            <div class="card mb-4" @contextmenu="preventCopy">
+            <div
+                class="card mb-4"
+                @contextmenu="preventCopy"
+                :class="{
+                    'required-question':
+                        !answeredQuestions.has(currentQuestionIndex),
+                    'answered-question':
+                        answeredQuestions.has(currentQuestionIndex),
+                }"
+            >
                 <div
                     class="card-header bg-light d-flex justify-content-between align-items-center"
                 >
                     <h5 class="mb-0">
+                        <span
+                            v-if="!answeredQuestions.has(currentQuestionIndex)"
+                            class="text-danger me-2"
+                        >
+                            <i class="bi bi-exclamation-circle"></i>
+                        </span>
+                        <span v-else class="text-success me-2">
+                            <i class="bi bi-check-circle"></i>
+                        </span>
                         Вопрос {{ currentQuestionIndex + 1 }}
                         <small
                             v-if="selectedTest.settings.shuffleQuestions"
@@ -286,7 +349,6 @@
                     </div>
 
                     <!-- Да/Нет -->
-                    <!-- Да/Нет -->
                     <div
                         v-else-if="currentQuestion.type === 'true-false'"
                         class="answers"
@@ -354,6 +416,7 @@
                             class="form-control"
                             placeholder="Введите ваш ответ..."
                             rows="3"
+                            @input="clearValidationError"
                         ></textarea>
                     </div>
 
@@ -391,6 +454,7 @@
                                         userAnswers[currentQuestionIndex][index]
                                     "
                                     class="form-select"
+                                    @change="clearValidationError"
                                 >
                                     <option value="">
                                         Выберите соответствие
@@ -423,13 +487,17 @@
                     v-if="
                         currentQuestionIndex < selectedTest.questions.length - 1
                     "
-                    @click="nextQuestion"
+                    @click="validateAndNextQuestion"
                     class="btn btn-primary"
                 >
                     Следующий <i class="bi bi-arrow-right"></i>
                 </button>
 
-                <button v-else @click="finishTest" class="btn btn-success">
+                <button
+                    v-else
+                    @click="validateAndFinishTest"
+                    class="btn btn-success"
+                >
                     <i class="bi bi-check-circle"></i> Завершить тест
                 </button>
             </div>
@@ -440,7 +508,7 @@
 <script>
 export default {
     name: "TestRunner",
-    props: ["datasend", "loadData", "tests","showToast"],
+    props: ["datasend", "loadData", "tests", "showToast"],
     data() {
         return {
             selectedTest: null,
@@ -451,10 +519,14 @@ export default {
             copyAttempted: false,
             userName: "",
             tempUserName: "",
-            // Для перемешивания - храним отдельно для каждого вопроса
+            // Для перемешивания
             shuffledQuestions: [],
-            shuffledOptionsMap: new Map(), // questionIndex -> shuffledOptions
-            shuffledPairsMap: new Map(), // questionIndex -> { pairs, rightOptions }
+            shuffledOptionsMap: new Map(),
+            shuffledPairsMap: new Map(),
+            // Для валидации
+            validationError: "",
+            // Для отслеживания отвеченных вопросов
+            answeredQuestions: new Set(),
         };
     },
     computed: {
@@ -571,6 +643,9 @@ export default {
             if (this.currentQuestion.type === "matching") {
                 this.shuffleMatchingOptions();
             }
+
+            // Сбрасываем ошибку валидации при инициализации вопроса
+            this.validationError = "";
         },
 
         shouldShuffleAnswers() {
@@ -638,7 +713,8 @@ export default {
             this.timer = setInterval(() => {
                 this.timeLeft--;
                 if (this.timeLeft <= 0) {
-                    this.finishTest();
+                    // При завершении времени автоматически завершаем тест с проверкой
+                    this.validateAndFinishTest();
                 }
             }, 1000);
         },
@@ -649,20 +725,242 @@ export default {
             return `${mins}:${secs.toString().padStart(2, "0")}`;
         },
 
+        // ВАЛИДАЦИЯ ВОПРОСОВ
+        validateCurrentQuestion() {
+            this.validationError = "";
+            const answer = this.userAnswers[this.currentQuestionIndex];
+            const question = this.currentQuestion;
+
+            // Проверяем наличие ответа
+            let isValid = false;
+
+            switch (question.type) {
+                case "single":
+                    // Для одиночного выбора answer должно быть числом или строкой, но не пустым
+                    isValid =
+                        answer !== "" &&
+                        answer !== null &&
+                        answer !== undefined;
+                    if (!isValid) {
+                        this.validationError =
+                            "Пожалуйста, выберите один вариант ответа";
+                    }
+                    break;
+
+                case "multiple":
+                    // Для множественного выбора массив не должен быть пустым
+                    isValid = Array.isArray(answer) && answer.length > 0;
+                    if (!isValid) {
+                        this.validationError =
+                            "Пожалуйста, выберите хотя бы один вариант ответа";
+                    }
+                    break;
+
+                case "true-false":
+                    // Для да/нет должно быть выбрано значение
+                    isValid = answer === "true" || answer === "false";
+                    if (!isValid) {
+                        this.validationError =
+                            "Пожалуйста, выберите Да или Нет";
+                    }
+                    break;
+
+                case "text":
+                    // Для текстового ответа не должно быть пустой строкой
+                    isValid = answer && answer.trim() !== "";
+                    if (!isValid) {
+                        this.validationError = "Пожалуйста, введите ваш ответ";
+                    }
+                    break;
+
+                case "matching":
+                    // Для сопоставления все пары должны быть заполнены
+                    if (!Array.isArray(answer)) {
+                        isValid = false;
+                    } else {
+                        const hasEmptySelections = answer.some(
+                            (item) => !item || item.trim() === ""
+                        );
+                        isValid = !hasEmptySelections;
+                    }
+                    if (!isValid) {
+                        this.validationError =
+                            "Пожалуйста, выберите соответствие для каждого элемента";
+                    }
+                    break;
+
+                default:
+                    isValid = false;
+                    this.validationError = "Неизвестный тип вопроса";
+                    break;
+            }
+
+            // Если валидация пройдена, добавляем вопрос в список отвеченных
+            if (isValid) {
+                this.answeredQuestions.add(this.currentQuestionIndex);
+            } else {
+                this.answeredQuestions.delete(this.currentQuestionIndex);
+            }
+
+            return isValid;
+        },
+
+        validateAllQuestions() {
+            // Проверяем все вопросы
+            for (let i = 0; i < this.selectedTest.questions.length; i++) {
+                const answer = this.userAnswers[i];
+                const question = this.selectedTest.settings.shuffleQuestions
+                    ? this.shuffledQuestions[i]
+                    : this.selectedTest.questions[i];
+
+                let isValid = false;
+
+                // Проверяем ответ в зависимости от типа вопроса
+                switch (question.type) {
+                    case "single":
+                        isValid =
+                            answer !== "" &&
+                            answer !== null &&
+                            answer !== undefined;
+                        break;
+                    case "multiple":
+                        isValid = Array.isArray(answer) && answer.length > 0;
+                        break;
+                    case "true-false":
+                        isValid = answer === "true" || answer === "false";
+                        break;
+                    case "text":
+                        isValid = answer && answer.trim() !== "";
+                        break;
+                    case "matching":
+                        if (Array.isArray(answer)) {
+                            const hasEmptySelections = answer.some(
+                                (item) => !item || item.trim() === ""
+                            );
+                            isValid = !hasEmptySelections;
+                        }
+                        break;
+                }
+
+                if (!isValid) {
+                    return {
+                        isValid: false,
+                        questionIndex: i,
+                    };
+                }
+            }
+
+            return { isValid: true };
+        },
+
+        validateAndNextQuestion() {
+            if (this.validateCurrentQuestion()) {
+                this.nextQuestion();
+            } else {
+                // Прокрутка к ошибке
+                this.$nextTick(() => {
+                    const errorElement =
+                        document.querySelector(".alert-danger");
+                    if (errorElement) {
+                        errorElement.scrollIntoView({ behavior: "smooth" });
+                    }
+                });
+            }
+        },
+
+        validateAndFinishTest() {
+            // Проверяем текущий вопрос
+            if (!this.validateCurrentQuestion()) {
+                // Прокрутка к ошибке
+                this.$nextTick(() => {
+                    const errorElement =
+                        document.querySelector(".alert-danger");
+                    if (errorElement) {
+                        errorElement.scrollIntoView({ behavior: "smooth" });
+                    }
+                });
+                return;
+            }
+
+            // Проверяем все вопросы
+            const validationResult = this.validateAllQuestions();
+            if (!validationResult.isValid) {
+                // Переключаемся на первый неотвеченный вопрос
+                this.currentQuestionIndex = validationResult.questionIndex;
+                this.validationError = `Вопрос ${
+                    validationResult.questionIndex + 1
+                } не отвечен. Пожалуйста, ответьте на него`;
+
+                // Прокрутка к ошибке
+                this.$nextTick(() => {
+                    const errorElement =
+                        document.querySelector(".alert-danger");
+                    if (errorElement) {
+                        errorElement.scrollIntoView({ behavior: "smooth" });
+                    }
+                });
+                return;
+            }
+
+            // Если все вопросы отвечены, завершаем тест
+            this.finishTest();
+        },
+
+        clearValidationError() {
+            this.validationError = "";
+        },
+
         nextQuestion() {
             if (
                 this.currentQuestionIndex <
                 this.selectedTest.questions.length - 1
             ) {
                 this.currentQuestionIndex++;
+                this.validationError = "";
                 this.initializeQuestion();
+
+                // Прокрутка к началу вопроса
+                this.$nextTick(() => {
+                    const questionElement =
+                        document.querySelector(".card.mb-4");
+                    if (questionElement) {
+                        questionElement.scrollIntoView({ behavior: "smooth" });
+                    }
+                });
             }
         },
 
         previousQuestion() {
             if (this.currentQuestionIndex > 0) {
                 this.currentQuestionIndex--;
+                this.validationError = "";
                 this.initializeQuestion();
+
+                // Прокрутка к началу вопроса
+                this.$nextTick(() => {
+                    const questionElement =
+                        document.querySelector(".card.mb-4");
+                    if (questionElement) {
+                        questionElement.scrollIntoView({ behavior: "smooth" });
+                    }
+                });
+            }
+        },
+
+        goToQuestion(index) {
+            if (index >= 0 && index < this.selectedTest.questions.length) {
+                this.currentQuestionIndex = index;
+                this.validationError = "";
+                this.initializeQuestion();
+
+                // Прокрутка к началу вопроса
+                this.$nextTick(() => {
+                    const questionElement =
+                        document.querySelector(".card.mb-4");
+                    if (questionElement) {
+                        questionElement.scrollIntoView({ behavior: "smooth" });
+                    }
+                });
             }
         },
 
@@ -676,6 +974,8 @@ export default {
                 this.tempUserName = "";
                 this.shuffledOptionsMap.clear();
                 this.shuffledPairsMap.clear();
+                this.answeredQuestions.clear();
+                this.validationError = "";
                 this.showToast(response.message, "success");
             });
         },
@@ -911,6 +1211,18 @@ export default {
     animation: pulse 1s infinite;
 }
 
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
 .copy-protection-warning {
     position: fixed;
     top: 20px;
@@ -932,5 +1244,72 @@ export default {
 .form-check:hover {
     background-color: #f8f9fa;
     border-color: #0d6efd;
+}
+
+/* Стили для валидации */
+.required-question {
+    border-left: 4px solid #dc3545 !important;
+}
+
+.answered-question {
+    border-left: 4px solid #28a745 !important;
+}
+
+/* Стили для маркеров вопросов */
+.progress-container {
+    position: relative;
+}
+
+.progress-markers {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+    pointer-events: none;
+}
+
+.question-marker {
+    position: absolute;
+    top: 0;
+    width: 8px;
+    height: 20px;
+    cursor: pointer;
+    z-index: 10;
+    pointer-events: auto;
+    transition: background-color 0.3s ease;
+}
+
+.question-marker.answered {
+    background-color: #28a745;
+}
+
+.question-marker.current {
+    background-color: #ffc107;
+    width: 10px;
+    height: 24px;
+    top: -2px;
+}
+
+.question-marker.unanswered {
+    background-color: #dc3545;
+}
+
+.question-marker:hover {
+    transform: scale(1.2);
+}
+
+/* Стили для навигации кнопок */
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    min-width: 120px;
+}
+
+.btn-success {
+    min-width: 150px;
 }
 </style>

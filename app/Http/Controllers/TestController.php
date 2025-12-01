@@ -3,15 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\Test;
+use App\Models\Tree;
 // use App\Models\Question;
 use Illuminate\Http\Request;
 // use Illuminate\Http\JsonResponse;
 
 class TestController extends Controller
 {
-    public function index()
+    // public function index()
+    // {
+    //     $tests = Test::with('questions')->get();
+    //     return response()->json(['data' => $tests]);
+    // }
+    public function testTree(Tree $tree_id)
     {
-        $tests = Test::with('questions')->get();
+        $tests = Test::with('questions')->where("tree_id", $tree_id->id)->get();
         return response()->json(['data' => $tests]);
     }
 
@@ -24,13 +30,15 @@ class TestController extends Controller
             'description' => 'nullable|string',
             'timeLimit' => 'required|integer|min:1',
             'settings' => 'nullable|array',
-            'grading' => 'nullable|array'
+            'grading' => 'nullable|array',
+            'tree_id' => 'required|exists:trees,id'
         ]);
 
         $test = Test::create([
             'title' => $validated['title'],
             'description' => $validated['description'],
             'timeLimit' => $validated['timeLimit'],
+            'tree_id' => $validated['tree_id'],
             'settings' => [
                 'allowDetailedResults' => true,
                 'requireUserName' => $request->input('settings.requireUserName', false),
@@ -138,11 +146,12 @@ class TestController extends Controller
         $testData = json_decode(file_get_contents($file->getPathname()), true);
 
         $test = Test::create([
-            'title' => $testData['title'] . ' (import)',
+            'title' => $testData['title'] . ' (импорт)',
             'description' => $testData['description'],
             'timeLimit' => $testData['timeLimit'],
             'settings' => $testData['settings'],
-            'grading' => $testData['grading']
+            'grading' => $testData['grading'],
+            'tree_id' => $request->tree_id,
         ]);
 
         foreach ($testData['questions'] as $questionData) {

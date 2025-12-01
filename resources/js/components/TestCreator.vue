@@ -36,7 +36,7 @@
                     @click="cancelEdit"
                     class="btn btn-outline-secondary"
                 >
-                    <i class="bi bi-arrow-left"></i> Назад к списку
+                    <i class="bi bi-arrow-left"></i> Назад
                 </button>
             </div>
         </div>
@@ -873,12 +873,6 @@
                     {{ isEditing ? "Обновить тест" : "Сохранить тест" }}
                 </button>
                 <button
-                    @click="resetTest"
-                    class="btn btn-outline-secondary btn-lg"
-                >
-                    <i class="bi bi-arrow-clockwise"></i> Сбросить
-                </button>
-                <button
                     v-if="isEditing"
                     @click="deleteTest"
                     class="btn btn-outline-danger btn-lg"
@@ -1069,7 +1063,12 @@ import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
 export default {
     name: "TestCreator",
     emits: ["error"],
-    props: ["editTestId", "datasend", "loadData", "showToast"],
+    props: [
+        "editTestId",
+        "datasend",
+        "showToast",
+        "changeCurrentView",
+    ],
     data() {
         return {
             test: {
@@ -1606,8 +1605,8 @@ export default {
 
                     this.datasend(`tests/${this.test.id}`, "PUT", this.test)
                         .then((response) => {
-                            this.loadData();
                             this.resetTest();
+                            this.changeCurrentView();
                             this.showToast(response.message, "success");
                         })
                         .catch((err) => {
@@ -1615,17 +1614,13 @@ export default {
                         });
                 } else {
                     const testToSend = { ...this.test };
+                    testToSend.tree_id = this.$route.params.id;
                     delete testToSend.id;
 
                     this.datasend(`tests`, "POST", testToSend)
                         .then((response) => {
-                            console.log("Тест создан:", response);
-                            // this.loadData(); // Раскомментируйте эту строку
-                            // this.resetTest();
-                            // this.showToast(response.message, "success");
-
-                            // this.loadData();
-                            // this.resetTest();
+                            this.resetTest();
+                            this.changeCurrentView();
                             this.showToast(response.message, "success");
                         })
                         .catch((err) => {
@@ -1645,7 +1640,10 @@ export default {
             }
         },
 
-        cancelEdit() {},
+        cancelEdit() {
+            this.resetTest();
+            this.changeCurrentView();
+        },
 
         deleteTest() {
             if (
@@ -1662,9 +1660,9 @@ export default {
                         "DELETE",
                         this.test
                     ).then((response) => {
-                        this.loadData();
                         this.resetTest();
                         this.showToast(response.message, "success");
+                        this.changeCurrentView();
                     });
                 } catch (error) {
                     this.error = error.message;

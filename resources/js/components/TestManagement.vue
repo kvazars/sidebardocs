@@ -14,12 +14,14 @@
             ></button>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="mb-0"><i class="bi bi-gear"></i> Управление тестами</h2>
+        <div
+            class="d-flex justify-content-between align-items-center mb-4 mt-2"
+            v-if="tests.length === 0"
+        >
             <div>
                 <button
                     @click="showImportModal"
-                    class="btn btn-success me-2"
+                    class="btn btn-success me-2 text-white"
                     :disabled="loading"
                 >
                     <i class="bi bi-upload"></i> Импорт теста
@@ -56,7 +58,7 @@
             <div
                 v-for="test in tests"
                 :key="test.id"
-                class="col-md-6 col-lg-4 mb-4"
+                class="col-md-12 col-lg-12 mt-4"
             >
                 <div class="test-management-card card h-100">
                     <div
@@ -168,34 +170,6 @@
             </div>
         </div>
 
-        <!-- Статистика -->
-        <div v-if="tests.length > 0" class="card mt-4">
-            <div class="card-header bg-light">
-                <h6 class="mb-0">Общая статистика</h6>
-            </div>
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-md-3">
-                        <h4 class="text-primary">{{ tests.length }}</h4>
-                        <small class="text-muted">Всего тестов</small>
-                    </div>
-                    <div class="col-md-3">
-                        <h4 class="text-success">{{ totalQuestions }}</h4>
-                        <small class="text-muted">Всего вопросов</small>
-                    </div>
-                    <div class="col-md-3">
-                        <h4 class="text-info">{{ totalPoints }}</h4>
-                        <small class="text-muted">Всего баллов</small>
-                    </div>
-                    <div class="col-md-3">
-                        <h4 class="text-warning">{{ averageQuestions }}</h4>
-                        <small class="text-muted">Вопросов в среднем</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Модальное окно импорта -->
         <div class="modal fade" id="importModal" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -333,9 +307,10 @@
 
 <script>
 import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
+
 export default {
     name: "TestManagement",
-    props: ["tests", "datasend", "loadData", "showToast"],
+    props: ["datasend", "showToast", "changeCurrentView"],
 
     emits: ["error"],
     data() {
@@ -346,7 +321,11 @@ export default {
             loading: false,
             actionLoading: false,
             error: "",
+            tests: [],
         };
+    },
+    mounted() {
+        this.getTests();
     },
     computed: {
         totalQuestions() {
@@ -368,7 +347,16 @@ export default {
         },
     },
     methods: {
-        editTest(testId) {},
+        getTests() {
+            this.datasend(`tests/${this.$route.params.id}/get`, "GET").then(
+                (response) => {
+                    this.tests = response.data;
+                }
+            );
+        },
+        editTest(testId) {
+            this.changeCurrentView("creator", testId);
+        },
 
         async confirmDelete(test) {
             if (
@@ -381,7 +369,7 @@ export default {
 
                 this.datasend(`tests/${test.id}`, "DELETE", this.test).then(
                     (response) => {
-                        this.loadData();
+                        this.getTests();
                         this.showToast(response.message, "success");
                     }
                 );
@@ -544,11 +532,12 @@ export default {
             try {
                 let formData = new FormData();
                 formData.append("file", this.selectedFile);
+                formData.append("tree_id", this.$route.params.id);
 
                 this.datasend("tests/import", "POST", formData, true).then(
                     (response) => {
                         this.showToast(response.message, "success");
-                        this.loadData();
+                        this.getTests();
                         const modalElement =
                             document.getElementById("importModal");
                         if (modalElement) {

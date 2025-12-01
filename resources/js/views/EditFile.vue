@@ -1,3 +1,155 @@
+<template>
+    <div v-if="user">
+        <CNav variant="tabs">
+            <CNavItem>
+                <CNavLink
+                    href="javascript:void(0);"
+                    :active="tabPaneActiveKey == 1"
+                    @click="
+                        () => {
+                            tabPaneActiveKey = 1;
+                        }
+                    "
+                >
+                    <i class="bi bi-archive"></i> Ресурс
+                </CNavLink>
+            </CNavItem>
+            <CNavItem v-if="!this.$route.params.parent">
+                <CNavLink
+                    href="javascript:void(0);"
+                    :active="tabPaneActiveKey == 2"
+                    @click="
+                        () => {
+                            tabPaneActiveKey = 2;
+                        }
+                    "
+                    ><i class="bi bi-gear"></i> Управление тестами</CNavLink
+                >
+            </CNavItem>
+        </CNav>
+        <CTabContent>
+            <CTabPane
+                role="tabpanel"
+                aria-labelledby="home-tab"
+                :visible="tabPaneActiveKey == 1"
+            >
+                <CCard v-if="datasend" class="my-4">
+                    <CCardHeader>Информация</CCardHeader>
+                    <CCardBody>
+                        <CFormInput
+                            type="text"
+                            id="exampleFormControlInput1"
+                            label="Название документа"
+                            placeholder="Введите название документа"
+                            v-model="name"
+                        />
+                        <CAccordion class="mt-4">
+                            <CAccordionItem :item-key="1">
+                                <CAccordionHeader>
+                                    Доступность документа
+                                </CAccordionHeader>
+                                <CAccordionBody>
+                                    <div class="w-100 d-flex flex-column gap-3">
+                                        <div
+                                            class="d-flex gap-3 align-items-center"
+                                        >
+                                            <div>
+                                                <CFormSwitch
+                                                    v-model="
+                                                        accessibilitymanagers
+                                                    "
+                                                    label="Доступно для всех менеджеров"
+                                                    id="accessibilitymanagers_for"
+                                                />
+                                            </div>
+                                            <div>
+                                                <CFormSwitch
+                                                    v-model="accessibility"
+                                                    label="Доступно всем авторизованным"
+                                                    id="accessibility_for"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div
+                                            v-if="!accessibility"
+                                            class="row w-100 px-2"
+                                        >
+                                            <div
+                                                class="col-lg-3"
+                                                v-for="(
+                                                    item, key
+                                                ) in groupAvailables"
+                                                :key="key"
+                                            >
+                                                <div
+                                                    class="d-flex form-check gap-2"
+                                                    v-for="(gr, index) in item"
+                                                    :key="index"
+                                                >
+                                                    <input
+                                                        class="form-check-input"
+                                                        type="checkbox"
+                                                        :value="
+                                                            'group_' + gr.id
+                                                        "
+                                                        :id="'group_' + gr.id"
+                                                        v-model="gr.checked"
+                                                    />
+                                                    <label
+                                                        style="
+                                                            user-select: none;
+                                                        "
+                                                        class="form-check-label"
+                                                        :for="'group_' + gr.id"
+                                                    >
+                                                        {{ gr.name }}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </CAccordionBody>
+                            </CAccordionItem>
+                        </CAccordion>
+                    </CCardBody>
+                </CCard>
+                <CCard>
+                    <CCardHeader>Содержимое</CCardHeader>
+                    <CCardBody class="p-1">
+                        <div id="editorjs"></div>
+                    </CCardBody>
+                </CCard>
+            </CTabPane>
+            <CTabPane
+                role="tabpanel"
+                aria-labelledby="profile-tab"
+                :visible="tabPaneActiveKey == 2"
+            >
+                <TestManagement
+                    :datasend="datasend"
+                    :showToast="showToast"
+                    :changeCurrentView="changeCurrentView"
+                    v-if="currentView == 'management'"
+                />
+
+                <TestCreator
+                    v-if="currentView == 'creator'"
+                    :editTestId="editTestId"
+                    :changeCurrentView="changeCurrentView"
+                    :datasend="datasend"
+                    :showToast="showToast"
+                />
+            </CTabPane>
+            <CTabPane
+                role="tabpanel"
+                aria-labelledby="contact-tab"
+                :visible="tabPaneActiveKey == 3"
+            >
+                Результаты
+            </CTabPane>
+        </CTabContent>
+    </div>
+</template>
 <script>
 import EditorJS from "@editorjs/editorjs";
 import Header from "@editorjs/header";
@@ -27,7 +179,8 @@ import Alert from "editorjs-alert";
 import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthIdStore } from "../stores/authId";
-
+import TestManagement from "../components/TestManagement.vue";
+import TestCreator from "../components/TestCreator.vue";
 export default {
     setup() {
         const postId = computed(() => route.params.id);
@@ -35,6 +188,11 @@ export default {
             postId,
         };
     },
+    components: {
+        TestManagement,
+        TestCreator,
+    },
+
     props: [
         "datasend",
         "server",
@@ -89,6 +247,7 @@ export default {
                         this.dataBlock = JSON.parse(res.content.data);
                         this.setContent(res.content);
                         this.createEditor();
+         
                     })
                     .catch((error) => {
                         console.log(error);
@@ -130,9 +289,16 @@ export default {
             groupAvailables: {},
             editor: null,
             visibleGroups: false,
+            tabPaneActiveKey: 1,
+            currentView: "management",
+            editTestId: null,
         };
     },
     methods: {
+        changeCurrentView(view = "management", id = null) {
+            this.currentView = view;
+            this.editTestId = id;
+        },
         save() {
             this.editor
                 .save()
@@ -526,84 +692,3 @@ const aceConfig = {
     },
 };
 </script>
-
-<template>
-    <div v-if="user">
-        <CCard v-if="datasend" class="my-4">
-            <CCardHeader>Информация</CCardHeader>
-            <CCardBody>
-                <CFormInput
-                    type="text"
-                    id="exampleFormControlInput1"
-                    label="Название документа"
-                    placeholder="Введите название документа"
-                    v-model="name"
-                />
-                <CAccordion class="mt-4">
-                    <CAccordionItem :item-key="1">
-                        <CAccordionHeader>
-                            Доступность документа
-                        </CAccordionHeader>
-                        <CAccordionBody>
-                            <div class="w-100 d-flex flex-column gap-3">
-                                <div class="d-flex gap-3 align-items-center">
-                                    <div>
-                                        <CFormSwitch
-                                            v-model="accessibilitymanagers"
-                                            label="Доступно для всех менеджеров"
-                                            id="accessibilitymanagers_for"
-                                        />
-                                    </div>
-                                    <div>
-                                        <CFormSwitch
-                                            v-model="accessibility"
-                                            label="Доступно всем авторизованным"
-                                            id="accessibility_for"
-                                        />
-                                    </div>
-                                </div>
-                                <div
-                                    v-if="!accessibility"
-                                    class="row w-100 px-2"
-                                >
-                                    <div
-                                        class="col-lg-3"
-                                        v-for="(item, key) in groupAvailables"
-                                        :key="key"
-                                    >
-                                        <div
-                                            class="d-flex form-check gap-2"
-                                            v-for="(gr, index) in item"
-                                            :key="index"
-                                        >
-                                            <input
-                                                class="form-check-input"
-                                                type="checkbox"
-                                                :value="'group_' + gr.id"
-                                                :id="'group_' + gr.id"
-                                                v-model="gr.checked"
-                                            />
-                                            <label
-                                                style="user-select: none"
-                                                class="form-check-label"
-                                                :for="'group_' + gr.id"
-                                            >
-                                                {{ gr.name }}
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </CAccordionBody>
-                    </CAccordionItem>
-                </CAccordion>
-            </CCardBody>
-        </CCard>
-        <CCard>
-            <CCardHeader>Содержимое</CCardHeader>
-            <CCardBody class="p-1">
-                <div id="editorjs"></div>
-            </CCardBody>
-        </CCard>
-    </div>
-</template>

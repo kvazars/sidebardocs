@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('tests', function (Blueprint $table) {
             $table->id();
             $table->string('title');
+            $table->foreignId('tree_id')->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->text('description')->nullable();
             $table->integer('timeLimit')->default(30);
             $table->json('settings')->nullable();

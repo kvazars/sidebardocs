@@ -71,6 +71,7 @@
                             :server="server"
                             :dashboard="dashboard"
                             :about="about"
+                            :showToast="showToast"
                         />
                     </template>
                     <EditFile
@@ -100,101 +101,6 @@
             :catchError="catchError"
             :getMenu="getMenu"
         />
-
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-            <div class="container">
-                <a class="navbar-brand fw-bold" href="#">
-                    <i class="bi bi-clipboard-check"></i> Система тестов
-                </a>
-                <button
-                    class="navbar-toggler"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navbarNav"
-                >
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a
-                                class="nav-link"
-                                :class="{ active: currentView === 'creator' }"
-                                @click="switchToCreator()"
-                                href="#"
-                            >
-                                Создание тестов
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a
-                                class="nav-link"
-                                :class="{ active: currentView === 'runner' }"
-                                @click="currentView = 'runner'"
-                                href="#"
-                            >
-                                Прохождение тестов
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a
-                                class="nav-link"
-                                :class="{ active: currentView === 'results' }"
-                                @click="currentView = 'results'"
-                                href="#"
-                            >
-                                Результаты
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a
-                                class="nav-link"
-                                :class="{
-                                    active: currentView === 'management',
-                                }"
-                                @click="currentView = 'management'"
-                                href="#"
-                            >
-                                Управление тестами
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-        <main class="container my-4">
-            <TestCreator
-                v-if="currentView === 'creator'"
-                :edit-test-id="editingTestId"
-                :loadData="loadData"
-                :datasend="datasend"
-                :showToast="showToast"
-            />
-
-            <TestManagement
-                v-else-if="currentView === 'management'"
-                :tests="tests"
-                :datasend="datasend"
-                :loadData="loadData"
-                :showToast="showToast"
-            />
-
-            <TestRunner
-                v-else-if="currentView === 'runner'"
-                :tests="tests"
-                :datasend="datasend"
-                :loadData="loadData"
-                :showToast="showToast"
-            />
-
-            <TestResults
-                v-else
-                :results="results"
-                :datasend="datasend"
-                :showToast="showToast"
-            />
-        </main>
-        <AntiCopyProtection />
     </div>
 </template>
 
@@ -209,11 +115,6 @@ import ShowFile from "../views/ShowFile.vue";
 import EditFile from "../views/EditFile.vue";
 import Page500 from "../views/pages/Page500.vue";
 import AppBreadcrumb from "../components/AppBreadcrumb.vue";
-import TestCreator from "../components/TestCreator.vue";
-import TestManagement from "../components/TestManagement.vue";
-import TestRunner from "../components/TestRunner.vue";
-import TestResults from "../components/TestResults.vue";
-import AntiCopyProtection from "../components/AntiCopyProtection.vue";
 
 export default {
     components: {
@@ -225,11 +126,6 @@ export default {
         ShowFile,
         EditFile,
         AppBreadcrumb,
-        TestManagement,
-        TestCreator,
-        TestRunner,
-        TestResults,
-        AntiCopyProtection,
     },
 
     data() {
@@ -245,17 +141,10 @@ export default {
             page500: false,
             content: null,
             breadcrumbs: ["Документы"],
-            currentView: "management",
-            tests: [],
-            results: [],
-            editingTestId: null,
-            loading: false,
-            error: "",
         };
     },
     mounted() {
         this.getMenu();
-        this.loadData();
     },
     watch: {
         $route() {
@@ -263,36 +152,6 @@ export default {
         },
     },
     methods: {
-        switchToCreator(testId = null) {
-            this.editingTestId = testId;
-            this.currentView = "creator";
-        },
-
-        // handleEditTest(testId) {
-        //     this.switchToCreator(testId);
-        // },
-
-        // handleEditCancelled() {
-        //     this.currentView = "management";
-        //     this.editingTestId = null;
-        // },
-
-        handleError(errorMessage) {
-            this.error = errorMessage;
-        },
-
-        loadData() {
-            this.loading = true;
-            this.error = "";
-            this.datasend("tests", "GET").then((response) => {
-                this.tests = response.data;
-            });
-
-            this.datasend("results", "GET").then((response) => {
-                this.results = response.data;
-            });
-        },
-
         showToast(message, type = "info") {
             const toast = document.createElement("div");
             toast.className = `alert alert-${type} alert-dismissible fade show`;
@@ -371,7 +230,9 @@ export default {
         catchError(error) {
             for (let index = 0; index < Object.keys(error).length; index++) {
                 Object.values(error)[index].forEach((element) => {
-                    this.showToast(false, element);
+                    // this.showToast(false, element);
+                    this.showToast(element, "danger");
+                    // message, type = "info"
                 });
             }
         },

@@ -2,17 +2,28 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Test;
 use App\Models\TestResult;
+use App\Models\Tree;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class TestResultController extends Controller
 {
-    public function index(): JsonResponse
+    // public function index(): JsonResponse
+    // {
+    //     $results = TestResult::with('test')->get();
+    //     return response()->json(['data' => $results]);
+    // }
+    public function resultTree(Tree $tree_id): JsonResponse
     {
-        $results = TestResult::with('test')->get();
+        $test = Test::where("tree_id", $tree_id->id)->first();
+
+        $results = TestResult::with('test', 'user')->where("test_id", $test->id)->get();
         return response()->json(['data' => $results]);
     }
+
 
     public function store(Request $request): JsonResponse
     {
@@ -28,7 +39,7 @@ class TestResultController extends Controller
             'question_results' => 'nullable|array'
         ]);
 
-        TestResult::create($validated);
+        TestResult::create(["user_id" => Auth::id()] + $validated);
 
 
         return response()->json(['message' => 'Спасибо за прохождение теста!']);

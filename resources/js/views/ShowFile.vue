@@ -6,6 +6,13 @@
                 <strong>Доступно группам: </strong>{{ groups }}
             </div>
 
+            <TestResults
+                :results="results"
+                :datasend="datasend"
+                :showToast="showToast"
+                :getResult="getResult"
+                v-if="my && results.length > 0"
+            />
             <hr />
 
             <div v-for="val in fileData" :key="val">
@@ -273,7 +280,14 @@
                     </figure>
                 </div>
             </div>
+            <TestRunner
+                :tests="tests"
+                :datasend="datasend"
+                :showToast="showToast"
+            />
         </div>
+
+        <AntiCopyProtection />
     </div>
 </template>
 
@@ -285,6 +299,9 @@ import PdfShow from "../components/PdfShow.vue";
 import DocxShow from "../components/DocxShow.vue";
 import ExcelShow from "../components/ExcelShow.vue";
 import IFrameShow from "../components/IFrameShow.vue";
+import TestRunner from "../components/TestRunner.vue";
+import TestResults from "../components/TestResults.vue";
+import AntiCopyProtection from "../components/AntiCopyProtection.vue";
 
 export default {
     components: {
@@ -294,6 +311,9 @@ export default {
         DocxShow,
         ExcelShow,
         IFrameShow,
+        TestRunner,
+        TestResults,
+        AntiCopyProtection,
     },
     props: [
         "id",
@@ -315,6 +335,9 @@ export default {
             indexRef: {},
             imgs: {},
             groups: null,
+            tests: [],
+            results: [],
+            my: false,
         };
     },
 
@@ -336,6 +359,14 @@ export default {
                             });
                         }, 2000);
                     } else {
+                        if (
+                            this.auths.id == res.content.tree.user_id ||
+                            this.auths.role == "admin"
+                        ) {
+                            this.my = true;
+                            this.getResult();
+                        }
+
                         this.pagetitle = res.name;
                         this.parseDoc(res.content);
                         this.setContent(res.content);
@@ -348,6 +379,7 @@ export default {
                             this.groups = "всем";
                         }
                     }
+                    this.getTests();
                 })
                 .catch();
         } else {
@@ -356,6 +388,20 @@ export default {
         }
     },
     methods: {
+        getResult() {
+            this.datasend(`results/${this.$route.params.id}/get`, "GET").then(
+                (response) => {
+                    this.results = response.data;
+                }
+            );
+        },
+        getTests() {
+            this.datasend(`tests/${this.$route.params.id}/get`, "GET").then(
+                (response) => {
+                    this.tests = response.data;
+                }
+            );
+        },
         showImg(ref, index) {
             this.indexRef[ref] = index;
             this.visibleRef[ref] = true;

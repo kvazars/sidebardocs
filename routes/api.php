@@ -18,24 +18,29 @@ Route::get("/homepage", [TreeController::class, "index"]);
 
 
 
-// Route::apiResource('tests', TestController::class);
-
-Route::post('tests/import', [TestController::class, 'import']);
-Route::get('tests/{test}/export', [TestController::class, 'export']);
-Route::get('tests/{test}/results', [TestController::class, 'results']);
-Route::apiResources([
-    'tests' => TestController::class,
-    'results' => TestResultController::class,
-]);
-
-// Route::delete('/results', [TestResultController::class, 'clear']);
-// Route::apiResource('results', TestResultController::class);
-
-Route::get('tests/{testId}/results', [TestResultController::class, 'testResults']);
-// Route::delete('/test-results/{result}', [TestResultController::class, 'destroy']);
 
 
 Route::middleware(['auth:sanctum'])->group(function () {
+
+    // Route::apiResource('tests', TestController::class);
+
+    Route::post('tests/import', [TestController::class, 'import']);
+    Route::get('tests/{test}/export', [TestController::class, 'export']);
+    Route::get('tests/{test}/results', [TestController::class, 'results']);
+    Route::apiResources([
+        'tests' => TestController::class,
+        'results' => TestResultController::class,
+    ]);
+
+    // Route::delete('/results', [TestResultController::class, 'clear']);
+    // Route::apiResource('results', TestResultController::class);
+
+    Route::get('tests/{testId}/results', [TestResultController::class, 'testResults']);
+    Route::get('tests/{tree_id}/get', [TestController::class, 'testTree']);
+    Route::get('results/{tree_id}/get', [TestResultController::class, 'resultTree']);
+    // Route::delete('/test-results/{result}', [TestResultController::class, 'destroy']);
+
+
     //admin,ceo,user
     Route::get("/userFolder", [TreeController::class, "userFolder"]);
     Route::get('/logout', [UserController::class, 'logout']);

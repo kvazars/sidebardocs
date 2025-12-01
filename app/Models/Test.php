@@ -15,6 +15,7 @@ class Test extends Model
         'description',
         'timeLimit',
         'settings',
+        'tree_id',
         'grading'
     ];
 
