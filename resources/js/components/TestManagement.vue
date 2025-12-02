@@ -585,7 +585,7 @@
                                 <span v-if="importFormat === 'xml'">
                                     Выберите файл теста в формате Moodle XML
                                     (поддерживаются вопросы: multichoice,
-                                    matching, shortanswer, essay, truefalse)
+                                    matching, text, essay, truefalse)
                                 </span>
                             </div>
                         </div>
@@ -982,8 +982,8 @@ export default {
 
                 /*
                 const url = URL.createObjectURL( blob ?? new Blob([]) );
-                
-                const link = document.createElement("a"); 
+
+                const link = document.createElement("a");
                 link.href = url;
                 link.download = `test-${
                     this.currentExportTest.title || "export"
@@ -1153,6 +1153,8 @@ export default {
                                 type,
                                 i
                             );
+                            console.log(question);
+
                             if (question) {
                                 questions.push(question);
                             }
@@ -1210,7 +1212,15 @@ export default {
             const questionText =
                 this.extractTextWithImages(questionTextElement);
             const questionName = nameElement
-                ? this.extractText(this.getChildElement(nameElement, "text"))
+                ? this.stripTags(
+                      this.extractText(
+                          this.getChildElement(nameElement, "text")
+                      ),
+                      ["p", "b"],
+                      {
+                          keepContent: true,
+                      }
+                  )
                 : `Вопрос ${index + 1}`;
 
             // Баллы по умолчанию
@@ -1288,7 +1298,9 @@ export default {
 
                 answers.push({
                     id: i + 1,
-                    text: answerText,
+                    text: this.stripTags(answerText, ["p", "b"], {
+                        keepContent: true,
+                    }),
                     correct: isCorrect,
                     points: isCorrect ? points : 0,
                 });
@@ -1306,7 +1318,9 @@ export default {
             return {
                 id: this.generateId(),
                 type: isSingleChoice ? "single" : "multiple",
-                text: text,
+                text: this.stripTags(text, ["p", "b"], {
+                    keepContent: true,
+                }),
                 points: points,
                 answers: answers,
                 explanation: "",
@@ -1314,6 +1328,54 @@ export default {
                     shuffleAnswers: shuffleAnswers,
                 },
             };
+        },
+
+        stripTags(str, tags, options = {}) {
+            const {
+                keepContent = false,
+                selfClosing = true,
+                removeCData = true,
+                keepCDataContent = true,
+            } = options;
+
+            const tagList = Array.isArray(tags) ? tags : [tags];
+            let result = str;
+
+            // Обработка CDATA (если включена опция)
+            if (removeCData) {
+                if (keepCDataContent) {
+                    // Удаляем только теги CDATA, оставляя содержимое
+                    result = result.replace(/<!\[CDATA\[(.*?)\]\]>/gis, "$1");
+                } else {
+                    // Удаляем CDATA полностью с содержимым
+                    result = result.replace(/<!\[CDATA\[.*?\]\]>/gis, "");
+                }
+            }
+
+            // Обработка тегов
+            tagList.forEach((tag) => {
+                // Регулярное выражение для парных тегов
+                let regex;
+
+                if (keepContent) {
+                    // Удаляем только теги, оставляя содержимое
+                    regex = new RegExp(`</?${tag}[^>]*>`, "gsi");
+                } else {
+                    // Удаляем теги вместе с содержимым
+                    if (selfClosing) {
+                        regex = new RegExp(
+                            `<${tag}[^>]*?(?:>.*?</${tag}>|/?>)`,
+                            "gsi"
+                        );
+                    } else {
+                        regex = new RegExp(`<${tag}[^>]*>.*?</${tag}>`, "gsi");
+                    }
+                }
+
+                result = result.replace(regex, keepContent ? "" : "");
+            });
+
+            return result;
         },
 
         parseMatchingQuestion(qElement, name, text, points) {
@@ -1329,8 +1391,12 @@ export default {
                     const answerText =
                         this.extractTextWithImages(answerElement);
                     pairs.push({
-                        question: questionText,
-                        answer: answerText,
+                        left: this.stripTags(questionText, ["p", "b"], {
+                            keepContent: true,
+                        }),
+                        right: this.stripTags(answerText, ["p", "b"], {
+                            keepContent: true,
+                        }),
                     });
                 }
             }
@@ -1351,6 +1417,7 @@ export default {
 
             for (let i = 0; i < answerElements.length; i++) {
                 const answerText = this.extractText(answerElements[i]);
+
                 if (answerText && answerText.trim()) {
                     correctAnswers.push(answerText.trim());
                 }
@@ -1358,10 +1425,11 @@ export default {
 
             return {
                 id: this.generateId(),
-                type: "short",
+                type: "text",
                 text: text,
                 points: points,
-                correctAnswer: correctAnswers.join("; "),
+                correctAnswer: JSON.stringify(correctAnswers),
+                correct_answers: (correctAnswers),
                 explanation: "",
             };
         },
@@ -1369,7 +1437,7 @@ export default {
         parseEssayQuestion(qElement, name, text, points) {
             return {
                 id: this.generateId(),
-                type: "essay",
+                type: "text",
                 text: text,
                 points: points,
                 explanation: "",
@@ -1422,7 +1490,7 @@ export default {
             return {
                 id: this.generateId(),
                 type: "essay",
-                text: `${text}<br><small><i>Тип вопроса Moodle: ${originalType}</i></small>`,
+                text: `${text}`,
                 points: points,
                 explanation: "",
             };
@@ -1442,10 +1510,12 @@ export default {
             let text = textElement.textContent || textElement.innerHTML || "";
 
             // Очищаем HTML теги, но сохраняем переносы строк
-            text = text.replace(/<br\s*\/?>/gi, "\n");
-            text = text.replace(/<\/?[^>]+(>|$)/g, "");
+            text = text.replace(/<br\s*\/?>/gi, " ");
+            text = text.replace(/<\/?[^>]+(>|$)/g, " ");
 
-            return text.trim();
+            return this.stripTags(text.trim(), ["p", "b"], {
+                keepContent: true,
+            });
         },
 
         extractTextWithImages(element) {
@@ -1463,7 +1533,9 @@ export default {
             // Обрабатываем изображения в формате base64
             html = this.processImagesInHtml(html);
 
-            return html;
+            return this.stripTags(html, ["p", "b"], {
+                keepContent: true,
+            });
         },
 
         processImagesInHtml(html) {
@@ -1491,7 +1563,7 @@ export default {
                 single: "Один ответ",
                 multiple: "Несколько ответов",
                 matching: "Сопоставление",
-                short: "Короткий ответ",
+                text: "Короткий ответ",
                 essay: "Развернутый ответ",
             };
 
@@ -1581,7 +1653,7 @@ export default {
                         }
                         break;
 
-                    case "short":
+                    case "text":
                         if (
                             !question.correctAnswer ||
                             question.correctAnswer.trim() === ""
@@ -1664,6 +1736,7 @@ export default {
                 formData.append("file", this.selectedFile);
                 formData.append("tree_id", this.$route.params.id);
                 formData.append("format", this.importFormat);
+
 
                 // Для XML добавляем распарсенные данные
                 if (this.importFormat === "xml") {

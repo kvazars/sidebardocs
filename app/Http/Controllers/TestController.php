@@ -150,7 +150,7 @@ class TestController extends Controller
             $testData = json_decode(file_get_contents($file->getPathname()), true);
         } elseif ($format === 'xml') {
             if ($request->has('xml_data')) {
-                $testData = json_decode($request->input('xml_data'), true);
+                $testData = ["grading" => json_decode($request->grading)] + json_decode($request->input('xml_data'), true);
 
                 if (json_last_error() !== JSON_ERROR_NONE) {
                     throw new \Exception('Ошибка декодирования XML данных');

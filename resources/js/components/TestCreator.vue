@@ -1106,9 +1106,8 @@ export default {
         },
         hasQuestionsWithImages() {
             return this.test.questions.some(
-                (question) =>
-                    question.options &&
-                    question.options.some((option) => option.image)
+                (question) => question.options /*&&
+                    question.options.some((option) => option.image)*/
             );
         },
     },
@@ -1259,8 +1258,8 @@ export default {
                 case "single":
                 case "multiple":
                     newQuestion.options = [
-                        { text: "", correct: false, image: null },
-                        { text: "", correct: false, image: null },
+                        { text: "", correct: false },
+                        { text: "", correct: false },
                     ];
                     break;
                 case "true-false":
@@ -1304,8 +1303,8 @@ export default {
                 points: 1,
                 image: null,
                 options: [
-                    { text: "", correct: false, image: null },
-                    { text: "", correct: false, image: null },
+                    { text: "", correct: false },
+                    { text: "", correct: false },
                 ],
             };
 
@@ -1322,7 +1321,6 @@ export default {
             this.test.questions[qIndex].options.push({
                 text: "",
                 correct: false,
-                image: null,
             });
         },
 
@@ -1410,7 +1408,7 @@ export default {
         },
 
         removeOptionImage(qIndex, oIndex) {
-            this.test.questions[qIndex].options[oIndex].image = null;
+            //this.test.questions[qIndex].options[oIndex].image = null;
         },
 
         removeLeftImage(qIndex, pIndex) {
@@ -1480,13 +1478,13 @@ export default {
             const images = new Set();
 
             this.test.questions.forEach((question) => {
-                if (question.image) images.add(question.image);
+                // if (question.image) images.add(question.image);
 
-                if (question.options) {
-                    question.options.forEach((option) => {
-                        if (option.image) images.add(option.image);
-                    });
-                }
+                // if (question.options) {
+                //     question.options.forEach((option) => {
+                //         if (option.image) images.add(option.image);
+                //     });
+                // }
 
                 if (question.pairs) {
                     question.pairs.forEach((pair) => {
@@ -1871,9 +1869,9 @@ export default {
                         if (option.correct === undefined) {
                             option.correct = false;
                         }
-                        if (option.image === undefined) {
-                            option.image = null;
-                        }
+                        // if (option.image === undefined) {
+                        //     option.image = null;
+                        // }
                     });
                 }
             });
