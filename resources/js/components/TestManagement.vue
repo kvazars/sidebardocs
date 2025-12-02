@@ -1181,8 +1181,8 @@ export default {
 
                     const testData = {
                         title: cleanName || "Импортированный тест",
-                        description: `Импортировано из Moodle XML файла: ${fileName}`,
-                        timeLimit: 60, // Значение по умолчанию
+                        description: fileName,
+                        timeLimit: 30, // Значение по умолчанию
                         questions: questions,
                         settings: {
                             requireUserName: true,
@@ -1209,8 +1209,10 @@ export default {
                 throw new Error("Отсутствует текст вопроса");
             }
 
-            const questionText =
-                this.extractTextWithImages(questionTextElement);
+            const questionText = this.extractText(questionTextElement);
+            const questionImage = this.extractImage(questionTextElement);
+            // console.log(questionImage);
+
             const questionName = nameElement
                 ? this.stripTags(
                       this.extractText(
@@ -1239,35 +1241,40 @@ export default {
                         qElement,
                         questionName,
                         questionText,
-                        points
+                        points,
+                        questionImage
                     );
                 case "matching":
                     return this.parseMatchingQuestion(
                         qElement,
                         questionName,
                         questionText,
-                        points
+                        points,
+                        questionImage
                     );
                 case "shortanswer":
                     return this.parseShortanswerQuestion(
                         qElement,
                         questionName,
                         questionText,
-                        points
+                        points,
+                        questionImage
                     );
                 case "essay":
                     return this.parseEssayQuestion(
                         qElement,
                         questionName,
                         questionText,
-                        points
+                        points,
+                        questionImage
                     );
                 case "truefalse":
                     return this.parseTruefalseQuestion(
                         qElement,
                         questionName,
                         questionText,
-                        points
+                        points,
+                        questionImage
                     );
                 default:
                     console.warn(`Неподдерживаемый тип вопроса: ${type}`);
@@ -1276,19 +1283,21 @@ export default {
                         questionName,
                         questionText,
                         points,
-                        type
+                        type,
+                        questionImage
                     );
             }
         },
 
-        parseMultichoiceQuestion(qElement, name, text, points) {
+        parseMultichoiceQuestion(qElement, name, text, points, image) {
             const answerElements = qElement.getElementsByTagName("answer");
             const answers = [];
             let correctAnswersCount = 0;
-
             for (let i = 0; i < answerElements.length; i++) {
                 const answerElement = answerElements[i];
-                const answerText = this.extractTextWithImages(answerElement);
+                const answerText = this.extractText(answerElement);
+                const answerImage = this.extractImage(answerElement);
+                //!!!
                 const fraction = parseFloat(
                     answerElement.getAttribute("fraction") || "0"
                 );
@@ -1302,6 +1311,7 @@ export default {
                         keepContent: true,
                     }),
                     correct: isCorrect,
+                    image: answerImage,
                     points: isCorrect ? points : 0,
                 });
             }
@@ -1321,8 +1331,9 @@ export default {
                 text: this.stripTags(text, ["p", "b"], {
                     keepContent: true,
                 }),
+                image: image,
                 points: points,
-                answers: answers,
+                options: answers,
                 explanation: "",
                 settings: {
                     shuffleAnswers: shuffleAnswers,
@@ -1378,18 +1389,22 @@ export default {
             return result;
         },
 
-        parseMatchingQuestion(qElement, name, text, points) {
+        parseMatchingQuestion(qElement, name, text, points, image) {
             const subQuestions = qElement.getElementsByTagName("subquestion");
             const pairs = [];
 
             for (let i = 0; i < subQuestions.length; i++) {
                 const subQ = subQuestions[i];
-                const questionText = this.extractTextWithImages(subQ);
+                const questionText = this.extractText(subQ);
+                const leftImage = this.extractImage(subQ);
                 const answerElement = subQ.getElementsByTagName("answer")[0];
+                const rightImage = this.extractImage(
+                    subQ.getElementsByTagName("answer")[0]
+                );
 
                 if (answerElement) {
-                    const answerText =
-                        this.extractTextWithImages(answerElement);
+                    const answerText = this.extractText(answerElement);
+                    // const answerImage = this.extractImage(answerElement);
                     pairs.push({
                         left: this.stripTags(questionText, ["p", "b"], {
                             keepContent: true,
@@ -1397,6 +1412,8 @@ export default {
                         right: this.stripTags(answerText, ["p", "b"], {
                             keepContent: true,
                         }),
+                        leftImage: leftImage,
+                        rightImage: rightImage,
                     });
                 }
             }
@@ -1406,12 +1423,13 @@ export default {
                 type: "matching",
                 text: text,
                 points: points,
+                image: image,
                 pairs: pairs,
                 explanation: "",
             };
         },
 
-        parseShortanswerQuestion(qElement, name, text, points) {
+        parseShortanswerQuestion(qElement, name, text, points, image) {
             const answerElements = qElement.getElementsByTagName("answer");
             const correctAnswers = [];
 
@@ -1427,24 +1445,26 @@ export default {
                 id: this.generateId(),
                 type: "text",
                 text: text,
+                image: image,
                 points: points,
                 correctAnswer: JSON.stringify(correctAnswers),
-                correct_answers: (correctAnswers),
+                correct_answers: correctAnswers,
                 explanation: "",
             };
         },
 
-        parseEssayQuestion(qElement, name, text, points) {
+        parseEssayQuestion(qElement, name, text, points, image) {
             return {
                 id: this.generateId(),
                 type: "text",
+                image: image,
                 text: text,
                 points: points,
                 explanation: "",
             };
         },
 
-        parseTruefalseQuestion(qElement, name, text, points) {
+        parseTruefalseQuestion(qElement, name, text, points, image) {
             const answerElements = qElement.getElementsByTagName("answer");
             let correctAnswer = null;
 
@@ -1466,6 +1486,7 @@ export default {
                 id: this.generateId(),
                 type: "single",
                 text: text,
+                image: image,
                 points: points,
                 answers: [
                     {
@@ -1485,11 +1506,19 @@ export default {
             };
         },
 
-        parseFallbackQuestion(qElement, name, text, points, originalType) {
+        parseFallbackQuestion(
+            qElement,
+            name,
+            text,
+            points,
+            originalType,
+            image
+        ) {
             // Fallback для неподдерживаемых типов - преобразуем в текстовый вопрос
             return {
                 id: this.generateId(),
-                type: "essay",
+                type: "text",
+                image: image,
                 text: `${text}`,
                 points: points,
                 explanation: "",
@@ -1502,23 +1531,18 @@ export default {
             return elements.length > 0 ? elements[0] : null;
         },
 
-        extractText(element) {
-            if (!element) return "";
-            const textElement = element.getElementsByTagName("text")[0];
-            if (!textElement) return element.textContent || "";
-
-            let text = textElement.textContent || textElement.innerHTML || "";
-
-            // Очищаем HTML теги, но сохраняем переносы строк
-            text = text.replace(/<br\s*\/?>/gi, " ");
-            text = text.replace(/<\/?[^>]+(>|$)/g, " ");
-
-            return this.stripTags(text.trim(), ["p", "b"], {
-                keepContent: true,
-            });
+        extractTextFromHTML(html) {
+            return html
+                .replace(/<[^>]*>/g, "") // Удалить все теги
+                .replace(/<!\[CDATA\[[\s\S]*?]]>/g, "") // Удалить CDATA
+                .replace(/&[a-z]+;/gi, "") // Удалить HTML-сущности (&nbsp; и т.д.)
+                .replace(/]]>/g, "") // Удалить оставшиеся ]]>
+                .replace(/\[CDATA\[/g, "") // Удалить оставшиеся [CDATA[
+                .replace(/\s+/g, " ") // Убрать лишние пробелы
+                .trim();
         },
 
-        extractTextWithImages(element) {
+        extractText(element) {
             if (!element) return "";
             const textElement = element.getElementsByTagName("text")[0];
             if (!textElement) return "";
@@ -1530,27 +1554,25 @@ export default {
                 html = textElement.textContent || "";
             }
 
-            // Обрабатываем изображения в формате base64
-            html = this.processImagesInHtml(html);
-
-            return this.stripTags(html, ["p", "b"], {
-                keepContent: true,
-            });
+            return this.stripTags(
+                this.extractTextFromHTML(html.replace(/\n/g, " ")),
+                ["p", "b", "img"],
+                {
+                    keepContent: true,
+                }
+            );
         },
 
-        processImagesInHtml(html) {
-            if (!html) return "";
+        extractImage(element) {
+            if (!element) return "";
+            const textElement = element.getElementsByTagName("text")[0];
+            if (!textElement) return "";
+            const regex = /src="([^"]*)"/;
 
-            // Регулярное выражение для поиска изображений в base64
-            // Поддерживаем разные форматы: png, jpeg, jpg, gif
-            const imgRegex =
-                /<img[^>]+src="data:image\/(png|jpeg|jpg|gif);base64,([^"]+)"[^>]*>/gi;
+            const match = element.innerHTML.match(regex);
 
-            return html.replace(imgRegex, (match, format, base64) => {
-                // Сохраняем изображение как есть в base64
-                // Можно оптимизировать размер, но пока оставляем как есть
-                return `<img src="data:image/${format.toLowerCase()};base64,${base64}" style="max-width: 100%; height: auto;" />`;
-            });
+            const src = match ? match[1] : null;
+            return src;
         },
 
         generateId() {
@@ -1615,28 +1637,6 @@ export default {
                 switch (question.type) {
                     case "single":
                     case "multiple":
-                        if (
-                            !question.answers ||
-                            !Array.isArray(question.answers) ||
-                            question.answers.length === 0
-                        ) {
-                            this.importErrors.push(
-                                `Вопрос ${
-                                    index + 1
-                                }: отсутствуют варианты ответов`
-                            );
-                        } else {
-                            const correctAnswers = question.answers.filter(
-                                (a) => a.correct
-                            );
-                            if (correctAnswers.length === 0) {
-                                this.importErrors.push(
-                                    `Вопрос ${
-                                        index + 1
-                                    }: нет правильных ответов`
-                                );
-                            }
-                        }
                         break;
 
                     case "matching":
@@ -1736,7 +1736,6 @@ export default {
                 formData.append("file", this.selectedFile);
                 formData.append("tree_id", this.$route.params.id);
                 formData.append("format", this.importFormat);
-
 
                 // Для XML добавляем распарсенные данные
                 if (this.importFormat === "xml") {
