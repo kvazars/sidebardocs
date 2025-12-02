@@ -139,12 +139,24 @@ class TestController extends Controller
     {
 
         $request->validate([
-            'file' => 'required|file|mimes:json'
+            'tree_id' => 'required|integer|exists:trees,id',
+            'file' => 'required|file|mimes:json,xml',
+            'format' => 'required|in:json,xml',
         ]);
+        $format = $request->input('format');
 
         $file = $request->file('file');
-        $testData = json_decode(file_get_contents($file->getPathname()), true);
+        if ($format === 'json') {
+            $testData = json_decode(file_get_contents($file->getPathname()), true);
+        } elseif ($format === 'xml') {
+            if ($request->has('xml_data')) {
+                $testData = json_decode($request->input('xml_data'), true);
 
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    throw new \Exception('Ошибка декодирования XML данных');
+                }
+            }
+        }
         $test = Test::create([
             'title' => $testData['title'] . ' (импорт)',
             'description' => $testData['description'],
