@@ -151,7 +151,7 @@
                                 <i class="bi bi-pencil"></i> Редактировать
                             </button>
                             <button
-                                @click="exportTest(test)"
+                                @click="showExportModal(test)"
                                 class="btn btn-outline-success btn-sm"
                                 :disabled="actionLoading"
                             >
@@ -170,6 +170,7 @@
             </div>
         </div>
 
+        <!-- Модальное окно импорта -->
         <div class="modal fade" id="importModal" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -302,11 +303,265 @@
                 </div>
             </div>
         </div>
+
+        <!-- Модальное окно экспорта -->
+        <div class="modal fade" id="exportModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="bi bi-download"></i> Экспорт теста
+                        </h5>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                        ></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="mb-3">
+                            Выберите формат для экспорта теста "
+                            <strong>{{ currentExportTest?.title }}</strong
+                            >":
+                        </p>
+
+                        <div class="list-group">
+                            <!-- JSON формат -->
+                            <button
+                                @click="exportJson"
+                                class="list-group-item list-group-item-action d-flex align-items-center"
+                                :disabled="actionLoading"
+                            >
+                                <div class="me-3">
+                                    <i
+                                        class="bi bi-file-code fs-4 text-primary"
+                                    ></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-bold">JSON формат</div>
+                                    <small class="text-muted">
+                                        Для импорта обратно в систему или обмена
+                                        между системами
+                                    </small>
+                                </div>
+                                <div>
+                                    <i class="bi bi-chevron-right"></i>
+                                </div>
+                            </button>
+
+                            <!-- Word формат -->
+                            <button
+                                @click="exportWord"
+                                class="list-group-item list-group-item-action d-flex align-items-center"
+                                :disabled="actionLoading"
+                            >
+                                <div class="me-3">
+                                    <i
+                                        class="bi bi-file-word fs-4 text-info"
+                                    ></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-bold">Microsoft Word</div>
+                                    <small class="text-muted">
+                                        Для печати, редактирования в Word или
+                                        отправки преподавателям
+                                    </small>
+                                </div>
+                                <div>
+                                    <i class="bi bi-chevron-right"></i>
+                                </div>
+                            </button>
+                        </div>
+
+                        <!-- Выбор типа экспорта Word -->
+                        <div v-if="showWordOptions" class="mt-4">
+                            <h6 class="mb-3">Настройки экспорта Word:</h6>
+                            <div class="form-check mb-2">
+                                <input
+                                    v-model="wordExportType"
+                                    class="form-check-input"
+                                    type="radio"
+                                    id="withAnswers"
+                                    value="withAnswers"
+                                    :disabled="actionLoading"
+                                />
+                                <label
+                                    class="form-check-label"
+                                    for="withAnswers"
+                                >
+                                    <strong>С правильными ответами</strong>
+                                    <div class="form-text">
+                                        Правильные ответы будут выделены
+                                        <strong>жирным</strong> шрифтом в самом
+                                        вопросе
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input
+                                    v-model="wordExportType"
+                                    class="form-check-input"
+                                    type="radio"
+                                    id="withoutAnswers"
+                                    value="withoutAnswers"
+                                    :disabled="actionLoading"
+                                />
+                                <label
+                                    class="form-check-label"
+                                    for="withoutAnswers"
+                                >
+                                    <strong>Без правильных ответов</strong>
+                                    <div class="form-text">
+                                        Версия для студентов (правильные ответы
+                                        скрыты)
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input
+                                    v-model="wordExportType"
+                                    class="form-check-input"
+                                    type="radio"
+                                    id="separateAnswers"
+                                    value="separateAnswers"
+                                    :disabled="actionLoading"
+                                />
+                                <label
+                                    class="form-check-label"
+                                    for="separateAnswers"
+                                >
+                                    <strong
+                                        >С ответами на отдельной
+                                        странице</strong
+                                    >
+                                    <div class="text-warning small">
+                                        <i
+                                            class="bi bi-exclamation-triangle"
+                                        ></i>
+                                        Только для преподавателей!
+                                    </div>
+                                </label>
+                            </div>
+
+                            <!-- Кнопка подтверждения экспорта Word -->
+                            <div class="d-flex gap-2 mt-4">
+                                <button
+                                    @click="cancelWordOptions"
+                                    class="btn btn-outline-secondary"
+                                    :disabled="actionLoading"
+                                >
+                                    <i class="bi bi-arrow-left"></i> Назад
+                                </button>
+                                <button
+                                    @click="performWordExport"
+                                    class="btn btn-primary flex-grow-1"
+                                    :disabled="actionLoading"
+                                >
+                                    <span
+                                        v-if="actionLoading"
+                                        class="spinner-border spinner-border-sm me-2"
+                                        role="status"
+                                    ></span>
+                                    <i v-else class="bi bi-download me-2"></i>
+                                    Экспортировать в Word
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Информация о тесте -->
+                        <div
+                            class="card mt-4"
+                            :class="{ 'mt-3': !showWordOptions }"
+                        >
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <small class="text-muted"
+                                            >Вопросов:</small
+                                        >
+                                        <div class="fw-bold">
+                                            {{
+                                                currentExportTest?.questions
+                                                    ?.length || 0
+                                            }}
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted"
+                                            >Баллов:</small
+                                        >
+                                        <div class="fw-bold">
+                                            {{
+                                                currentExportTest
+                                                    ? getTotalPoints(
+                                                          currentExportTest
+                                                      )
+                                                    : 0
+                                            }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-6">
+                                        <small class="text-muted">Время:</small>
+                                        <div class="fw-bold">
+                                            {{
+                                                currentExportTest?.timeLimit ||
+                                                0
+                                            }}
+                                            минут
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted"
+                                            >Типов вопросов:</small
+                                        >
+                                        <div class="fw-bold">
+                                            {{
+                                                currentExportTest
+                                                    ? getQuestionTypesCount(
+                                                          currentExportTest
+                                                      )
+                                                    : 0
+                                            }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal"
+                            :disabled="actionLoading"
+                        >
+                            Отмена
+                        </button>
+                        <div
+                            v-if="actionLoading && !showWordOptions"
+                            class="text-muted"
+                        >
+                            <span
+                                class="spinner-border spinner-border-sm me-2"
+                            ></span>
+                            Экспорт выполняется...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
 import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
+import {
+    exportTestToWord,
+    exportTestToWordWithoutAnswers,
+    exportTestToWordWithSeparateAnswers,
+} from "@/utils/exportToWord";
 
 export default {
     name: "TestManagement",
@@ -322,6 +577,9 @@ export default {
             actionLoading: false,
             error: "",
             tests: [],
+            currentExportTest: null, // Текущий тест для экспорта
+            showWordOptions: false, // Показывать ли опции Word
+            wordExportType: "withAnswers", // Тип экспорта Word
         };
     },
     mounted() {
@@ -402,12 +660,150 @@ export default {
             return Math.ceil(test.questions.length * 1 + 2);
         },
 
+        // Показать модальное окно экспорта
+        showExportModal(test) {
+            this.currentExportTest = test;
+            this.showWordOptions = false;
+            this.wordExportType = "withAnswers";
+
+            this.$nextTick(() => {
+                const modalElement = document.getElementById("exportModal");
+                if (modalElement) {
+                    const modal = new bootstrap.Modal(modalElement);
+                    modal.show();
+                }
+            });
+        },
+
+        // Экспорт в JSON
+        async exportJson() {
+            if (!this.currentExportTest) return;
+
+            this.actionLoading = true;
+            this.error = "";
+
+            try {
+                const blob = await this.exportJsonBlob(this.currentExportTest);
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = `test-${
+                    this.currentExportTest.title || "export"
+                }.json`;
+                link.click();
+                URL.revokeObjectURL(url);
+                this.showToast("Тест успешно экспортирован в JSON!", "success");
+
+                // Закрыть модальное окно
+                this.hideExportModal();
+            } catch (error) {
+                console.error("Ошибка экспорта в JSON:", error);
+                this.error = "Ошибка при экспорте в JSON";
+                this.showToast("Ошибка при экспорте теста", "danger");
+            } finally {
+                this.actionLoading = false;
+            }
+        },
+
+        // Экспорт в Word
+        async exportWord() {
+            if (!this.currentExportTest) return;
+
+            // Показываем опции Word
+            this.showWordOptions = true;
+
+            // Если уже загружается, не показываем опции
+            if (this.actionLoading) return;
+        },
+
+        // Подтвержденный экспорт в Word
+        async performWordExport() {
+            if (!this.currentExportTest) return;
+
+            this.actionLoading = true;
+            this.error = "";
+
+            try {
+                let blob;
+
+                // Выбираем тип экспорта
+                switch (this.wordExportType) {
+                    case "withAnswers":
+                        blob = await exportTestToWord(this.currentExportTest);
+                        break;
+                    case "withoutAnswers":
+                        blob = await exportTestToWordWithoutAnswers(
+                            this.currentExportTest
+                        );
+                        break;
+                    case "separateAnswers":
+                        blob = await exportTestToWordWithSeparateAnswers(
+                            this.currentExportTest
+                        );
+                        break;
+                    default:
+                        blob = await exportTestToWord(this.currentExportTest);
+                }
+
+/*
+                const url = URL.createObjectURL( blob ?? new Blob([]) );
+                
+                const link = document.createElement("a"); 
+                link.href = url;
+                link.download = `test-${
+                    this.currentExportTest.title || "export"
+                }.docx`;
+                link.click();
+                URL.revokeObjectURL(url);*/
+
+                let message = "Тест успешно экспортирован в Word!";
+                if (this.wordExportType === "withoutAnswers") {
+                    message += " (без ответов)";
+                } else if (this.wordExportType === "separateAnswers") {
+                    message += " (с ответами на отдельной странице)";
+                }
+
+                this.showToast(message, "success");
+                this.hideExportModal();
+            } catch (error) {
+                console.error("Ошибка экспорта в Word:", error);
+                this.error = "Ошибка при экспорте в Word";
+                this.showToast("Ошибка при экспорте теста", "danger");
+            } finally {
+                this.actionLoading = false;
+            }
+        },
+
+        // Скрыть модальное окно экспорта
+        hideExportModal() {
+            const modalElement = document.getElementById("exportModal");
+            if (modalElement) {
+                const modal = bootstrap.Modal.getInstance(modalElement);
+                if (modal) {
+                    modal.hide();
+                }
+            }
+        },
+
+        // Метод для получения JSON blob
+        async exportJsonBlob(test) {
+            return this.datasend(
+                `tests/${test.id}/export`,
+                "GET",
+                null,
+                false,
+                true
+            ).then((response) => {
+                return response;
+            });
+        },
+
+        // Старый метод экспорта (оставляем для обратной совместимости)
         exportTest(test) {
             this.actionLoading = true;
             this.error = "";
 
             try {
-                // const blob = await exportTest(test);
                 this.datasend(
                     `tests/${test.id}/export`,
                     "GET",
@@ -432,6 +828,7 @@ export default {
             }
         },
 
+        // Импорт
         showImportModal() {
             this.importPreview = null;
             this.importErrors = [];
@@ -592,5 +989,23 @@ export default {
 .import-preview {
     max-height: 300px;
     overflow-y: auto;
+}
+
+/* Стили для модального окна экспорта */
+.list-group-item:hover {
+    background-color: #f8f9fa;
+    cursor: pointer;
+}
+
+.list-group-item:active {
+    background-color: #e9ecef;
+}
+
+.form-check {
+    padding-left: 2rem;
+}
+
+.form-check-input {
+    margin-left: -2rem;
 }
 </style>
