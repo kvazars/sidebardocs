@@ -87,12 +87,6 @@
 
                         <div class="test-settings mb-3">
                             <div
-                                v-if="test.settings.requireUserName"
-                                class="badge bg-info me-1 mb-1"
-                            >
-                                <i class="bi bi-person"></i> Имя
-                            </div>
-                            <div
                                 v-if="test.settings.shuffleQuestions"
                                 class="badge bg-primary me-1 mb-1"
                             >

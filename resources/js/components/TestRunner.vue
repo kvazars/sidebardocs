@@ -31,12 +31,6 @@
                             </div>
                             <div class="mt-2">
                                 <small
-                                    v-if="test.settings.requireUserName"
-                                    class="text-info"
-                                >
-                                    <i class="bi bi-person"></i> Требуется имя
-                                </small>
-                                <small
                                     v-if="test.settings.shuffleQuestions"
                                     class="text-primary"
                                 >
@@ -49,10 +43,6 @@
                                 >
                                     <i class="bi bi-shuffle"></i> Перемеш.
                                     ответы
-                                </small>
-                                <small class="text-danger ms-2">
-                                    <i class="bi bi-exclamation-circle"></i> Все
-                                    вопросы обязательны
                                 </small>
                             </div>
                         </div>
