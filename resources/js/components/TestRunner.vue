@@ -552,7 +552,7 @@
                                 draggable="true"
                                 @dragstart="handleDragStart($event, index)"
                                 @dragover.prevent
-                                :data-item-id="itemId"
+                                :data-index="index"
                             >
                                 <div class="d-flex align-items-center">
                                     <div
@@ -699,13 +699,13 @@ export default {
 
         currentShuffledPairs() {
             const data = this.shuffledPairsMap.get(this.currentQuestionIndex);
-            if (data && data.pairs) {
-                return data.pairs;
+            if (data && data.options) {
+                return data.options;
             }
 
             // Иначе используем оригинальные пары
-            if (this.currentQuestion && this.currentQuestion.pairs) {
-                return this.currentQuestion.pairs.map((pair, index) => ({
+            if (this.currentQuestion && this.currentQuestion.options) {
+                return this.currentQuestion.options.map((pair, index) => ({
                     ...pair,
                     originalIndex: index,
                 }));
@@ -721,8 +721,8 @@ export default {
             }
 
             // Иначе используем оригинальные правые части
-            if (this.currentQuestion && this.currentQuestion.pairs) {
-                return this.currentQuestion.pairs.map((pair) => pair.right);
+            if (this.currentQuestion && this.currentQuestion.options) {
+                return this.currentQuestion.options.map((pair) => pair.right);
             }
 
             return [];
@@ -810,7 +810,7 @@ export default {
                 }
 
                 // Создаем массив нужной длины для сопоставления
-                const length = this.currentQuestion?.pairs?.length || 0;
+                const length = this.currentQuestion?.options?.length || 0;
                 const newArray = new Array(length).fill("");
 
                 // Сохраняем инициализированный массив
@@ -844,21 +844,22 @@ export default {
                 }
 
                 // Инициализируем массив с исходным порядком
-                const defaultOrder = this.currentQuestion?.items
-                    ? this.currentQuestion.items.map((_, index) => index)
+                const defaultOrder = this.currentQuestion?.options
+                    ? this.currentQuestion.options.map((_, index) => index)
                     : [];
 
-                if (originalIndex !== -1) {
+                if (originalIndex !== undefined && defaultOrder.length > 0) {
                     this.userAnswersByOriginalIndex.set(originalIndex, [
                         ...defaultOrder,
                     ]);
+                    return [...defaultOrder];
                 }
 
                 return defaultOrder;
             },
             set(value) {
                 const originalIndex = this.currentOriginalIndex;
-                if (originalIndex !== -1) {
+                if (originalIndex !== undefined) {
                     this.userAnswersByOriginalIndex.set(originalIndex, [
                         ...value,
                     ]);
@@ -886,17 +887,16 @@ export default {
     },
     methods: {
         getSortingItemText(itemId) {
-            if (!this.currentQuestion?.items?.[itemId]) {
+            if (!this.currentQuestion?.options?.[itemId]) {
                 return `Элемент ${itemId + 1}`;
             }
-            return (
-                this.currentQuestion.items[itemId].text ||
-                `Элемент ${itemId + 1}`
-            );
+
+            const item = this.currentQuestion.options[itemId];
+            return item.text || item.title || item.name || `${itemId + 1}`;
         },
 
         getSortingItemImage(itemId) {
-            return this.currentQuestion?.items?.[itemId]?.image;
+            return this.currentQuestion?.options?.[itemId]?.image;
         },
 
         handleDragStart(event, index) {
@@ -911,14 +911,11 @@ export default {
             const toElement = event.target.closest(".sorting-item");
 
             if (toElement) {
-                const toIndex = parseInt(
-                    toElement.dataset.index ||
-                        Array.from(toElement.parentNode.children).indexOf(
-                            toElement
-                        )
-                );
+                // Получаем индекс элемента-цели
+                const sortingItems = document.querySelectorAll(".sorting-item");
+                const toIndex = Array.from(sortingItems).indexOf(toElement);
 
-                if (fromIndex !== toIndex && !isNaN(toIndex)) {
+                if (fromIndex !== toIndex && !isNaN(toIndex) && toIndex >= 0) {
                     const newOrder = [...this.currentSortingAnswer];
                     const [movedItem] = newOrder.splice(fromIndex, 1);
                     newOrder.splice(toIndex, 0, movedItem);
@@ -928,8 +925,8 @@ export default {
         },
 
         resetSortingOrder() {
-            const defaultOrder = this.currentQuestion?.items
-                ? this.currentQuestion.items.map((_, index) => index)
+            const defaultOrder = this.currentQuestion?.options
+                ? this.currentQuestion.options.map((_, index) => index)
                 : [];
             this.currentSortingAnswer = defaultOrder;
         },
@@ -1009,13 +1006,15 @@ export default {
                     hasAnswer = Array.isArray(answer) && answer.length > 0;
                     break;
                 case "sorting":
-                    hasAnswer = Array.isArray(answer) && answer.length > 0;
+                    hasAnswer =
+                        Array.isArray(answer) &&
+                        answer.length === (question.options?.length || 0);
                     break;
                 case "matching":
                     if (
                         Array.isArray(answer) &&
-                        question.pairs &&
-                        answer.length === question.pairs.length
+                        question.options &&
+                        answer.length === question.options.length
                     ) {
                         const matchingData = this.shuffledPairsMap.get(
                             this.currentQuestionIndex
@@ -1200,6 +1199,9 @@ export default {
         initializeQuestion() {
             if (!this.currentQuestion) return;
 
+            // Получаем оригинальный индекс текущего вопроса
+            const originalIndex = this.currentOriginalIndex;
+
             // Перемешиваем варианты ответов если нужно
             if (this.shouldShuffleAnswers()) {
                 this.shuffleQuestionOptions();
@@ -1231,13 +1233,16 @@ export default {
                     this.matchingAnswers = [...currentAnswer];
                 } else {
                     // Создаем массив нужной длины
-                    const length = this.currentQuestion.pairs
-                        ? this.currentQuestion.pairs.length
+                    const length = this.currentQuestion.options
+                        ? this.currentQuestion.options.length
                         : 0;
                     this.matchingAnswers = new Array(length).fill("");
 
                     // Если массив не инициализирован, инициализируем его
-                    if (!Array.isArray(currentAnswer)) {
+                    if (
+                        !Array.isArray(currentAnswer) &&
+                        originalIndex !== undefined
+                    ) {
                         this.userAnswersByOriginalIndex.set(originalIndex, [
                             ...this.matchingAnswers,
                         ]);
@@ -1248,20 +1253,56 @@ export default {
             }
 
             if (this.currentQuestion.type === "sorting") {
-                const originalIndex = this.currentOriginalIndex;
-                const answer =
-                    this.userAnswersByOriginalIndex.get(originalIndex);
-
+                // Проверяем, есть ли у вопроса элементы для сортировки
                 if (
-                    !Array.isArray(answer) ||
-                    answer.length !== this.currentQuestion.items?.length
+                    !this.currentQuestion.options ||
+                    this.currentQuestion.options.length === 0
                 ) {
-                    const defaultOrder = this.currentQuestion.items
-                        ? this.currentQuestion.items.map((_, index) => index)
-                        : [];
-                    this.userAnswersByOriginalIndex.set(originalIndex, [
-                        ...defaultOrder,
-                    ]);
+                    console.warn(
+                        "Вопрос типа sorting не имеет элементов items"
+                    );
+                    return;
+                }
+
+                // Инициализируем ответ для сортировки, если его еще нет
+                if (originalIndex !== undefined) {
+                    const existingAnswer =
+                        this.userAnswersByOriginalIndex.get(originalIndex);
+
+                    if (
+                        !Array.isArray(existingAnswer) ||
+                        existingAnswer.length === 0
+                    ) {
+                        // Создаем начальный порядок (0, 1, 2, ...)
+                        const defaultOrder = this.currentQuestion.options.map(
+                            (_, index) => index
+                        );
+
+                        // Если нужно перемешивать, перемешиваем начальный порядок
+                        if (
+                            this.selectedTest.settings.shuffleAnswers &&
+                            this.selectedTest.settings.shuffleSorting !== false
+                        ) {
+                            // Создаем копию и перемешиваем
+                            const shuffledOrder = [...defaultOrder];
+                            for (let i = shuffledOrder.length - 1; i > 0; i--) {
+                                const j = Math.floor(Math.random() * (i + 1));
+                                [shuffledOrder[i], shuffledOrder[j]] = [
+                                    shuffledOrder[j],
+                                    shuffledOrder[i],
+                                ];
+                            }
+                            this.userAnswersByOriginalIndex.set(
+                                originalIndex,
+                                shuffledOrder
+                            );
+                        } else {
+                            this.userAnswersByOriginalIndex.set(
+                                originalIndex,
+                                defaultOrder
+                            );
+                        }
+                    }
                 }
             }
 
@@ -1271,7 +1312,6 @@ export default {
             // Обновляем статус отвеченности
             this.updateAnsweredStatus();
         },
-
         shouldShuffleAnswers() {
             // Основная проверка - если shuffleAnswers = false, не перемешиваем
             if (!this.selectedTest.settings.shuffleAnswers) {
@@ -1294,8 +1334,26 @@ export default {
                     );
                 case "matching":
                     return this.selectedTest.settings.shuffleMatching !== false;
+                case "sorting":
+                    return this.selectedTest.settings.shuffleSorting !== false;
                 default:
                     return false; // Для других типов не перемешиваем
+            }
+        },
+        shuffleSortingItems() {
+            if (!this.currentQuestion.options) return;
+
+            const items = [...this.currentQuestion.options];
+            const shuffledOrder = items
+                .map((_, index) => index)
+                .sort(() => Math.random() - 0.5);
+
+            const originalIndex = this.currentOriginalIndex;
+            if (originalIndex !== undefined) {
+                this.userAnswersByOriginalIndex.set(
+                    originalIndex,
+                    shuffledOrder
+                );
             }
         },
 
@@ -1314,9 +1372,9 @@ export default {
         },
 
         shuffleMatchingOptions() {
-            if (!this.currentQuestion.pairs) return;
+            if (!this.currentQuestion.options) return;
 
-            const pairs = [...this.currentQuestion.pairs];
+            const pairs = [...this.currentQuestion.options];
             const shuffledPairs = pairs
                 .map((pair, index) => ({ ...pair, originalIndex: index }))
                 .sort(() => Math.random() - 0.5);
@@ -1545,17 +1603,16 @@ export default {
                         case "true-false":
                             isCorrect =
                                 userAnswer ===
-                                originalQuestion.correct_answer?.toString();
+                                originalQuestion.options?.toString();
                             score = isCorrect ? originalQuestion.points : 0;
                             break;
 
                         case "text":
-                            const correct_answers =
-                                originalQuestion.correct_answers || [];
+                            const options = originalQuestion.options || [];
                             const userAnswerText =
                                 userAnswer?.toString().toLowerCase().trim() ||
                                 "";
-                            isCorrect = correct_answers.some(
+                            isCorrect = options.some(
                                 (correct_answer) =>
                                     userAnswerText ===
                                     correct_answer.toLowerCase().trim()
@@ -1565,8 +1622,8 @@ export default {
 
                         case "matching":
                             if (
-                                !originalQuestion.pairs ||
-                                originalQuestion.pairs.length === 0
+                                !originalQuestion.options ||
+                                originalQuestion.options.length === 0
                             ) {
                                 score = 0;
                                 isCorrect = false;
@@ -1585,7 +1642,7 @@ export default {
                             let correctPairs = 0;
                             userAnswer.forEach((userRightAnswer, pairIndex) => {
                                 const originalPair =
-                                    originalQuestion.pairs[pairIndex];
+                                    originalQuestion.options[pairIndex];
                                 if (
                                     originalPair &&
                                     originalPair.right === userRightAnswer
@@ -1595,10 +1652,12 @@ export default {
                             });
 
                             score =
-                                (correctPairs / originalQuestion.pairs.length) *
+                                (correctPairs /
+                                    originalQuestion.options.length) *
                                 originalQuestion.points;
                             isCorrect =
-                                correctPairs === originalQuestion.pairs.length;
+                                correctPairs ===
+                                originalQuestion.options.length;
                             break;
 
                         default:
@@ -1806,7 +1865,7 @@ export default {
                 case "sorting":
                     isValid =
                         Array.isArray(answer) &&
-                        answer.length === (question.items?.length || 0);
+                        answer.length === (question.options?.length || 0);
                     if (!isValid) {
                         this.validationError =
                             "Пожалуйста, расположите все элементы в порядке";
@@ -1821,11 +1880,11 @@ export default {
                     break;
 
                 case "matching":
-                    if (question.pairs) {
+                    if (question.options) {
                         if (Array.isArray(answer)) {
                             // Основная проверка - что массив имеет правильную длину
                             // и все элементы не пустые
-                            isValid = answer.length === question.pairs.length;
+                            isValid = answer.length === question.options.length;
 
                             if (isValid) {
                                 // Проверяем, что все элементы заполнены
@@ -1924,10 +1983,10 @@ export default {
                         isValid = answer && answer.toString().trim() !== "";
                         break;
                     case "matching":
-                        if (Array.isArray(answer) && question.pairs) {
+                        if (Array.isArray(answer) && question.options) {
                             // Упрощенная проверка - просто проверяем, что все элементы не пустые
                             isValid =
-                                answer.length === question.pairs.length &&
+                                answer.length === question.options.length &&
                                 answer.every(
                                     (item) =>
                                         item !== null &&
@@ -2130,7 +2189,7 @@ export default {
             const answer = this.getCurrentAnswer();
             let currentAnswers = Array.isArray(answer)
                 ? [...answer]
-                : new Array(this.currentQuestion.pairs.length).fill("");
+                : new Array(this.currentQuestion.options.length).fill("");
 
             if (pairIndex < currentAnswers.length) {
                 currentAnswers[pairIndex] = value;
@@ -2288,8 +2347,8 @@ export default {
 
                         case "sorting":
                             if (
-                                !originalQuestion.items ||
-                                originalQuestion.items.length === 0
+                                !originalQuestion.options ||
+                                originalQuestion.options.length === 0
                             ) {
                                 score = 0;
                                 isCorrect = false;
@@ -2308,7 +2367,9 @@ export default {
                             // Проверяем правильность порядка
                             const correctOrder =
                                 originalQuestion.correctOrder ||
-                                originalQuestion.items.map((_, index) => index);
+                                originalQuestion.options.map(
+                                    (_, index) => index
+                                );
 
                             let correctPositions = 0;
                             userAnswer.forEach((itemId, position) => {
@@ -2320,28 +2381,28 @@ export default {
                             // Рассчитываем баллы пропорционально количеству правильно расположенных элементов
                             score =
                                 (correctPositions /
-                                    originalQuestion.items.length) *
+                                    originalQuestion.options.length) *
                                 originalQuestion.points;
                             isCorrect =
                                 correctPositions ===
-                                originalQuestion.items.length;
+                                originalQuestion.options.length;
                             break;
 
                         case "true-false":
                             isCorrect =
-                                userAnswer ===
-                                originalQuestion.correct_answer?.toString();
+                                userAnswer ==
+                                originalQuestion.options?.toString();
                             score = isCorrect ? originalQuestion.points : 0;
+
                             break;
 
                         case "text":
-                            const correct_answers =
-                                originalQuestion.correct_answers || [];
+                            const options = originalQuestion.options || [];
                             const userAnswerText =
                                 userAnswer?.toString().toLowerCase().trim() ||
                                 "";
 
-                            isCorrect = correct_answers.some(
+                            isCorrect = options.some(
                                 (correct_answer) =>
                                     userAnswerText ===
                                     correct_answer.toLowerCase().trim()
@@ -2354,8 +2415,8 @@ export default {
                                 this.shuffledPairsMap.get(displayedIndex);
 
                             if (
-                                !originalQuestion.pairs ||
-                                originalQuestion.pairs.length === 0
+                                !originalQuestion.options ||
+                                originalQuestion.options.length === 0
                             ) {
                                 score = 0;
                                 isCorrect = false;
@@ -2375,7 +2436,7 @@ export default {
 
                             if (matchingData) {
                                 // Если пары были перемешаны
-                                const shuffledPairs = matchingData.pairs;
+                                const shuffledPairs = matchingData.options;
 
                                 userAnswer.forEach(
                                     (userRightAnswer, displayedPairIndex) => {
@@ -2396,7 +2457,7 @@ export default {
                                 userAnswer.forEach(
                                     (userRightAnswer, pairIndex) => {
                                         const originalPair =
-                                            originalQuestion.pairs[pairIndex];
+                                            originalQuestion.options[pairIndex];
                                         if (
                                             originalPair &&
                                             originalPair.right ===
@@ -2409,10 +2470,12 @@ export default {
                             }
 
                             score =
-                                (correctPairs / originalQuestion.pairs.length) *
+                                (correctPairs /
+                                    originalQuestion.options.length) *
                                 originalQuestion.points;
                             isCorrect =
-                                correctPairs === originalQuestion.pairs.length;
+                                correctPairs ===
+                                originalQuestion.options.length;
                             break;
 
                         default:
@@ -2550,7 +2613,7 @@ export default {
 
                     return userAnswer
                         .map((itemId, index) => {
-                            const item = originalQuestion.items?.[itemId];
+                            const item = originalQuestion.options?.[itemId];
                             return `${index + 1}. ${
                                 item?.text || `Элемент ${itemId + 1}`
                             }`;
@@ -2570,7 +2633,7 @@ export default {
                     const matchingData =
                         this.shuffledPairsMap.get(displayedIndex);
                     const pairs =
-                        matchingData?.pairs || originalQuestion.pairs || [];
+                        matchingData?.options || originalQuestion.options || [];
 
                     const formattedPairs = userAnswer.map(
                         (rightAnswer, idx) => {
@@ -2605,14 +2668,12 @@ export default {
                             ?.map((opt) => opt.text) || []
                     );
                 case "true-false":
-                    return originalQuestion.correct_answer === "true"
-                        ? "Да"
-                        : "Нет";
+                    return originalQuestion.options === "true" ? "Да" : "Нет";
                 case "text":
-                    return originalQuestion.correct_answers || [];
+                    return originalQuestion.options || [];
                 case "matching":
                     return (
-                        originalQuestion.pairs?.map((pair) => ({
+                        originalQuestion.options?.map((pair) => ({
                             left: pair.left,
 
                             right: pair.right,
@@ -2675,12 +2736,12 @@ export default {
                             ?.map((opt) => opt.text) || []
                     );
                 case "true-false":
-                    return question.correct_answer === "true" ? "Да" : "Нет";
+                    return question.options === "true" ? "Да" : "Нет";
                 case "text":
-                    return question.correct_answers || [];
+                    return question.options || [];
                 case "matching":
                     return (
-                        question.pairs?.map((pair) => ({
+                        question.options?.map((pair) => ({
                             left: pair.left,
                             right: pair.right,
                         })) || []

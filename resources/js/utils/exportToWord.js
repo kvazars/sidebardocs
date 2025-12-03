@@ -46,16 +46,14 @@ function getCorrectAnswerText(question) {
             return multipleCorrect || "Нет правильных ответов";
 
         case "true-false":
-            return question.correct_answer === "true" ? "Верно" : "Неверно";
+            return question.options === "true" ? "Верно" : "Неверно";
 
         case "text":
-            return (
-                question.correct_answers?.join(", ") || "Нет правильного ответа"
-            );
+            return question.options?.join(", ") || "Нет правильного ответа";
 
         case "matching":
-            if (!question.pairs) return "Нет пар для сопоставления";
-            return question.pairs
+            if (!question.options) return "Нет пар для сопоставления";
+            return question.options
                 .map(
                     (pair, idx) =>
                         `${idx + 1} → ${String.fromCharCode(65 + idx)}) ${
@@ -644,7 +642,7 @@ async function getQuestionContent(question, exportType, questionIndex) {
             break;
 
         case "true-false":
-            const correctAnswer = question.correct_answer === "true";
+            const correctAnswer = question.options === "true";
 
             if (exportType === "withAnswers") {
                 children.push(
@@ -698,8 +696,8 @@ async function getQuestionContent(question, exportType, questionIndex) {
         case "text":
             if (
                 exportType === "withAnswers" &&
-                question.correct_answers &&
-                question.correct_answers.length > 0
+                question.options &&
+                question.options.length > 0
             ) {
                 children.push(
                     new Paragraph({
@@ -709,7 +707,7 @@ async function getQuestionContent(question, exportType, questionIndex) {
                                 bold: true,
                             }),
                             new TextRun({
-                                text: question.correct_answers.join(", "),
+                                text: question.options.join(", "),
                                 bold: true,
                             }),
                         ],
@@ -729,16 +727,16 @@ async function getQuestionContent(question, exportType, questionIndex) {
             break;
 
         case "matching":
-            if (question.pairs && question.pairs.length > 0) {
+            if (question.options && question.options.length > 0) {
                 const leftColumn = [];
                 const rightColumn = [];
 
                 for (
                     let pairIndex = 0;
-                    pairIndex < question.pairs.length;
+                    pairIndex < question.options.length;
                     pairIndex++
                 ) {
-                    const pair = question.pairs[pairIndex];
+                    const pair = question.options[pairIndex];
 
                     // Левая часть
                     leftColumn.push(
@@ -801,15 +799,15 @@ async function getQuestionContent(question, exportType, questionIndex) {
                     } else {
                         // Перемешиваем для студентов
                         const shuffledIndex = Math.floor(
-                            Math.random() * question.pairs.length
+                            Math.random() * question.options.length
                         );
                         rightText = `${String.fromCharCode(65 + pairIndex)}) ${
-                            question.pairs[shuffledIndex].right || ""
+                            question.options[shuffledIndex].right || ""
                         }`;
-                        rightImageBuffer = question.pairs[shuffledIndex]
+                        rightImageBuffer = question.options[shuffledIndex]
                             .rightImage
                             ? base64ToArrayBuffer(
-                                  question.pairs[shuffledIndex].rightImage
+                                  question.options[shuffledIndex].rightImage
                               )
                             : null;
                     }
@@ -929,7 +927,7 @@ async function getQuestionContent(question, exportType, questionIndex) {
                     })
                 );
 
-                question.pairs.forEach((pair, pairIndex) => {
+                question.options.forEach((pair, pairIndex) => {
                     children.push(
                         new Paragraph({
                             text: `${pairIndex + 1}) _________`,

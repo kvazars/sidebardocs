@@ -1443,7 +1443,7 @@ export default {
 
         parseMatchingQuestion(qElement, name, text, points, image) {
             const subQuestions = qElement.getElementsByTagName("subquestion");
-            const pairs = [];
+            const options = [];
 
             for (let i = 0; i < subQuestions.length; i++) {
                 const subQ = subQuestions[i];
@@ -1457,7 +1457,7 @@ export default {
                 if (answerElement) {
                     const answerText = this.extractText(answerElement);
                     // const answerImage = this.extractImage(answerElement);
-                    pairs.push({
+                    options.push({
                         left: this.stripTags(questionText, ["p", "b"], {
                             keepContent: true,
                         }),
@@ -1476,7 +1476,7 @@ export default {
                 text: text,
                 points: points,
                 image: image,
-                pairs: pairs,
+                options: options,
                 explanation: "",
             };
         },
@@ -1500,7 +1500,7 @@ export default {
                 image: image,
                 points: points,
                 correctAnswer: JSON.stringify(correctAnswers),
-                correct_answers: correctAnswers,
+                options: correctAnswers,
                 explanation: "",
             };
         },
@@ -1694,9 +1694,9 @@ export default {
 
                     case "matching":
                         if (
-                            !question.pairs ||
-                            !Array.isArray(question.pairs) ||
-                            question.pairs.length === 0
+                            !question.options ||
+                            !Array.isArray(question.options) ||
+                            question.options.length === 0
                         ) {
                             this.importErrors.push(
                                 `Вопрос ${

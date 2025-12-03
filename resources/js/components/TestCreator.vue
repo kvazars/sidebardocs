@@ -658,7 +658,7 @@
                                 <div>
                                     <div class="form-check form-check-inline">
                                         <input
-                                            v-model="question.correct_answer"
+                                            v-model="question.options"
                                             type="radio"
                                             id="trues"
                                             value="true"
@@ -672,7 +672,7 @@
                                     </div>
                                     <div class="form-check form-check-inline">
                                         <input
-                                            v-model="question.correct_answer"
+                                            v-model="question.options"
                                             type="radio"
                                             value="false"
                                             id="falses"
@@ -694,16 +694,12 @@
                                     (регистронезависимые):</label
                                 >
                                 <div
-                                    v-for="(
-                                        answer, aIndex
-                                    ) in question.correct_answers"
+                                    v-for="(answer, aIndex) in question.options"
                                     :key="aIndex"
                                     class="input-group mb-2"
                                 >
                                     <input
-                                        v-model="
-                                            question.correct_answers[aIndex]
-                                        "
+                                        v-model="question.options[aIndex]"
                                         type="text"
                                         class="form-control"
                                         placeholder="Правильный ответ"
@@ -713,9 +709,7 @@
                                             removecorrect_answer(qIndex, aIndex)
                                         "
                                         class="btn btn-outline-danger"
-                                        :disabled="
-                                            question.correct_answers.length <= 1
-                                        "
+                                        :disabled="question.options.length <= 1"
                                     >
                                         <i class="bi bi-x"></i>
                                     </button>
@@ -738,7 +732,7 @@
                                     >Пары для сопоставления:</label
                                 >
                                 <div
-                                    v-for="(pair, pIndex) in question.pairs"
+                                    v-for="(pair, pIndex) in question.options"
                                     :key="pIndex"
                                     class="matching-pair row mb-2 align-items-center"
                                 >
@@ -802,7 +796,7 @@
                                         />
 
                                         <!-- Изображение для правой части -->
-                                        <div class="mt-1">
+                                        <!-- <div class="mt-1">
                                             <div
                                                 v-if="pair.rightImage"
                                                 class="image-preview-container position-relative d-inline-block"
@@ -837,7 +831,7 @@
                                                 accept="image/*"
                                                 class="form-control form-control-sm mt-1"
                                             />
-                                        </div>
+                                        </div> -->
                                     </div>
 
                                     <div class="col-md-1">
@@ -850,7 +844,7 @@
                                             "
                                             class="btn btn-outline-danger btn-sm"
                                             :disabled="
-                                                question.pairs.length <= 2
+                                                question.options.length <= 2
                                             "
                                         >
                                             <i class="bi bi-trash"></i>
@@ -883,7 +877,9 @@
                                     @drop="onSortingDrop($event, qIndex)"
                                 >
                                     <div
-                                        v-for="(item, iIndex) in question.items"
+                                        v-for="(
+                                            item, iIndex
+                                        ) in question.options"
                                         :key="item.id"
                                         class="sorting-item card mb-2"
                                         draggable="true"
@@ -1009,7 +1005,7 @@
                                                         "
                                                         class="btn btn-outline-danger btn-sm"
                                                         :disabled="
-                                                            question.items
+                                                            question.options
                                                                 .length <= 2
                                                         "
                                                         title="Удалить элемент"
@@ -1308,7 +1304,6 @@ export default {
                 this.test.questions.length > 0 &&
                 this.test.questions.every((q) => {
                     let valid = this.validateQuestion(q) == null;
-                    console.log(valid);
 
                     return valid;
                 });
@@ -1375,11 +1370,11 @@ export default {
     },
     methods: {
         removeSortingItemImage(qIndex, iIndex) {
-            this.test.questions[qIndex].items[iIndex].image = null;
+            this.test.questions[qIndex].options[iIndex].image = null;
         },
         onSortingItemMoved(qIndex, event) {
             const question = this.test.questions[qIndex];
-            const items = [...question.items];
+            const items = [...question.options];
             const movedItem = items[event.oldIndex];
 
             // Удаляем элемент со старой позиции
@@ -1388,7 +1383,7 @@ export default {
             items.splice(event.newIndex, 0, movedItem);
 
             // Обновляем массив элементов
-            question.items = items;
+            question.options = items;
 
             // Обновляем правильный порядок
             this.updateCorrectOrder(qIndex);
@@ -1397,13 +1392,10 @@ export default {
             this.$forceUpdate();
         },
         getcorrect_answers(question) {
-            if (
-                !question.correct_answers ||
-                !Array.isArray(question.correct_answers)
-            ) {
-                question.correct_answers = [""];
+            if (!question.options || !Array.isArray(question.options)) {
+                question.options = [""];
             }
-            return question.correct_answers;
+            return question.options;
         },
         getQuestionTypeLabel(type) {
             const labels = {
@@ -1481,6 +1473,7 @@ export default {
             if (!question.text || question.text.trim() === "") {
                 return "Не заполнен текст вопроса";
             }
+            console.log(question.options);
 
             // Проверка в зависимости от типа вопроса
             switch (question.type) {
@@ -1538,20 +1531,19 @@ export default {
 
                 case "true-false":
                     if (
-                        question.correct_answer === undefined ||
-                        question.correct_answer === null
+                        question.options === undefined ||
+                        question.options === null
                     ) {
                         return "Не выбран правильный ответ";
                     }
                     break;
                 case "sorting":
-                    if (!question.items || question.items.length < 2) {
+                    if (!question.options || question.options.length < 2) {
                         return "Должно быть не менее 2 элементов для сортировки";
                     }
-
                     // Проверяем заполненность всех элементов
-                    for (let i = 0; i < question.items.length; i++) {
-                        const item = question.items[i];
+                    for (let i = 0; i < question.options.length; i++) {
+                        const item = question.options[i];
                         if (!item.text || item.text.trim() === "") {
                             if (!item.image) {
                                 return `Элемент ${
@@ -1564,24 +1556,21 @@ export default {
                     // Проверяем правильный порядок
                     if (
                         !question.correctOrder ||
-                        question.correctOrder.length !== question.items.length
+                        question.correctOrder.length !== question.options.length
                     ) {
                         return "Некорректный правильный порядок";
                     }
                     break;
                 case "text":
-                    if (
-                        !question.correct_answers ||
-                        question.correct_answers.length === 0
-                    ) {
+                    if (!question.options || question.options.length === 0) {
                         return "Не указаны правильные ответы";
                     }
 
                     // Проверяем каждый правильный ответ
-                    for (let i = 0; i < question.correct_answers.length; i++) {
+                    for (let i = 0; i < question.options.length; i++) {
                         if (
-                            !question.correct_answers[i] ||
-                            question.correct_answers[i].trim() === ""
+                            !question.options[i] ||
+                            question.options[i].trim() === ""
                         ) {
                             return `Правильный ответ ${i + 1} не заполнен`;
                         }
@@ -1589,13 +1578,13 @@ export default {
                     break;
 
                 case "matching":
-                    if (!question.pairs || question.pairs.length < 2) {
+                    if (!question.options || question.options.length < 2) {
                         return "Должно быть не менее 2 пар для сопоставления";
                     }
 
                     // Проверяем каждую пару
-                    for (let i = 0; i < question.pairs.length; i++) {
-                        const pair = question.pairs[i];
+                    for (let i = 0; i < question.options.length; i++) {
+                        const pair = question.options[i];
                         const leftEmpty = !pair.left.trim() && !pair.leftImage;
                         const rightEmpty =
                             !pair.right.trim() && !pair.rightImage;
@@ -1649,28 +1638,29 @@ export default {
                     ];
                     break;
                 case "true-false":
-                    newQuestion.correct_answer = undefined;
+                    newQuestion.options = undefined;
                     break;
                 case "text":
-                    newQuestion.correct_answers = [""]; // Используем camelCase
+                    newQuestion.options = [""];
                     break;
                 case "sorting":
-                    newQuestion.items = [
+                    newQuestion.options = [
                         {
                             id: this.generateId(),
-                            text: "Элемент 1",
+                            text: "",
                             image: null,
                             correctPosition: 0,
                         },
                         {
                             id: this.generateId(),
-                            text: "Элемент 2",
+                            text: "",
                             image: null,
                             correctPosition: 1,
                         },
                     ];
+                    break;
                 case "matching":
-                    newQuestion.pairs = [
+                    newQuestion.options = [
                         {
                             left: "",
                             right: "",
@@ -1710,25 +1700,7 @@ export default {
                     { text: "", correct: false },
                 ],
             };
-            if (newQuestion.type === "sorting") {
-                newQuestion.items = [
-                    {
-                        id: this.generateId(),
-                        text: "Первый элемент",
-                        image: null,
-                        correctPosition: 0,
-                    },
-                    {
-                        id: this.generateId(),
-                        text: "Второй элемент",
-                        image: null,
-                        correctPosition: 1,
-                    },
-                ];
-                newQuestion.correctOrder = [0, 1];
-                // Удаляем options для типа sorting
-                delete newQuestion.options;
-            }
+
             this.test.questions.push(newQuestion);
         },
 
@@ -1751,24 +1723,21 @@ export default {
 
         addcorrect_answer(qIndex) {
             const question = this.test.questions[qIndex];
-            if (!question.correct_answers) {
-                question.correct_answers = [""];
+            if (!question.options) {
+                question.options = [""];
             }
-            question.correct_answers.push("");
+            question.options.push("");
         },
 
         removecorrect_answer(qIndex, aIndex) {
             const question = this.test.questions[qIndex];
-            if (
-                question.correct_answers &&
-                question.correct_answers.length > 1
-            ) {
-                question.correct_answers.splice(aIndex, 1);
+            if (question.options && question.options.length > 1) {
+                question.options.splice(aIndex, 1);
             }
         },
 
         addMatchingPair(qIndex) {
-            this.test.questions[qIndex].pairs.push({
+            this.test.questions[qIndex].options.push({
                 left: "",
                 right: "",
                 leftImage: null,
@@ -1777,7 +1746,7 @@ export default {
         },
 
         removeMatchingPair(qIndex, pIndex) {
-            this.test.questions[qIndex].pairs.splice(pIndex, 1);
+            this.test.questions[qIndex].options.splice(pIndex, 1);
         },
 
         addGradeLevel() {
@@ -1810,7 +1779,7 @@ export default {
             const file = event.target.files[0];
             if (file && this.validateImageFile(file)) {
                 const base64 = await this.fileToBase64(file);
-                this.test.questions[qIndex].pairs[pIndex].leftImage = base64;
+                this.test.questions[qIndex].options[pIndex].leftImage = base64;
             }
             event.target.value = "";
         },
@@ -1831,11 +1800,11 @@ export default {
 
                 if (fromIndex !== toIndex && !isNaN(toIndex)) {
                     const question = this.test.questions[qIndex];
-                    const items = [...question.items];
+                    const items = [...question.options];
                     const [movedItem] = items.splice(fromIndex, 1);
                     items.splice(toIndex, 0, movedItem);
 
-                    question.items = items;
+                    question.options = items;
                     this.updateCorrectOrder(qIndex);
                 }
             }
@@ -1851,7 +1820,7 @@ export default {
             const file = event.target.files[0];
             if (file && this.validateImageFile(file)) {
                 const base64 = await this.fileToBase64(file);
-                this.test.questions[qIndex].pairs[pIndex].rightImage = base64;
+                this.test.questions[qIndex].options[pIndex].rightImage = base64;
             }
             event.target.value = "";
         },
@@ -1865,11 +1834,11 @@ export default {
         },
 
         removeLeftImage(qIndex, pIndex) {
-            this.test.questions[qIndex].pairs[pIndex].leftImage = null;
+            this.test.questions[qIndex].options[pIndex].leftImage = null;
         },
 
         removeRightImage(qIndex, pIndex) {
-            this.test.questions[qIndex].pairs[pIndex].rightImage = null;
+            this.test.questions[qIndex].options[pIndex].rightImage = null;
         },
 
         validateImageFile(file) {
@@ -1907,18 +1876,18 @@ export default {
             const newId = this.generateId();
             const newItem = {
                 id: newId,
-                text: `Элемент ${this.test.questions[qIndex].items.length + 1}`,
+                text: "",
                 image: null,
-                correctPosition: this.test.questions[qIndex].items.length,
+                correctPosition: this.test.questions[qIndex].options.length,
             };
 
-            this.test.questions[qIndex].items.push(newItem);
+            this.test.questions[qIndex].options.push(newItem);
             this.updateCorrectOrder(qIndex);
         },
 
         removeSortingItem(qIndex, iIndex) {
-            if (this.test.questions[qIndex].items.length > 2) {
-                this.test.questions[qIndex].items.splice(iIndex, 1);
+            if (this.test.questions[qIndex].options.length > 2) {
+                this.test.questions[qIndex].options.splice(iIndex, 1);
                 this.updateCorrectOrder(qIndex);
             }
         },
@@ -1927,23 +1896,23 @@ export default {
             const file = event.target.files[0];
             if (file && this.validateImageFile(file)) {
                 const base64 = await this.fileToBase64(file);
-                this.test.questions[qIndex].items[iIndex].image = base64;
+                this.test.questions[qIndex].options[iIndex].image = base64;
                 this.$forceUpdate(); // Принудительное обновление для отображения изображения
             }
             event.target.value = "";
         },
 
         removeSortingItemImageremoveSortingItemImage(qIndex, iIndex) {
-            this.test.questions[qIndex].items[iIndex].image = null;
+            this.test.questions[qIndex].options[iIndex].image = null;
         },
 
         updateCorrectOrder(qIndex) {
             const question = this.test.questions[qIndex];
             // Правильный порядок - это текущий порядок элементов в массиве
-            question.correctOrder = question.items.map((_, index) => index);
+            question.correctOrder = question.options.map((_, index) => index);
 
             // Обновляем correctPosition для каждого элемента
-            question.items.forEach((item, index) => {
+            question.options.forEach((item, index) => {
                 item.correctPosition = index;
             });
         },
@@ -1984,8 +1953,8 @@ export default {
                 //     });
                 // }
 
-                if (question.pairs) {
-                    question.pairs.forEach((pair) => {
+                if (question.options) {
+                    question.options.forEach((pair) => {
                         if (pair.leftImage) images.add(pair.leftImage);
                         if (pair.rightImage) images.add(pair.rightImage);
                     });
@@ -2033,12 +2002,12 @@ export default {
                     ].image = this.imageManager.selectedImage;
                     break;
                 case "left":
-                    this.test.questions[currentQuestionIndex].pairs[
+                    this.test.questions[currentQuestionIndex].options[
                         currentPairIndex
                     ].leftImage = this.imageManager.selectedImage;
                     break;
                 case "right":
-                    this.test.questions[currentQuestionIndex].pairs[
+                    this.test.questions[currentQuestionIndex].options[
                         currentPairIndex
                     ].rightImage = this.imageManager.selectedImage;
                     break;
@@ -2061,7 +2030,7 @@ export default {
                 if (this.isEditing) {
                     this.test.id = this.editTestId;
                     console.log(this.test);
-                    
+
                     this.datasend(`tests/${this.test.id}`, "PUT", this.test)
                         .then((response) => {
                             this.resetTest();
@@ -2317,33 +2286,28 @@ export default {
             test.questions.forEach((question) => {
                 // Для типа "text" обрабатываем оба варианта названия поля
                 if (question.type === "text") {
-                    // Если поле называется correct_answers (из базы данных), переименовываем в correct_answers
-                    if (question.correct_answers && !question.correct_answers) {
-                        question.correct_answers = question.correct_answers;
-                        delete question.correct_answers;
+                    if (question.options && !question.options) {
+                        question.options = question.options;
+                        delete question.options;
                     }
 
-                    // Убедимся, что correct_answers существует и является массивом
-                    if (
-                        !question.correct_answers ||
-                        !Array.isArray(question.correct_answers)
-                    ) {
-                        question.correct_answers = [""];
+                    if (!question.options || !Array.isArray(question.options)) {
+                        question.options = [""];
                     }
                 }
 
                 if (question.type === "sorting") {
-                    if (!question.items || !Array.isArray(question.items)) {
-                        question.items = [
+                    if (!question.options || !Array.isArray(question.options)) {
+                        question.options = [
                             {
                                 id: this.generateId(),
-                                text: "Первый элемент",
+                                text: "",
                                 image: null,
                                 correctPosition: 0,
                             },
                             {
                                 id: this.generateId(),
-                                text: "Второй элемент",
+                                text: "",
                                 image: null,
                                 correctPosition: 1,
                             },
@@ -2354,13 +2318,13 @@ export default {
                         !question.correctOrder ||
                         !Array.isArray(question.correctOrder)
                     ) {
-                        question.correctOrder = question.items.map(
+                        question.correctOrder = question.options.map(
                             (_, index) => index
                         );
                     }
 
                     // Убедимся, что у каждого элемента есть ID
-                    question.items.forEach((item, index) => {
+                    question.options.forEach((item, index) => {
                         if (!item.id) {
                             item.id = this.generateId();
                         }
@@ -2382,8 +2346,8 @@ export default {
 
                 // Для типа matching
                 if (question.type === "matching") {
-                    if (!question.pairs || !Array.isArray(question.pairs)) {
-                        question.pairs = [
+                    if (!question.options || !Array.isArray(question.options)) {
+                        question.options = [
                             {
                                 left: "",
                                 right: "",
@@ -2400,17 +2364,17 @@ export default {
                     }
                 }
 
-                // Убедимся, что у опций есть все необходимые поля
-                if (question.options) {
-                    question.options.forEach((option) => {
-                        if (option.correct === undefined) {
-                            option.correct = false;
-                        }
-                        // if (option.image === undefined) {
-                        //     option.image = null;
-                        // }
-                    });
-                }
+                // // Убедимся, что у опций есть все необходимые поля
+                // if (question.options) {
+                //     question.options.forEach((option) => {
+                //         if (option.correct === undefined) {
+                //             option.correct = false;
+                //         }
+                //         // if (option.image === undefined) {
+                //         //     option.image = null;
+                //         // }
+                //     });
+                // }
             });
         },
     },

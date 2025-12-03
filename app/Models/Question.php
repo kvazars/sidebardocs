@@ -17,16 +17,11 @@ class Question extends Model
         'points',
         'image',
         'options',
-        'correct_answers',
-        'pairs',
-        'correct_answer',
         'order'
     ];
 
     protected $casts = [
         'options' => 'array',
-        'correct_answers' => 'array',
-        'pairs' => 'array'
     ];
 
     public function test(): BelongsTo
