@@ -528,6 +528,75 @@
                             </div>
                         </div>
                     </div>
+
+                    <div
+                        v-else-if="currentQuestion.type === 'sorting'"
+                        class="answers"
+                    >
+                        <div class="alert alert-info mb-3">
+                            <i class="bi bi-arrow-down-up"></i>
+                            <strong>Инструкция:</strong> Расположите элементы в
+                            правильном порядке, перетаскивая их с помощью мыши
+                        </div>
+
+                        <!-- Область сортировки -->
+                        <div
+                            class="sorting-area"
+                            @dragover.prevent
+                            @drop="handleDrop"
+                        >
+                            <div
+                                v-for="(itemId, index) in currentSortingAnswer"
+                                :key="itemId"
+                                class="sorting-item mb-2 border rounded p-3"
+                                draggable="true"
+                                @dragstart="handleDragStart($event, index)"
+                                @dragover.prevent
+                                :data-item-id="itemId"
+                            >
+                                <div class="d-flex align-items-center">
+                                    <div
+                                        class="drag-handle me-3 text-muted"
+                                        style="cursor: grab"
+                                    >
+                                        <i class="bi bi-grip-vertical fs-5"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div>
+                                            {{ getSortingItemText(itemId) }}
+                                        </div>
+                                        <!-- Изображение элемента -->
+                                        <div
+                                            v-if="getSortingItemImage(itemId)"
+                                            class="mt-2 text-center"
+                                        >
+                                            <img
+                                                :src="
+                                                    getSortingItemImage(itemId)
+                                                "
+                                                class="img-thumbnail"
+                                                style="max-height: 100px"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div class="position-badge ms-3">
+                                        <span class="badge bg-secondary">{{
+                                            index + 1
+                                        }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Кнопка сброса порядка -->
+                        <button
+                            @click="resetSortingOrder"
+                            class="btn btn-outline-secondary btn-sm mt-3"
+                        >
+                            <i class="bi bi-arrow-clockwise"></i> Сбросить
+                            порядок
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -763,6 +832,40 @@ export default {
                 }
             },
         },
+
+        currentSortingAnswer: {
+            get() {
+                const originalIndex = this.currentOriginalIndex;
+                const answer =
+                    this.userAnswersByOriginalIndex.get(originalIndex);
+
+                if (Array.isArray(answer) && answer.length > 0) {
+                    return [...answer];
+                }
+
+                // Инициализируем массив с исходным порядком
+                const defaultOrder = this.currentQuestion?.items
+                    ? this.currentQuestion.items.map((_, index) => index)
+                    : [];
+
+                if (originalIndex !== -1) {
+                    this.userAnswersByOriginalIndex.set(originalIndex, [
+                        ...defaultOrder,
+                    ]);
+                }
+
+                return defaultOrder;
+            },
+            set(value) {
+                const originalIndex = this.currentOriginalIndex;
+                if (originalIndex !== -1) {
+                    this.userAnswersByOriginalIndex.set(originalIndex, [
+                        ...value,
+                    ]);
+                    this.updateAnsweredStatus();
+                }
+            },
+        },
     },
     userAnswers: {
         handler(newVal) {
@@ -782,6 +885,55 @@ export default {
         });
     },
     methods: {
+        getSortingItemText(itemId) {
+            if (!this.currentQuestion?.items?.[itemId]) {
+                return `Элемент ${itemId + 1}`;
+            }
+            return (
+                this.currentQuestion.items[itemId].text ||
+                `Элемент ${itemId + 1}`
+            );
+        },
+
+        getSortingItemImage(itemId) {
+            return this.currentQuestion?.items?.[itemId]?.image;
+        },
+
+        handleDragStart(event, index) {
+            event.dataTransfer.setData("text/plain", index.toString());
+        },
+
+        handleDrop(event) {
+            event.preventDefault();
+            const fromIndex = parseInt(
+                event.dataTransfer.getData("text/plain")
+            );
+            const toElement = event.target.closest(".sorting-item");
+
+            if (toElement) {
+                const toIndex = parseInt(
+                    toElement.dataset.index ||
+                        Array.from(toElement.parentNode.children).indexOf(
+                            toElement
+                        )
+                );
+
+                if (fromIndex !== toIndex && !isNaN(toIndex)) {
+                    const newOrder = [...this.currentSortingAnswer];
+                    const [movedItem] = newOrder.splice(fromIndex, 1);
+                    newOrder.splice(toIndex, 0, movedItem);
+                    this.currentSortingAnswer = newOrder;
+                }
+            }
+        },
+
+        resetSortingOrder() {
+            const defaultOrder = this.currentQuestion?.items
+                ? this.currentQuestion.items.map((_, index) => index)
+                : [];
+            this.currentSortingAnswer = defaultOrder;
+        },
+
         getDefaultAnswerValue() {
             if (!this.currentQuestion) return "";
 
@@ -854,6 +1006,9 @@ export default {
                         answer !== undefined;
                     break;
                 case "multiple":
+                    hasAnswer = Array.isArray(answer) && answer.length > 0;
+                    break;
+                case "sorting":
                     hasAnswer = Array.isArray(answer) && answer.length > 0;
                     break;
                 case "matching":
@@ -1090,6 +1245,24 @@ export default {
                 }
             } else {
                 this.matchingAnswers = [];
+            }
+
+            if (this.currentQuestion.type === "sorting") {
+                const originalIndex = this.currentOriginalIndex;
+                const answer =
+                    this.userAnswersByOriginalIndex.get(originalIndex);
+
+                if (
+                    !Array.isArray(answer) ||
+                    answer.length !== this.currentQuestion.items?.length
+                ) {
+                    const defaultOrder = this.currentQuestion.items
+                        ? this.currentQuestion.items.map((_, index) => index)
+                        : [];
+                    this.userAnswersByOriginalIndex.set(originalIndex, [
+                        ...defaultOrder,
+                    ]);
+                }
             }
 
             // Сбрасываем ошибку валидации при инициализации вопроса
@@ -1630,6 +1803,15 @@ export default {
                             "Пожалуйста, выберите Да или Нет";
                     }
                     break;
+                case "sorting":
+                    isValid =
+                        Array.isArray(answer) &&
+                        answer.length === (question.items?.length || 0);
+                    if (!isValid) {
+                        this.validationError =
+                            "Пожалуйста, расположите все элементы в порядке";
+                    }
+                    break;
 
                 case "text":
                     isValid = answer && answer.toString().trim() !== "";
@@ -2104,6 +2286,47 @@ export default {
                             score = isCorrect ? originalQuestion.points : 0;
                             break;
 
+                        case "sorting":
+                            if (
+                                !originalQuestion.items ||
+                                originalQuestion.items.length === 0
+                            ) {
+                                score = 0;
+                                isCorrect = false;
+                                break;
+                            }
+
+                            if (
+                                !Array.isArray(userAnswer) ||
+                                userAnswer.length === 0
+                            ) {
+                                score = 0;
+                                isCorrect = false;
+                                break;
+                            }
+
+                            // Проверяем правильность порядка
+                            const correctOrder =
+                                originalQuestion.correctOrder ||
+                                originalQuestion.items.map((_, index) => index);
+
+                            let correctPositions = 0;
+                            userAnswer.forEach((itemId, position) => {
+                                if (itemId === correctOrder[position]) {
+                                    correctPositions++;
+                                }
+                            });
+
+                            // Рассчитываем баллы пропорционально количеству правильно расположенных элементов
+                            score =
+                                (correctPositions /
+                                    originalQuestion.items.length) *
+                                originalQuestion.points;
+                            isCorrect =
+                                correctPositions ===
+                                originalQuestion.items.length;
+                            break;
+
                         case "true-false":
                             isCorrect =
                                 userAnswer ===
@@ -2320,6 +2543,19 @@ export default {
                     });
 
                     return answerTexts.join(", ");
+                case "sorting":
+                    if (!Array.isArray(userAnswer) || userAnswer.length === 0) {
+                        return "";
+                    }
+
+                    return userAnswer
+                        .map((itemId, index) => {
+                            const item = originalQuestion.items?.[itemId];
+                            return `${index + 1}. ${
+                                item?.text || `Элемент ${itemId + 1}`
+                            }`;
+                        })
+                        .join("; ");
 
                 case "true-false":
                     return userAnswer === "true" ? "Да" : "Нет";
@@ -2636,5 +2872,41 @@ export default {
     background-color: #dc3545 !important;
     color: white !important;
     animation: pulse 0.5s infinite;
+}
+.sorting-area {
+    min-height: 200px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 2px dashed #dee2e6;
+}
+
+.sorting-item {
+    background-color: white;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: move;
+}
+
+.sorting-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sorting-item.dragging {
+    opacity: 0.5;
+    border: 2px dashed #0d6efd;
+}
+
+.drag-handle {
+    cursor: grab;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
+}
+
+.position-badge {
+    min-width: 40px;
+    text-align: center;
 }
 </style>

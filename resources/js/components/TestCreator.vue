@@ -373,6 +373,16 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-md-3">
+                            <div class="card text-center">
+                                <div class="card-body py-2">
+                                    <h6 class="card-title mb-0">
+                                        {{ questionTypes.sorting }}
+                                    </h6>
+                                    <small class="text-muted">Сортировка</small>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div
@@ -512,6 +522,9 @@
                                         </option>
                                         <option value="matching">
                                             Сопоставление
+                                        </option>
+                                        <option value="sorting">
+                                            Сортировка (ранжирование)
                                         </option>
                                     </select>
                                 </div>
@@ -852,6 +865,181 @@
                                     пару
                                 </button>
                             </div>
+                            <!-- В TestCreator.vue добавьте в шаблон -->
+
+                            <!-- Сортировка (ранжирование) -->
+                            <div
+                                v-if="question.type === 'sorting'"
+                                class="mb-3"
+                            >
+                                <label class="form-label"
+                                    >Элементы для сортировки (перетащите для
+                                    изменения порядка):</label
+                                >
+
+                                <div
+                                    class="sorting-items-list"
+                                    @dragover.prevent
+                                    @drop="onSortingDrop($event, qIndex)"
+                                >
+                                    <div
+                                        v-for="(item, iIndex) in question.items"
+                                        :key="item.id"
+                                        class="sorting-item card mb-2"
+                                        draggable="true"
+                                        @dragstart="
+                                            onSortingDragStart($event, iIndex)
+                                        "
+                                        @dragover.prevent
+                                        :data-index="iIndex"
+                                    >
+                                        <div class="card-body p-3">
+                                            <div
+                                                class="d-flex align-items-center"
+                                            >
+                                                <div
+                                                    class="drag-handle me-3 text-muted"
+                                                    style="cursor: grab"
+                                                >
+                                                    <i
+                                                        class="bi bi-grip-vertical fs-5"
+                                                    ></i>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <div class="mb-2">
+                                                        <label
+                                                            class="form-label small mb-1"
+                                                            >Текст элемента
+                                                            {{
+                                                                iIndex + 1
+                                                            }}:</label
+                                                        >
+                                                        <input
+                                                            v-model="item.text"
+                                                            type="text"
+                                                            class="form-control"
+                                                            placeholder="Введите текст элемента"
+                                                        />
+                                                    </div>
+
+                                                    <!-- Изображение элемента -->
+                                                    <div class="mb-2">
+                                                        <label
+                                                            class="form-label small mb-1"
+                                                            >Изображение
+                                                            элемента:</label
+                                                        >
+
+                                                        <div
+                                                            v-if="item.image"
+                                                            class="mb-2"
+                                                        >
+                                                            <div
+                                                                class="image-preview-container position-relative d-inline-block"
+                                                            >
+                                                                <img
+                                                                    :src="
+                                                                        item.image
+                                                                    "
+                                                                    class="img-thumbnail"
+                                                                    style="
+                                                                        max-height: 100px;
+                                                                    "
+                                                                />
+                                                                <button
+                                                                    @click="
+                                                                        removeSortingItemImage(
+                                                                            qIndex,
+                                                                            iIndex
+                                                                        )
+                                                                    "
+                                                                    class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1"
+                                                                    type="button"
+                                                                >
+                                                                    <i
+                                                                        class="bi bi-x"
+                                                                    ></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+
+                                                        <div
+                                                            class="input-group"
+                                                        >
+                                                            <input
+                                                                type="file"
+                                                                @change="
+                                                                    handleSortingItemImageUpload(
+                                                                        $event,
+                                                                        qIndex,
+                                                                        iIndex
+                                                                    )
+                                                                "
+                                                                accept="image/*"
+                                                                class="form-control form-control-sm"
+                                                            />
+                                                            <button
+                                                                class="btn btn-outline-secondary btn-sm"
+                                                                type="button"
+                                                                @click="
+                                                                    openImageManager(
+                                                                        qIndex,
+                                                                        iIndex,
+                                                                        null,
+                                                                        'sorting'
+                                                                    )
+                                                                "
+                                                            >
+                                                                <i
+                                                                    class="bi bi-image"
+                                                                ></i>
+                                                                Выбрать
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="ms-3">
+                                                    <button
+                                                        @click="
+                                                            removeSortingItem(
+                                                                qIndex,
+                                                                iIndex
+                                                            )
+                                                        "
+                                                        class="btn btn-outline-danger btn-sm"
+                                                        :disabled="
+                                                            question.items
+                                                                .length <= 2
+                                                        "
+                                                        title="Удалить элемент"
+                                                    >
+                                                        <i
+                                                            class="bi bi-trash"
+                                                        ></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div class="mt-2 text-muted small">
+                                                <i
+                                                    class="bi bi-info-circle"
+                                                ></i>
+                                                Правильная позиция:
+                                                {{ iIndex + 1 }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button
+                                    @click="addSortingItem(qIndex)"
+                                    class="btn btn-outline-primary btn-sm mt-2"
+                                >
+                                    <i class="bi bi-plus-circle"></i> Добавить
+                                    элемент
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -1068,6 +1256,7 @@ export default {
     name: "TestCreator",
     emits: ["error"],
     props: ["editTestId", "datasend", "showToast", "changeCurrentView"],
+
     data() {
         return {
             test: {
@@ -1136,12 +1325,14 @@ export default {
             const types = {
                 single: 0,
                 multiple: 0,
+                sorting: 0, // Добавлено
                 other: 0,
             };
 
             this.test.questions.forEach((q) => {
                 if (q.type === "single") types.single++;
                 else if (q.type === "multiple") types.multiple++;
+                else if (q.type === "sorting") types.sorting++;
                 else types.other++;
             });
 
@@ -1183,6 +1374,28 @@ export default {
         },
     },
     methods: {
+        removeSortingItemImage(qIndex, iIndex) {
+            this.test.questions[qIndex].items[iIndex].image = null;
+        },
+        onSortingItemMoved(qIndex, event) {
+            const question = this.test.questions[qIndex];
+            const items = [...question.items];
+            const movedItem = items[event.oldIndex];
+
+            // Удаляем элемент со старой позиции
+            items.splice(event.oldIndex, 1);
+            // Вставляем элемент на новую позицию
+            items.splice(event.newIndex, 0, movedItem);
+
+            // Обновляем массив элементов
+            question.items = items;
+
+            // Обновляем правильный порядок
+            this.updateCorrectOrder(qIndex);
+
+            // Принудительное обновление для реактивности
+            this.$forceUpdate();
+        },
         getcorrect_answers(question) {
             if (
                 !question.correct_answers ||
@@ -1199,6 +1412,7 @@ export default {
                 "true-false": "Да/Нет",
                 text: "Свободный ввод",
                 matching: "Сопоставление",
+                sorting: "Сортировка/Ранжирование",
             };
             return labels[type] || type;
         },
@@ -1330,7 +1544,31 @@ export default {
                         return "Не выбран правильный ответ";
                     }
                     break;
+                case "sorting":
+                    if (!question.items || question.items.length < 2) {
+                        return "Должно быть не менее 2 элементов для сортировки";
+                    }
 
+                    // Проверяем заполненность всех элементов
+                    for (let i = 0; i < question.items.length; i++) {
+                        const item = question.items[i];
+                        if (!item.text || item.text.trim() === "") {
+                            if (!item.image) {
+                                return `Элемент ${
+                                    i + 1
+                                } не заполнен (нужен текст или изображение)`;
+                            }
+                        }
+                    }
+
+                    // Проверяем правильный порядок
+                    if (
+                        !question.correctOrder ||
+                        question.correctOrder.length !== question.items.length
+                    ) {
+                        return "Некорректный правильный порядок";
+                    }
+                    break;
                 case "text":
                     if (
                         !question.correct_answers ||
@@ -1416,6 +1654,21 @@ export default {
                 case "text":
                     newQuestion.correct_answers = [""]; // Используем camelCase
                     break;
+                case "sorting":
+                    newQuestion.items = [
+                        {
+                            id: this.generateId(),
+                            text: "Элемент 1",
+                            image: null,
+                            correctPosition: 0,
+                        },
+                        {
+                            id: this.generateId(),
+                            text: "Элемент 2",
+                            image: null,
+                            correctPosition: 1,
+                        },
+                    ];
                 case "matching":
                     newQuestion.pairs = [
                         {
@@ -1442,7 +1695,9 @@ export default {
                 this.test.questions.splice(index, 1, newQuestion);
             }
         },
-
+        generateId() {
+            return Date.now() + Math.floor(Math.random() * 1000);
+        },
         addQuestion() {
             const newQuestion = {
                 id: Date.now() + Math.random(),
@@ -1455,7 +1710,25 @@ export default {
                     { text: "", correct: false },
                 ],
             };
-
+            if (newQuestion.type === "sorting") {
+                newQuestion.items = [
+                    {
+                        id: this.generateId(),
+                        text: "Первый элемент",
+                        image: null,
+                        correctPosition: 0,
+                    },
+                    {
+                        id: this.generateId(),
+                        text: "Второй элемент",
+                        image: null,
+                        correctPosition: 1,
+                    },
+                ];
+                newQuestion.correctOrder = [0, 1];
+                // Удаляем options для типа sorting
+                delete newQuestion.options;
+            }
             this.test.questions.push(newQuestion);
         },
 
@@ -1541,7 +1814,39 @@ export default {
             }
             event.target.value = "";
         },
+        onSortingDragStart(event, index) {
+            event.dataTransfer.setData("text/plain", index.toString());
+            event.currentTarget.classList.add("dragging");
+        },
 
+        onSortingDrop(event, qIndex) {
+            event.preventDefault();
+            const fromIndex = parseInt(
+                event.dataTransfer.getData("text/plain")
+            );
+            const toElement = event.target.closest(".sorting-item");
+
+            if (toElement) {
+                const toIndex = parseInt(toElement.dataset.index);
+
+                if (fromIndex !== toIndex && !isNaN(toIndex)) {
+                    const question = this.test.questions[qIndex];
+                    const items = [...question.items];
+                    const [movedItem] = items.splice(fromIndex, 1);
+                    items.splice(toIndex, 0, movedItem);
+
+                    question.items = items;
+                    this.updateCorrectOrder(qIndex);
+                }
+            }
+
+            // Убираем класс dragging
+            document
+                .querySelectorAll(".sorting-item.dragging")
+                .forEach((el) => {
+                    el.classList.remove("dragging");
+                });
+        },
         async handleRightImageUpload(event, qIndex, pIndex) {
             const file = event.target.files[0];
             if (file && this.validateImageFile(file)) {
@@ -1595,6 +1900,51 @@ export default {
                 reader.readAsDataURL(file);
                 reader.onload = () => resolve(reader.result);
                 reader.onerror = (error) => reject(error);
+            });
+        },
+
+        addSortingItem(qIndex) {
+            const newId = this.generateId();
+            const newItem = {
+                id: newId,
+                text: `Элемент ${this.test.questions[qIndex].items.length + 1}`,
+                image: null,
+                correctPosition: this.test.questions[qIndex].items.length,
+            };
+
+            this.test.questions[qIndex].items.push(newItem);
+            this.updateCorrectOrder(qIndex);
+        },
+
+        removeSortingItem(qIndex, iIndex) {
+            if (this.test.questions[qIndex].items.length > 2) {
+                this.test.questions[qIndex].items.splice(iIndex, 1);
+                this.updateCorrectOrder(qIndex);
+            }
+        },
+
+        async handleSortingItemImageUpload(event, qIndex, iIndex) {
+            const file = event.target.files[0];
+            if (file && this.validateImageFile(file)) {
+                const base64 = await this.fileToBase64(file);
+                this.test.questions[qIndex].items[iIndex].image = base64;
+                this.$forceUpdate(); // Принудительное обновление для отображения изображения
+            }
+            event.target.value = "";
+        },
+
+        removeSortingItemImageremoveSortingItemImage(qIndex, iIndex) {
+            this.test.questions[qIndex].items[iIndex].image = null;
+        },
+
+        updateCorrectOrder(qIndex) {
+            const question = this.test.questions[qIndex];
+            // Правильный порядок - это текущий порядок элементов в массиве
+            question.correctOrder = question.items.map((_, index) => index);
+
+            // Обновляем correctPosition для каждого элемента
+            question.items.forEach((item, index) => {
+                item.correctPosition = index;
             });
         },
 
@@ -1710,7 +2060,8 @@ export default {
             try {
                 if (this.isEditing) {
                     this.test.id = this.editTestId;
-
+                    console.log(this.test);
+                    
                     this.datasend(`tests/${this.test.id}`, "PUT", this.test)
                         .then((response) => {
                             this.resetTest();
@@ -1981,6 +2332,44 @@ export default {
                     }
                 }
 
+                if (question.type === "sorting") {
+                    if (!question.items || !Array.isArray(question.items)) {
+                        question.items = [
+                            {
+                                id: this.generateId(),
+                                text: "Первый элемент",
+                                image: null,
+                                correctPosition: 0,
+                            },
+                            {
+                                id: this.generateId(),
+                                text: "Второй элемент",
+                                image: null,
+                                correctPosition: 1,
+                            },
+                        ];
+                    }
+
+                    if (
+                        !question.correctOrder ||
+                        !Array.isArray(question.correctOrder)
+                    ) {
+                        question.correctOrder = question.items.map(
+                            (_, index) => index
+                        );
+                    }
+
+                    // Убедимся, что у каждого элемента есть ID
+                    question.items.forEach((item, index) => {
+                        if (!item.id) {
+                            item.id = this.generateId();
+                        }
+                        if (item.correctPosition === undefined) {
+                            item.correctPosition = index;
+                        }
+                    });
+                }
+
                 // Для типов с options
                 if (["single", "multiple"].includes(question.type)) {
                     if (!question.options || !Array.isArray(question.options)) {
@@ -2066,5 +2455,44 @@ export default {
 .statistics-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+.sortable-ghost {
+    opacity: 0.5;
+    background: #c8ebfb;
+}
+
+.sortable-chosen {
+    background-color: #e9ecef;
+}
+
+.sortable-drag {
+    opacity: 0.8;
+    transform: rotate(5deg);
+}
+
+.sorting-items-list {
+    min-height: 100px;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.sorting-item {
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.sorting-item:hover {
+    border-color: #0d6efd;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.drag-handle {
+    cursor: grab;
+}
+
+.drag-handle:active {
+    cursor: grabbing;
 }
 </style>

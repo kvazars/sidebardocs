@@ -63,6 +63,8 @@ class TestController extends Controller
                     'options' => $questionData['options'] ?? null,
                     'correct_answers' => $questionData['correct_answers'] ?? null,
                     'pairs' => $questionData['pairs'] ?? null,
+                    'items' => $questionData['items'] ?? null,
+                    'correctOrder' => $questionData['correctOrder'] ?? null,
                     'correct_answer' => $questionData['correct_answer'] ?? null,
                     'order' => $questionData['order'] ?? 0
                 ]);
@@ -119,6 +121,9 @@ class TestController extends Controller
                     'options' => $questionData['options'] ?? null,
                     'correct_answers' => $questionData['correct_answers'] ?? null,
                     'pairs' => $questionData['pairs'] ?? null,
+
+                    'items' => $questionData['items'] ?? null,
+                    'correctOrder' => $questionData['correctOrder'] ?? null,
                     'correct_answer' => $questionData['correct_answer'] ?? null,
                     'order' => $questionData['order'] ?? 0
                 ]);
@@ -175,6 +180,9 @@ class TestController extends Controller
                 'options' => $questionData['options'] ?? null,
                 'correct_answers' => $questionData['correct_answers'] ?? null,
                 'pairs' => $questionData['pairs'] ?? null,
+
+                'items' => $questionData['items'] ?? null,
+                'correctOrder' => $questionData['correctOrder'] ?? null,
                 'correct_answer' => $questionData['correct_answer'] ?? null,
                 'order' => $questionData['order'] ?? 0
             ]);
@@ -203,6 +211,9 @@ class TestController extends Controller
                     'options' => $question->options,
                     'correct_answers' => $question->correct_answers,
                     'pairs' => $question->pairs,
+
+                    'items' => $question['items'] ?? null,
+                    'correctOrder' => $question['correctOrder'] ?? null,
                     'correct_answer' => $question->correct_answer,
                     'order' => $question->order
                 ];

@@ -16,8 +16,11 @@ class Test extends Model
         'timeLimit',
         'settings',
         'tree_id',
-        'grading'
+        'grading',
+        'items',
+        'correctOrder',
     ];
+
 
     protected $casts = [
         'settings' => 'array',

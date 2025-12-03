@@ -187,6 +187,45 @@
                                             : 'bg-danger bg-opacity-10'
                                     "
                                 >
+                                    <div
+                                        v-if="
+                                            qResult.questionType === 'sorting'
+                                        "
+                                        class="sorting-details mt-2"
+                                    >
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <strong class="d-block mb-1"
+                                                    >Ваш порядок:</strong
+                                                >
+                                                <ol class="mb-0">
+                                                    <li
+                                                        v-for="(
+                                                            item, idx
+                                                        ) in qResult.userAnswer"
+                                                        :key="idx"
+                                                    >
+                                                        {{ item }}
+                                                    </li>
+                                                </ol>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <strong class="d-block mb-1"
+                                                    >Правильный порядок:</strong
+                                                >
+                                                <ol class="mb-0">
+                                                    <li
+                                                        v-for="(
+                                                            item, idx
+                                                        ) in qResult.correct_answer"
+                                                        :key="idx"
+                                                    >
+                                                        {{ item }}
+                                                    </li>
+                                                </ol>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <h6 class="mb-1">
                                         Вопрос {{ qIndex + 1 }}:
                                         {{ qResult.question || "Без текста" }}
@@ -590,6 +629,14 @@ export default {
                 return "Нет ответа";
             }
 
+            if (qResult.questionType === "sorting") {
+                if (Array.isArray(userAnswer)) {
+                    return userAnswer
+                        .map((item, index) => `${index + 1}. ${item}`)
+                        .join("; ");
+                }
+            }
+
             if (Array.isArray(userAnswer)) {
                 if (userAnswer.length === 0) return "Нет выбранных вариантов";
                 return userAnswer.join(", ");
@@ -607,7 +654,10 @@ export default {
             }
 
             if (Array.isArray(correct_answer)) {
-                return correct_answer.join(", ");
+                // return correct_answer.join(", ");
+                return correct_answer
+                    .map((item, index) => `${index + 1}. ${item}`)
+                    .join("; ");
             }
 
             if (correct_answer === "true" || correct_answer === true)

@@ -1261,6 +1261,14 @@ export default {
                         points,
                         questionImage
                     );
+                case "sorting":
+                    return this.parseSortingQuestion(
+                        qElement,
+                        questionName,
+                        questionText,
+                        points,
+                        questionImage
+                    );
                 case "truefalse":
                     return this.parseTruefalseQuestion(
                         qElement,
@@ -1281,7 +1289,58 @@ export default {
                     );
             }
         },
+        parseSortingQuestion(qElement, name, text, points, image) {
+            const itemElements =
+                qElement.getElementsByTagName("dragitem") ||
+                qElement.getElementsByTagName("item");
+            const items = [];
 
+            for (let i = 0; i < itemElements.length; i++) {
+                const itemElement = itemElements[i];
+                const itemText = this.extractText(itemElement);
+                const itemImage = this.extractImage(itemElement);
+
+                items.push({
+                    id: i,
+                    text: this.stripTags(itemText, ["p", "b"], {
+                        keepContent: true,
+                    }),
+                    image: itemImage,
+                    correctPosition: i,
+                });
+            }
+
+            // Если нет элементов, создаем два по умолчанию
+            if (items.length === 0) {
+                items.push(
+                    {
+                        id: 0,
+                        text: "Первый элемент",
+                        image: null,
+                        correctPosition: 0,
+                    },
+                    {
+                        id: 1,
+                        text: "Второй элемент",
+                        image: null,
+                        correctPosition: 1,
+                    }
+                );
+            }
+
+            return {
+                id: this.generateId(),
+                type: "sorting",
+                text: this.stripTags(text, ["p", "b"], {
+                    keepContent: true,
+                }),
+                image: image,
+                points: points,
+                items: items,
+                correctOrder: items.map((_, index) => index),
+                explanation: "",
+            };
+        },
         parseMultichoiceQuestion(qElement, name, text, points, image) {
             const answerElements = qElement.getElementsByTagName("answer");
             const answers = [];
@@ -1580,6 +1639,7 @@ export default {
                 matching: "Сопоставление",
                 text: "Короткий ответ",
                 essay: "Развернутый ответ",
+                sorting: "Сортировка/Ранжирование",
             };
 
             const types = new Set(
