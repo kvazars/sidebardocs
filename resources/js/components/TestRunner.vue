@@ -1552,7 +1552,41 @@ export default {
                         "%)",
                     "warning"
                 );
+                this.resetTestState();
             });
+        },
+        resetTestState() {
+            // Сброс всех основных данных
+            this.selectedTest = null;
+            this.currentQuestionIndex = 0;
+            this.userAnswers = []; // ОЧИСТКА ОТВЕТОВ
+            this.timeLeft = 0;
+            this.timer = null;
+            this.copyAttempted = false;
+            this.userName = "";
+            this.tempUserName = "";
+
+            // Очистка всех перемешанных данных
+            this.shuffledQuestions = [];
+            this.shuffledOptionsMap.clear();
+            this.shuffledPairsMap.clear();
+
+            // Очистка валидации
+            this.validationError = "";
+
+            // Очистка отслеживания отвеченных вопросов
+            this.answeredQuestions.clear();
+
+            // Очистка временных массивов
+            this.multipleChoiceAnswers = [];
+            this.matchingAnswers = [];
+
+            // Очистка маппингов
+            this.userAnswersByOriginalIndex.clear();
+            this.displayedQuestionToOriginal.clear();
+            this.originalToDisplayedQuestion.clear();
+            this.displayToOriginalIndex?.clear();
+            this.originalToDisplayIndex?.clear();
         },
 
         formatTime(seconds) {
@@ -1860,12 +1894,14 @@ export default {
                 this.shuffledPairsMap.clear();
                 this.answeredQuestions.clear();
                 this.validationError = "";
+
                 this.showToast(
                     response.message +
                         "<br>Количество набранных баллов: " +
                         result.total_score,
                     "success"
                 );
+                this.resetTestState();
             });
         },
         isOptionSelected(optionIndex) {

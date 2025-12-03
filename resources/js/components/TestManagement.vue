@@ -690,9 +690,8 @@
                                                     "
                                                 >
                                                     Вопрос {{ idx + 1 }}:
-                                                    {{ question.type }} ({{
-                                                        question.points
-                                                    }}
+                                                    {{ typeMap[question.type] }}
+                                                    ({{ question.points }}
                                                     баллов)
                                                 </button>
                                             </h2>
@@ -812,6 +811,14 @@ export default {
             showWordOptions: false, // Показывать ли опции Word
             wordExportType: "withAnswers", // Тип экспорта Word
             importFormat: "json",
+            typeMap: {
+                single: "Один ответ",
+                multiple: "Несколько ответов",
+                matching: "Сопоставление",
+                "true-false": "Да/Нет",
+                text: "Короткий ответ",
+                essay: "Развернутый ответ",
+            },
         };
     },
     mounted() {

@@ -19,8 +19,6 @@ return new class extends Migration
             $table->integer('timeLimit')->default(30);
             $table->json('settings')->nullable();
             $table->json('grading')->nullable();
-            $table->boolean('shuffle_questions')->default(false);
-            $table->boolean('shuffle_answers')->default(false);
             $table->timestamps();
         });
     }
