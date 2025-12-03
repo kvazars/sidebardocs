@@ -564,7 +564,7 @@
                 <button
                     v-else
                     @click="validateAndFinishTest"
-                    class="btn btn-success"
+                    class="btn btn-success text-white"
                 >
                     <i class="bi bi-check-circle"></i> Завершить тест
                 </button>
@@ -1896,11 +1896,17 @@ export default {
                 this.validationError = "";
 
                 this.showToast(
-                    response.message +
-                        "<br>Количество набранных баллов: " +
-                        result.total_score,
+                    "Тест завершен!<br>" +
+                        "Набрано баллов: " +
+                        result.total_score +
+                        " из " +
+                        result.max_score +
+                        " (" +
+                        result.percentage +
+                        "%)",
                     "success"
                 );
+
                 this.resetTestState();
             });
         },
