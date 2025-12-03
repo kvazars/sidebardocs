@@ -160,6 +160,15 @@
                 </div>
             </div>
 
+            <div
+                v-if="showTimeWarning"
+                class="alert alert-warning alert-dismissible fade show mb-3"
+            >
+                <i class="bi bi-clock-history"></i>
+                Осталось меньше 30 секунд! Неотвеченные вопросы не будут
+                засчитаны.
+            </div>
+
             <!-- Таймер и прогресс -->
             <div class="row mb-4">
                 <div class="col-md-8">
@@ -168,8 +177,24 @@
                             <div
                                 class="progress-bar progress-bar-striped progress-bar-animated"
                                 :style="{ width: progress + '%' }"
+                                title="`Вопрос ${currentQuestionIndex + 1} из ${selectedTest.questions.length}`"
                             ></div>
                         </div>
+                        <div
+                            v-if="timeLeft <= 60"
+                            class="progress-bar bg-warning"
+                            :style="{
+                                width:
+                                    (answeredQuestions.size /
+                                        selectedTest.questions.length) *
+                                        100 +
+                                    '%',
+                                position: 'absolute',
+                                left: 0,
+                                opacity: 0.3,
+                            }"
+                            :title="`Отвечено: ${answeredQuestions.size} из ${selectedTest.questions.length}`"
+                        ></div>
                         <div class="progress-markers">
                             <div
                                 v-for="i in selectedTest.questions.length"
@@ -207,8 +232,16 @@
                     </small>
                 </div>
                 <div class="col-md-4">
-                    <div class="timer alert" :class="timerClass">
-                        <i class="bi bi-clock"></i> {{ formatTime(timeLeft) }}
+                    <div
+                        class="timer alert"
+                        :class="[timerClass, { expired: timeLeft <= 0 }]"
+                    >
+                        <i class="bi bi-clock"></i>
+                        {{
+                            timeLeft > 0
+                                ? formatTime(timeLeft)
+                                : "Время истекло!"
+                        }}
                     </div>
                 </div>
             </div>
@@ -658,6 +691,10 @@ export default {
             return this.currentQuestion.originalIndex !== undefined
                 ? this.currentQuestion.originalIndex
                 : this.currentQuestionIndex;
+        },
+
+        showTimeWarning() {
+            return this.timeLeft <= 30 && this.timeLeft > 0;
         },
 
         currentUserAnswer: {
@@ -1152,10 +1189,370 @@ export default {
             this.timer = setInterval(() => {
                 this.timeLeft--;
                 if (this.timeLeft <= 0) {
-                    // При завершении времени автоматически завершаем тест с проверкой
-                    this.validateAndFinishTest();
+                    clearInterval(this.timer);
+                    // При истечении времени сразу завершаем без валидации
+                    this.forceFinishTest();
                 }
             }, 1000);
+        },
+
+        calculatePartialResult() {
+            let totalScore = 0;
+            let maxPossibleScore = 0; // Максимум за отвеченные вопросы
+            let totalMaxScore = 0; // Общий максимум всех вопросов
+            const questionResults = [];
+
+            // Проходим по всем вопросам
+            this.selectedTest.questions.forEach(
+                (originalQuestion, originalIndex) => {
+                    // Всегда добавляем в общий максимум
+                    totalMaxScore += originalQuestion.points;
+
+                    const userAnswer =
+                        this.userAnswersByOriginalIndex.get(originalIndex);
+
+                    // Проверяем, отвечен ли вопрос
+                    let isAnswered = false;
+
+                    switch (originalQuestion.type) {
+                        case "single":
+                        case "true-false":
+                        case "text":
+                            isAnswered =
+                                userAnswer !== "" &&
+                                userAnswer !== null &&
+                                userAnswer !== undefined &&
+                                userAnswer.toString().trim() !== "";
+                            break;
+                        // case "multiple":
+                        //     isAnswered =
+                        //         Array.isArray(userAnswer) &&
+                        //         userAnswer.length > 0;
+                        //     break;
+                        case "multiple":
+                            isAnswered =
+                                Array.isArray(userAnswer) &&
+                                userAnswer.length > 0;
+                            break;
+                        case "matching":
+                            isAnswered =
+                                Array.isArray(userAnswer) &&
+                                userAnswer.length > 0 &&
+                                userAnswer.every(
+                                    (item) =>
+                                        item !== null &&
+                                        item !== undefined &&
+                                        item.toString().trim() !== ""
+                                );
+                            break;
+                    }
+
+                    // Если вопрос не отвечен, добавляем как неотвеченный
+                    if (!isAnswered) {
+                        questionResults.push({
+                            question: originalQuestion.text,
+                            questionImage: originalQuestion.image,
+                            userAnswer: "Не отвечено (время истекло)",
+                            correct_answer:
+                                this.getCorrectAnswer(originalQuestion),
+                            isCorrect: false,
+                            score: 0,
+                            max_score: originalQuestion.points,
+                            originalIndex,
+                            answered: false,
+                            completed_under_timeout: true,
+                        });
+                        return; // Не учитываем в набранных баллах
+                    }
+
+                    // Добавляем максимальный балл вопроса
+                    maxPossibleScore += originalQuestion.points;
+
+                    // Рассчитываем результат для отвеченного вопроса
+                    let isCorrect = false;
+                    let score = 0;
+
+                    switch (originalQuestion.type) {
+                        case "single":
+                            if (userAnswer === undefined || userAnswer === "") {
+                                score = 0;
+                                isCorrect = false;
+                                break;
+                            }
+
+                            let correctOriginalIndex = -1;
+                            if (originalQuestion.options) {
+                                correctOriginalIndex =
+                                    originalQuestion.options.findIndex(
+                                        (opt) => opt.correct === true
+                                    );
+                            }
+
+                            const selectedOriginalIndex = Number(userAnswer);
+                            isCorrect =
+                                selectedOriginalIndex === correctOriginalIndex;
+                            score = isCorrect ? originalQuestion.points : 0;
+                            break;
+
+                        // case "multiple":
+                        //     if (
+                        //         !Array.isArray(userAnswer) ||
+                        //         userAnswer.length === 0
+                        //     ) {
+                        //         score = 0;
+                        //         isCorrect = false;
+                        //         break;
+                        //     }
+
+                        //     const correctOriginalIndices = [];
+                        //     if (originalQuestion.options) {
+                        //         originalQuestion.options.forEach((opt, idx) => {
+                        //             if (opt.correct === true) {
+                        //                 correctOriginalIndices.push(idx);
+                        //             }
+                        //         });
+                        //     }
+
+                        //     const selectedOriginalIndices = userAnswer.map(
+                        //         (idx) => Number(idx)
+                        //     );
+
+                        //     const correctSelections =
+                        //         selectedOriginalIndices.filter((idx) =>
+                        //             correctOriginalIndices.includes(idx)
+                        //         ).length;
+                        //     const wrongSelections =
+                        //         selectedOriginalIndices.filter(
+                        //             (idx) =>
+                        //                 !correctOriginalIndices.includes(idx)
+                        //         ).length;
+
+                        //     if (correctOriginalIndices.length > 0) {
+                        //         const effectiveCorrect = Math.max(
+                        //             0,
+                        //             correctSelections - wrongSelections
+                        //         );
+                        //         score =
+                        //             (effectiveCorrect /
+                        //                 correctOriginalIndices.length) *
+                        //             originalQuestion.points;
+                        //     } else {
+                        //         score = 0;
+                        //     }
+                        //     isCorrect = score > 0;
+                        //     break;
+                        case "multiple":
+                            if (
+                                !Array.isArray(userAnswer) ||
+                                userAnswer.length === 0
+                            ) {
+                                score = 0;
+                                isCorrect = false;
+                                break;
+                            }
+
+                            const correctOriginalIndices = [];
+                            if (originalQuestion.options) {
+                                originalQuestion.options.forEach((opt, idx) => {
+                                    if (opt.correct === true) {
+                                        correctOriginalIndices.push(idx);
+                                    }
+                                });
+                            }
+
+                            const selectedOriginalIndices = userAnswer.map(
+                                (idx) => Number(idx)
+                            );
+
+                            // Проверяем, что выбраны ВСЕ правильные ответы
+                            const hasAllCorrect = correctOriginalIndices.every(
+                                (idx) => selectedOriginalIndices.includes(idx)
+                            );
+
+                            // Проверяем, что НЕ выбрано ни одного неправильного ответа
+                            const hasNoWrong = selectedOriginalIndices.every(
+                                (idx) => correctOriginalIndices.includes(idx)
+                            );
+
+                            // Ответ правильный только если выбраны все правильные и ни одного неправильного
+                            isCorrect = hasAllCorrect && hasNoWrong;
+                            score = isCorrect ? originalQuestion.points : 0;
+                            break;
+
+                        case "true-false":
+                            isCorrect =
+                                userAnswer ===
+                                originalQuestion.correct_answer?.toString();
+                            score = isCorrect ? originalQuestion.points : 0;
+                            break;
+
+                        case "text":
+                            const correct_answers =
+                                originalQuestion.correct_answers || [];
+                            const userAnswerText =
+                                userAnswer?.toString().toLowerCase().trim() ||
+                                "";
+                            isCorrect = correct_answers.some(
+                                (correct_answer) =>
+                                    userAnswerText ===
+                                    correct_answer.toLowerCase().trim()
+                            );
+                            score = isCorrect ? originalQuestion.points : 0;
+                            break;
+
+                        case "matching":
+                            if (
+                                !originalQuestion.pairs ||
+                                originalQuestion.pairs.length === 0
+                            ) {
+                                score = 0;
+                                isCorrect = false;
+                                break;
+                            }
+
+                            if (
+                                !Array.isArray(userAnswer) ||
+                                userAnswer.length === 0
+                            ) {
+                                score = 0;
+                                isCorrect = false;
+                                break;
+                            }
+
+                            let correctPairs = 0;
+                            userAnswer.forEach((userRightAnswer, pairIndex) => {
+                                const originalPair =
+                                    originalQuestion.pairs[pairIndex];
+                                if (
+                                    originalPair &&
+                                    originalPair.right === userRightAnswer
+                                ) {
+                                    correctPairs++;
+                                }
+                            });
+
+                            score =
+                                (correctPairs / originalQuestion.pairs.length) *
+                                originalQuestion.points;
+                            isCorrect =
+                                correctPairs === originalQuestion.pairs.length;
+                            break;
+
+                        default:
+                            score = 0;
+                            isCorrect = false;
+                            break;
+                    }
+
+                    totalScore += score;
+
+                    questionResults.push({
+                        question: originalQuestion.text,
+                        questionImage: originalQuestion.image,
+                        userAnswer: this.formatUserAnswerForDisplay(
+                            originalQuestion,
+                            originalIndex,
+                            userAnswer
+                        ),
+                        correct_answer: this.getCorrectAnswer(originalQuestion),
+                        isCorrect,
+                        score,
+                        max_score: originalQuestion.points,
+                        originalIndex,
+                        answered: true,
+                        completed_under_timeout: true,
+                    });
+                }
+            );
+
+            // Теперь считаем процент от общего количества баллов
+            const percentage =
+                totalMaxScore > 0 ? (totalScore / totalMaxScore) * 100 : 0;
+
+            const grade = this.calculateGrade(percentage);
+
+            const result = {
+                test_id: this.selectedTest.id,
+                test_title: this.selectedTest.title,
+                timestamp: new Date().toISOString(),
+                total_score: totalScore,
+                max_score: totalMaxScore, // Общий максимум всех вопросов
+                answered_max_score: maxPossibleScore, // Максимум только отвеченных
+                percentage: Math.round(percentage),
+                grade,
+                time_spent: this.selectedTest.timeLimit * 60,
+                completed_with_timeout: true,
+                answered_questions_count: this.answeredQuestions.size,
+                total_questions_count: this.selectedTest.questions.length,
+                settings: {
+                    show_user_name_in_results:
+                        this.selectedTest.settings.showUserNameInResults,
+                },
+            };
+
+            if (
+                this.selectedTest.settings.requireUserName &&
+                this.selectedTest.settings.showUserNameInResults
+            ) {
+                result.user_name = this.userName;
+            }
+
+            result.question_results = questionResults;
+
+            return result;
+        },
+
+        forceFinishTest() {
+            // Останавливаем таймер
+            if (this.timer) {
+                clearInterval(this.timer);
+                this.timer = null;
+            }
+
+            // Собираем результат
+            const result = this.calculatePartialResult();
+
+            // Отправляем результат
+            this.datasend("results", "POST", result).then((response) => {
+                // Сброс состояния
+                this.selectedTest = null;
+                this.userName = "";
+                this.tempUserName = "";
+                this.shuffledOptionsMap.clear();
+                this.shuffledPairsMap.clear();
+                this.answeredQuestions.clear();
+                this.validationError = "";
+
+                // Расчет дополнительной информации для сообщения
+                const answeredPercentage =
+                    result.total_questions_count > 0
+                        ? Math.round(
+                              (result.answered_questions_count /
+                                  result.total_questions_count) *
+                                  100
+                          )
+                        : 0;
+
+                // Показываем сообщение
+                this.showToast(
+                    "⏰ Время истекло! Тест завершен автоматически.<br>" +
+                        "Отвечено вопросов: " +
+                        result.answered_questions_count +
+                        " из " +
+                        result.total_questions_count +
+                        " (" +
+                        answeredPercentage +
+                        "%)<br>" +
+                        "Набрано баллов: " +
+                        result.total_score +
+                        " из " +
+                        result.max_score +
+                        " (" +
+                        result.percentage +
+                        "%)",
+                    "warning"
+                );
+            });
         },
 
         formatTime(seconds) {
@@ -1348,6 +1745,10 @@ export default {
 
         validateAndFinishTest() {
             // Проверяем текущий вопрос
+            if (this.timeLeft <= 0) {
+                this.forceFinishTest();
+                return;
+            }
             if (!this.validateCurrentQuestion()) {
                 // Прокрутка к ошибке
                 this.$nextTick(() => {
@@ -1389,6 +1790,9 @@ export default {
         },
 
         nextQuestion() {
+            if (this.timeLeft <= 0) {
+                return;
+            }
             if (
                 this.currentQuestionIndex <
                 this.selectedTest.questions.length - 1
@@ -1409,6 +1813,9 @@ export default {
         },
 
         previousQuestion() {
+            if (this.timeLeft <= 0) {
+                return;
+            }
             if (this.currentQuestionIndex > 0) {
                 this.currentQuestionIndex--;
                 this.validationError = "";
@@ -1574,6 +1981,57 @@ export default {
                             score = isCorrect ? question.points : 0;
                             break;
 
+                        // case "multiple":
+                        //     if (
+                        //         !Array.isArray(userAnswer) ||
+                        //         userAnswer.length === 0
+                        //     ) {
+                        //         score = 0;
+                        //         isCorrect = false;
+                        //         break;
+                        //     }
+
+                        //     // Находим оригинальные индексы правильных ответов
+                        //     const correctOriginalIndices = [];
+                        //     if (originalQuestion.options) {
+                        //         originalQuestion.options.forEach((opt, idx) => {
+                        //             if (opt.correct === true) {
+                        //                 correctOriginalIndices.push(idx);
+                        //             }
+                        //         });
+                        //     }
+
+                        //     // Получаем выбранные пользователем оригинальные индексы
+                        //     const selectedOriginalIndices = userAnswer.map(
+                        //         (idx) => Number(idx)
+                        //     );
+
+                        //     // Подсчитываем правильные и неправильные
+                        //     const correctSelections =
+                        //         selectedOriginalIndices.filter((idx) =>
+                        //             correctOriginalIndices.includes(idx)
+                        //         ).length;
+                        //     const wrongSelections =
+                        //         selectedOriginalIndices.filter(
+                        //             (idx) =>
+                        //                 !correctOriginalIndices.includes(idx)
+                        //         ).length;
+
+                        //     if (correctOriginalIndices.length > 0) {
+                        //         // Вычитаем неправильные из правильных
+                        //         const effectiveCorrect = Math.max(
+                        //             0,
+                        //             correctSelections - wrongSelections
+                        //         );
+                        //         score =
+                        //             (effectiveCorrect /
+                        //                 correctOriginalIndices.length) *
+                        //             originalQuestion.points;
+                        //     } else {
+                        //         score = 0;
+                        //     }
+                        //     isCorrect = score > 0;
+                        //     break;
                         case "multiple":
                             if (
                                 !Array.isArray(userAnswer) ||
@@ -1599,31 +2057,19 @@ export default {
                                 (idx) => Number(idx)
                             );
 
-                            // Подсчитываем правильные и неправильные
-                            const correctSelections =
-                                selectedOriginalIndices.filter((idx) =>
-                                    correctOriginalIndices.includes(idx)
-                                ).length;
-                            const wrongSelections =
-                                selectedOriginalIndices.filter(
-                                    (idx) =>
-                                        !correctOriginalIndices.includes(idx)
-                                ).length;
+                            // Проверяем, что выбраны ВСЕ правильные ответы
+                            const hasAllCorrect = correctOriginalIndices.every(
+                                (idx) => selectedOriginalIndices.includes(idx)
+                            );
 
-                            if (correctOriginalIndices.length > 0) {
-                                // Вычитаем неправильные из правильных
-                                const effectiveCorrect = Math.max(
-                                    0,
-                                    correctSelections - wrongSelections
-                                );
-                                score =
-                                    (effectiveCorrect /
-                                        correctOriginalIndices.length) *
-                                    originalQuestion.points;
-                            } else {
-                                score = 0;
-                            }
-                            isCorrect = score > 0;
+                            // Проверяем, что НЕ выбрано ни одного неправильного ответа
+                            const hasNoWrong = selectedOriginalIndices.every(
+                                (idx) => correctOriginalIndices.includes(idx)
+                            );
+
+                            // Ответ правильный только если выбраны все правильные и ни одного неправильного
+                            isCorrect = hasAllCorrect && hasNoWrong;
+                            score = isCorrect ? originalQuestion.points : 0;
                             break;
 
                         case "true-false":
@@ -1757,6 +2203,9 @@ export default {
                 percentage: Math.round(percentage),
                 grade,
                 time_spent: this.selectedTest.timeLimit * 60 - this.timeLeft,
+                completed_with_timeout: false,
+                answered_questions_count: this.selectedTest.questions.length,
+                total_questions_count: this.selectedTest.questions.length,
                 settings: {
                     show_user_name_in_results:
                         this.selectedTest.settings.showUserNameInResults,
@@ -2150,5 +2599,10 @@ export default {
 
 .btn-success {
     min-width: 150px;
+}
+.timer.expired {
+    background-color: #dc3545 !important;
+    color: white !important;
+    animation: pulse 0.5s infinite;
 }
 </style>
