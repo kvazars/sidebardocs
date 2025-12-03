@@ -1077,11 +1077,15 @@ export default {
     },
     computed: {
         isTestValid() {
-            return (
+            let valid =
                 this.test.title.trim() &&
                 this.test.questions.length > 0 &&
-                this.test.questions.every((q) => this.validateQuestion(q))
-            );
+                this.test.questions.every((q) => {
+                    let valid = this.validateQuestion(q);
+                    return valid;
+                });
+
+            return valid;
         },
         totalPoints() {
             return this.test.questions.reduce(
@@ -1229,9 +1233,12 @@ export default {
                 case "matching":
                     return (
                         question.pairs.length >= 2 &&
-                        question.pairs.every(
-                            (p) => p.left.trim() && p.right.trim()
-                        )
+                        question.pairs.every((p) => {
+                            return (
+                                (p.left.trim() != "" || p.leftImage != null) &&
+                                (p.right.trim() != "" || p.rightImage != null)
+                            );
+                        })
                     );
                 default:
                     return false;
