@@ -504,12 +504,6 @@
                         >
                             Отмена
                         </button>
-                        <div v-if="!showWordOptions" class="text-muted">
-                            <span
-                                class="spinner-border spinner-border-sm me-2"
-                            ></span>
-                            Экспорт выполняется...
-                        </div>
                     </div>
                 </div>
             </div>

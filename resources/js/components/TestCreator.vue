@@ -281,7 +281,7 @@
             </div>
 
             <!-- Вопросы -->
-            <div class="card">
+            <div class="card mb-5">
                 <div
                     class="card-header bg-success text-white d-flex justify-content-between align-items-center"
                 >
@@ -862,21 +862,26 @@
             </div>
 
             <!-- Действия -->
-            <div class="mt-4 d-flex gap-2 justify-content-center">
+            <div
+                class="fixed-bottom p-3 bg-white border-top shadow-lg d-flex justify-content-center gap-3"
+            >
                 <button
                     @click="saveTest"
                     :disabled="!isTestValid"
-                    class="btn btn-success btn-lg"
+                    class="btn btn-success btn-lg text-white px-5"
+                    :class="{ 'opacity-50': !isTestValid }"
                 >
                     <i class="bi bi-check-circle"></i>
                     {{ isEditing ? "Обновить тест" : "Сохранить тест" }}
                 </button>
+
+                <!-- Опционально можно добавить кнопку отмены -->
                 <button
                     v-if="isEditing"
-                    @click="deleteTest"
-                    class="btn btn-outline-danger btn-lg"
+                    @click="cancelEdit"
+                    class="btn btn-outline-secondary btn-lg"
                 >
-                    <i class="bi bi-trash"></i> Удалить тест
+                    <i class="bi bi-x-circle"></i> Отмена
                 </button>
             </div>
         </div>
@@ -1113,7 +1118,9 @@ export default {
                 this.test.title.trim() &&
                 this.test.questions.length > 0 &&
                 this.test.questions.every((q) => {
-                    let valid = this.validateQuestion(q);
+                    let valid = this.validateQuestion(q) == null;
+                    console.log(valid);
+
                     return valid;
                 });
 
