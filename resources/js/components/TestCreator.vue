@@ -289,6 +289,38 @@
                     <span class="badge bg-light text-dark"
                         >{{ test.questions.length }} вопросов</span
                     >
+                    <span
+                        v-if="errorQuestionsCount > 0"
+                        class="badge bg-danger"
+                    >
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        {{ errorQuestionsCount }} ошибок
+                    </span>
+                </div>
+                <div
+                    v-if="errorQuestionsCount > 0"
+                    class="alert alert-danger m-3 mb-0 py-2"
+                >
+                    <div class="d-flex align-items-center">
+                        <i
+                            class="bi bi-exclamation-triangle-fill fs-5 me-2"
+                        ></i>
+                        <div>
+                            <strong>Обнаружены ошибки в вопросах:</strong>
+                            <div class="mt-1">
+                                <template
+                                    v-for="item in questionsWithErrors"
+                                    :key="item.index"
+                                >
+                                    <span
+                                        class="badge bg-danger bg-opacity-25 text-danger border border-danger me-2 mb-1"
+                                    >
+                                        Вопрос {{ item.index + 1 }}
+                                    </span>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body">
                     <!-- Статистика вопросов -->
@@ -1114,6 +1146,21 @@ export default {
                     question.options.some((option) => option.image)*/
             );
         },
+        errorQuestionsCount() {
+            return this.test.questions.filter((q) => this.hasQuestionError(q))
+                .length;
+        },
+
+        // Список вопросов с ошибками
+        questionsWithErrors() {
+            return this.test.questions
+                .map((q, index) => ({
+                    index: index,
+                    question: q,
+                    error: this.validateQuestion(q),
+                }))
+                .filter((item) => item.error !== null);
+        },
     },
     watch: {
         editTestId: {
@@ -1209,40 +1256,127 @@ export default {
         },
 
         validateQuestion(question) {
-            if (!question.text.trim()) return false;
+            // Проверка текста вопроса
+            if (!question.text || question.text.trim() === "") {
+                return "Не заполнен текст вопроса";
+            }
 
+            // Проверка в зависимости от типа вопроса
             switch (question.type) {
                 case "single":
-                    return (
-                        question.options.length >= 2 &&
-                        question.options.some((opt) => opt.correct)
-                    );
+                    if (!question.options || question.options.length < 2) {
+                        return "Должно быть не менее 2 вариантов ответа";
+                    }
+
+                    // Проверяем заполненность всех вариантов
+                    for (let i = 0; i < question.options.length; i++) {
+                        if (
+                            !question.options[i].text ||
+                            question.options[i].text.trim() === ""
+                        ) {
+                            if (question.options[i].image === null) {
+                                return `Вариант ответа ${i + 1} не заполнен`;
+                            }
+                        }
+                    }
+
+                    if (!question.options.some((opt) => opt.correct)) {
+                        return "Не выбран правильный ответ";
+                    }
+
+                    // Проверяем что выбран только один ответ для single
+                    const correctCount = question.options.filter(
+                        (opt) => opt.correct
+                    ).length;
+                    if (correctCount > 1) {
+                        return "Для одиночного выбора должен быть выбран только один вариант";
+                    }
+                    break;
+
                 case "multiple":
-                    return (
-                        question.options.length >= 2 &&
-                        question.options.some((opt) => opt.correct)
-                    );
+                    if (!question.options || question.options.length < 2) {
+                        return "Должно быть не менее 2 вариантов ответа";
+                    }
+
+                    // Проверяем заполненность всех вариантов
+                    for (let i = 0; i < question.options.length; i++) {
+                        if (
+                            !question.options[i].text ||
+                            question.options[i].text.trim() === ""
+                        ) {
+                            if (question.options[i].image === null) {
+                                return `Вариант ответа ${i + 1} не заполнен`;
+                            }
+                        }
+                    }
+
+                    if (!question.options.some((opt) => opt.correct)) {
+                        return "Не выбраны правильные ответы";
+                    }
+                    break;
+
                 case "true-false":
-                    return question.correct_answer !== undefined;
+                    if (
+                        question.correct_answer === undefined ||
+                        question.correct_answer === null
+                    ) {
+                        return "Не выбран правильный ответ";
+                    }
+                    break;
+
                 case "text":
-                    return (
-                        question.correct_answers &&
-                        question.correct_answers.length > 0 &&
-                        question.correct_answers.every((a) => a && a.trim())
-                    );
+                    if (
+                        !question.correct_answers ||
+                        question.correct_answers.length === 0
+                    ) {
+                        return "Не указаны правильные ответы";
+                    }
+
+                    // Проверяем каждый правильный ответ
+                    for (let i = 0; i < question.correct_answers.length; i++) {
+                        if (
+                            !question.correct_answers[i] ||
+                            question.correct_answers[i].trim() === ""
+                        ) {
+                            return `Правильный ответ ${i + 1} не заполнен`;
+                        }
+                    }
+                    break;
+
                 case "matching":
-                    return (
-                        question.pairs.length >= 2 &&
-                        question.pairs.every((p) => {
-                            return (
-                                (p.left.trim() != "" || p.leftImage != null) &&
-                                (p.right.trim() != "" || p.rightImage != null)
-                            );
-                        })
-                    );
-                default:
-                    return false;
+                    if (!question.pairs || question.pairs.length < 2) {
+                        return "Должно быть не менее 2 пар для сопоставления";
+                    }
+
+                    // Проверяем каждую пару
+                    for (let i = 0; i < question.pairs.length; i++) {
+                        const pair = question.pairs[i];
+                        const leftEmpty = !pair.left.trim() && !pair.leftImage;
+                        const rightEmpty =
+                            !pair.right.trim() && !pair.rightImage;
+
+                        if (leftEmpty && rightEmpty) {
+                            return `Пара ${i + 1} не заполнена`;
+                        } else if (leftEmpty) {
+                            return `Левая часть пары ${i + 1} не заполнена`;
+                        } else if (rightEmpty) {
+                            return `Правая часть пары ${i + 1} не заполнена`;
+                        }
+                    }
+                    break;
             }
+
+            return null; // Ошибок нет, валидация пройдена
+        },
+
+        // Новый метод для проверки, есть ли ошибка в вопросе
+        hasQuestionError(question) {
+            return this.validateQuestion(question) !== null;
+        },
+
+        // Получить текст ошибки для вопроса
+        getQuestionErrorMessage(question) {
+            return this.validateQuestion(question);
         },
 
         resetQuestionAnswers(question) {
@@ -1415,7 +1549,7 @@ export default {
         },
 
         removeOptionImage(qIndex, oIndex) {
-            //this.test.questions[qIndex].options[oIndex].image = null;
+            this.test.questions[qIndex].options[oIndex].image = null;
         },
 
         removeLeftImage(qIndex, pIndex) {

@@ -78,13 +78,12 @@ export default {
             this.showMenu = false;
         },
         save() {
-            let form ={};
-            form.append("name", this.folderTitle);
+            let form = { name: this.folderTitle };
 
             if (this.folderParent) {
-                form.append("tree_id", this.folderParent);
+                form.tree_id = this.folderParent;
             } else {
-                form.append("id", this.folderId);
+                form.id = this.folderId;
             }
 
             this.datasend("folder", "POST", form)

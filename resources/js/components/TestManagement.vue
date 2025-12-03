@@ -584,8 +584,6 @@
                                 </span>
                                 <span v-if="importFormat === 'xml'">
                                     Выберите файл теста в формате Moodle XML
-                                    (поддерживаются вопросы: multichoice,
-                                    matching, text, essay, truefalse)
                                 </span>
                             </div>
                         </div>
