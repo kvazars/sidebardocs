@@ -52,14 +52,7 @@
         </div>
 
         <!-- Ввод имени (если требуется) -->
-        <div
-            v-else-if="
-                selectedTest &&
-                selectedTest.settings.requireUserName &&
-                !userName
-            "
-            class="user-name-section"
-        >
+        <div v-else-if="selectedTest && !userName" class="user-name-section">
             <div class="card">
                 <div class="card-header bg-info text-white">
                     <h5 class="mb-0">
@@ -764,11 +757,48 @@ export default {
 
         currentMultipleChoiceAnswer: {
             get() {
-                const answer = this.currentUserAnswer;
-                return Array.isArray(answer) ? [...answer] : [];
+                // Получаем ответ напрямую из хранилища
+                if (this.currentOriginalIndex === -1) return [];
+
+                const answer = this.userAnswersByOriginalIndex.get(
+                    this.currentOriginalIndex
+                );
+
+                if (Array.isArray(answer)) {
+                    // Фильтруем пустые значения и преобразуем в числа
+                    return answer
+                        .filter(
+                            (item) =>
+                                item !== null &&
+                                item !== undefined &&
+                                item !== ""
+                        )
+                        .map((item) => Number(item));
+                }
+
+                // Если ответ не массив, возвращаем пустой массив
+                return [];
             },
             set(value) {
-                this.currentUserAnswer = Array.isArray(value) ? [...value] : [];
+                if (this.currentOriginalIndex !== -1) {
+                    // Фильтруем пустые значения и сохраняем как числа
+                    const filteredValue = Array.isArray(value)
+                        ? value
+                              .filter(
+                                  (item) =>
+                                      item !== null &&
+                                      item !== undefined &&
+                                      item !== ""
+                              )
+                              .map((item) => Number(item))
+                        : [];
+
+                    this.userAnswersByOriginalIndex.set(
+                        this.currentOriginalIndex,
+                        filteredValue
+                    );
+                    this.updateAnsweredStatus();
+                }
             },
         },
 
@@ -911,6 +941,8 @@ export default {
                 case "multiple":
                 case "matching":
                     return [];
+                case "single":
+                    return null;
                 default:
                     return "";
             }
@@ -971,12 +1003,21 @@ export default {
                 case "true-false":
                 case "text":
                     hasAnswer =
-                        answer !== "" &&
                         answer !== null &&
-                        answer !== undefined;
+                        answer !== undefined &&
+                        answer !== "" &&
+                        answer.toString().trim() !== "";
                     break;
                 case "multiple":
-                    hasAnswer = Array.isArray(answer) && answer.length > 0;
+                    hasAnswer =
+                        Array.isArray(answer) &&
+                        answer.length > 0 &&
+                        !answer.some(
+                            (item) =>
+                                item === null ||
+                                item === undefined ||
+                                item === ""
+                        );
                     break;
                 case "sorting":
                     hasAnswer =
@@ -1026,11 +1067,6 @@ export default {
             // Сбрасываем имя пользователя
             this.userName = "";
             this.tempUserName = "";
-
-            // Если имя не требуется, сразу инициализируем тест
-            if (!this.selectedTest.settings.requireUserName) {
-                this.initializeTest();
-            }
         },
 
         startTestWithName() {
@@ -1079,6 +1115,12 @@ export default {
                     case "multiple":
                     case "matching":
                         this.userAnswersByOriginalIndex.set(originalIndex, []);
+                        break;
+                    case "single":
+                        this.userAnswersByOriginalIndex.set(
+                            originalIndex,
+                            null
+                        ); // null вместо ""
                         break;
                     default:
                         this.userAnswersByOriginalIndex.set(originalIndex, "");
@@ -1430,11 +1472,6 @@ export default {
                                 userAnswer !== undefined &&
                                 userAnswer.toString().trim() !== "";
                             break;
-                        // case "multiple":
-                        //     isAnswered =
-                        //         Array.isArray(userAnswer) &&
-                        //         userAnswer.length > 0;
-                        //     break;
                         case "multiple":
                             isAnswered =
                                 Array.isArray(userAnswer) &&
@@ -1457,7 +1494,6 @@ export default {
                     if (!isAnswered) {
                         questionResults.push({
                             question: originalQuestion.text,
-                            questionImage: originalQuestion.image,
                             userAnswer: "Не отвечено (время истекло)",
                             correct_answer:
                                 this.getCorrectAnswer(originalQuestion),
@@ -1500,53 +1536,6 @@ export default {
                             score = isCorrect ? originalQuestion.points : 0;
                             break;
 
-                        // case "multiple":
-                        //     if (
-                        //         !Array.isArray(userAnswer) ||
-                        //         userAnswer.length === 0
-                        //     ) {
-                        //         score = 0;
-                        //         isCorrect = false;
-                        //         break;
-                        //     }
-
-                        //     const correctOriginalIndices = [];
-                        //     if (originalQuestion.options) {
-                        //         originalQuestion.options.forEach((opt, idx) => {
-                        //             if (opt.correct === true) {
-                        //                 correctOriginalIndices.push(idx);
-                        //             }
-                        //         });
-                        //     }
-
-                        //     const selectedOriginalIndices = userAnswer.map(
-                        //         (idx) => Number(idx)
-                        //     );
-
-                        //     const correctSelections =
-                        //         selectedOriginalIndices.filter((idx) =>
-                        //             correctOriginalIndices.includes(idx)
-                        //         ).length;
-                        //     const wrongSelections =
-                        //         selectedOriginalIndices.filter(
-                        //             (idx) =>
-                        //                 !correctOriginalIndices.includes(idx)
-                        //         ).length;
-
-                        //     if (correctOriginalIndices.length > 0) {
-                        //         const effectiveCorrect = Math.max(
-                        //             0,
-                        //             correctSelections - wrongSelections
-                        //         );
-                        //         score =
-                        //             (effectiveCorrect /
-                        //                 correctOriginalIndices.length) *
-                        //             originalQuestion.points;
-                        //     } else {
-                        //         score = 0;
-                        //     }
-                        //     isCorrect = score > 0;
-                        //     break;
                         case "multiple":
                             if (
                                 !Array.isArray(userAnswer) ||
@@ -1586,9 +1575,25 @@ export default {
                             break;
 
                         case "true-false":
+                            // Обработка разных форматов
+                            let correctPartialAnswer;
+
+                            if (typeof originalQuestion.options === "string") {
+                                correctPartialAnswer = originalQuestion.options;
+                            } else if (
+                                Array.isArray(originalQuestion.options)
+                            ) {
+                                correctPartialAnswer =
+                                    originalQuestion.options[0] || "false";
+                            } else {
+                                correctPartialAnswer =
+                                    originalQuestion.options?.toString() ||
+                                    "false";
+                            }
+
+                            const userPartialAnswerStr = userAnswer?.toString();
                             isCorrect =
-                                userAnswer ===
-                                originalQuestion.options?.toString();
+                                userPartialAnswerStr === correctPartialAnswer;
                             score = isCorrect ? originalQuestion.points : 0;
                             break;
 
@@ -1644,6 +1649,71 @@ export default {
                                 correctPairs ===
                                 originalQuestion.options.length;
                             break;
+                        case "sorting":
+                            if (
+                                !originalQuestion.options ||
+                                originalQuestion.options.length === 0
+                            ) {
+                                score = 0;
+                                isCorrect = false;
+                                break;
+                            }
+
+                            if (
+                                !Array.isArray(userAnswer) ||
+                                userAnswer.length === 0
+                            ) {
+                                score = 0;
+                                isCorrect = false;
+                                break;
+                            }
+
+                            // Получаем правильный порядок из correctPosition
+                            const correctOrder = [];
+                            const positionMap = new Map();
+
+                            // Собираем правильный порядок
+                            originalQuestion.options.forEach((opt, index) => {
+                                positionMap.set(
+                                    index,
+                                    opt.correctPosition || index
+                                );
+                            });
+
+                            // Сортируем по correctPosition
+                            const sortedByPosition = [
+                                ...originalQuestion.options.keys(),
+                            ].sort((a, b) => {
+                                const posA = positionMap.get(a);
+                                const posB = positionMap.get(b);
+                                return posA - posB;
+                            });
+
+                            // Создаем маппинг: originalIndex -> его правильная позиция
+                            const correctPositionForIndex = new Map();
+                            sortedByPosition.forEach(
+                                (originalIndex, correctPosition) => {
+                                    correctPositionForIndex.set(
+                                        originalIndex,
+                                        correctPosition
+                                    );
+                                }
+                            );
+
+                            // Проверяем, полностью ли совпадает порядок
+                            let isFullyCorrect = true;
+                            userAnswer.forEach((userItemId, userPosition) => {
+                                const shouldBeAtPosition =
+                                    correctPositionForIndex.get(userItemId);
+                                if (shouldBeAtPosition !== userPosition) {
+                                    isFullyCorrect = false;
+                                }
+                            });
+
+                            // Только полностью правильный ответ дает баллы
+                            isCorrect = isFullyCorrect;
+                            score = isCorrect ? originalQuestion.points : 0;
+                            break;
 
                         default:
                             score = 0;
@@ -1655,7 +1725,6 @@ export default {
 
                     questionResults.push({
                         question: originalQuestion.text,
-                        questionImage: originalQuestion.image,
                         userAnswer: this.formatUserAnswerForDisplay(
                             originalQuestion,
                             originalIndex,
@@ -1691,18 +1760,9 @@ export default {
                 completed_with_timeout: true,
                 answered_questions_count: this.answeredQuestions.size,
                 total_questions_count: this.selectedTest.questions.length,
-                settings: {
-                    show_user_name_in_results:
-                        this.selectedTest.settings.showUserNameInResults,
-                },
             };
 
-            if (
-                this.selectedTest.settings.requireUserName &&
-                this.selectedTest.settings.showUserNameInResults
-            ) {
-                result.user_name = this.userName;
-            }
+            result.user_name = this.userName;
 
             result.question_results = questionResults;
 
@@ -1816,14 +1876,16 @@ export default {
 
             switch (question.type) {
                 case "single":
-                    // Проверяем, что ответ не пустой и является допустимым значением
-                    const isNumber =
-                        typeof answer === "number" ||
-                        (typeof answer === "string" && !isNaN(answer));
+                    // Проверяем, что ответ не null, не undefined и не пустая строка
+                    const isNumber = typeof answer === "number";
                     const isStringWithValue =
                         typeof answer === "string" && answer.trim() !== "";
 
-                    isValid = (isNumber && answer !== "") || isStringWithValue;
+                    isValid =
+                        answer !== null &&
+                        answer !== undefined &&
+                        answer !== "" &&
+                        (isNumber || isStringWithValue);
 
                     if (!isValid) {
                         this.validationError =
@@ -1832,7 +1894,36 @@ export default {
                     break;
 
                 case "multiple":
-                    isValid = Array.isArray(answer) && answer.length > 0;
+                    // Для multiple используем currentMultipleChoiceAnswer напрямую
+                    const multipleAnswer = this.currentMultipleChoiceAnswer;
+
+                    // Проверка 1: Это массив
+                    if (Array.isArray(multipleAnswer)) {
+                        // Проверка 2: Массив не пустой
+                        if (multipleAnswer.length > 0) {
+                            // Проверка 3: Все элементы валидны (не пустые строки)
+                            isValid = multipleAnswer.every(
+                                (item) =>
+                                    item !== null &&
+                                    item !== undefined &&
+                                    item.toString().trim() !== ""
+                            );
+
+                            // Проверка 4: Все элементы - числа (индексы)
+                            if (isValid) {
+                                isValid = multipleAnswer.every(
+                                    (item) =>
+                                        typeof Number(item) === "number" &&
+                                        !isNaN(Number(item))
+                                );
+                            }
+                        } else {
+                            isValid = false; // Пустой массив
+                        }
+                    } else {
+                        isValid = false; // Не массив
+                    }
+
                     if (!isValid) {
                         this.validationError =
                             "Пожалуйста, выберите хотя бы один вариант ответа";
@@ -1840,7 +1931,7 @@ export default {
                     break;
 
                 case "true-false":
-                    isValid = answer === "true" || answer === "false";
+                    isValid = answer == "true" || answer == "false";
                     if (!isValid) {
                         this.validationError =
                             "Пожалуйста, выберите Да или Нет";
@@ -1872,7 +1963,11 @@ export default {
                     break;
 
                 case "text":
-                    isValid = answer && answer.toString().trim() !== "";
+                    isValid =
+                        answer !== null &&
+                        answer !== undefined &&
+                        answer.toString().trim() !== "";
+
                     if (!isValid) {
                         this.validationError = "Пожалуйста, введите ваш ответ";
                     }
@@ -1976,7 +2071,21 @@ export default {
                             answer !== undefined;
                         break;
                     case "multiple":
+                        // Проверка, что выбрано хотя бы один вариант
                         isValid = Array.isArray(answer) && answer.length > 0;
+
+                        // Дополнительная проверка валидности выбранных значений
+                        if (
+                            isValid &&
+                            answer.some(
+                                (item) =>
+                                    item === null ||
+                                    item === undefined ||
+                                    item === ""
+                            )
+                        ) {
+                            isValid = false;
+                        }
                         break;
                     case "sorting":
                         // ОБНОВЛЕННАЯ ПРОВЕРКА ДЛЯ СОРТИРОВКИ
@@ -2001,7 +2110,11 @@ export default {
                         }
                         break;
                     case "text":
-                        isValid = answer && answer.toString().trim() !== "";
+                        // Проверка заполненности текстового поля
+                        isValid =
+                            answer !== null &&
+                            answer !== undefined &&
+                            answer.toString().trim() !== "";
                         break;
                     case "matching":
                         if (Array.isArray(answer) && question.options) {
@@ -2275,57 +2388,6 @@ export default {
                             score = isCorrect ? question.points : 0;
                             break;
 
-                        // case "multiple":
-                        //     if (
-                        //         !Array.isArray(userAnswer) ||
-                        //         userAnswer.length === 0
-                        //     ) {
-                        //         score = 0;
-                        //         isCorrect = false;
-                        //         break;
-                        //     }
-
-                        //     // Находим оригинальные индексы правильных ответов
-                        //     const correctOriginalIndices = [];
-                        //     if (originalQuestion.options) {
-                        //         originalQuestion.options.forEach((opt, idx) => {
-                        //             if (opt.correct === true) {
-                        //                 correctOriginalIndices.push(idx);
-                        //             }
-                        //         });
-                        //     }
-
-                        //     // Получаем выбранные пользователем оригинальные индексы
-                        //     const selectedOriginalIndices = userAnswer.map(
-                        //         (idx) => Number(idx)
-                        //     );
-
-                        //     // Подсчитываем правильные и неправильные
-                        //     const correctSelections =
-                        //         selectedOriginalIndices.filter((idx) =>
-                        //             correctOriginalIndices.includes(idx)
-                        //         ).length;
-                        //     const wrongSelections =
-                        //         selectedOriginalIndices.filter(
-                        //             (idx) =>
-                        //                 !correctOriginalIndices.includes(idx)
-                        //         ).length;
-
-                        //     if (correctOriginalIndices.length > 0) {
-                        //         // Вычитаем неправильные из правильных
-                        //         const effectiveCorrect = Math.max(
-                        //             0,
-                        //             correctSelections - wrongSelections
-                        //         );
-                        //         score =
-                        //             (effectiveCorrect /
-                        //                 correctOriginalIndices.length) *
-                        //             originalQuestion.points;
-                        //     } else {
-                        //         score = 0;
-                        //     }
-                        //     isCorrect = score > 0;
-                        //     break;
                         case "multiple":
                             if (
                                 !Array.isArray(userAnswer) ||
@@ -2385,36 +2447,74 @@ export default {
                                 break;
                             }
 
-                            // Проверяем правильность порядка
-                            const correctOrder =
-                                originalQuestion.correctOrder ||
-                                originalQuestion.options.map(
-                                    (_, index) => index
-                                );
+                            // Получаем правильный порядок из correctPosition
+                            const correctOrder = [];
+                            const positionMap = new Map();
 
-                            let correctPositions = 0;
-                            userAnswer.forEach((itemId, position) => {
-                                if (itemId === correctOrder[position]) {
-                                    correctPositions++;
+                            // Собираем правильный порядок
+                            originalQuestion.options.forEach((opt, index) => {
+                                positionMap.set(
+                                    index,
+                                    opt.correctPosition || index
+                                );
+                            });
+
+                            // Сортируем по correctPosition
+                            const sortedByPosition = [
+                                ...originalQuestion.options.keys(),
+                            ].sort((a, b) => {
+                                const posA = positionMap.get(a);
+                                const posB = positionMap.get(b);
+                                return posA - posB;
+                            });
+
+                            // Создаем маппинг: originalIndex -> его правильная позиция
+                            const correctPositionForIndex = new Map();
+                            sortedByPosition.forEach(
+                                (originalIndex, correctPosition) => {
+                                    correctPositionForIndex.set(
+                                        originalIndex,
+                                        correctPosition
+                                    );
+                                }
+                            );
+
+                            // Проверяем, полностью ли совпадает порядок
+                            let isFullyCorrect = true;
+                            userAnswer.forEach((userItemId, userPosition) => {
+                                const shouldBeAtPosition =
+                                    correctPositionForIndex.get(userItemId);
+                                if (shouldBeAtPosition !== userPosition) {
+                                    isFullyCorrect = false;
                                 }
                             });
 
-                            // Рассчитываем баллы пропорционально количеству правильно расположенных элементов
-                            score =
-                                (correctPositions /
-                                    originalQuestion.options.length) *
-                                originalQuestion.points;
-                            isCorrect =
-                                correctPositions ===
-                                originalQuestion.options.length;
+                            // Только полностью правильный ответ дает баллы
+                            isCorrect = isFullyCorrect;
+                            score = isCorrect ? originalQuestion.points : 0;
                             break;
 
                         case "true-false":
-                            isCorrect =
-                                userAnswer ==
-                                originalQuestion.options?.toString();
-                            score = isCorrect ? originalQuestion.points : 0;
+                            // Обработка разных форматов хранения правильного ответа
+                            let correctAnswer;
 
+                            if (typeof originalQuestion.options === "string") {
+                                correctAnswer = originalQuestion.options; // "true" или "false"
+                            } else if (
+                                Array.isArray(originalQuestion.options)
+                            ) {
+                                correctAnswer =
+                                    originalQuestion.options[0] || "false";
+                            } else {
+                                correctAnswer =
+                                    originalQuestion.options?.toString() ||
+                                    "false";
+                            }
+
+                            // Приводим userAnswer к строке для сравнения
+                            const userAnswerStr = userAnswer?.toString();
+                            isCorrect = userAnswerStr === correctAnswer;
+                            score = isCorrect ? originalQuestion.points : 0;
                             break;
 
                         case "text":
@@ -2509,7 +2609,6 @@ export default {
                     totalScore += score;
                     questionResults.push({
                         question: originalQuestion.text,
-                        questionImage: originalQuestion.image,
                         userAnswer: this.formatUserAnswerForDisplay(
                             originalQuestion,
                             originalIndex,
@@ -2546,18 +2645,9 @@ export default {
                 completed_with_timeout: false,
                 answered_questions_count: this.selectedTest.questions.length,
                 total_questions_count: this.selectedTest.questions.length,
-                settings: {
-                    show_user_name_in_results:
-                        this.selectedTest.settings.showUserNameInResults,
-                },
             };
 
-            if (
-                this.selectedTest.settings.requireUserName &&
-                this.selectedTest.settings.showUserNameInResults
-            ) {
-                result.user_name = this.userName;
-            }
+            result.user_name = this.userName;
 
             result.question_results = questionResults;
 
@@ -2628,22 +2718,24 @@ export default {
                     });
 
                     return answerTexts.join(", ");
+
                 case "sorting":
                     if (!Array.isArray(userAnswer) || userAnswer.length === 0) {
                         return "";
                     }
 
-                    return userAnswer
-                        .map((itemId, index) => {
-                            const item = originalQuestion.options?.[itemId];
-                            return `${index + 1}. ${
-                                item?.text || `Элемент ${itemId + 1}`
-                            }`;
-                        })
-                        .join("; ");
+                    // Получаем текст элементов
+                    const sortedItemsText = userAnswer.map((itemId, index) => {
+                        const item = originalQuestion.options?.[itemId];
+                        const itemText = item?.text || `Элемент ${itemId + 1}`;
+                        return `${index + 1}. ${itemText}`;
+                    });
+
+                    // Единый формат: перечисление позиций и текстов
+                    return sortedItemsText.join("; ");
 
                 case "true-false":
-                    return userAnswer === "true" ? "Да" : "Нет";
+                    return userAnswer == "true" ? "Да" : "Нет";
 
                 case "text":
                     return userAnswer.toString();
@@ -2661,19 +2753,18 @@ export default {
                         (rightAnswer, idx) => {
                             const leftText =
                                 pairs[idx]?.left || `Элемент ${idx + 1}`;
-                            return `${leftText} → ${
-                                rightAnswer || "Не выбрано"
-                            }`;
+                            const rightText = rightAnswer || "Не выбрано";
+                            return `${leftText} → ${rightText}`;
                         }
                     );
 
+                    // Единый формат: перечисление сопоставлений через точку с запятой
                     return formattedPairs.join("; ");
 
                 default:
                     return userAnswer.toString();
             }
         },
-
         getCorrectAnswer(originalQuestion) {
             if (!originalQuestion) return "";
 
@@ -2690,17 +2781,60 @@ export default {
                             ?.map((opt) => opt.text) || []
                     );
                 case "true-false":
-                    return originalQuestion.options === "true" ? "Да" : "Нет";
+                    if (typeof originalQuestion.options === "string") {
+                        return originalQuestion.options == "true"
+                            ? "Да"
+                            : "Нет";
+                    }
+                    if (Array.isArray(originalQuestion.options)) {
+                        return originalQuestion.options[0] == "true"
+                            ? "Да"
+                            : "Нет";
+                    }
+                    return originalQuestion.options == "true" ? "Да" : "Нет";
                 case "text":
                     return originalQuestion.options || [];
                 case "matching":
-                    return (
-                        originalQuestion.options?.map((pair) => ({
-                            left: pair.left,
+                    if (!originalQuestion.options) return [];
 
-                            right: pair.right,
-                        })) || []
+                    // Единый формат для сопоставления: список пар через точку с запятой
+                    const matchingPairs = originalQuestion.options.map(
+                        (pair) => {
+                            return `${pair.left} → ${pair.right}`;
+                        }
                     );
+
+                    return matchingPairs.join("; ");
+                case "sorting":
+                    if (!originalQuestion.options) return [];
+
+                    // Получаем правильный порядок из correctPosition
+                    const positionMap = new Map();
+                    originalQuestion.options.forEach((opt, index) => {
+                        positionMap.set(index, opt.correctPosition || index);
+                    });
+
+                    // Сортируем по correctPosition
+                    const sortedByPosition = [
+                        ...originalQuestion.options.keys(),
+                    ].sort((a, b) => {
+                        const posA = positionMap.get(a);
+                        const posB = positionMap.get(b);
+                        return posA - posB;
+                    });
+
+                    // Формируем текст правильного порядка
+                    const correctOrderText = sortedByPosition.map(
+                        (originalIndex, position) => {
+                            const item =
+                                originalQuestion.options[originalIndex];
+                            const itemText =
+                                item?.text || `Элемент ${originalIndex + 1}`;
+                            return `${position + 1}. ${itemText}`;
+                        }
+                    );
+
+                    return correctOrderText.join("; ");
                 default:
                     return "";
             }

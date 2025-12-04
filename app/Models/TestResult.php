@@ -18,13 +18,11 @@ class TestResult extends Model
         'percentage',
         'grade',
         'time_spent',
-        'settings',
         'question_results',
         'user_id',
     ];
 
     protected $casts = [
-        'settings' => 'array',
         'question_results' => 'array'
     ];
 

@@ -303,7 +303,7 @@
                                     <h6 class="card-title mb-0">
                                         {{ questionTypes.sorting }}
                                     </h6>
-                                    <small class="text-muted">Сортировка</small>
+                                    <small class="text-muted">Упорядочивание</small>
                                 </div>
                             </div>
                         </div>
@@ -448,7 +448,7 @@
                                             Сопоставление
                                         </option>
                                         <option value="sorting">
-                                            Сортировка (ранжирование)
+                                            Упорядочивание (ранжирование)
                                         </option>
                                     </select>
                                 </div>
@@ -785,7 +785,7 @@
                             </div>
                             <!-- В TestCreator.vue добавьте в шаблон -->
 
-                            <!-- Сортировка (ранжирование) -->
+                            <!-- Упорядочивание (ранжирование) -->
                             <div
                                 v-if="question.type === 'sorting'"
                                 class="mb-3"
@@ -1185,8 +1185,6 @@ export default {
                 description: "",
                 timeLimit: 30,
                 settings: {
-                    requireUserName: true,
-                    showUserNameInResults: true,
                     shuffleQuestions: false,
                     shuffleAnswers: false,
                 },
@@ -1325,7 +1323,7 @@ export default {
                 "true-false": "Да/Нет",
                 text: "Свободный ввод",
                 matching: "Сопоставление",
-                sorting: "Сортировка/Ранжирование",
+                sorting: "Упорядочивание",
             };
             return labels[type] || type;
         },
@@ -1475,12 +1473,12 @@ export default {
                     }
 
                     // Проверяем правильный порядок
-                    if (
-                        !question.correctOrder ||
-                        question.correctOrder.length !== question.options.length
-                    ) {
-                        return "Некорректный правильный порядок";
-                    }
+                    // if (
+                    //     !question.correctOrder ||
+                    //     question.correctOrder.length !== question.options.length
+                    // ) {
+                    //     return "Некорректный правильный порядок";
+                    // }
                     break;
                 case "text":
                     if (!question.options || question.options.length === 0) {
@@ -2029,8 +2027,6 @@ export default {
                 description: "",
                 timeLimit: 30,
                 settings: {
-                    requireUserName: true,
-                    showUserNameInResults: true,
                     shuffleQuestions: false,
                     shuffleAnswers: false,
                 },
@@ -2173,8 +2169,6 @@ export default {
             // Убедимся, что все необходимые поля существуют
             if (!test.settings) {
                 test.settings = {
-                    requireUserName: true,
-                    showUserNameInResults: true,
                     shuffleQuestions: false,
                     shuffleAnswers: false,
                 };

@@ -10,6 +10,7 @@ function getQuestionTypeLabel(type) {
         "true-false": "Верно/Неверно",
         text: "Свободный ответ",
         matching: "Сопоставление",
+        sorting: "Упорядочивание",
     };
     return labels[type] || type;
 }
@@ -60,6 +61,13 @@ function getCorrectAnswerText(question) {
                             pair.right
                         }`
                 )
+                .join("; ");
+
+        case "sorting":
+            if (!question.options) return "Нет элементов для сортировки";
+            // Для сортировки показываем правильный порядок
+            return question.options
+                .map((item, idx) => `${idx + 1}. ${item.text}`)
                 .join("; ");
 
         default:
@@ -245,32 +253,6 @@ async function createTestDocument(test, exportType = "withAnswers") {
         }),
     ];
 
-    // if (test.settings) {
-    //     const settings = [];
-    //     if (test.settings.shuffleQuestions)
-    //         settings.push("Перемешивание вопросов");
-    //     if (test.settings.shuffleAnswers)
-    //         settings.push("Перемешивание ответов");
-    //     if (test.settings.requireUserName) settings.push("Требуется имя");
-
-    //     infoTableRows.push(
-    //         new TableRow({
-    //             children: [
-    //                 new TableCell({
-    //                     children: [new Paragraph("Настройки:")],
-    //                 }),
-    //                 new TableCell({
-    //                     children: [
-    //                         new Paragraph(
-    //                             settings.join(", ") || "Нет особых настроек"
-    //                         ),
-    //                     ],
-    //                 }),
-    //             ],
-    //         })
-    //     );
-    // }
-
     children.push(
         new Table({
             rows: infoTableRows,
@@ -377,7 +359,7 @@ async function createTestDocument(test, exportType = "withAnswers") {
                 new TextRun({
                     text: "Вопросы теста:",
                     bold: true,
-                    size: 32,
+                    size: 18,
                 }),
             ],
             alignment: AlignmentType.CENTER,
@@ -396,7 +378,7 @@ async function createTestDocument(test, exportType = "withAnswers") {
                     new TextRun({
                         text: `Вопрос ${index + 1}`,
                         bold: true,
-                        size: 28,
+                        size: 16,
                     }),
                 ],
                 spacing: { before: index === 0 ? 0 : 400, after: 200 },
@@ -932,6 +914,212 @@ async function getQuestionContent(question, exportType, questionIndex) {
                         new Paragraph({
                             text: `${pairIndex + 1}) _________`,
                             indent: { left: 400 },
+                            spacing: { after: 5 },
+                        })
+                    );
+                });
+            }
+            break;
+
+        case "sorting":
+            if (question.options && question.options.length > 0) {
+                // Для варианта с ответами показываем правильный порядок
+                if (exportType === "withAnswers") {
+                    children.push(
+                        new Paragraph({
+                            children: [
+                                new TextRun({
+                                    text: "Правильный порядок:",
+                                    bold: true,
+                                }),
+                            ],
+                            spacing: { before: 100, after: 50 },
+                        })
+                    );
+
+                    question.options.forEach((item, itemIndex) => {
+                        const itemChildren = [
+                            new TextRun({
+                                text: `${itemIndex + 1}. `,
+                                bold: true,
+                            }),
+                            new TextRun({
+                                text: item.text || "",
+                                bold: true,
+                            }),
+                        ];
+
+                        // Изображение элемента
+                        if (item.image) {
+                            try {
+                                const imageBuffer = base64ToArrayBuffer(
+                                    item.image
+                                );
+                                if (imageBuffer) {
+                                    children.push(
+                                        new Paragraph({
+                                            children: itemChildren,
+                                            indent: { left: 200 },
+                                            spacing: { after: 50 },
+                                        })
+                                    );
+
+                                    children.push(
+                                        new Paragraph({
+                                            children: [
+                                                new ImageRun({
+                                                    data: imageBuffer,
+                                                    transformation: {
+                                                        width: 200,
+                                                        height: 150,
+                                                    },
+                                                }),
+                                            ],
+                                            indent: { left: 250 },
+                                            alignment: AlignmentType.LEFT,
+                                            spacing: { before: 10, after: 50 },
+                                        })
+                                    );
+                                    return;
+                                }
+                            } catch (error) {
+                                console.error(
+                                    "Ошибка обработки изображения элемента сортировки:",
+                                    error
+                                );
+                            }
+                        }
+
+                        children.push(
+                            new Paragraph({
+                                children: itemChildren,
+                                indent: { left: 200 },
+                                spacing: { after: 100 },
+                            })
+                        );
+                    });
+
+                    children.push(
+                        new Paragraph({
+                            text: "",
+                            spacing: { before: 100, after: 100 },
+                        })
+                    );
+                }
+
+                // Перемешанные элементы для студента
+                children.push(
+                    new Paragraph({
+                        children: [
+                            new TextRun({
+                                text: "Упорядочьте следующие элементы в правильной последовательности:",
+                                italics: true,
+                            }),
+                        ],
+                        spacing: {
+                            before: exportType === "withAnswers" ? 100 : 0,
+                            after: 200,
+                        },
+                    })
+                );
+
+                // Создаем перемешанный список для студента
+                const itemsToShow = [...question.options];
+                if (exportType !== "withAnswers") {
+                    // Перемешиваем для студентов (кроме режима с ответами)
+                    itemsToShow.sort(() => Math.random() - 0.5);
+                }
+
+                itemsToShow.forEach((item, itemIndex) => {
+                    const itemChildren = [
+                        new TextRun({
+                            text: `${String.fromCharCode(65 + itemIndex)}) `,
+                            bold: false,
+                        }),
+                        new TextRun({
+                            text: item.text || "",
+                            bold: false,
+                        }),
+                    ];
+
+                    // Изображение элемента
+                    if (item.image) {
+                        try {
+                            const imageBuffer = base64ToArrayBuffer(item.image);
+                            if (imageBuffer) {
+                                children.push(
+                                    new Paragraph({
+                                        children: itemChildren,
+                                        indent: { left: 200 },
+                                        spacing: { after: 50 },
+                                    })
+                                );
+
+                                children.push(
+                                    new Paragraph({
+                                        children: [
+                                            new ImageRun({
+                                                data: imageBuffer,
+                                                transformation: {
+                                                    width: 200,
+                                                    height: 150,
+                                                },
+                                            }),
+                                        ],
+                                        indent: { left: 250 },
+                                        alignment: AlignmentType.LEFT,
+                                        spacing: { before: 10, after: 50 },
+                                    })
+                                );
+                                return;
+                            }
+                        } catch (error) {
+                            console.error(
+                                "Ошибка обработки изображения элемента сортировки:",
+                                error
+                            );
+                        }
+                    }
+
+                    children.push(
+                        new Paragraph({
+                            children: itemChildren,
+                            indent: { left: 200 },
+                            spacing: { after: 100 },
+                        })
+                    );
+                });
+
+                // Поля для ответов (упорядочивания)
+                children.push(
+                    new Paragraph({
+                        text: "Порядок элементов (впишите буквы в правильном порядке):",
+                        spacing: { before: 200, after: 10 },
+                    })
+                );
+
+                children.push(
+                    new Paragraph({
+                        text: "Правильная последовательность: __________________________________",
+                        spacing: { before: 50, after: 100 },
+                    })
+                );
+
+                // Альтернативный вариант: таблица для нумерации
+                children.push(
+                    new Paragraph({
+                        text: "Или пронумеруйте элементы в правильном порядке:",
+                        spacing: { before: 100, after: 10 },
+                    })
+                );
+
+                itemsToShow.forEach((item, itemIndex) => {
+                    children.push(
+                        new Paragraph({
+                            text: `${String.fromCharCode(
+                                65 + itemIndex
+                            )}) _________ - ${item.text || ""}`,
+                            indent: { left: 200 },
                             spacing: { after: 5 },
                         })
                     );

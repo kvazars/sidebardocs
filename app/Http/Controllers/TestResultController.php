@@ -37,7 +37,6 @@ class TestResultController extends Controller
             'percentage' => 'required|numeric',
             'grade' => 'required|string',
             'time_spent' => 'required|integer',
-            'settings' => 'nullable|array',
             'question_results' => 'nullable|array'
         ]);
 

@@ -492,14 +492,7 @@
                                 </div>
                                 <div v-if="importPreview.settings" class="mb-2">
                                     <strong>Настройки:</strong>
-                                    <span
-                                        v-if="
-                                            importPreview.settings
-                                                .requireUserName
-                                        "
-                                        class="badge bg-info ms-1"
-                                        >Имя</span
-                                    >
+                                    <span class="badge bg-info ms-1">Имя</span>
                                     <span
                                         v-if="
                                             importPreview.settings
@@ -1045,7 +1038,6 @@ export default {
                         timeLimit: 30, // Значение по умолчанию
                         questions: questions,
                         settings: {
-                            requireUserName: true,
                             shuffleQuestions: false,
                             shuffleAnswers: false,
                         },
@@ -1506,7 +1498,7 @@ export default {
                 matching: "Сопоставление",
                 text: "Короткий ответ",
                 essay: "Развернутый ответ",
-                sorting: "Сортировка/Ранжирование",
+                sorting: "Упорядочивание",
             };
 
             const types = new Set(

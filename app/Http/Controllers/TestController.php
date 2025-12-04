@@ -40,9 +40,6 @@ class TestController extends Controller
             'timeLimit' => $validated['timeLimit'],
             'tree_id' => $validated['tree_id'],
             'settings' => [
-                'allowDetailedResults' => true,
-                'requireUserName' => $request->input('settings.requireUserName', false),
-                'showUserNameInResults' => $request->input('settings.showUserNameInResults', true),
                 'shuffleQuestions' => $request->input('settings.shuffleQuestions', false),
                 'shuffleAnswers' => $request->input('settings.shuffleAnswers', false),
             ],
@@ -58,7 +55,6 @@ class TestController extends Controller
                     'points' => $questionData['points'],
                     'image' => $questionData['image'] ?? null,
                     'options' => $questionData['options'] ?? null,
-                    'correctOrder' => $questionData['correctOrder'] ?? null,
                     'order' => $questionData['order'] ?? 0
                 ]);
             }
@@ -89,9 +85,6 @@ class TestController extends Controller
             'description' => $validated['description'],
             'timeLimit' => $validated['timeLimit'],
             'settings' => [
-                'allowDetailedResults' => true,
-                'requireUserName' => $request->input('settings.requireUserName', false),
-                'showUserNameInResults' => $request->input('settings.showUserNameInResults', true),
                 'shuffleQuestions' => $request->input('settings.shuffleQuestions', false),
                 'shuffleAnswers' => $request->input('settings.shuffleAnswers', false),
             ],
@@ -109,7 +102,6 @@ class TestController extends Controller
                     'points' => $questionData['points'],
                     'image' => $questionData['image'] ?? null,
                     'options' => $questionData['options'] ?? null,
-                    'correctOrder' => $questionData['correctOrder'] ?? null,
                     'order' => $questionData['order'] ?? 0
                 ]);
             }
@@ -164,7 +156,6 @@ class TestController extends Controller
                 'image' => $questionData['image'] ?? null,
                 'options' => $questionData['options'] ?? null,
                 'items' => $questionData['items'] ?? null,
-                'correctOrder' => $questionData['correctOrder'] ?? null,
                 'order' => $questionData['order'] ?? 0
             ]);
         }
@@ -191,7 +182,6 @@ class TestController extends Controller
                     'image' => $question->image,
                     'options' => $question->options,
                     'items' => $question['items'] ?? null,
-                    'correctOrder' => $question['correctOrder'] ?? null,
                     'order' => $question->order
                 ];
             })->toArray()
