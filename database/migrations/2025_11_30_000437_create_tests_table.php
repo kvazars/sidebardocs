@@ -19,7 +19,6 @@ return new class extends Migration
             $table->integer('timeLimit')->default(30);
             $table->json('settings')->nullable();
             $table->json('grading')->nullable();
-            $table->json('items')->nullable();
             $table->json('correctOrder')->nullable();
             $table->timestamps();
         });

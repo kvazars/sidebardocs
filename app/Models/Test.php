@@ -17,7 +17,6 @@ class Test extends Model
         'settings',
         'tree_id',
         'grading',
-        'items',
         'correctOrder',
     ];
 

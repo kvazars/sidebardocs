@@ -142,82 +142,6 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Дополнительные настройки для типов вопросов -->
-                            <div
-                                v-if="test.settings.shuffleAnswers"
-                                class="mt-3 p-3 bg-light rounded"
-                            >
-                                <h6 class="mb-2">
-                                    Настройки перемешивания ответов:
-                                </h6>
-
-                                <div class="form-check form-check-inline">
-                                    <input
-                                        v-model="
-                                            test.settings.shuffleSingleChoice
-                                        "
-                                        class="form-check-input"
-                                        type="checkbox"
-                                        :disabled="
-                                            !test.settings.shuffleAnswers
-                                        "
-                                    />
-                                    <label class="form-check-label"
-                                        >Одиночный выбор</label
-                                    >
-                                </div>
-
-                                <div class="form-check form-check-inline">
-                                    <input
-                                        v-model="
-                                            test.settings.shuffleMultipleChoice
-                                        "
-                                        class="form-check-input"
-                                        type="checkbox"
-                                        :disabled="
-                                            !test.settings.shuffleAnswers
-                                        "
-                                    />
-                                    <label class="form-check-label"
-                                        >Множественный выбор</label
-                                    >
-                                </div>
-
-                                <div class="form-check form-check-inline">
-                                    <input
-                                        v-model="test.settings.shuffleMatching"
-                                        class="form-check-input"
-                                        type="checkbox"
-                                        :disabled="
-                                            !test.settings.shuffleAnswers
-                                        "
-                                    />
-                                    <label class="form-check-label"
-                                        >Сопоставление</label
-                                    >
-                                </div>
-
-                                <div class="form-text small">
-                                    Выберите типы вопросов, для которых нужно
-                                    перемешивать ответы
-                                </div>
-                            </div>
-
-                            <!-- Предупреждение для вопросов с изображениями -->
-                            <div
-                                v-if="
-                                    test.settings.shuffleAnswers &&
-                                    hasQuestionsWithImages
-                                "
-                                class="alert alert-warning mt-3"
-                            >
-                                <i class="bi bi-exclamation-triangle"></i>
-                                <strong>Внимание:</strong> В тесте есть вопросы
-                                с изображениями в вариантах ответов. При
-                                перемешивании изображения останутся привязанными
-                                к своим вариантам.
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1265,9 +1189,6 @@ export default {
                     showUserNameInResults: true,
                     shuffleQuestions: false,
                     shuffleAnswers: false,
-                    shuffleSingleChoice: true,
-                    shuffleMultipleChoice: true,
-                    shuffleMatching: true,
                 },
                 grading: [
                     {
@@ -2112,9 +2033,6 @@ export default {
                     showUserNameInResults: true,
                     shuffleQuestions: false,
                     shuffleAnswers: false,
-                    shuffleSingleChoice: true,
-                    shuffleMultipleChoice: true,
-                    shuffleMatching: true,
                 },
                 grading: [
                     {
@@ -2259,9 +2177,6 @@ export default {
                     showUserNameInResults: true,
                     shuffleQuestions: false,
                     shuffleAnswers: false,
-                    shuffleSingleChoice: true,
-                    shuffleMultipleChoice: true,
-                    shuffleMatching: true,
                 };
             }
 

@@ -45,9 +45,6 @@ class TestController extends Controller
                 'showUserNameInResults' => $request->input('settings.showUserNameInResults', true),
                 'shuffleQuestions' => $request->input('settings.shuffleQuestions', false),
                 'shuffleAnswers' => $request->input('settings.shuffleAnswers', false),
-                'shuffleSingleChoice' => $request->input('settings.shuffleSingleChoice', true),
-                'shuffleMultipleChoice' => $request->input('settings.shuffleMultipleChoice', true),
-                'shuffleMatching' => $request->input('settings.shuffleMatching', true),
             ],
             'grading' => $validated['grading'] ?? null
         ]);
@@ -97,9 +94,6 @@ class TestController extends Controller
                 'showUserNameInResults' => $request->input('settings.showUserNameInResults', true),
                 'shuffleQuestions' => $request->input('settings.shuffleQuestions', false),
                 'shuffleAnswers' => $request->input('settings.shuffleAnswers', false),
-                'shuffleSingleChoice' => $request->input('settings.shuffleSingleChoice', true),
-                'shuffleMultipleChoice' => $request->input('settings.shuffleMultipleChoice', true),
-                'shuffleMatching' => $request->input('settings.shuffleMatching', true),
             ],
             'grading' => $validated['grading'] ?? null
         ]);

@@ -134,22 +134,6 @@
                 ></button>
             </div>
 
-            <!-- Защита от копирования -->
-            <div v-if="copyAttempted" class="copy-protection-warning">
-                <div
-                    class="alert alert-warning alert-dismissible fade show"
-                    role="alert"
-                >
-                    <i class="bi bi-exclamation-triangle"></i> Копирование
-                    текста запрещено!
-                    <button
-                        type="button"
-                        class="btn-close"
-                        @click="copyAttempted = false"
-                    ></button>
-                </div>
-            </div>
-
             <div
                 v-if="showTimeWarning"
                 class="alert alert-warning alert-dismissible fade show mb-3"
@@ -239,7 +223,6 @@
             <!-- Вопрос -->
             <div
                 class="card mb-4"
-                @contextmenu="preventCopy"
                 :class="{
                     'required-question':
                         !answeredQuestions.has(currentQuestionIndex),
@@ -587,15 +570,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Кнопка сброса порядка -->
-                        <button
-                            @click="resetSortingOrder"
-                            class="btn btn-outline-secondary btn-sm mt-3"
-                        >
-                            <i class="bi bi-arrow-clockwise"></i> Сбросить
-                            порядок
-                        </button>
                     </div>
                 </div>
             </div>
@@ -643,7 +617,6 @@ export default {
             userAnswers: [],
             timeLeft: 0,
             timer: null,
-            copyAttempted: false,
             userName: "",
             tempUserName: "",
             // Для перемешивания
@@ -1196,23 +1169,35 @@ export default {
                 .sort(() => Math.random() - 0.5);
         },
 
+        shuffleSortingItems() {
+            if (!this.currentQuestion.options) return;
+
+            const items = [...this.currentQuestion.options];
+            const shuffledOrder = items
+                .map((_, index) => index)
+                .sort(() => Math.random() - 0.5);
+
+            const originalIndex = this.currentOriginalIndex;
+            if (originalIndex !== undefined) {
+                this.userAnswersByOriginalIndex.set(
+                    originalIndex,
+                    shuffledOrder
+                );
+            }
+        },
+
         initializeQuestion() {
             if (!this.currentQuestion) return;
 
             // Получаем оригинальный индекс текущего вопроса
             const originalIndex = this.currentOriginalIndex;
-
+            if (this.currentQuestion.type === "sorting") {
+                this.shuffleSortingItems();
+            }
             // Перемешиваем варианты ответов если нужно
             if (this.shouldShuffleAnswers()) {
                 this.shuffleQuestionOptions();
-                // Для вопросов на сопоставление также перемешиваем
-                if (this.currentQuestion.type === "matching") {
-                    this.shuffleMatchingOptions();
-                }
-            } else {
-                // Если не нужно перемешивать, очищаем мапы для текущего вопроса
-                this.shuffledOptionsMap.delete(this.currentQuestionIndex);
-                this.shuffledPairsMap.delete(this.currentQuestionIndex);
+                this.shuffleMatchingOptions();
             }
 
             // Инициализируем временные массивы для сложных типов вопросов
@@ -1317,28 +1302,28 @@ export default {
             if (!this.selectedTest.settings.shuffleAnswers) {
                 return false;
             }
-
-            const questionType = this.currentQuestion.type;
+            return true;
+            // const questionType = this.currentQuestion.type;
 
             // Если shuffleAnswers = true, проверяем настройки для конкретных типов вопросов
             // (если они заданы, иначе считаем что перемешивать можно)
-            switch (questionType) {
-                case "single":
-                    return (
-                        this.selectedTest.settings.shuffleSingleChoice !== false
-                    );
-                case "multiple":
-                    return (
-                        this.selectedTest.settings.shuffleMultipleChoice !==
-                        false
-                    );
-                case "matching":
-                    return this.selectedTest.settings.shuffleMatching !== false;
-                case "sorting":
-                    return this.selectedTest.settings.shuffleSorting !== false;
-                default:
-                    return false; // Для других типов не перемешиваем
-            }
+            // switch (questionType) {
+            //     case "single":
+            //         return (
+            //             this.selectedTest.settings.shuffleSingleChoice !== false
+            //         );
+            //     case "multiple":
+            //         return (
+            //             this.selectedTest.settings.shuffleMultipleChoice !==
+            //             false
+            //         );
+            //     case "matching":
+            //         return this.selectedTest.settings.shuffleMatching !== false;
+            //     case "sorting":
+            //         return this.selectedTest.settings.shuffleSorting !== false;
+            //     default:
+            //         return false; // Для других типов не перемешиваем
+            // }
         },
         shuffleSortingItems() {
             if (!this.currentQuestion.options) return;
@@ -1784,7 +1769,6 @@ export default {
             this.userAnswers = []; // ОЧИСТКА ОТВЕТОВ
             this.timeLeft = 0;
             this.timer = null;
-            this.copyAttempted = false;
             this.userName = "";
             this.tempUserName = "";
 
@@ -1866,9 +1850,24 @@ export default {
                     isValid =
                         Array.isArray(answer) &&
                         answer.length === (question.options?.length || 0);
+
+                    // ДОПОЛНИТЕЛЬНАЯ ПРОВЕРКА: все элементы должны быть уникальны
+                    if (isValid) {
+                        const uniqueSet = new Set(answer);
+                        isValid = uniqueSet.size === answer.length;
+
+                        // Проверяем, что все индексы в допустимом диапазоне
+                        if (isValid) {
+                            const maxIndex = question.options.length - 1;
+                            isValid = answer.every(
+                                (itemId) => itemId >= 0 && itemId <= maxIndex
+                            );
+                        }
+                    }
+
                     if (!isValid) {
                         this.validationError =
-                            "Пожалуйста, расположите все элементы в порядке";
+                            "Пожалуйста, расположите все элементы в правильном порядке";
                     }
                     break;
 
@@ -1978,6 +1977,28 @@ export default {
                         break;
                     case "multiple":
                         isValid = Array.isArray(answer) && answer.length > 0;
+                        break;
+                    case "sorting":
+                        // ОБНОВЛЕННАЯ ПРОВЕРКА ДЛЯ СОРТИРОВКИ
+                        if (Array.isArray(answer) && question.options) {
+                            isValid = answer.length === question.options.length;
+
+                            // Проверяем уникальность
+                            if (isValid) {
+                                const uniqueSet = new Set(answer);
+                                isValid = uniqueSet.size === answer.length;
+
+                                // Проверяем допустимость индексов
+                                if (isValid) {
+                                    const maxIndex =
+                                        question.options.length - 1;
+                                    isValid = answer.every(
+                                        (itemId) =>
+                                            itemId >= 0 && itemId <= maxIndex
+                                    );
+                                }
+                            }
+                        }
                         break;
                     case "text":
                         isValid = answer && answer.toString().trim() !== "";
@@ -2436,7 +2457,8 @@ export default {
 
                             if (matchingData) {
                                 // Если пары были перемешаны
-                                const shuffledPairs = matchingData.options;
+                                const shuffledPairs = matchingData.pairs;
+                                // console.log(matchingData);
 
                                 userAnswer.forEach(
                                     (userRightAnswer, displayedPairIndex) => {
@@ -2761,13 +2783,6 @@ export default {
             return grade ? grade.grade : "Не оценено";
         },
 
-        preventCopy(event) {
-            event.preventDefault();
-            this.copyAttempted = true;
-            setTimeout(() => {
-                this.copyAttempted = false;
-            }, 2000);
-        },
         isOptionSelected(optionIndex) {
             const answer = this.userAnswers[this.currentQuestionIndex];
             if (!Array.isArray(answer)) return false;
@@ -2838,15 +2853,6 @@ export default {
     100% {
         opacity: 1;
     }
-}
-
-.copy-protection-warning {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 10000;
-    min-width: 300px;
 }
 
 .user-name-section {

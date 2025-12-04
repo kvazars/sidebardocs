@@ -50,15 +50,15 @@ export default {
         setupProtection() {
             document.addEventListener("contextmenu", this.preventCopy);
             document.addEventListener("keydown", this.preventKeyActions);
-            document.addEventListener("dragstart", this.preventDrag);
-            document.addEventListener("selectstart", this.preventSelection);
+            // document.addEventListener("dragstart", this.preventDrag);
+            // document.addEventListener("selectstart", this.preventSelection);
         },
 
         removeProtection() {
             document.removeEventListener("contextmenu", this.preventCopy);
             document.removeEventListener("keydown", this.preventKeyActions);
-            document.removeEventListener("dragstart", this.preventDrag);
-            document.removeEventListener("selectstart", this.preventSelection);
+            // document.removeEventListener("dragstart", this.preventDrag);
+            // document.removeEventListener("selectstart", this.preventSelection);
         },
 
         // Проверяем, является ли target DOM-элементом с методом closest
