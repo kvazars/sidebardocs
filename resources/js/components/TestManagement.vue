@@ -669,7 +669,7 @@ export default {
                 single: "Один ответ",
                 multiple: "Несколько ответов",
                 matching: "Сопоставление",
-                "true-false": "Да/Нет",
+                truefalse: "Да/Нет",
                 text: "Короткий ответ",
                 essay: "Развернутый ответ",
             },
@@ -1006,7 +1006,6 @@ export default {
                                 type,
                                 i
                             );
-                            console.log(question);
 
                             if (question) {
                                 questions.push(question);

@@ -249,19 +249,17 @@
                 <div class="card-body">
                     <!-- Статистика вопросов -->
                     <div class="row mb-3">
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="card text-center">
                                 <div class="card-body py-2">
                                     <h6 class="card-title mb-0">
                                         {{ totalPoints }}
                                     </h6>
-                                    <small class="text-muted"
-                                        >Всего баллов</small
-                                    >
+                                    <small class="text-muted">Баллы</small>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="card text-center">
                                 <div class="card-body py-2">
                                     <h6 class="card-title mb-0">
@@ -273,7 +271,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="card text-center">
                                 <div class="card-body py-2">
                                     <h6 class="card-title mb-0">
@@ -285,25 +283,35 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="card text-center">
                                 <div class="card-body py-2">
                                     <h6 class="card-title mb-0">
-                                        {{ questionTypes.other }}
+                                        {{ questionTypes.truefalse }}
                                     </h6>
-                                    <small class="text-muted"
-                                        >Другие типы</small
-                                    >
+                                    <small class="text-muted">Да/Нет</small>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
+                            <div class="card text-center">
+                                <div class="card-body py-2">
+                                    <h6 class="card-title mb-0">
+                                        {{ questionTypes.text }}
+                                    </h6>
+                                    <small class="text-muted">Текст</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
                             <div class="card text-center">
                                 <div class="card-body py-2">
                                     <h6 class="card-title mb-0">
                                         {{ questionTypes.sorting }}
                                     </h6>
-                                    <small class="text-muted">Упорядочивание</small>
+                                    <small class="text-muted"
+                                        >Упорядочивание</small
+                                    >
                                 </div>
                             </div>
                         </div>
@@ -438,7 +446,7 @@
                                         <option value="multiple">
                                             Множественный выбор
                                         </option>
-                                        <option value="true-false">
+                                        <option value="truefalse">
                                             Да/Нет
                                         </option>
                                         <option value="text">
@@ -573,7 +581,7 @@
 
                             <!-- Да/Нет -->
                             <div
-                                v-if="question.type === 'true-false'"
+                                v-if="question.type === 'truefalse'"
                                 class="mb-3"
                             >
                                 <label class="form-label"
@@ -834,110 +842,39 @@
                                                                 iIndex + 1
                                                             }}:</label
                                                         >
-                                                        <input
-                                                            v-model="item.text"
-                                                            type="text"
-                                                            class="form-control"
-                                                            placeholder="Введите текст элемента"
-                                                        />
-                                                    </div>
-
-                                                    <!-- Изображение элемента -->
-                                                    <div class="mb-2">
-                                                        <label
-                                                            class="form-label small mb-1"
-                                                            >Изображение
-                                                            элемента:</label
-                                                        >
-
-                                                        <div
-                                                            v-if="item.image"
-                                                            class="mb-2"
-                                                        >
-                                                            <div
-                                                                class="image-preview-container position-relative d-inline-block"
-                                                            >
-                                                                <img
-                                                                    :src="
-                                                                        item.image
-                                                                    "
-                                                                    class="img-thumbnail"
-                                                                    style="
-                                                                        max-height: 100px;
-                                                                    "
-                                                                />
-                                                                <button
-                                                                    @click="
-                                                                        removeSortingItemImage(
-                                                                            qIndex,
-                                                                            iIndex
-                                                                        )
-                                                                    "
-                                                                    class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1"
-                                                                    type="button"
-                                                                >
-                                                                    <i
-                                                                        class="bi bi-x"
-                                                                    ></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-
                                                         <div
                                                             class="input-group"
                                                         >
                                                             <input
-                                                                type="file"
-                                                                @change="
-                                                                    handleSortingItemImageUpload(
-                                                                        $event,
+                                                                v-model="
+                                                                    item.text
+                                                                "
+                                                                type="text"
+                                                                class="form-control"
+                                                                placeholder="Введите текст элемента"
+                                                            />
+                                                            <button
+                                                                @click="
+                                                                    removeSortingItem(
                                                                         qIndex,
                                                                         iIndex
                                                                     )
                                                                 "
-                                                                accept="image/*"
-                                                                class="form-control form-control-sm"
-                                                            />
-                                                            <button
-                                                                class="btn btn-outline-secondary btn-sm"
-                                                                type="button"
-                                                                @click="
-                                                                    openImageManager(
-                                                                        qIndex,
-                                                                        iIndex,
-                                                                        null,
-                                                                        'sorting'
-                                                                    )
+                                                                class="btn btn-outline-danger btn-sm"
+                                                                :disabled="
+                                                                    question
+                                                                        .options
+                                                                        .length <=
+                                                                    2
                                                                 "
+                                                                title="Удалить элемент"
                                                             >
                                                                 <i
-                                                                    class="bi bi-image"
+                                                                    class="bi bi-trash"
                                                                 ></i>
-                                                                Выбрать
                                                             </button>
                                                         </div>
                                                     </div>
-                                                </div>
-
-                                                <div class="ms-3">
-                                                    <button
-                                                        @click="
-                                                            removeSortingItem(
-                                                                qIndex,
-                                                                iIndex
-                                                            )
-                                                        "
-                                                        class="btn btn-outline-danger btn-sm"
-                                                        :disabled="
-                                                            question.options
-                                                                .length <= 2
-                                                        "
-                                                        title="Удалить элемент"
-                                                    >
-                                                        <i
-                                                            class="bi bi-trash"
-                                                        ></i>
-                                                    </button>
                                                 </div>
                                             </div>
 
@@ -1239,15 +1176,19 @@ export default {
             const types = {
                 single: 0,
                 multiple: 0,
-                sorting: 0, // Добавлено
-                other: 0,
+                sorting: 0,
+                truefalse: 0,
+                text: 0,
+                matching: 0,
             };
 
             this.test.questions.forEach((q) => {
                 if (q.type === "single") types.single++;
                 else if (q.type === "multiple") types.multiple++;
                 else if (q.type === "sorting") types.sorting++;
-                else types.other++;
+                else if (q.type === "matching") types.matching++;
+                else if (q.type === "truefalse") types.truefalse++;
+                else if (q.type === "text") types.text++;
             });
 
             return types;
@@ -1288,9 +1229,6 @@ export default {
         },
     },
     methods: {
-        removeSortingItemImage(qIndex, iIndex) {
-            this.test.questions[qIndex].options[iIndex].image = null;
-        },
         onSortingItemMoved(qIndex, event) {
             const question = this.test.questions[qIndex];
             const items = [...question.options];
@@ -1320,7 +1258,7 @@ export default {
             const labels = {
                 single: "Одиночный выбор",
                 multiple: "Множественный выбор",
-                "true-false": "Да/Нет",
+                truefalse: "Да/Нет",
                 text: "Свободный ввод",
                 matching: "Сопоставление",
                 sorting: "Упорядочивание",
@@ -1392,7 +1330,6 @@ export default {
             if (!question.text || question.text.trim() === "") {
                 return "Не заполнен текст вопроса";
             }
-            console.log(question.options);
 
             // Проверка в зависимости от типа вопроса
             switch (question.type) {
@@ -1448,7 +1385,7 @@ export default {
                     }
                     break;
 
-                case "true-false":
+                case "truefalse":
                     if (
                         question.options === undefined ||
                         question.options === null
@@ -1556,7 +1493,7 @@ export default {
                         { text: "", correct: false },
                     ];
                     break;
-                case "true-false":
+                case "truefalse":
                     newQuestion.options = undefined;
                     break;
                 case "text":
@@ -1821,10 +1758,6 @@ export default {
             event.target.value = "";
         },
 
-        removeSortingItemImageremoveSortingItemImage(qIndex, iIndex) {
-            this.test.questions[qIndex].options[iIndex].image = null;
-        },
-
         updateCorrectOrder(qIndex) {
             const question = this.test.questions[qIndex];
             // Правильный порядок - это текущий порядок элементов в массиве
@@ -1948,7 +1881,6 @@ export default {
             try {
                 if (this.isEditing) {
                     this.test.id = this.editTestId;
-                    console.log(this.test);
 
                     this.datasend(`tests/${this.test.id}`, "PUT", this.test)
                         .then((response) => {

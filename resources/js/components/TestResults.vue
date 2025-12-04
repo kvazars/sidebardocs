@@ -628,15 +628,6 @@ export default {
             if (userAnswer === null || userAnswer === undefined) {
                 return "Нет ответа";
             }
-            console.log(correct_answer);
-            
-            // if (qResult.questionType === "sorting") {
-            //     if (Array.isArray(userAnswer)) {
-            //         return userAnswer
-            //             .map((item, index) => `${index + 1}. ${item}`)
-            //             .join("; ");
-            //     }
-            // }
 
             if (Array.isArray(userAnswer)) {
                 if (userAnswer.length === 0) return "Нет выбранных вариантов";
@@ -652,7 +643,7 @@ export default {
         formatcorrect_answer(correct_answer) {
             // return correct_answer;
             // console.log(correct_answer);
-            
+
             if (correct_answer === null || correct_answer === undefined) {
                 return "";
             }
@@ -664,8 +655,7 @@ export default {
                     .join("; ");
             }
 
-            if (correct_answer == "true" || correct_answer == true)
-                return "Да";
+            if (correct_answer == "true" || correct_answer == true) return "Да";
             if (correct_answer == "false" || correct_answer == false)
                 return "Нет";
 

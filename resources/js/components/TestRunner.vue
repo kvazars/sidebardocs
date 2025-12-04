@@ -366,7 +366,7 @@
 
                     <!-- Да/Нет -->
                     <div
-                        v-else-if="currentQuestion.type === 'true-false'"
+                        v-else-if="currentQuestion.type === 'truefalse'"
                         class="answers"
                     >
                         <div class="row">
@@ -537,24 +537,7 @@
                                     >
                                         <i class="bi bi-grip-vertical fs-5"></i>
                                     </div>
-                                    <div class="flex-grow-1">
-                                        <div>
-                                            {{ getSortingItemText(itemId) }}
-                                        </div>
-                                        <!-- Изображение элемента -->
-                                        <div
-                                            v-if="getSortingItemImage(itemId)"
-                                            class="mt-2 text-center"
-                                        >
-                                            <img
-                                                :src="
-                                                    getSortingItemImage(itemId)
-                                                "
-                                                class="img-thumbnail"
-                                                style="max-height: 100px"
-                                            />
-                                        </div>
-                                    </div>
+
                                     <div class="position-badge ms-3">
                                         <span class="badge bg-secondary">{{
                                             index + 1
@@ -898,10 +881,6 @@ export default {
             return item.text || item.title || item.name || `${itemId + 1}`;
         },
 
-        getSortingItemImage(itemId) {
-            return this.currentQuestion?.options?.[itemId]?.image;
-        },
-
         handleDragStart(event, index) {
             event.dataTransfer.setData("text/plain", index.toString());
         },
@@ -1000,7 +979,7 @@ export default {
 
             switch (question.type) {
                 case "single":
-                case "true-false":
+                case "truefalse":
                 case "text":
                     hasAnswer =
                         answer !== null &&
@@ -1464,7 +1443,7 @@ export default {
 
                     switch (originalQuestion.type) {
                         case "single":
-                        case "true-false":
+                        case "truefalse":
                         case "text":
                             isAnswered =
                                 userAnswer !== "" &&
@@ -1574,7 +1553,7 @@ export default {
                             score = isCorrect ? originalQuestion.points : 0;
                             break;
 
-                        case "true-false":
+                        case "truefalse":
                             // Обработка разных форматов
                             let correctPartialAnswer;
 
@@ -1930,7 +1909,7 @@ export default {
                     }
                     break;
 
-                case "true-false":
+                case "truefalse":
                     isValid = answer == "true" || answer == "false";
                     if (!isValid) {
                         this.validationError =
@@ -2064,7 +2043,7 @@ export default {
 
                 switch (question.type) {
                     case "single":
-                    case "true-false":
+                    case "truefalse":
                         isValid =
                             answer !== "" &&
                             answer !== null &&
@@ -2494,7 +2473,7 @@ export default {
                             score = isCorrect ? originalQuestion.points : 0;
                             break;
 
-                        case "true-false":
+                        case "truefalse":
                             // Обработка разных форматов хранения правильного ответа
                             let correctAnswer;
 
@@ -2734,7 +2713,7 @@ export default {
                     // Единый формат: перечисление позиций и текстов
                     return sortedItemsText.join("; ");
 
-                case "true-false":
+                case "truefalse":
                     return userAnswer == "true" ? "Да" : "Нет";
 
                 case "text":
@@ -2780,7 +2759,7 @@ export default {
                             ?.filter((opt) => opt.correct === true)
                             ?.map((opt) => opt.text) || []
                     );
-                case "true-false":
+                case "truefalse":
                     if (typeof originalQuestion.options === "string") {
                         return originalQuestion.options == "true"
                             ? "Да"
@@ -2840,28 +2819,6 @@ export default {
             }
         },
 
-        debugShuffledOptions(displayedIndex) {
-            console.log(`Вопрос ${displayedIndex}:`);
-            if (this.shuffledOptionsMap.has(displayedIndex)) {
-                const shuffled = this.shuffledOptionsMap.get(displayedIndex);
-                console.log(
-                    "Перемешанные варианты:",
-                    shuffled.map((opt) => ({
-                        text: opt.text,
-                        originalIndex: opt.originalIndex,
-                        correct:
-                            this.selectedTest.questions[
-                                this.displayedQuestionToOriginal.get(
-                                    displayedIndex
-                                )
-                            ]?.options?.[opt.originalIndex]?.correct,
-                    }))
-                );
-            } else {
-                console.log("Варианты не перемешаны");
-            }
-        },
-
         calculateGrade(percentage) {
             if (!this.selectedTest.grading) return "Не оценено";
 
@@ -2891,7 +2848,7 @@ export default {
                             ?.filter((opt) => opt.correct)
                             ?.map((opt) => opt.text) || []
                     );
-                case "true-false":
+                case "truefalse":
                     return question.options === "true" ? "Да" : "Нет";
                 case "text":
                     return question.options || [];

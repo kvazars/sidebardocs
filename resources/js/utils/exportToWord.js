@@ -7,7 +7,7 @@ function getQuestionTypeLabel(type) {
     const labels = {
         single: "Одиночный выбор",
         multiple: "Множественный выбор",
-        "true-false": "Верно/Неверно",
+        truefalse: "Верно/Неверно",
         text: "Свободный ответ",
         matching: "Сопоставление",
         sorting: "Упорядочивание",
@@ -46,7 +46,7 @@ function getCorrectAnswerText(question) {
                 .join(", ");
             return multipleCorrect || "Нет правильных ответов";
 
-        case "true-false":
+        case "truefalse":
             return question.options === "true" ? "Верно" : "Неверно";
 
         case "text":
@@ -623,8 +623,8 @@ async function getQuestionContent(question, exportType, questionIndex) {
             }
             break;
 
-        case "true-false":
-            const correctAnswer = question.options === "true";
+        case "truefalse":
+            const correctAnswer = question.options == "true";
 
             if (exportType === "withAnswers") {
                 children.push(
