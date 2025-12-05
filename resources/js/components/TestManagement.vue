@@ -280,12 +280,6 @@
                             <!-- Кнопка подтверждения экспорта Word -->
                             <div class="d-flex gap-2 mt-4">
                                 <button
-                                    @click="cancelWordOptions"
-                                    class="btn btn-outline-secondary"
-                                >
-                                    <i class="bi bi-arrow-left"></i> Назад
-                                </button>
-                                <button
                                     @click="performWordExport"
                                     class="btn btn-primary flex-grow-1"
                                 >
@@ -474,7 +468,7 @@
                                 </div>
                                 <div class="mb-2">
                                     <strong>Всего баллов:</strong>
-                                    {{ getTotalPointsPreview(importPreview) }}
+                                    {{ getTotalPoints(importPreview) }}
                                 </div>
                                 <div class="mb-2">
                                     <strong>Типы вопросов:</strong>
@@ -678,25 +672,7 @@ export default {
     mounted() {
         this.getTests();
     },
-    computed: {
-        totalQuestions() {
-            return this.tests.reduce(
-                (sum, test) => sum + test.questions.length,
-                0
-            );
-        },
-        totalPoints() {
-            return this.tests.reduce(
-                (sum, test) => sum + this.getTotalPoints(test),
-                0
-            );
-        },
-        averageQuestions() {
-            return this.tests.length > 0
-                ? Math.round(this.totalQuestions / this.tests.length)
-                : 0;
-        },
-    },
+
     methods: {
         getTests() {
             this.datasend(`tests/${this.$route.params.id}/get`, "GET").then(
@@ -1701,13 +1677,7 @@ export default {
             } finally {
             }
         },
-        getTotalPointsPreview(test) {
-            if (!test || !test.questions) return 0;
-            return test.questions.reduce(
-                (sum, q) => sum + (parseInt(q.points) || 0),
-                0
-            );
-        },
+
         showImportModal() {
             this.importPreview = null;
             this.importErrors = [];

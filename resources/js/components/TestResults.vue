@@ -256,8 +256,7 @@
                                         >
                                             {{
                                                 formatUserAnswer(
-                                                    qResult.userAnswer,
-                                                    qResult.correct_answer
+                                                    qResult.userAnswer
                                                 )
                                             }}
                                         </div>
@@ -269,7 +268,7 @@
                                         >
                                         <div class="text-success">
                                             {{
-                                                formatcorrect_answer(
+                                                formatCorrectAnswer(
                                                     qResult.correct_answer
                                                 )
                                             }}
@@ -445,19 +444,14 @@
                                             : 'text-danger'
                                     "
                                 >
-                                    {{
-                                        formatUserAnswer(
-                                            qResult.userAnswer,
-                                            qResult.correct_answer
-                                        )
-                                    }}
+                                    {{ formatUserAnswer(qResult.userAnswer) }}
                                 </div>
                             </div>
                             <div v-if="!qResult.isCorrect" class="mb-2">
                                 <strong>Правильный ответ:</strong>
                                 <div class="text-success">
                                     {{
-                                        formatcorrect_answer(
+                                        formatCorrectAnswer(
                                             qResult.correct_answer
                                         )
                                     }}
@@ -624,7 +618,7 @@ export default {
             event.target.style.display = "none";
         },
 
-        formatUserAnswer(userAnswer, correct_answer) {
+        formatUserAnswer(userAnswer) {
             if (userAnswer === null || userAnswer === undefined) {
                 return "Нет ответа";
             }
@@ -640,7 +634,7 @@ export default {
             return userAnswer.toString() || "Пустой ответ";
         },
 
-        formatcorrect_answer(correct_answer) {
+        formatCorrectAnswer(correct_answer) {
             // return correct_answer;
             // console.log(correct_answer);
 

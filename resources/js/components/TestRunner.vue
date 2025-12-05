@@ -537,6 +537,9 @@
                                     >
                                         <i class="bi bi-grip-vertical fs-5"></i>
                                     </div>
+                                    <div class="flex-grow-1">
+                                        {{ getSortingItemText(itemId) }}
+                                    </div>
 
                                     <div class="position-badge ms-3">
                                         <span class="badge bg-secondary">{{
@@ -585,7 +588,7 @@
 <script>
 export default {
     name: "TestRunner",
-    props: ["datasend", "loadData", "tests", "showToast"],
+    props: ["datasend", "tests", "showToast"],
     data() {
         return {
             selectedTest: null,
@@ -854,33 +857,15 @@ export default {
             },
         },
     },
-    userAnswers: {
-        handler(newVal) {
-            if (this.currentQuestion) {
-                this.$nextTick(() => {
-                    this.validateCurrentQuestion();
-                });
-            }
-        },
-        deep: true,
+
+    mounted() {
+        document.addEventListener(
+            "visibilitychange",
+            this.handleVisibilityChange
+        );
     },
 
-    currentQuestionIndex() {
-        // При смене вопроса проверяем валидацию
-        this.$nextTick(() => {
-            this.validateCurrentQuestion();
-        });
-    },
     methods: {
-        getSortingItemText(itemId) {
-            if (!this.currentQuestion?.options?.[itemId]) {
-                return `Элемент ${itemId + 1}`;
-            }
-
-            const item = this.currentQuestion.options[itemId];
-            return item.text || item.title || item.name || `${itemId + 1}`;
-        },
-
         handleDragStart(event, index) {
             event.dataTransfer.setData("text/plain", index.toString());
         },
@@ -906,13 +891,6 @@ export default {
             }
         },
 
-        resetSortingOrder() {
-            const defaultOrder = this.currentQuestion?.options
-                ? this.currentQuestion.options.map((_, index) => index)
-                : [];
-            this.currentSortingAnswer = defaultOrder;
-        },
-
         getDefaultAnswerValue() {
             if (!this.currentQuestion) return "";
 
@@ -925,27 +903,6 @@ export default {
                 default:
                     return "";
             }
-        },
-        onAnswerChange() {
-            // Для radio и true/false
-            this.updateAnsweredStatus();
-            this.clearValidationError();
-        },
-
-        onMultipleChoiceChange() {
-            // Для множественного выбора
-            // Копируем массив в userAnswers
-            this.userAnswers[this.currentQuestionIndex] = [
-                ...this.multipleChoiceAnswers,
-            ];
-            this.updateAnsweredStatus();
-            this.clearValidationError();
-        },
-
-        onTextInput() {
-            // Для текстового ввода
-            this.updateAnsweredStatus();
-            this.clearValidationError();
         },
 
         onMatchingChange(index) {
@@ -980,6 +937,14 @@ export default {
             switch (question.type) {
                 case "single":
                 case "truefalse":
+                    hasAnswer =
+                        answer !== null &&
+                        answer !== undefined &&
+                        answer !== "" &&
+                        answer.toString().trim() !== "" &&
+                        !isNaN(Number(answer));
+                    break;
+
                 case "text":
                     hasAnswer =
                         answer !== null &&
@@ -1109,75 +1074,6 @@ export default {
             this.timeLeft = this.selectedTest.timeLimit * 60;
             this.startTimer();
             this.initializeQuestion();
-        },
-
-        createIndexMapping() {
-            if (this.selectedTest.settings.shuffleQuestions) {
-                this.shuffleQuestions();
-                // Создаем маппинг: отображаемый индекс -> оригинальный индекс
-                this.displayToOriginalIndex = new Map();
-                this.originalToDisplayIndex = new Map();
-
-                this.shuffledQuestions.forEach((question, displayIndex) => {
-                    const originalIndex = question.originalIndex;
-                    this.displayToOriginalIndex.set(
-                        displayIndex,
-                        originalIndex
-                    );
-                    this.originalToDisplayIndex.set(
-                        originalIndex,
-                        displayIndex
-                    );
-                });
-            } else {
-                this.shuffledQuestions = [...this.selectedTest.questions];
-                // Без перемешивания индексы совпадают
-                this.displayToOriginalIndex = new Map(
-                    this.selectedTest.questions.map((_, index) => [
-                        index,
-                        index,
-                    ])
-                );
-                this.originalToDisplayIndex = new Map(
-                    this.selectedTest.questions.map((_, index) => [
-                        index,
-                        index,
-                    ])
-                );
-            }
-        },
-
-        getCurrentAnswer() {
-            const originalIndex = this.getOriginalIndex(
-                this.currentQuestionIndex
-            );
-            return this.userAnswers[originalIndex];
-        },
-
-        // Установка ответа для текущего отображаемого вопроса
-        setCurrentAnswer(value) {
-            const originalIndex = this.getOriginalIndex(
-                this.currentQuestionIndex
-            );
-            // В Vue 3 простое присваивание работает для реактивных массивов
-            this.userAnswers[originalIndex] = value;
-
-            // Если нужно форсировать обновление (редко требуется)
-            // this.userAnswers = [...this.userAnswers];
-        },
-
-        // Получение оригинального индекса по отображаемому
-        getOriginalIndex(displayIndex) {
-            return (
-                this.displayToOriginalIndex.get(displayIndex) || displayIndex
-            );
-        },
-
-        // Получение отображаемого индекса по оригинальному
-        getDisplayIndex(originalIndex) {
-            return (
-                this.originalToDisplayIndex.get(originalIndex) || originalIndex
-            );
         },
 
         shuffleQuestions() {
@@ -1319,32 +1215,7 @@ export default {
             this.updateAnsweredStatus();
         },
         shouldShuffleAnswers() {
-            // Основная проверка - если shuffleAnswers = false, не перемешиваем
-            if (!this.selectedTest.settings.shuffleAnswers) {
-                return false;
-            }
-            return true;
-            // const questionType = this.currentQuestion.type;
-
-            // Если shuffleAnswers = true, проверяем настройки для конкретных типов вопросов
-            // (если они заданы, иначе считаем что перемешивать можно)
-            // switch (questionType) {
-            //     case "single":
-            //         return (
-            //             this.selectedTest.settings.shuffleSingleChoice !== false
-            //         );
-            //     case "multiple":
-            //         return (
-            //             this.selectedTest.settings.shuffleMultipleChoice !==
-            //             false
-            //         );
-            //     case "matching":
-            //         return this.selectedTest.settings.shuffleMatching !== false;
-            //     case "sorting":
-            //         return this.selectedTest.settings.shuffleSorting !== false;
-            //     default:
-            //         return false; // Для других типов не перемешиваем
-            // }
+            return this.selectedTest.settings.shuffleAnswers === true;
         },
         shuffleSortingItems() {
             if (!this.currentQuestion.options) return;
@@ -2230,7 +2101,7 @@ export default {
             clearInterval(this.timer);
             const result = this.calculateResult();
 
-            this.datasend("results", "POST", result).then((response) => {
+            this.datasend("results", "POST", result).then(() => {
                 this.selectedTest = null;
                 this.userName = "";
                 this.tempUserName = "";
@@ -2253,68 +2124,6 @@ export default {
 
                 this.resetTestState();
             });
-        },
-        isOptionSelected(optionIndex) {
-            const answer = this.getCurrentAnswer();
-            if (!Array.isArray(answer)) return false;
-            return answer.includes(optionIndex);
-        },
-
-        toggleMultipleChoiceOption(optionIndex, event) {
-            // Создаем копию массива или инициализируем новый
-            let currentAnswers = this.userAnswers[this.currentQuestionIndex];
-
-            // Если массив не инициализирован или не является массивом
-            if (!Array.isArray(currentAnswers)) {
-                currentAnswers = [];
-            }
-
-            // Создаем новый массив для реактивности
-            let newAnswers = [...currentAnswers];
-
-            if (event.target.checked) {
-                // Добавляем индекс, если его еще нет
-                if (!newAnswers.includes(optionIndex)) {
-                    newAnswers.push(optionIndex);
-                }
-            } else {
-                // Удаляем индекс
-                newAnswers = newAnswers.filter((idx) => idx !== optionIndex);
-            }
-
-            // Обновляем реактивно
-            this.userAnswers[this.currentQuestionIndex] = newAnswers;
-
-            // Обновляем answeredQuestions
-            if (newAnswers.length > 0) {
-                this.answeredQuestions.add(this.currentQuestionIndex);
-            } else {
-                this.answeredQuestions.delete(this.currentQuestionIndex);
-            }
-
-            // Принудительно вызываем обновление валидации
-            this.$nextTick(() => {
-                this.validateCurrentQuestion();
-            });
-        },
-
-        updateMatchingAnswer(pairIndex, value) {
-            const answer = this.getCurrentAnswer();
-            let currentAnswers = Array.isArray(answer)
-                ? [...answer]
-                : new Array(this.currentQuestion.options.length).fill("");
-
-            if (pairIndex < currentAnswers.length) {
-                currentAnswers[pairIndex] = value;
-            } else {
-                currentAnswers[pairIndex] = value;
-            }
-
-            this.setCurrentAnswer(currentAnswers);
-        },
-        handleMatchingChange(pairIndex, event) {
-            this.updateMatchingAnswer(pairIndex, event.target.value);
-            this.clearValidationError();
         },
 
         calculateResult() {
@@ -2706,7 +2515,13 @@ export default {
                     // Получаем текст элементов
                     const sortedItemsText = userAnswer.map((itemId, index) => {
                         const item = originalQuestion.options?.[itemId];
-                        const itemText = item?.text || `Элемент ${itemId + 1}`;
+                        // Исправлено: получаем текст из правильного поля объекта
+                        const itemText =
+                            item?.text ||
+                            item?.content ||
+                            item?.title ||
+                            item?.name ||
+                            `Элемент ${itemId + 1}`;
                         return `${index + 1}. ${itemText}`;
                     });
 
@@ -2732,7 +2547,15 @@ export default {
                         (rightAnswer, idx) => {
                             const leftText =
                                 pairs[idx]?.left || `Элемент ${idx + 1}`;
-                            const rightText = rightAnswer || "Не выбрано";
+                            // Исправлено: проверяем, является ли rightAnswer объектом
+                            const rightText =
+                                typeof rightAnswer === "object"
+                                    ? rightAnswer.text ||
+                                      rightAnswer.content ||
+                                      rightAnswer.title ||
+                                      rightAnswer.name ||
+                                      "Не выбрано"
+                                    : rightAnswer || "Не выбрано";
                             return `${leftText} → ${rightText}`;
                         }
                     );
@@ -2824,98 +2647,46 @@ export default {
 
             const gradeSystem = this.selectedTest.grading;
             const grade = gradeSystem.find(
-                (g) => percentage >= g.minScore && percentage <= g.max_score // Используйте то название, которое есть в ваших данных
-            );
-            return grade ? grade.grade : "Не оценено";
-        },
-        handleTextInput(event) {
-            this.setCurrentAnswer(event.target.value);
-            this.clearValidationError();
-        },
-
-        getcorrect_answer(question) {
-            if (!question) return "";
-
-            switch (question.type) {
-                case "single":
-                    const correctOption = question.options?.find(
-                        (opt) => opt.correct
-                    );
-                    return correctOption ? correctOption.text : "";
-                case "multiple":
-                    return (
-                        question.options
-                            ?.filter((opt) => opt.correct)
-                            ?.map((opt) => opt.text) || []
-                    );
-                case "truefalse":
-                    return question.options === "true" ? "Да" : "Нет";
-                case "text":
-                    return question.options || [];
-                case "matching":
-                    return (
-                        question.options?.map((pair) => ({
-                            left: pair.left,
-                            right: pair.right,
-                        })) || []
-                    );
-                default:
-                    return "";
-            }
-        },
-
-        calculateGrade(percentage) {
-            if (!this.selectedTest.grading) return "Не оценено";
-
-            const gradeSystem = this.selectedTest.grading;
-            const grade = gradeSystem.find(
                 (g) => percentage >= g.minScore && percentage <= g.max_score
             );
             return grade ? grade.grade : "Не оценено";
         },
+        getSortingItemText(itemId) {
+            if (!this.currentQuestion?.options?.[itemId]) {
+                return `Элемент ${itemId + 1}`;
+            }
 
-        isOptionSelected(optionIndex) {
-            const answer = this.userAnswers[this.currentQuestionIndex];
-            if (!Array.isArray(answer)) return false;
-            return answer.includes(optionIndex);
+            const item = this.currentQuestion.options[itemId];
+            return item.text || item.title || item.name || `${itemId + 1}`;
         },
 
-        toggleMultipleChoiceOption(optionIndex, event) {
-            // Создаем копию массива или инициализируем новый
-            let currentAnswers = this.userAnswers[this.currentQuestionIndex];
+        handleVisibilityChange() {
+            if (document.hidden) {
+                // Запоминаем время ухода
+                this.lastHiddenTime = Date.now();
+            } else if (this.lastHiddenTime && this.selectedTest) {
+                // При возвращении корректируем время
+                const timeHidden = Date.now() - this.lastHiddenTime;
+                this.timeLeft = Math.max(
+                    0,
+                    this.timeLeft - Math.floor(timeHidden / 1000)
+                );
 
-            // Если массив не инициализирован или не является массивом
-            if (!Array.isArray(currentAnswers)) {
-                currentAnswers = [];
-            }
-
-            // Создаем новый массив для реактивности
-            let newAnswers = [...currentAnswers];
-
-            if (event.target.checked) {
-                // Добавляем индекс, если его еще нет
-                if (!newAnswers.includes(optionIndex)) {
-                    newAnswers.push(optionIndex);
+                // Проверяем, не истекло ли время
+                if (this.timeLeft <= 0) {
+                    this.forceFinishTest();
                 }
-            } else {
-                // Удаляем индекс
-                newAnswers = newAnswers.filter((idx) => idx !== optionIndex);
-            }
-
-            // Обновляем реактивно (просто присваиваем новый массив)
-            this.userAnswers[this.currentQuestionIndex] = newAnswers;
-
-            // Обновляем answeredQuestions
-            if (newAnswers.length > 0) {
-                this.answeredQuestions.add(this.currentQuestionIndex);
-            } else {
-                this.answeredQuestions.delete(this.currentQuestionIndex);
             }
         },
     },
     beforeUnmount() {
+        document.removeEventListener(
+            "visibilitychange",
+            this.handleVisibilityChange
+        );
         if (this.timer) {
             clearInterval(this.timer);
+            this.timer = null;
         }
     },
 };

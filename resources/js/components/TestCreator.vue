@@ -414,14 +414,6 @@
                                         class="form-control"
                                         :id="'imageUpload' + qIndex"
                                     />
-                                    <button
-                                        class="btn btn-outline-secondary"
-                                        type="button"
-                                        @click="openImageManager(qIndex)"
-                                    >
-                                        <i class="bi bi-image"></i> Менеджер
-                                        изображений
-                                    </button>
                                 </div>
                                 <div class="form-text">
                                     Поддерживаемые форматы: JPG, PNG, GIF.
@@ -726,44 +718,6 @@
                                             class="form-control"
                                             placeholder="Правая часть"
                                         />
-
-                                        <!-- Изображение для правой части -->
-                                        <!-- <div class="mt-1">
-                                            <div
-                                                v-if="pair.rightImage"
-                                                class="image-preview-container position-relative d-inline-block"
-                                            >
-                                                <img
-                                                    :src="pair.rightImage"
-                                                    class="img-thumbnail"
-                                                    style="max-height: 80px"
-                                                />
-                                                <button
-                                                    @click="
-                                                        removeRightImage(
-                                                            qIndex,
-                                                            pIndex
-                                                        )
-                                                    "
-                                                    class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1"
-                                                    type="button"
-                                                >
-                                                    <i class="bi bi-x"></i>
-                                                </button>
-                                            </div>
-                                            <input
-                                                type="file"
-                                                @change="
-                                                    handleRightImageUpload(
-                                                        $event,
-                                                        qIndex,
-                                                        pIndex
-                                                    )
-                                                "
-                                                accept="image/*"
-                                                class="form-control form-control-sm mt-1"
-                                            />
-                                        </div> -->
                                     </div>
 
                                     <div class="col-md-1">
@@ -930,83 +884,6 @@
                 </button>
             </div>
         </div>
-        <!-- Модальное окно менеджера изображений -->
-        <div class="modal fade" id="imageManagerModal" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Менеджер изображений</h5>
-                        <button
-                            type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                        ></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <input
-                                type="file"
-                                @change="handleManagerImageUpload"
-                                accept="image/*"
-                                class="form-control"
-                                multiple
-                            />
-                        </div>
-
-                        <div class="row" v-if="imageManager.images.length > 0">
-                            <div
-                                v-for="(image, index) in imageManager.images"
-                                :key="index"
-                                class="col-md-4 mb-3"
-                            >
-                                <div
-                                    class="image-item card"
-                                    :class="{
-                                        'border-primary':
-                                            imageManager.selectedImage ===
-                                            image,
-                                    }"
-                                    @click="selectImageInManager(image)"
-                                >
-                                    <img
-                                        :src="image"
-                                        class="card-img-top"
-                                        style="height: 100px; object-fit: cover"
-                                    />
-                                    <div class="card-body p-2 text-center">
-                                        <small class="text-muted"
-                                            >Изображение {{ index + 1 }}</small
-                                        >
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div v-else class="text-center text-muted py-4">
-                            <i class="bi bi-image display-4"></i>
-                            <p class="mt-2">Нет загруженных изображений</p>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button
-                            type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal"
-                        >
-                            Отмена
-                        </button>
-                        <button
-                            type="button"
-                            class="btn btn-primary"
-                            @click="applySelectedImage"
-                            :disabled="!imageManager.selectedImage"
-                        >
-                            Выбрать изображение
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Модальное окно импорта -->
         <div class="modal fade" id="importModalCreator" tabindex="-1">
@@ -1137,14 +1014,7 @@ export default {
                 ],
                 questions: [],
             },
-            imageManager: {
-                images: [],
-                selectedImage: null,
-                currentQuestionIndex: null,
-                currentOptionIndex: null,
-                currentPairIndex: null,
-                imageType: null,
-            },
+
             isEditing: false,
             importPreview: null,
             importErrors: [],
@@ -1193,12 +1063,7 @@ export default {
 
             return types;
         },
-        hasQuestionsWithImages() {
-            return this.test.questions.some(
-                (question) => question.options /*&&
-                    question.options.some((option) => option.image)*/
-            );
-        },
+
         errorQuestionsCount() {
             return this.test.questions.filter((q) => this.hasQuestionError(q))
                 .length;
@@ -1229,31 +1094,6 @@ export default {
         },
     },
     methods: {
-        onSortingItemMoved(qIndex, event) {
-            const question = this.test.questions[qIndex];
-            const items = [...question.options];
-            const movedItem = items[event.oldIndex];
-
-            // Удаляем элемент со старой позиции
-            items.splice(event.oldIndex, 1);
-            // Вставляем элемент на новую позицию
-            items.splice(event.newIndex, 0, movedItem);
-
-            // Обновляем массив элементов
-            question.options = items;
-
-            // Обновляем правильный порядок
-            this.updateCorrectOrder(qIndex);
-
-            // Принудительное обновление для реактивности
-            this.$forceUpdate();
-        },
-        getcorrect_answers(question) {
-            if (!question.options || !Array.isArray(question.options)) {
-                question.options = [""];
-            }
-            return question.options;
-        },
         getQuestionTypeLabel(type) {
             const labels = {
                 single: "Одиночный выбор",
@@ -1409,13 +1249,6 @@ export default {
                         }
                     }
 
-                    // Проверяем правильный порядок
-                    // if (
-                    //     !question.correctOrder ||
-                    //     question.correctOrder.length !== question.options.length
-                    // ) {
-                    //     return "Некорректный правильный порядок";
-                    // }
                     break;
                 case "text":
                     if (!question.options || question.options.length === 0) {
@@ -1462,11 +1295,6 @@ export default {
         // Новый метод для проверки, есть ли ошибка в вопросе
         hasQuestionError(question) {
             return this.validateQuestion(question) !== null;
-        },
-
-        // Получить текст ошибки для вопроса
-        getQuestionErrorMessage(question) {
-            return this.validateQuestion(question);
         },
 
         resetQuestionAnswers(question) {
@@ -1672,14 +1500,6 @@ export default {
                     el.classList.remove("dragging");
                 });
         },
-        async handleRightImageUpload(event, qIndex, pIndex) {
-            const file = event.target.files[0];
-            if (file && this.validateImageFile(file)) {
-                const base64 = await this.fileToBase64(file);
-                this.test.questions[qIndex].options[pIndex].rightImage = base64;
-            }
-            event.target.value = "";
-        },
 
         removeQuestionImage(qIndex) {
             this.test.questions[qIndex].image = null;
@@ -1691,10 +1511,6 @@ export default {
 
         removeLeftImage(qIndex, pIndex) {
             this.test.questions[qIndex].options[pIndex].leftImage = null;
-        },
-
-        removeRightImage(qIndex, pIndex) {
-            this.test.questions[qIndex].options[pIndex].rightImage = null;
         },
 
         validateImageFile(file) {
@@ -1769,111 +1585,6 @@ export default {
             });
         },
 
-        openImageManager(
-            qIndex,
-            oIndex = null,
-            pIndex = null,
-            imageType = "question"
-        ) {
-            this.imageManager.currentQuestionIndex = qIndex;
-            this.imageManager.currentOptionIndex = oIndex;
-            this.imageManager.currentPairIndex = pIndex;
-            this.imageManager.imageType = imageType;
-            this.imageManager.selectedImage = null;
-
-            this.collectExistingImages();
-
-            this.$nextTick(() => {
-                const modalElement =
-                    document.getElementById("imageManagerModal");
-                if (modalElement) {
-                    const modal = new bootstrap.Modal(modalElement);
-                    modal.show();
-                }
-            });
-        },
-
-        collectExistingImages() {
-            const images = new Set();
-
-            this.test.questions.forEach((question) => {
-                // if (question.image) images.add(question.image);
-
-                // if (question.options) {
-                //     question.options.forEach((option) => {
-                //         if (option.image) images.add(option.image);
-                //     });
-                // }
-
-                if (question.options) {
-                    question.options.forEach((pair) => {
-                        if (pair.leftImage) images.add(pair.leftImage);
-                        if (pair.rightImage) images.add(pair.rightImage);
-                    });
-                }
-            });
-
-            this.imageManager.images = Array.from(images);
-        },
-
-        async handleManagerImageUpload(event) {
-            const files = Array.from(event.target.files);
-            for (const file of files) {
-                if (this.validateImageFile(file)) {
-                    const base64 = await this.fileToBase64(file);
-                    if (!this.imageManager.images.includes(base64)) {
-                        this.imageManager.images.push(base64);
-                    }
-                }
-            }
-            event.target.value = "";
-        },
-
-        selectImageInManager(image) {
-            this.imageManager.selectedImage = image;
-        },
-
-        applySelectedImage() {
-            if (!this.imageManager.selectedImage) return;
-
-            const {
-                currentQuestionIndex,
-                currentOptionIndex,
-                currentPairIndex,
-                imageType,
-            } = this.imageManager;
-
-            switch (imageType) {
-                case "question":
-                    this.test.questions[currentQuestionIndex].image =
-                        this.imageManager.selectedImage;
-                    break;
-                case "option":
-                    this.test.questions[currentQuestionIndex].options[
-                        currentOptionIndex
-                    ].image = this.imageManager.selectedImage;
-                    break;
-                case "left":
-                    this.test.questions[currentQuestionIndex].options[
-                        currentPairIndex
-                    ].leftImage = this.imageManager.selectedImage;
-                    break;
-                case "right":
-                    this.test.questions[currentQuestionIndex].options[
-                        currentPairIndex
-                    ].rightImage = this.imageManager.selectedImage;
-                    break;
-            }
-
-            const modalElement = document.getElementById("imageManagerModal");
-            if (modalElement) {
-                const modal = bootstrap.Modal.getInstance(modalElement);
-                if (modal) {
-                    modal.hide();
-                }
-            }
-        },
-
         saveTest() {
             this.loading = true;
             this.error = "";
@@ -1922,34 +1633,6 @@ export default {
         cancelEdit() {
             this.resetTest();
             this.changeCurrentView();
-        },
-
-        deleteTest() {
-            if (
-                confirm(
-                    "Вы уверены, что хотите удалить этот тест? Все результаты этого теста также будут удалены."
-                )
-            ) {
-                this.loading = true;
-                this.error = "";
-
-                try {
-                    this.datasend(
-                        `tests/${this.test.id}`,
-                        "DELETE",
-                        this.test
-                    ).then((response) => {
-                        this.resetTest();
-                        this.showToast(response.message, "success");
-                        this.changeCurrentView();
-                    });
-                } catch (error) {
-                    this.error = error.message;
-                    this.$emit("error", error.message);
-                } finally {
-                    this.loading = false;
-                }
-            }
         },
 
         resetTest() {
@@ -2204,18 +1887,6 @@ export default {
                         ];
                     }
                 }
-
-                // // Убедимся, что у опций есть все необходимые поля
-                // if (question.options) {
-                //     question.options.forEach((option) => {
-                //         if (option.correct === undefined) {
-                //             option.correct = false;
-                //         }
-                //         // if (option.image === undefined) {
-                //         //     option.image = null;
-                //         // }
-                //     });
-                // }
             });
         },
     },
