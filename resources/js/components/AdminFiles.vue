@@ -273,7 +273,17 @@ export default {
     components: {
         Bootstrap5Pagination,
     },
-    props: ["datasend", "catchError", "showToast"],
+    props: [
+        "datasend",
+        "catchError",
+        "showToast",
+        "dashboard",
+        "server",
+        "api",
+        "getMenu",
+        "setContent",
+    ],
+
     data() {
         return {
             files: null,
@@ -308,7 +318,7 @@ export default {
                     .then((res) => {
                         if (res.success) {
                             this.getFiles();
-                            this.showToast(res.success, res.message);
+                            this.showToast(res.message, "success");
                         }
                     })
                     .catch((error) => console.log(error));
@@ -325,11 +335,11 @@ export default {
                 groups: JSON.stringify(this.files.data[id].groups),
             };
 
-            this.datasend("saveresourceadmin", "POST",  form)
+            this.datasend("saveresourceadmin", "POST", form)
                 .then((res) => {
                     if (res.success) {
                         this.getFiles();
-                        this.showToast(res.success, res.message);
+                        this.showToast(res.message, "success");
                     }
                 })
                 .catch((error) => console.log(error));
@@ -344,7 +354,7 @@ export default {
                     .then((res) => {
                         if (res.success) {
                             this.getFiles();
-                            this.showToast(res.success, res.message);
+                            this.showToast(res.message, "success");
                         }
                     })
                     .catch((error) => console.log(error));

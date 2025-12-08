@@ -18,6 +18,7 @@
                 <CNavLink
                     href="javascript:void(0);"
                     :active="tabPaneActiveKey == 2"
+                    v-if="this.$route.params.id"
                     @click="
                         () => {
                             tabPaneActiveKey = 2;
@@ -124,6 +125,7 @@
                 role="tabpanel"
                 aria-labelledby="profile-tab"
                 :visible="tabPaneActiveKey == 2"
+                v-if="this.$route.params.id"
             >
                 <TestManagement
                     :datasend="datasend"
@@ -204,6 +206,8 @@ export default {
         "setContent",
     ],
     mounted() {
+    
+        
         if (this.datasend) {
             if (this.$route.params.id) {
                 this.datasend(

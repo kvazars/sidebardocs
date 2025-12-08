@@ -434,6 +434,11 @@
                 :datasend="datasend"
                 :catchError="catchError"
                 :showToast="showToast"
+                :dashboard="dashboard"
+                :server="server"
+                :api="api"
+                :getMenu="getMenu"
+                :setContent="setContent"
                 v-if="role == 'table'"
             />
 
@@ -444,6 +449,11 @@
                 :dashboard="dashboard"
                 :server="server"
                 :api="api"
+                :datasend="datasend"
+                :getMenu="getMenu"
+                :setContent="setContent"
+                :showToast="showToast"
+                :catchError="catchError"
             />
         </CCardBody>
     </CCard>
@@ -570,7 +580,10 @@ export default {
         "server",
         "api",
         "userRole",
+        "getMenu",
+        "setContent",
     ],
+
     data() {
         return {
             role: this.userRole == "admin" ? "user" : "table",
@@ -613,7 +626,7 @@ export default {
         clearCache() {
             this.datasend("checkImageResource", "GET", {})
                 .then((res) => {
-                    this.showToast(res.success, res.message);
+                    this.showToast(res.message, "success");
                 })
                 .catch((error) => {
                     console.log(error);
@@ -633,7 +646,7 @@ export default {
             if (confirm("Вы действительно хотите удалить группу?")) {
                 this.datasend(`group/${id}`, "DELETE", {})
                     .then((res) => {
-                        this.showToast(res.success, res.message);
+                        this.showToast(res.success, "success");
                         if (res.success) {
                             this.visibleModal = false;
                             this.cardName = null;
@@ -657,7 +670,7 @@ export default {
             ) {
                 this.datasend(`user/${id}`, "DELETE", {})
                     .then((res) => {
-                        this.showToast(res.success, res.message);
+                        this.showToast(res.success, "success");
                         if (res.success) {
                             this.getList();
                             this.visibleModal = false;
@@ -708,7 +721,7 @@ export default {
                 }
                 this.datasend("about", "POST", form, true)
                     .then((res) => {
-                        this.showToast(res.success, res.message);
+                        this.showToast(res.message, "success");
                         if (res.success) {
                             this.getList();
                             this.visibleModal = false;
@@ -746,7 +759,7 @@ export default {
 
             this.datasend("group", this.groupId ? "PUT" : "POST", form)
                 .then((res) => {
-                    this.showToast(res.success, res.message);
+                    this.showToast(res.success, "success");
                     if (res.success) {
                         this.getList();
                         this.visibleModal = false;
@@ -781,7 +794,7 @@ export default {
             }
             this.datasend("user", this.userId ? "PUT" : "POST", form)
                 .then((res) => {
-                    this.showToast(res.success, res.message);
+                    this.showToast(res.success, "success");
                     if (res.success) {
                         this.getList();
                         this.visibleModal = false;

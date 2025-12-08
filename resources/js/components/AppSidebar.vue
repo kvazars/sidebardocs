@@ -94,7 +94,7 @@ export default {
                         this.folderId = "";
                         this.folderParent = "";
                         this.visibleModalFolder = false;
-                        this.showToast(res.success, res.message);
+                        this.showToast(res.message, "success");
                     } else if (res.errors) {
                         this.catchError(res.errors);
                     }
@@ -115,7 +115,7 @@ export default {
         updoc(id) {
             this.datasend("doc/up/" + id, "POST", {})
                 .then((res) => {
-                    this.showToast(res.success, res.message);
+                    this.showToast(res.message, "success");
                     this.getMenu();
                 })
                 .catch((error) => console.log(error));
@@ -123,7 +123,7 @@ export default {
         downdoc(id) {
             this.datasend("doc/down/" + id, "POST", {})
                 .then((res) => {
-                    this.showToast(res.success, res.message);
+                    this.showToast(res.message, "success");
                     this.getMenu();
                 })
                 .catch((error) => console.log(error));
@@ -132,7 +132,7 @@ export default {
             if (confirm("Вы уверены?")) {
                 this.datasend("folder/" + id, "DELETE", {})
                     .then((res) => {
-                        this.showToast(res.success, res.message);
+                        this.showToast(res.message, "success");
                         this.getMenu();
                     })
                     .catch((error) => console.log(error));
@@ -179,7 +179,7 @@ export default {
                         .then((res) => {
                             if (res.success) {
                                 this.getMenu();
-                                this.showToast(res.success, res.message);
+                                this.showToast(res.message, "success");
                                 this.$router.push({ name: "Home" });
                             }
                         })

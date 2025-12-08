@@ -305,18 +305,7 @@ body
 .minh60 {
     min-height: 60px;
 }
-body .ce-inline-tool--link {
-    font: normal normal normal 14px / 1 FontAwesome;
-    font-size: inherit;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-}
-body .ce-inline-tool--link::before {
-    content: "\f0c1";
-}
-body .ce-inline-tool--link.ce-inline-tool--unlink::before {
-    content: "\f127";
-}
+
 body .icon.icon--link,
 body .icon.icon--unlink {
     width: 0 !important;
@@ -645,21 +634,22 @@ a[href*=".7Z"]:before {
 }
 
 .sort-up::after {
-    font: normal normal normal 16px / 1 FontAwesome;
-    content: "\f0de";
+     font: normal normal normal 13px Bootstrap-Icons;
+    content: "\f574";
     position: relative;
-    top: 5px;
     padding-left: 3px;
+    top: 2px;
 }
 .sort-down::after {
-    font: normal normal normal 16px / 1 FontAwesome;
-    content: "\f0dd";
+        font: normal normal normal 13px Bootstrap-Icons;
+    content: "\F575";
     position: relative;
     padding-left: 3px;
+    top: 2px;
 }
 .sort-out::after {
-    font: normal normal normal 14px / 1 FontAwesome;
-    content: "\f07d";
+    font: normal normal normal 14px / 1 Bootstrap-Icons;
+    content: "\F127";
     position: relative;
     padding-left: 3px;
 }

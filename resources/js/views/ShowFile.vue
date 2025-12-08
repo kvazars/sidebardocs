@@ -352,7 +352,7 @@ export default {
             )
                 .then((res) => {
                     if (!res.content) {
-                        this.showToast(res.success, res.message);
+                        this.showToast(res.message, "success");
                         setTimeout(() => {
                             this.$router.push({
                                 name: "NotFound",
