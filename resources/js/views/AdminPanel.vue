@@ -449,7 +449,7 @@
                 :dashboard="dashboard"
                 :server="server"
                 :api="api"
-                :datasend="datasend"
+                :datasend=null
                 :getMenu="getMenu"
                 :setContent="setContent"
                 :showToast="showToast"

@@ -206,8 +206,6 @@ export default {
         "setContent",
     ],
     mounted() {
-    
-        
         if (this.datasend) {
             if (this.$route.params.id) {
                 this.datasend(
@@ -251,7 +249,6 @@ export default {
                         this.dataBlock = JSON.parse(res.content.data);
                         this.setContent(res.content);
                         this.createEditor();
-         
                     })
                     .catch((error) => {
                         console.log(error);
@@ -278,6 +275,7 @@ export default {
             }
         } else {
             this.dataBlock = JSON.parse(this.dashboard.data);
+
             this.createEditor();
         }
     },

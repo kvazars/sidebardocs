@@ -14,6 +14,7 @@ use App\Models\UserGroups;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
@@ -274,7 +275,7 @@ class ContentController extends Controller
         $group = Group::get()->sortBy("name");
 
         if (isset($request->search)) {
-            $files->where('name', 'LIKE', '%' . $request->input('search') . '%');
+            $files->where(DB::raw('lower(name)'), 'like', '%' . strtolower($request->search) . '%');
         }
 
         if (isset($request->user)) {
