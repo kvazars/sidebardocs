@@ -1,63 +1,5 @@
-<script setup>
-import { onMounted, ref } from "vue";
-import { useColorModes } from "@coreui/vue";
-
-import { useSidebarStore } from "../stores/sidebar.js";
-import { useAuthIdStore } from "../stores/authId";
-import { useRouter } from "vue-router";
-
-const headerClassNames = ref("p-0");
-const { colorMode, setColorMode } = useColorModes(
-    "coreui-free-vue-admin-template-theme"
-);
-const sidebar = useSidebarStore();
-const auths = useAuthIdStore();
-const router = useRouter();
-
-const props = defineProps(["openWindowFunction", "datasend", "logoutFun"]);
-
-onMounted(() => {
-    document.addEventListener("scroll", () => {
-        if (document.documentElement.scrollTop > 0) {
-            headerClassNames.value = "p-0 shadow-sm";
-        } else {
-            headerClassNames.value = "p-0";
-        }
-    });
-});
-
-const modeTheme = ref(
-    localStorage.getItem("coreui-free-vue-admin-template-theme") ?? "light"
-);
-
-function logout() {
-    props
-        .datasend("logout", "GET", {})
-        .then((res) => {
-            if (res.success) {
-                props.logoutFun();
-            }
-        })
-        .catch((error) => {
-            console.log(error);
-        });
-}
-
-function goToAdmin() {
-    router.push({
-        name: "admin",
-    });
-}
-
-function goToSettings() {
-    router.push({
-        name: "settings",
-    });
-}
-</script>
-
 <template>
-    <CHeader position="sticky" :class="headerClassNames">
+    <CHeader position="sticky" :class="headerClassNames" id="headerOne" >
         <CContainer class="border-bottom px-4" fluid>
             <CHeaderToggler
                 @click="sidebar.toggleVisible()"
@@ -151,3 +93,61 @@ function goToSettings() {
         </CContainer>
     </CHeader>
 </template>
+
+<script setup>
+import { onMounted, ref } from "vue";
+import { useColorModes } from "@coreui/vue";
+
+import { useSidebarStore } from "../stores/sidebar.js";
+import { useAuthIdStore } from "../stores/authId";
+import { useRouter } from "vue-router";
+
+const headerClassNames = ref("p-0");
+const { colorMode, setColorMode } = useColorModes(
+    "coreui-free-vue-admin-template-theme"
+);
+const sidebar = useSidebarStore();
+const auths = useAuthIdStore();
+const router = useRouter();
+
+const props = defineProps(["openWindowFunction", "datasend", "logoutFun"]);
+
+onMounted(() => {
+    document.addEventListener("scroll", () => {
+        if (document.documentElement.scrollTop > 0) {
+            headerClassNames.value = "p-0 shadow-sm";
+        } else {
+            headerClassNames.value = "p-0";
+        }
+    });
+});
+
+const modeTheme = ref(
+    localStorage.getItem("coreui-free-vue-admin-template-theme") ?? "light"
+);
+
+function logout() {
+    props
+        .datasend("logout", "GET", {})
+        .then((res) => {
+            if (res.success) {
+                props.logoutFun();
+            }
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+}
+
+function goToAdmin() {
+    router.push({
+        name: "admin",
+    });
+}
+
+function goToSettings() {
+    router.push({
+        name: "settings",
+    });
+}
+</script>

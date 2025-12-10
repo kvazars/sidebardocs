@@ -1274,9 +1274,10 @@ export default {
                     // Проверяем каждую пару
                     for (let i = 0; i < question.options.length; i++) {
                         const pair = question.options[i];
-                        const leftEmpty = !pair.left.trim() && !pair.leftImage;
-                        const rightEmpty =
-                            !pair.right.trim() && !pair.rightImage;
+
+                        const leftEmpty =
+                            !(pair.left || "").trim() && !pair.leftImage;
+                        const rightEmpty = !pair.right.trim();
 
                         if (leftEmpty && rightEmpty) {
                             return `Пара ${i + 1} не заполнена`;
@@ -1349,13 +1350,11 @@ export default {
                             left: "",
                             right: "",
                             leftImage: null,
-                            rightImage: null,
                         },
                         {
                             left: "",
                             right: "",
                             leftImage: null,
-                            rightImage: null,
                         },
                     ];
                     break;
@@ -1425,7 +1424,6 @@ export default {
                 left: "",
                 right: "",
                 leftImage: null,
-                rightImage: null,
             });
         },
 
@@ -1876,13 +1874,11 @@ export default {
                                 left: "",
                                 right: "",
                                 leftImage: null,
-                                rightImage: null,
                             },
                             {
                                 left: "",
                                 right: "",
                                 leftImage: null,
-                                rightImage: null,
                             },
                         ];
                     }

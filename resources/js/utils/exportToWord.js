@@ -769,15 +769,11 @@ async function getQuestionContent(question, exportType, questionIndex) {
 
                     // Правая часть
                     let rightText;
-                    let rightImageBuffer = null;
 
                     if (exportType === "withAnswers") {
                         rightText = `${String.fromCharCode(65 + pairIndex)}) ${
                             pair.right || ""
                         }`;
-                        rightImageBuffer = pair.rightImage
-                            ? base64ToArrayBuffer(pair.rightImage)
-                            : null;
                     } else {
                         // Перемешиваем для студентов
                         const shuffledIndex = Math.floor(
@@ -786,12 +782,6 @@ async function getQuestionContent(question, exportType, questionIndex) {
                         rightText = `${String.fromCharCode(65 + pairIndex)}) ${
                             question.options[shuffledIndex].right || ""
                         }`;
-                        rightImageBuffer = question.options[shuffledIndex]
-                            .rightImage
-                            ? base64ToArrayBuffer(
-                                  question.options[shuffledIndex].rightImage
-                              )
-                            : null;
                     }
 
                     const rightParagraphs = [
@@ -805,24 +795,6 @@ async function getQuestionContent(question, exportType, questionIndex) {
                             spacing: { after: 150 },
                         }),
                     ];
-
-                    if (rightImageBuffer) {
-                        rightParagraphs.push(
-                            new Paragraph({
-                                children: [
-                                    new ImageRun({
-                                        data: rightImageBuffer,
-                                        transformation: {
-                                            width: 150,
-                                            height: 100,
-                                        },
-                                    }),
-                                ],
-                                alignment: AlignmentType.CENTER,
-                                spacing: { before: 10, after: 10 },
-                            })
-                        );
-                    }
 
                     rightColumn.push(...rightParagraphs);
                 }

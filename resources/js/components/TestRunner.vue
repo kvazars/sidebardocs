@@ -1,5 +1,5 @@
 <template>
-    <div class="test-runner">
+    <div class="test-runner my-4">
         <div
             v-if="savedTestState && !userName && !tempUserName"
             class="modal-overlay"
@@ -542,8 +542,7 @@
                                     <span class="fw-bold me-2">{{
                                         pair.left
                                     }}</span>
-                                    <!-- Изображение левой части -->
-                                    <
+
                                     <div v-if="pair.leftImage" class="ms-2">
                                         <div class="option-image-container">
                                             <img
@@ -718,7 +717,7 @@
 <script>
 export default {
     name: "TestRunner",
-    props: ["datasend", "tests", "showToast"],
+    props: ["datasend", "tests", "showToast", "blockForTest"],
     data() {
         return {
             selectedTest: null,
@@ -817,7 +816,11 @@ export default {
         },
 
         progress() {
-            if (!this.selectedTest) return 0;
+            if (!this.selectedTest) {
+                this.blockForTest(false);
+                return 0;
+            }
+            this.blockForTest();
             return (
                 ((this.currentQuestionIndex + 1) /
                     this.selectedTest.questions.length) *
@@ -1436,6 +1439,7 @@ export default {
             this.startTimer();
             this.initializeQuestion();
             this.startAutoSave();
+            // this.blockForTest();
         },
 
         shuffleQuestions() {
@@ -1854,9 +1858,9 @@ export default {
                             });
 
                             score =
-                                (correctPairs /
-                                    originalQuestion.options.length) *
-                                originalQuestion.points;
+                                correctPairs === originalQuestion.options.length
+                                    ? originalQuestion.points
+                                    : 0;
                             isCorrect =
                                 correctPairs ===
                                 originalQuestion.options.length;
@@ -2079,6 +2083,7 @@ export default {
             localStorage.removeItem("testProgress");
             this.savedTestState = null;
             this.restoreAttempted = false;
+            this.blockForTest(false);
         },
 
         formatTime(seconds) {
@@ -2741,9 +2746,9 @@ export default {
                             }
 
                             score =
-                                (correctPairs /
-                                    originalQuestion.options.length) *
-                                originalQuestion.points;
+                                correctPairs === originalQuestion.options.length
+                                    ? originalQuestion.points
+                                    : 0;
                             isCorrect =
                                 correctPairs ===
                                 originalQuestion.options.length;

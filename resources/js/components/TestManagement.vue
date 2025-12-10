@@ -1284,9 +1284,6 @@ export default {
                 const questionText = this.extractText(subQ);
                 const leftImage = this.extractImage(subQ);
                 const answerElement = subQ.getElementsByTagName("answer")[0];
-                const rightImage = this.extractImage(
-                    subQ.getElementsByTagName("answer")[0]
-                );
 
                 if (answerElement) {
                     const answerText = this.extractText(answerElement);
@@ -1299,7 +1296,6 @@ export default {
                             keepContent: true,
                         }),
                         leftImage: leftImage,
-                        rightImage: rightImage,
                     });
                 }
             }
