@@ -34,7 +34,18 @@
             <div class="card mb-4">
                 <div class="card-body">
                     <div class="row align-items-center">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
+                            <label class="form-label"
+                                >Поиск по названию теста/пользователю:</label
+                            >
+                            <input
+                                v-model="searchQuery"
+                                type="text"
+                                class="form-control"
+                                placeholder="Введите название теста..."
+                            />
+                        </div>
+                        <div class="col-md-4">
                             <label class="form-label">Сортировка:</label>
                             <select v-model="sortBy" class="form-select">
                                 <option value="date">
@@ -51,7 +62,7 @@
                                 </option>
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label">Фильтр по оценке:</label>
                             <select v-model="gradeFilter" class="form-select">
                                 <option value="">Все оценки</option>
@@ -84,6 +95,7 @@
                             class="card-header d-flex justify-content-between align-items-center"
                         >
                             <div>
+                                <h5 class="mb-0">{{ getTestTitle(result) }}</h5>
                                 <small class="text-muted">{{
                                     formatDate(result.created_at)
                                 }}</small>
@@ -313,6 +325,7 @@
                 <table class="table table-striped table-hover">
                     <thead class="table-dark">
                         <tr>
+                            <th>Тест</th>
                             <th>Пользователь</th>
                             <th>Баллы</th>
                             <th>Процент</th>
@@ -327,6 +340,9 @@
                             v-for="result in filteredResults"
                             :key="getResultKey(result)"
                         >
+                            <td>
+                                <strong>{{ getTestTitle(result) }}</strong>
+                            </td>
                             <td>
                                 <span
                                     v-if="result.user_name"
@@ -418,6 +434,7 @@
                             </span>
                         </h6>
                     </div>
+
                     <div class="card-body">
                         <div
                             v-for="(qResult, qIndex) in getQuestionResults(
@@ -504,6 +521,7 @@ export default {
         return {
             sortBy: "date",
             gradeFilter: "",
+            searchQuery: "",
             viewMode: "table", // 'cards' или 'table'
             expandedResults: new Set(),
         };
@@ -511,6 +529,17 @@ export default {
     computed: {
         filteredResults() {
             let filtered = this.results;
+
+            if (this.searchQuery) {
+                const query = this.searchQuery.toLowerCase().trim();
+                filtered = filtered.filter((result) => {
+                    const testTitle = this.getTestTitle(result).toLowerCase();
+                    const userName = (result.user_name || "").toLowerCase();
+                    return (
+                        testTitle.includes(query) || userName.includes(query)
+                    );
+                });
+            }
 
             // Фильтр по оценке
             if (this.gradeFilter) {

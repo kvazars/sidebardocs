@@ -13,11 +13,7 @@
                 </div>
                 <div class="card-body">
                     <p>
-                        У вас есть незавершенный тест "<strong>{{
-                            savedTestState.testId
-                        }}</strong
-                        >".
-                    </p>
+                        У вас есть незавершенный тест!                    </p>
                     <p>Хотите продолжить с того места, где остановились?</p>
 
                     <div class="mt-3">
@@ -31,7 +27,7 @@
                             @click="startNewTest"
                             class="btn btn-outline-secondary"
                         >
-                            <i class="bi bi-plus-circle"></i> Начать заново
+                            <i class="bi bi-plus-circle"></i> Отмена
                         </button>
                     </div>
                 </div>
