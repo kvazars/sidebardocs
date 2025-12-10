@@ -1,5 +1,42 @@
 <template>
     <div class="test-runner">
+        <div
+            v-if="savedTestState && !userName && !tempUserName"
+            class="modal-overlay"
+        >
+            <div class="restore-dialog card">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0">
+                        <i class="bi bi-arrow-clockwise"></i> Восстановление
+                        теста
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p>
+                        У вас есть незавершенный тест "<strong>{{
+                            savedTestState.testId
+                        }}</strong
+                        >".
+                    </p>
+                    <p>Хотите продолжить с того места, где остановились?</p>
+
+                    <div class="mt-3">
+                        <button
+                            @click="continueSavedTest"
+                            class="btn btn-success me-2"
+                        >
+                            <i class="bi bi-play-circle"></i> Продолжить
+                        </button>
+                        <button
+                            @click="startNewTest"
+                            class="btn btn-outline-secondary"
+                        >
+                            <i class="bi bi-plus-circle"></i> Начать заново
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Выбор теста -->
         <div v-if="!selectedTest" class="test-selection">
             <div v-if="tests.length != 0" class="row">
@@ -710,6 +747,8 @@ export default {
             modalImageUrl: "",
             modalTitle: "",
             lastHiddenTime: null,
+            savedTestState: null,
+            restoreAttempted: false,
         };
     },
     computed: {
@@ -961,9 +1000,145 @@ export default {
             this.handleVisibilityChange
         );
         document.addEventListener("keydown", this.handleKeydown);
+        window.addEventListener("beforeunload", this.handleBeforeUnload);
+
+        this.checkForSavedTest();
     },
 
     methods: {
+        startNewTest() {
+            localStorage.removeItem("testProgress");
+            this.savedTestState = null;
+            this.selectedTest = null;
+        },
+        continueSavedTest() {
+            // Ищем тест по ID
+            const testToRestore = this.tests.find(
+                (t) => t.id === this.savedTestState.testId
+            );
+            if (testToRestore) {
+                this.selectedTest = JSON.parse(JSON.stringify(testToRestore));
+                this.userName = this.savedTestState.userName;
+                this.applyRestoredState();
+            } else {
+                this.showToast("Тест не найден", "error");
+                localStorage.removeItem("testProgress");
+            }
+            this.savedTestState = null;
+        },
+        handleBeforeUnload(event) {
+            if (this.selectedTest && this.userName) {
+                this.saveTestState();
+            }
+        },
+
+        checkForSavedTest() {
+            if (this.restoreTestState()) {
+                console.log("Есть сохраненный тест");
+            }
+        },
+        saveTestState() {
+            if (!this.selectedTest || !this.userName) return;
+
+            const state = {
+                testId: this.selectedTest.id,
+                userName: this.userName,
+                currentQuestionIndex: this.currentQuestionIndex,
+                timeLeft: this.timeLeft,
+                answers: Object.fromEntries(this.userAnswersByOriginalIndex),
+                shuffledQuestions: this.shuffledQuestions,
+                shuffledOptionsMap: Array.from(
+                    this.shuffledOptionsMap.entries()
+                ),
+                shuffledPairsMap: Array.from(this.shuffledPairsMap.entries()),
+                answeredQuestions: Array.from(this.answeredQuestions),
+                timestamp: Date.now(),
+            };
+
+            localStorage.setItem("testProgress", JSON.stringify(state));
+        },
+
+        restoreTestState() {
+            const saved = localStorage.getItem("testProgress");
+            if (!saved) return false;
+
+            try {
+                const state = JSON.parse(saved);
+
+                // Проверяем, не прошло ли более 24 часов
+                const hoursPassed =
+                    (Date.now() - state.timestamp) / (1000 * 60 * 60);
+                if (hoursPassed > 24) {
+                    localStorage.removeItem("testProgress");
+                    return false;
+                }
+
+                this.savedTestState = state;
+                return true;
+            } catch (error) {
+                console.error("Ошибка восстановления теста:", error);
+                localStorage.removeItem("testProgress");
+                return false;
+            }
+        },
+
+        applyRestoredState() {
+            if (!this.savedTestState) return false;
+
+            try {
+                // Восстанавливаем основные данные
+                this.userName = this.savedTestState.userName;
+                this.currentQuestionIndex =
+                    this.savedTestState.currentQuestionIndex;
+                this.timeLeft = this.savedTestState.timeLeft;
+
+                // Восстанавливаем перемешанные вопросы
+                this.shuffledQuestions =
+                    this.savedTestState.shuffledQuestions || [];
+
+                // Восстанавливаем Map'ы
+                this.shuffledOptionsMap = new Map(
+                    this.savedTestState.shuffledOptionsMap
+                );
+                this.shuffledPairsMap = new Map(
+                    this.savedTestState.shuffledPairsMap
+                );
+
+                // Восстанавливаем ответы
+                if (this.savedTestState.answers) {
+                    this.userAnswersByOriginalIndex.clear();
+                    Object.entries(this.savedTestState.answers).forEach(
+                        ([key, value]) => {
+                            const originalIndex = parseInt(key);
+                            this.userAnswersByOriginalIndex.set(
+                                originalIndex,
+                                value
+                            );
+                        }
+                    );
+                }
+
+                // Восстанавливаем отвеченные вопросы
+                this.answeredQuestions = new Set(
+                    this.savedTestState.answeredQuestions
+                );
+
+                // Инициализируем текущий вопрос
+                this.initializeQuestion();
+
+                // Запускаем таймер
+                this.startTimer();
+
+                // Очищаем сохраненное состояние
+                localStorage.removeItem("testProgress");
+                this.savedTestState = null;
+
+                return true;
+            } catch (error) {
+                console.error("Ошибка применения состояния:", error);
+                return false;
+            }
+        },
         openImageModal(imageUrl, title = "Изображение") {
             this.modalImageUrl = imageUrl;
             this.modalTitle = title;
@@ -1131,19 +1306,77 @@ export default {
             } else {
                 this.answeredQuestions.delete(displayedIndex);
             }
+            if (this.selectedTest && this.userName) {
+                this.$nextTick(() => {
+                    this.saveTestState();
+                });
+            }
+        },
+
+        startAutoSave() {
+            if (this.autoSaveTimer) clearInterval(this.autoSaveTimer);
+
+            this.autoSaveTimer = setInterval(() => {
+                if (this.selectedTest && this.userName) {
+                    this.saveTestState();
+                }
+            }, 30000); // 30 секунд
         },
 
         selectTest(test) {
+            const saved = localStorage.getItem("testProgress");
+            if (saved) {
+                try {
+                    const state = JSON.parse(saved);
+                    if (state.testId === test.id) {
+                        // Показываем диалог восстановления
+                        if (
+                            confirm(
+                                "У вас есть незавершенный тест. Хотите продолжить?"
+                            )
+                        ) {
+                            this.selectedTest = JSON.parse(
+                                JSON.stringify(test)
+                            );
+                            this.savedTestState = state;
+                            this.restoreAttempted = true;
+                            return;
+                        } else {
+                            // Удаляем сохраненный прогресс
+                            localStorage.removeItem("testProgress");
+                        }
+                    }
+                } catch (e) {
+                    console.error("Ошибка проверки сохраненного теста:", e);
+                }
+            }
             this.selectedTest = JSON.parse(JSON.stringify(test));
-
-            // Сбрасываем имя пользователя
             this.userName = "";
             this.tempUserName = "";
+            this.restoreAttempted = false;
         },
 
         startTestWithName() {
             if (this.tempUserName.trim()) {
                 this.userName = this.tempUserName.trim();
+
+                // Если есть сохраненное состояние и это тот же пользователь
+                if (
+                    this.savedTestState &&
+                    this.savedTestState.userName === this.userName
+                ) {
+                    this.initializeTest();
+                    const restored = this.applyRestoredState();
+                    if (restored) {
+                        this.showToast(
+                            "Тест восстановлен из последней сессии",
+                            "info"
+                        );
+                        return;
+                    }
+                }
+
+                // Иначе начинаем новый тест
                 this.initializeTest();
             }
         },
@@ -1202,6 +1435,7 @@ export default {
             this.timeLeft = this.selectedTest.timeLimit * 60;
             this.startTimer();
             this.initializeQuestion();
+            this.startAutoSave();
         },
 
         shuffleQuestions() {
@@ -1753,6 +1987,13 @@ export default {
                 clearInterval(this.timer);
                 this.timer = null;
             }
+            if (this.autoSaveTimer) {
+                clearInterval(this.autoSaveTimer);
+                this.autoSaveTimer = null;
+            }
+
+            // Очищаем сохраненное состояние
+            localStorage.removeItem("testProgress");
 
             // Собираем результат
             const result = this.calculatePartialResult();
@@ -1831,6 +2072,13 @@ export default {
             this.originalToDisplayedQuestion.clear();
             this.displayToOriginalIndex?.clear();
             this.originalToDisplayIndex?.clear();
+            if (this.autoSaveTimer) {
+                clearInterval(this.autoSaveTimer);
+                this.autoSaveTimer = null;
+            }
+            localStorage.removeItem("testProgress");
+            this.savedTestState = null;
+            this.restoreAttempted = false;
         },
 
         formatTime(seconds) {
@@ -2177,15 +2425,7 @@ export default {
                 this.currentQuestionIndex++;
                 this.validationError = "";
                 this.initializeQuestion();
-
-                // Прокрутка к началу вопроса
-                this.$nextTick(() => {
-                    const questionElement =
-                        document.querySelector(".card.mb-4");
-                    // if (questionElement) {
-                    //     questionElement.scrollIntoView({ behavior: "smooth" });
-                    // }
-                });
+                this.saveTestState();
             }
         },
 
@@ -2197,15 +2437,7 @@ export default {
                 this.currentQuestionIndex--;
                 this.validationError = "";
                 this.initializeQuestion();
-
-                // Прокрутка к началу вопроса
-                this.$nextTick(() => {
-                    const questionElement =
-                        document.querySelector(".card.mb-4");
-                    // if (questionElement) {
-                    //     questionElement.scrollIntoView({ behavior: "smooth" });
-                    // }
-                });
+                this.saveTestState(); // Сохраняем состояние
             }
         },
 
@@ -2217,18 +2449,19 @@ export default {
                 this.currentQuestionIndex = displayIndex;
                 this.validationError = "";
                 this.initializeQuestion();
-
-                this.$nextTick(() => {
-                    const questionElement =
-                        document.querySelector(".card.mb-4");
-                });
+                this.saveTestState(); // Сохраняем состояние
             }
         },
 
         finishTest() {
             clearInterval(this.timer);
-            const result = this.calculateResult();
 
+            if (this.autoSaveTimer) {
+                clearInterval(this.autoSaveTimer);
+                this.autoSaveTimer = null;
+            }
+            localStorage.removeItem("testProgress");
+            const result = this.calculateResult();
             this.datasend("results", "POST", result).then(() => {
                 this.selectedTest = null;
                 this.userName = "";
@@ -2812,9 +3045,19 @@ export default {
             "visibilitychange",
             this.handleVisibilityChange
         );
+        window.removeEventListener("beforeunload", this.handleBeforeUnload);
         if (this.timer) {
             clearInterval(this.timer);
             this.timer = null;
+        }
+        if (this.autoSaveTimer) {
+            clearInterval(this.autoSaveTimer);
+            this.autoSaveTimer = null;
+        }
+
+        // Сохраняем при размонтировании компонента
+        if (this.selectedTest && this.userName) {
+            this.saveTestState();
         }
     },
 };
@@ -2965,5 +3208,34 @@ export default {
 .position-badge {
     min-width: 40px;
     text-align: center;
+}
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+}
+
+.restore-dialog {
+    max-width: 500px;
+    width: 90%;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 </style>
