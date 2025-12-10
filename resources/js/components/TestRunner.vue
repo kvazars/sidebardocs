@@ -73,6 +73,7 @@
                             Имя будет сохранено вместе с результатами теста.
                         </div>
                     </div>
+
                     <button
                         @click="startTestWithName"
                         :disabled="!tempUserName.trim()"
@@ -257,11 +258,20 @@
                             v-if="currentQuestion.image"
                             class="mt-3 text-center"
                         >
-                            <img
-                                :src="currentQuestion.image"
-                                class="img-fluid rounded"
-                                style="max-height: 300px"
-                            />
+                            <div class="image-container">
+                                <img
+                                    :src="currentQuestion.image"
+                                    class="img-fluid rounded zoomable-image"
+                                    style="max-height: 300px; cursor: zoom-in"
+                                    @click="
+                                        openImageModal(
+                                            currentQuestion.image,
+                                            'Изображение к вопросу'
+                                        )
+                                    "
+                                    :title="'Нажмите для увеличения'"
+                                />
+                            </div>
                         </div>
                     </div>
 
@@ -306,11 +316,23 @@
                                     }}</span>
                                     <!-- Изображение варианта -->
                                     <div v-if="option.image" class="ms-3">
-                                        <img
-                                            :src="option.image"
-                                            class="img-thumbnail"
-                                            style="max-height: 80px"
-                                        />
+                                        <div class="option-image-container">
+                                            <img
+                                                :src="option.image"
+                                                class="img-thumbnail zoomable-image"
+                                                style="
+                                                    max-height: 80px;
+                                                    cursor: zoom-in;
+                                                "
+                                                @click="
+                                                    openImageModal(
+                                                        option.image,
+                                                        'Изображение варианта ответа'
+                                                    )
+                                                "
+                                                :title="'Нажмите для увеличения'"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </label>
@@ -353,11 +375,23 @@
                                     }}</span>
                                     <!-- Изображение варианта -->
                                     <div v-if="option.image" class="ms-3">
-                                        <img
-                                            :src="option.image"
-                                            class="img-thumbnail"
-                                            style="max-height: 80px"
-                                        />
+                                        <div class="option-image-container">
+                                            <img
+                                                :src="option.image"
+                                                class="img-thumbnail zoomable-image"
+                                                style="
+                                                    max-height: 80px;
+                                                    cursor: zoom-in;
+                                                "
+                                                @click="
+                                                    openImageModal(
+                                                        option.image,
+                                                        'Изображение варианта ответа'
+                                                    )
+                                                "
+                                                :title="'Нажмите для увеличения'"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </label>
@@ -472,12 +506,25 @@
                                         pair.left
                                     }}</span>
                                     <!-- Изображение левой части -->
-                                    <div v-if="pair.leftImage">
-                                        <img
-                                            :src="pair.leftImage"
-                                            class="img-thumbnail"
-                                            style="max-height: 60px"
-                                        />
+                                    <
+                                    <div v-if="pair.leftImage" class="ms-2">
+                                        <div class="option-image-container">
+                                            <img
+                                                :src="pair.leftImage"
+                                                class="img-thumbnail zoomable-image"
+                                                style="
+                                                    max-height: 60px;
+                                                    cursor: zoom-in;
+                                                "
+                                                @click="
+                                                    openImageModal(
+                                                        pair.leftImage,
+                                                        'Изображение левой части'
+                                                    )
+                                                "
+                                                :title="'Нажмите для увеличения'"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -582,6 +629,52 @@
                 </button>
             </div>
         </div>
+        <div
+            v-if="showImageModal"
+            class="modal fade show d-block"
+            tabindex="-1"
+            role="dialog"
+            style="background-color: rgba(0, 0, 0, 0.8)"
+        >
+            <div
+                class="modal-dialog modal-dialog-centered modal-xl"
+                role="document"
+            >
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ modalTitle }}</h5>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            @click="closeImageModal"
+                        ></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img
+                            :src="modalImageUrl"
+                            class="img-fluid"
+                            style="max-height: 70vh"
+                        />
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            @click="closeImageModal"
+                        >
+                            <i class="bi bi-x-lg"></i> Закрыть
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            @click="downloadImage"
+                        >
+                            <i class="bi bi-download"></i> Скачать
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -613,6 +706,10 @@ export default {
             // Для навигации по отображенным вопросам
             displayedQuestionToOriginal: new Map(),
             originalToDisplayedQuestion: new Map(),
+            showImageModal: false,
+            modalImageUrl: "",
+            modalTitle: "",
+            lastHiddenTime: null,
         };
     },
     computed: {
@@ -863,9 +960,40 @@ export default {
             "visibilitychange",
             this.handleVisibilityChange
         );
+        document.addEventListener("keydown", this.handleKeydown);
     },
 
     methods: {
+        openImageModal(imageUrl, title = "Изображение") {
+            this.modalImageUrl = imageUrl;
+            this.modalTitle = title;
+            this.showImageModal = true;
+            document.body.style.overflow = "hidden"; // Отключаем скролл страницы
+        },
+
+        closeImageModal() {
+            this.showImageModal = false;
+            this.modalImageUrl = "";
+            this.modalTitle = "";
+            document.body.style.overflow = ""; // Восстанавливаем скролл
+        },
+
+        downloadImage() {
+            if (!this.modalImageUrl) return;
+
+            const link = document.createElement("a");
+            link.href = this.modalImageUrl;
+            link.download = `image_${Date.now()}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        },
+
+        handleKeydown(event) {
+            if (event.key === "Escape" && this.showImageModal) {
+                this.closeImageModal();
+            }
+        },
         handleDragStart(event, index) {
             event.dataTransfer.setData("text/plain", index.toString());
         },
