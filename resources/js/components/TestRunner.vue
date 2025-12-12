@@ -12,8 +12,7 @@
                     </h5>
                 </div>
                 <div class="card-body">
-                    <p>
-                        У вас есть незавершенный тест!                    </p>
+                    <p>У вас есть незавершенный тест!</p>
                     <p>Хотите продолжить с того места, где остановились?</p>
 
                     <div class="mt-3">
@@ -567,7 +566,7 @@
                                 <select
                                     v-model="currentMatchingAnswer[index]"
                                     class="form-select"
-                                    @change="onMatchingChange(index, $event)"
+                                    @change="onMatchingChange(index, event)"
                                 >
                                     <option value="">
                                         Выберите соответствие
@@ -783,7 +782,8 @@ export default {
         currentShuffledPairs() {
             const data = this.shuffledPairsMap.get(this.currentQuestionIndex);
             if (data && data.options) {
-                return data.options;
+                // было: data.pairs
+                return data.options; // было: data.pairs
             }
 
             // Иначе используем оригинальные пары
@@ -834,9 +834,11 @@ export default {
         },
         currentOriginalIndex() {
             if (!this.currentQuestion) return -1;
-            return this.currentQuestion.originalIndex !== undefined
-                ? this.currentQuestion.originalIndex
-                : this.currentQuestionIndex;
+            const idx =
+                this.currentQuestion.originalIndex !== undefined
+                    ? this.currentQuestion.originalIndex
+                    : this.currentQuestionIndex;
+            return idx >= 0 ? idx : -1;
         },
 
         showTimeWarning() {
@@ -1011,6 +1013,7 @@ export default {
             this.selectedTest = null;
         },
         continueSavedTest() {
+            const state = this.savedTestState;
             // Ищем тест по ID
             const testToRestore = this.tests.find(
                 (t) => t.id === this.savedTestState.testId
@@ -1018,6 +1021,7 @@ export default {
             if (testToRestore) {
                 this.selectedTest = JSON.parse(JSON.stringify(testToRestore));
                 this.userName = this.savedTestState.userName;
+                this.savedTestState = state;
                 this.applyRestoredState();
             } else {
                 this.showToast("Тест не найден", "error");
@@ -1448,23 +1452,6 @@ export default {
                 .sort(() => Math.random() - 0.5);
         },
 
-        shuffleSortingItems() {
-            if (!this.currentQuestion.options) return;
-
-            const items = [...this.currentQuestion.options];
-            const shuffledOrder = items
-                .map((_, index) => index)
-                .sort(() => Math.random() - 0.5);
-
-            const originalIndex = this.currentOriginalIndex;
-            if (originalIndex !== undefined) {
-                this.userAnswersByOriginalIndex.set(
-                    originalIndex,
-                    shuffledOrder
-                );
-            }
-        },
-
         initializeQuestion() {
             if (!this.currentQuestion) return;
 
@@ -1623,7 +1610,7 @@ export default {
                 .sort(() => Math.random() - 0.5);
 
             this.shuffledPairsMap.set(this.currentQuestionIndex, {
-                pairs: shuffledPairs,
+                options: shuffledPairs, // было: pairs: shuffledPairs
                 rightOptions: shuffledRightOptions,
             });
 
@@ -1842,16 +1829,50 @@ export default {
                             }
 
                             let correctPairs = 0;
-                            userAnswer.forEach((userRightAnswer, pairIndex) => {
-                                const originalPair =
-                                    originalQuestion.options[pairIndex];
-                                if (
-                                    originalPair &&
-                                    originalPair.right === userRightAnswer
-                                ) {
-                                    correctPairs++;
-                                }
-                            });
+
+                            // Получаем данные о перемешивании для этого вопроса
+                            const displayedIndex =
+                                this.originalToDisplayedQuestion.get(
+                                    originalIndex
+                                );
+                            const matchingData =
+                                displayedIndex !== undefined
+                                    ? this.shuffledPairsMap.get(displayedIndex)
+                                    : null;
+
+                            if (matchingData && matchingData.options) {
+                                // Если варианты были перемешаны
+                                userAnswer.forEach(
+                                    (userRightAnswer, displayedPairIndex) => {
+                                        const shuffledPair =
+                                            matchingData.options[
+                                                displayedPairIndex
+                                            ];
+                                        if (
+                                            shuffledPair &&
+                                            shuffledPair.right ===
+                                                userRightAnswer
+                                        ) {
+                                            correctPairs++;
+                                        }
+                                    }
+                                );
+                            } else {
+                                // Если варианты не перемешаны
+                                userAnswer.forEach(
+                                    (userRightAnswer, pairIndex) => {
+                                        const originalPair =
+                                            originalQuestion.options[pairIndex];
+                                        if (
+                                            originalPair &&
+                                            originalPair.right ===
+                                                userRightAnswer
+                                        ) {
+                                            correctPairs++;
+                                        }
+                                    }
+                                );
+                            }
 
                             score =
                                 correctPairs === originalQuestion.options.length
@@ -2020,26 +2041,86 @@ export default {
                         : 0;
 
                 // Показываем сообщение
-                this.showToast(
-                    "⏰ Время истекло! Тест завершен автоматически.<br>" +
-                        "Отвечено вопросов: " +
-                        result.answered_questions_count +
-                        " из " +
-                        result.total_questions_count +
-                        " (" +
-                        answeredPercentage +
-                        "%)<br>" +
-                        "Набрано баллов: " +
-                        result.total_score +
-                        " из " +
-                        result.max_score +
-                        " (" +
-                        result.percentage +
-                        "%)",
-                    "warning"
-                );
+                const messageType = this.getMessageTypeByGrade(result.grade);
+
+                // Формируем сообщение
+                const toastMessage = `
+            <div style="text-align: left; line-height: 1.5;">
+                <strong>⏰ Время истекло! Тест завершен автоматически.</strong><br>
+                Отвечено вопросов: ${result.answered_questions_count} из ${
+                    result.total_questions_count
+                } (${answeredPercentage}%)<br>
+                Набрано баллов: ${result.total_score} из ${result.max_score} (${
+                    result.percentage
+                }%)<br>
+                <strong style="font-size: 1.2em; color: ${this.getGradeColor(
+                    result.grade
+                )};">
+                    Оценка: ${result.grade}
+                </strong>
+            </div>
+        `;
+
+                this.showToast(toastMessage, messageType);
                 this.resetTestState();
             });
+        },
+
+        getMessageTypeByGrade(grade) {
+            if (!grade || typeof grade !== "string") {
+                return "info";
+            }
+
+            // Приводим оценку к нижнему регистру для сравнения
+            const gradeLower = grade.toLowerCase().trim();
+
+            // Максимальные оценки
+            const excellentGrades = [
+                "отлично",
+                "отл",
+                "5",
+                "5/5",
+                "a",
+                "a+",
+                "a++",
+                "excellent",
+                "превосходно",
+                "идеально",
+                "100%",
+                "max",
+            ];
+
+            // Минимальные/неудовлетворительные оценки
+            const poorGrades = [
+                "неудовлетворительно",
+                "неуд",
+                "2",
+                "2/5",
+                "f",
+                "e",
+                "плохо",
+                "очень плохо",
+                "0",
+                "0%",
+                "не сдал",
+                "fail",
+                "провал",
+                "низший балл",
+                "минимальный",
+            ];
+
+            // Проверяем на максимальную оценку
+            if (excellentGrades.some((g) => gradeLower.includes(g))) {
+                return "success";
+            }
+
+            // Проверяем на низкую оценку
+            if (poorGrades.some((g) => gradeLower.includes(g))) {
+                return "danger";
+            }
+
+            // Все остальные - info
+            return "info";
         },
         resetTestState() {
             // Сброс всех основных данных
@@ -2070,8 +2151,6 @@ export default {
             this.userAnswersByOriginalIndex.clear();
             this.displayedQuestionToOriginal.clear();
             this.originalToDisplayedQuestion.clear();
-            this.displayToOriginalIndex?.clear();
-            this.originalToDisplayIndex?.clear();
             if (this.autoSaveTimer) {
                 clearInterval(this.autoSaveTimer);
                 this.autoSaveTimer = null;
@@ -2260,15 +2339,6 @@ export default {
         validateAndNextQuestion() {
             if (this.validateCurrentQuestion()) {
                 this.nextQuestion();
-            } else {
-                // Прокрутка к ошибке
-                // this.$nextTick(() => {
-                //     const errorElement =
-                //         document.querySelector(".alert-danger");
-                //     if (errorElement) {
-                //         errorElement.scrollIntoView({ behavior: "smooth" });
-                //     }
-                // });
             }
         },
         validateAllQuestions() {
@@ -2376,14 +2446,6 @@ export default {
                 return;
             }
             if (!this.validateCurrentQuestion()) {
-                // Прокрутка к ошибке
-                this.$nextTick(() => {
-                    const errorElement =
-                        document.querySelector(".alert-danger");
-                    // if (errorElement) {
-                    //     errorElement.scrollIntoView({ behavior: "smooth" });
-                    // }
-                });
                 return;
             }
 
@@ -2396,14 +2458,6 @@ export default {
                     validationResult.questionIndex + 1
                 } не отвечен. Пожалуйста, ответьте на него`;
 
-                // Прокрутка к ошибке
-                this.$nextTick(() => {
-                    const errorElement =
-                        document.querySelector(".alert-danger");
-                    // if (errorElement) {
-                    //     errorElement.scrollIntoView({ behavior: "smooth" });
-                    // }
-                });
                 return;
             }
 
@@ -2471,21 +2525,100 @@ export default {
                 this.shuffledPairsMap.clear();
                 this.answeredQuestions.clear();
                 this.validationError = "";
+                const messageType = this.getMessageTypeByGrade(result.grade);
 
-                this.showToast(
-                    "Тест завершен!<br>" +
-                        "Набрано баллов: " +
-                        result.total_score +
-                        " из " +
-                        result.max_score +
-                        " (" +
-                        result.percentage +
-                        "%)",
-                    "success"
-                );
+                const toastMessage = `
+            <div style="text-align: left; line-height: 1.5;">
+                <strong>✅ Тест завершен успешно!</strong><br>
+                Набрано баллов: ${result.total_score} из ${result.max_score} (${
+                    result.percentage
+                }%)<br>
+                <strong style="font-size: 1.2em; color: ${this.getGradeColor(
+                    result.grade
+                )};">
+                    Оценка: ${result.grade}
+                </strong>
+            </div>
+        `;
+
+                this.showToast(toastMessage, messageType);
 
                 this.resetTestState();
             });
+        },
+        getGradeColor(grade) {
+            if (!grade || typeof grade !== "string") {
+                return "#6c757d"; // серый по умолчанию
+            }
+
+            const gradeLower = grade.toLowerCase().trim();
+
+            // Максимальные оценки - зеленый
+            const excellentGrades = [
+                "отлично",
+                "отл",
+                "5",
+                "5/5",
+                "a",
+                "a+",
+                "a++",
+                "excellent",
+                "превосходно",
+                "идеально",
+                "100%",
+                "max",
+            ];
+
+            // Минимальные/неудовлетворительные оценки - красный
+            const poorGrades = [
+                "неудовлетворительно",
+                "неуд",
+                "2",
+                "2/5",
+                "f",
+                "e",
+                "плохо",
+                "очень плохо",
+                "0",
+                "0%",
+                "не сдал",
+                "fail",
+                "провал",
+                "низший балл",
+                "минимальный",
+            ];
+
+            // Средние/хорошие оценки - синий/оранжевый
+            const goodGrades = [
+                "хорошо",
+                "хор",
+                "4",
+                "4/5",
+                "b",
+                "c",
+                "c+",
+                "b+",
+                "good",
+                "удовлетворительно",
+                "уд",
+                "3",
+                "3/5",
+                "d",
+            ];
+
+            if (excellentGrades.some((g) => gradeLower.includes(g))) {
+                return "#198754"; // зеленый
+            }
+
+            if (poorGrades.some((g) => gradeLower.includes(g))) {
+                return "#dc3545"; // красный
+            }
+
+            if (goodGrades.some((g) => gradeLower.includes(g))) {
+                return "#0dcaf0"; // голубой для хороших оценок
+            }
+
+            return "#6c757d"; // серый по умолчанию
         },
 
         calculateResult() {
@@ -2703,29 +2836,46 @@ export default {
                                 break;
                             }
 
-                            let correctPairs = 0;
-
+                            // Ключевое исправление начинается здесь
                             if (matchingData) {
                                 // Если пары были перемешаны
-                                const shuffledPairs = matchingData.pairs;
-                                // console.log(matchingData);
+                                const shuffledPairs =
+                                    matchingData.options || [];
+
+                                // Проверяем каждое сопоставление
+                                let correctPairs = 0;
 
                                 userAnswer.forEach(
                                     (userRightAnswer, displayedPairIndex) => {
-                                        // Находим перемешанную пару по отображаемому индексу
+                                        // Получаем перемешанную пару по отображаемому индексу
                                         const shuffledPair =
                                             shuffledPairs[displayedPairIndex];
-                                        if (
-                                            shuffledPair &&
-                                            shuffledPair.right ===
+
+                                        if (shuffledPair) {
+                                            // Находим оригинальную правую часть этой перемешанной пары
+                                            const originalRightPart =
+                                                shuffledPair.right;
+
+                                            // Сравниваем с ответом пользователя
+                                            if (
+                                                originalRightPart ===
                                                 userRightAnswer
-                                        ) {
-                                            correctPairs++;
+                                            ) {
+                                                correctPairs++;
+                                            }
                                         }
                                     }
                                 );
+
+                                // Все пары должны быть правильными
+                                isCorrect =
+                                    correctPairs ===
+                                    originalQuestion.options.length;
+                                score = isCorrect ? originalQuestion.points : 0;
                             } else {
-                                // Если пары не перемешаны
+                                // Если пары не перемешаны - обычная проверка
+                                let correctPairs = 0;
+
                                 userAnswer.forEach(
                                     (userRightAnswer, pairIndex) => {
                                         const originalPair =
@@ -2739,15 +2889,16 @@ export default {
                                         }
                                     }
                                 );
-                            }
 
-                            score =
-                                correctPairs === originalQuestion.options.length
-                                    ? originalQuestion.points
-                                    : 0;
-                            isCorrect =
-                                correctPairs ===
-                                originalQuestion.options.length;
+                                score =
+                                    correctPairs ===
+                                    originalQuestion.options.length
+                                        ? originalQuestion.points
+                                        : 0;
+                                isCorrect =
+                                    correctPairs ===
+                                    originalQuestion.options.length;
+                            }
                             break;
 
                         default:
@@ -2917,7 +3068,7 @@ export default {
                                       rightAnswer.title ||
                                       rightAnswer.name ||
                                       "Не выбрано"
-                                    : rightAnswer || "Не выбрано";
+                                    : String(rightAnswer || "Не выбрано");
                             return `${leftText} → ${rightText}`;
                         }
                     );
@@ -3005,12 +3156,23 @@ export default {
         },
 
         calculateGrade(percentage) {
-            if (!this.selectedTest.grading) return "Не оценено";
+            if (
+                !this.selectedTest.grading ||
+                !Array.isArray(this.selectedTest.grading)
+            ) {
+                return "Не оценено";
+            }
 
             const gradeSystem = this.selectedTest.grading;
-            const grade = gradeSystem.find(
-                (g) => percentage >= g.minScore && percentage <= g.max_score
+
+            // Сортируем по minScore для надежности
+            const sortedGrades = [...gradeSystem].sort(
+                (a, b) => b.minScore - a.minScore
             );
+
+            // Находим первую оценку, для которой процент >= minScore
+            const grade = sortedGrades.find((g) => percentage >= g.minScore);
+
             return grade ? grade.grade : "Не оценено";
         },
         getSortingItemText(itemId) {

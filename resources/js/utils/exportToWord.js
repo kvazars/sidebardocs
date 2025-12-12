@@ -98,6 +98,15 @@ function base64ToArrayBuffer(base64) {
     }
 }
 
+// Функция перемешивания массива
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
 // Основная функция экспорта в Word с ответами
 export async function exportTestToWord(test) {
     try {
@@ -713,6 +722,69 @@ async function getQuestionContent(question, exportType, questionIndex) {
                 const leftColumn = [];
                 const rightColumn = [];
 
+                // Получаем оригинальные правые части
+                const originalRightOptions = question.options.map(
+                    (pair) => pair.right || ""
+                );
+
+                // Генерируем правые части для отображения
+                let displayRightOptions;
+
+                if (
+                    exportType === "withAnswers" ||
+                    exportType === "separateAnswers"
+                ) {
+                    // Для версий с ответами - оставляем как есть
+                    displayRightOptions = [...originalRightOptions];
+                } else {
+                    // Для студенческой версии без ответов
+                    displayRightOptions = [];
+
+                    // Собираем уникальные правые части
+                    const uniqueRightOptions = [
+                        ...new Set(originalRightOptions),
+                    ];
+
+                    // Если уникальных вариантов достаточно
+                    if (
+                        uniqueRightOptions.length >= originalRightOptions.length
+                    ) {
+                        // Берем нужное количество уникальных вариантов
+                        const shuffledUnique = [...uniqueRightOptions];
+                        shuffleArray(shuffledUnique);
+                        displayRightOptions = shuffledUnique.slice(
+                            0,
+                            originalRightOptions.length
+                        );
+                    } else {
+                        // Если уникальных вариантов меньше, чем нужно
+                        // Сначала добавляем все уникальные
+                        displayRightOptions = [...uniqueRightOptions];
+
+                        // Затем добавляем дубликаты с номерами до нужного количества
+                        let counter = 1;
+                        while (
+                            displayRightOptions.length <
+                            originalRightOptions.length
+                        ) {
+                            // Берем случайный уникальный вариант
+                            const randomIndex = Math.floor(
+                                Math.random() * uniqueRightOptions.length
+                            );
+                            const baseOption = uniqueRightOptions[randomIndex];
+
+                            // Добавляем с номером
+                            displayRightOptions.push(
+                                `${baseOption} (${counter})`
+                            );
+                            counter++;
+                        }
+
+                        // Перемешиваем окончательный список
+                        shuffleArray(displayRightOptions);
+                    }
+                }
+
                 for (
                     let pairIndex = 0;
                     pairIndex < question.options.length;
@@ -768,35 +840,28 @@ async function getQuestionContent(question, exportType, questionIndex) {
                     }
 
                     // Правая часть
-                    let rightText;
+                    const displayRight = displayRightOptions[pairIndex] || "";
+                    const isCorrect =
+                        exportType === "withAnswers" &&
+                        displayRight === pair.right;
 
-                    if (exportType === "withAnswers") {
-                        rightText = `${String.fromCharCode(65 + pairIndex)}) ${
-                            pair.right || ""
-                        }`;
-                    } else {
-                        // Перемешиваем для студентов
-                        const shuffledIndex = Math.floor(
-                            Math.random() * question.options.length
-                        );
-                        rightText = `${String.fromCharCode(65 + pairIndex)}) ${
-                            question.options[shuffledIndex].right || ""
-                        }`;
-                    }
-
-                    const rightParagraphs = [
+                    rightColumn.push(
                         new Paragraph({
                             children: [
                                 new TextRun({
-                                    text: rightText,
-                                    bold: exportType === "withAnswers",
+                                    text: `${String.fromCharCode(
+                                        65 + pairIndex
+                                    )}) `,
+                                    bold: isCorrect,
+                                }),
+                                new TextRun({
+                                    text: displayRight,
+                                    bold: isCorrect,
                                 }),
                             ],
                             spacing: { after: 150 },
-                        }),
-                    ];
-
-                    rightColumn.push(...rightParagraphs);
+                        })
+                    );
                 }
 
                 children.push(
@@ -848,7 +913,10 @@ async function getQuestionContent(question, exportType, questionIndex) {
                 );
 
                 // Инструкция
-                if (exportType === "withAnswers") {
+                if (
+                    exportType === "withAnswers" ||
+                    exportType === "separateAnswers"
+                ) {
                     children.push(
                         new Paragraph({
                             children: [
@@ -999,7 +1067,7 @@ async function getQuestionContent(question, exportType, questionIndex) {
                 const itemsToShow = [...question.options];
                 if (exportType !== "withAnswers") {
                     // Перемешиваем для студентов (кроме режима с ответами)
-                    itemsToShow.sort(() => Math.random() - 0.5);
+                    shuffleArray(itemsToShow);
                 }
 
                 itemsToShow.forEach((item, itemIndex) => {
