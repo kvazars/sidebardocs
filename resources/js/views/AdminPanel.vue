@@ -76,6 +76,18 @@
                         >Файлы</CNavLink
                     >
                 </CNavItem>
+                <CNavItem>
+                    <CNavLink
+                        href="#"
+                        @click="
+                            () => {
+                                getResult();
+                                role = 'tests';
+                            }
+                        "
+                        >Результаты тестов</CNavLink
+                    >
+                </CNavItem>
             </CNav>
         </CCardHeader>
         <CCardBody>
@@ -89,6 +101,8 @@
                         ? " менеджерами"
                         : role == "system"
                         ? " системой"
+                        : role == "tests"
+                        ? " результатами тестами"
                         : " файлами"
                 }}
             </h4>
@@ -427,6 +441,16 @@
                             </CCard>
                         </div>
                     </template>
+
+                    <template v-if="role == 'tests'">
+                        <TestResults
+                            :results="results"
+                            :datasend="datasend"
+                            :showToast="showToast"
+                            :getResult="getResult"
+                            v-if="results.length > 0"
+                        />
+                    </template>
                 </div>
             </div>
 
@@ -449,7 +473,7 @@
                 :dashboard="dashboard"
                 :server="server"
                 :api="api"
-                :datasend=null
+                :datasend="null"
                 :getMenu="getMenu"
                 :setContent="setContent"
                 :showToast="showToast"
@@ -570,7 +594,7 @@
 import EditFile from "./EditFile.vue";
 import AdminFiles from "../components/AdminFiles.vue";
 import { CButtonGroup } from "@coreui/vue";
-
+import TestResults from "../components/TestResults.vue";
 export default {
     props: [
         "datasend",
@@ -601,6 +625,7 @@ export default {
             systemName: null,
             systemLogo: null,
             visibleModal: false,
+            results: [],
         };
     },
     mounted() {
@@ -609,6 +634,11 @@ export default {
         }
     },
     methods: {
+        getResult() {
+            this.datasend(`results/all/all`, "GET").then((response) => {
+                this.results = response.data;
+            });
+        },
         authUser(user) {
             if (confirm("Вы действительно хотите авторизоваться?")) {
                 let form = { user: user };
@@ -811,6 +841,7 @@ export default {
     components: {
         EditFile,
         AdminFiles,
+        TestResults,
     },
 };
 </script>

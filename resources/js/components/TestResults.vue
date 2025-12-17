@@ -617,9 +617,9 @@ export default {
         },
 
         deleteResult(result) {
-            if (!confirm("Вы уверены, что хотите удалить этот результат?")) {
-                return;
-            }
+            // if (!confirm("Вы уверены, что хотите удалить этот результат?")) {
+            //     return;
+            // }
 
             this.datasend("results/" + result.id, "DELETE").then((response) => {
                 this.showToast(response.message, "success");

@@ -25,6 +25,15 @@ class TestResultController extends Controller
         }
         return response()->json(['data' => []]);
     }
+    public function resultAll(): JsonResponse
+    {
+        $tree = Tree::where("user_id", Auth::id())->pluck("id")->toArray();
+
+        $test = Test::whereIn("tree_id", $tree)->pluck('id')->toArray();
+
+        $results = TestResult::with('test', 'user')->whereIn("test_id", $test)->orderBy("created_at", "desc")->get();
+        return response()->json(['data' => $results]);
+    }
 
 
     public function store(Request $request): JsonResponse

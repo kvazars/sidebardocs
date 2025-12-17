@@ -38,6 +38,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('tests/{testId}/results', [TestResultController::class, 'testResults']);
     Route::get('tests/{tree_id}/get', [TestController::class, 'testTree']);
     Route::get('results/{tree_id}/get', [TestResultController::class, 'resultTree']);
+
     // Route::delete('/test-results/{result}', [TestResultController::class, 'destroy']);
 
 
@@ -48,6 +49,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //admin,ceo
     Route::middleware(["role:admin|ceo"])->group(function () {
+        Route::get('results/all/all', [TestResultController::class, 'resultAll']);
         Route::post("/resource", [ContentController::class, "saveResource"]);
         Route::post("/clearmyaccessfiles", [AvailableController::class, "clearmyaccessfiles"]);
         Route::post("/saveImageByUrl", [ContentController::class, "saveImageByUrl"]);
