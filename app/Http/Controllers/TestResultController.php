@@ -35,6 +35,14 @@ class TestResultController extends Controller
         return response()->json(['data' => $results]);
     }
 
+    public function bulkDelete(Request $request)
+    {
+        TestResult::whereIn("id", $request->result_ids)->delete();
+        return response()->json(['message' => 'Успешно удалены выбранные резульаты']);
+    }
+
+
+
 
     public function store(Request $request): JsonResponse
     {
