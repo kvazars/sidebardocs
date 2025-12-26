@@ -7,9 +7,10 @@ function getQuestionTypeLabel(type) {
     const labels = {
         single: "Одиночный выбор",
         multiple: "Множественный выбор",
-        "true-false": "Верно/Неверно",
+        truefalse: "Верно/Неверно",
         text: "Свободный ответ",
         matching: "Сопоставление",
+        sorting: "Упорядочивание",
     };
     return labels[type] || type;
 }
@@ -45,7 +46,7 @@ function getCorrectAnswerText(question) {
                 .join(", ");
             return multipleCorrect || "Нет правильных ответов";
 
-        case "true-false":
+        case "truefalse":
             return question.options === "true" ? "Верно" : "Неверно";
 
         case "text":
@@ -60,6 +61,13 @@ function getCorrectAnswerText(question) {
                             pair.right
                         }`
                 )
+                .join("; ");
+
+        case "sorting":
+            if (!question.options) return "Нет элементов для сортировки";
+            // Для сортировки показываем правильный порядок
+            return question.options
+                .map((item, idx) => `${idx + 1}. ${item.text}`)
                 .join("; ");
 
         default:
@@ -88,6 +96,15 @@ function base64ToArrayBuffer(base64) {
         console.error("Ошибка конвертации base64:", error);
         return null;
     }
+}
+
+// Функция перемешивания массива
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
 }
 
 // Основная функция экспорта в Word с ответами
@@ -245,32 +262,6 @@ async function createTestDocument(test, exportType = "withAnswers") {
         }),
     ];
 
-    // if (test.settings) {
-    //     const settings = [];
-    //     if (test.settings.shuffleQuestions)
-    //         settings.push("Перемешивание вопросов");
-    //     if (test.settings.shuffleAnswers)
-    //         settings.push("Перемешивание ответов");
-    //     if (test.settings.requireUserName) settings.push("Требуется имя");
-
-    //     infoTableRows.push(
-    //         new TableRow({
-    //             children: [
-    //                 new TableCell({
-    //                     children: [new Paragraph("Настройки:")],
-    //                 }),
-    //                 new TableCell({
-    //                     children: [
-    //                         new Paragraph(
-    //                             settings.join(", ") || "Нет особых настроек"
-    //                         ),
-    //                     ],
-    //                 }),
-    //             ],
-    //         })
-    //     );
-    // }
-
     children.push(
         new Table({
             rows: infoTableRows,
@@ -377,7 +368,7 @@ async function createTestDocument(test, exportType = "withAnswers") {
                 new TextRun({
                     text: "Вопросы теста:",
                     bold: true,
-                    size: 32,
+                    size: 18,
                 }),
             ],
             alignment: AlignmentType.CENTER,
@@ -396,7 +387,7 @@ async function createTestDocument(test, exportType = "withAnswers") {
                     new TextRun({
                         text: `Вопрос ${index + 1}`,
                         bold: true,
-                        size: 28,
+                        size: 16,
                     }),
                 ],
                 spacing: { before: index === 0 ? 0 : 400, after: 200 },
@@ -641,8 +632,8 @@ async function getQuestionContent(question, exportType, questionIndex) {
             }
             break;
 
-        case "true-false":
-            const correctAnswer = question.options === "true";
+        case "truefalse":
+            const correctAnswer = question.options == "true";
 
             if (exportType === "withAnswers") {
                 children.push(
@@ -731,6 +722,69 @@ async function getQuestionContent(question, exportType, questionIndex) {
                 const leftColumn = [];
                 const rightColumn = [];
 
+                // Получаем оригинальные правые части
+                const originalRightOptions = question.options.map(
+                    (pair) => pair.right || ""
+                );
+
+                // Генерируем правые части для отображения
+                let displayRightOptions;
+
+                if (
+                    exportType === "withAnswers" ||
+                    exportType === "separateAnswers"
+                ) {
+                    // Для версий с ответами - оставляем как есть
+                    displayRightOptions = [...originalRightOptions];
+                } else {
+                    // Для студенческой версии без ответов
+                    displayRightOptions = [];
+
+                    // Собираем уникальные правые части
+                    const uniqueRightOptions = [
+                        ...new Set(originalRightOptions),
+                    ];
+
+                    // Если уникальных вариантов достаточно
+                    if (
+                        uniqueRightOptions.length >= originalRightOptions.length
+                    ) {
+                        // Берем нужное количество уникальных вариантов
+                        const shuffledUnique = [...uniqueRightOptions];
+                        shuffleArray(shuffledUnique);
+                        displayRightOptions = shuffledUnique.slice(
+                            0,
+                            originalRightOptions.length
+                        );
+                    } else {
+                        // Если уникальных вариантов меньше, чем нужно
+                        // Сначала добавляем все уникальные
+                        displayRightOptions = [...uniqueRightOptions];
+
+                        // Затем добавляем дубликаты с номерами до нужного количества
+                        let counter = 1;
+                        while (
+                            displayRightOptions.length <
+                            originalRightOptions.length
+                        ) {
+                            // Берем случайный уникальный вариант
+                            const randomIndex = Math.floor(
+                                Math.random() * uniqueRightOptions.length
+                            );
+                            const baseOption = uniqueRightOptions[randomIndex];
+
+                            // Добавляем с номером
+                            displayRightOptions.push(
+                                `${baseOption} (${counter})`
+                            );
+                            counter++;
+                        }
+
+                        // Перемешиваем окончательный список
+                        shuffleArray(displayRightOptions);
+                    }
+                }
+
                 for (
                     let pairIndex = 0;
                     pairIndex < question.options.length;
@@ -786,63 +840,28 @@ async function getQuestionContent(question, exportType, questionIndex) {
                     }
 
                     // Правая часть
-                    let rightText;
-                    let rightImageBuffer = null;
+                    const displayRight = displayRightOptions[pairIndex] || "";
+                    const isCorrect =
+                        exportType === "withAnswers" &&
+                        displayRight === pair.right;
 
-                    if (exportType === "withAnswers") {
-                        rightText = `${String.fromCharCode(65 + pairIndex)}) ${
-                            pair.right || ""
-                        }`;
-                        rightImageBuffer = pair.rightImage
-                            ? base64ToArrayBuffer(pair.rightImage)
-                            : null;
-                    } else {
-                        // Перемешиваем для студентов
-                        const shuffledIndex = Math.floor(
-                            Math.random() * question.options.length
-                        );
-                        rightText = `${String.fromCharCode(65 + pairIndex)}) ${
-                            question.options[shuffledIndex].right || ""
-                        }`;
-                        rightImageBuffer = question.options[shuffledIndex]
-                            .rightImage
-                            ? base64ToArrayBuffer(
-                                  question.options[shuffledIndex].rightImage
-                              )
-                            : null;
-                    }
-
-                    const rightParagraphs = [
+                    rightColumn.push(
                         new Paragraph({
                             children: [
                                 new TextRun({
-                                    text: rightText,
-                                    bold: exportType === "withAnswers",
+                                    text: `${String.fromCharCode(
+                                        65 + pairIndex
+                                    )}) `,
+                                    bold: isCorrect,
+                                }),
+                                new TextRun({
+                                    text: displayRight,
+                                    bold: isCorrect,
                                 }),
                             ],
                             spacing: { after: 150 },
-                        }),
-                    ];
-
-                    if (rightImageBuffer) {
-                        rightParagraphs.push(
-                            new Paragraph({
-                                children: [
-                                    new ImageRun({
-                                        data: rightImageBuffer,
-                                        transformation: {
-                                            width: 150,
-                                            height: 100,
-                                        },
-                                    }),
-                                ],
-                                alignment: AlignmentType.CENTER,
-                                spacing: { before: 10, after: 10 },
-                            })
-                        );
-                    }
-
-                    rightColumn.push(...rightParagraphs);
+                        })
+                    );
                 }
 
                 children.push(
@@ -894,7 +913,10 @@ async function getQuestionContent(question, exportType, questionIndex) {
                 );
 
                 // Инструкция
-                if (exportType === "withAnswers") {
+                if (
+                    exportType === "withAnswers" ||
+                    exportType === "separateAnswers"
+                ) {
                     children.push(
                         new Paragraph({
                             children: [
@@ -932,6 +954,212 @@ async function getQuestionContent(question, exportType, questionIndex) {
                         new Paragraph({
                             text: `${pairIndex + 1}) _________`,
                             indent: { left: 400 },
+                            spacing: { after: 5 },
+                        })
+                    );
+                });
+            }
+            break;
+
+        case "sorting":
+            if (question.options && question.options.length > 0) {
+                // Для варианта с ответами показываем правильный порядок
+                if (exportType === "withAnswers") {
+                    children.push(
+                        new Paragraph({
+                            children: [
+                                new TextRun({
+                                    text: "Правильный порядок:",
+                                    bold: true,
+                                }),
+                            ],
+                            spacing: { before: 100, after: 50 },
+                        })
+                    );
+
+                    question.options.forEach((item, itemIndex) => {
+                        const itemChildren = [
+                            new TextRun({
+                                text: `${itemIndex + 1}. `,
+                                bold: true,
+                            }),
+                            new TextRun({
+                                text: item.text || "",
+                                bold: true,
+                            }),
+                        ];
+
+                        // Изображение элемента
+                        if (item.image) {
+                            try {
+                                const imageBuffer = base64ToArrayBuffer(
+                                    item.image
+                                );
+                                if (imageBuffer) {
+                                    children.push(
+                                        new Paragraph({
+                                            children: itemChildren,
+                                            indent: { left: 200 },
+                                            spacing: { after: 50 },
+                                        })
+                                    );
+
+                                    children.push(
+                                        new Paragraph({
+                                            children: [
+                                                new ImageRun({
+                                                    data: imageBuffer,
+                                                    transformation: {
+                                                        width: 200,
+                                                        height: 150,
+                                                    },
+                                                }),
+                                            ],
+                                            indent: { left: 250 },
+                                            alignment: AlignmentType.LEFT,
+                                            spacing: { before: 10, after: 50 },
+                                        })
+                                    );
+                                    return;
+                                }
+                            } catch (error) {
+                                console.error(
+                                    "Ошибка обработки изображения элемента сортировки:",
+                                    error
+                                );
+                            }
+                        }
+
+                        children.push(
+                            new Paragraph({
+                                children: itemChildren,
+                                indent: { left: 200 },
+                                spacing: { after: 100 },
+                            })
+                        );
+                    });
+
+                    children.push(
+                        new Paragraph({
+                            text: "",
+                            spacing: { before: 100, after: 100 },
+                        })
+                    );
+                }
+
+                // Перемешанные элементы для студента
+                children.push(
+                    new Paragraph({
+                        children: [
+                            new TextRun({
+                                text: "Упорядочьте следующие элементы в правильной последовательности:",
+                                italics: true,
+                            }),
+                        ],
+                        spacing: {
+                            before: exportType === "withAnswers" ? 100 : 0,
+                            after: 200,
+                        },
+                    })
+                );
+
+                // Создаем перемешанный список для студента
+                const itemsToShow = [...question.options];
+                if (exportType !== "withAnswers") {
+                    // Перемешиваем для студентов (кроме режима с ответами)
+                    shuffleArray(itemsToShow);
+                }
+
+                itemsToShow.forEach((item, itemIndex) => {
+                    const itemChildren = [
+                        new TextRun({
+                            text: `${String.fromCharCode(65 + itemIndex)}) `,
+                            bold: false,
+                        }),
+                        new TextRun({
+                            text: item.text || "",
+                            bold: false,
+                        }),
+                    ];
+
+                    // Изображение элемента
+                    if (item.image) {
+                        try {
+                            const imageBuffer = base64ToArrayBuffer(item.image);
+                            if (imageBuffer) {
+                                children.push(
+                                    new Paragraph({
+                                        children: itemChildren,
+                                        indent: { left: 200 },
+                                        spacing: { after: 50 },
+                                    })
+                                );
+
+                                children.push(
+                                    new Paragraph({
+                                        children: [
+                                            new ImageRun({
+                                                data: imageBuffer,
+                                                transformation: {
+                                                    width: 200,
+                                                    height: 150,
+                                                },
+                                            }),
+                                        ],
+                                        indent: { left: 250 },
+                                        alignment: AlignmentType.LEFT,
+                                        spacing: { before: 10, after: 50 },
+                                    })
+                                );
+                                return;
+                            }
+                        } catch (error) {
+                            console.error(
+                                "Ошибка обработки изображения элемента сортировки:",
+                                error
+                            );
+                        }
+                    }
+
+                    children.push(
+                        new Paragraph({
+                            children: itemChildren,
+                            indent: { left: 200 },
+                            spacing: { after: 100 },
+                        })
+                    );
+                });
+
+                // Поля для ответов (упорядочивания)
+                children.push(
+                    new Paragraph({
+                        text: "Порядок элементов (впишите буквы в правильном порядке):",
+                        spacing: { before: 200, after: 10 },
+                    })
+                );
+
+                children.push(
+                    new Paragraph({
+                        text: "Правильная последовательность: __________________________________",
+                        spacing: { before: 50, after: 100 },
+                    })
+                );
+
+                // Альтернативный вариант: таблица для нумерации
+                children.push(
+                    new Paragraph({
+                        text: "Или пронумеруйте элементы в правильном порядке:",
+                        spacing: { before: 100, after: 10 },
+                    })
+                );
+
+                itemsToShow.forEach((item, itemIndex) => {
+                    children.push(
+                        new Paragraph({
+                            text: `${String.fromCharCode(
+                                65 + itemIndex
+                            )}) _________ - ${item.text || ""}`,
+                            indent: { left: 200 },
                             spacing: { after: 5 },
                         })
                     );

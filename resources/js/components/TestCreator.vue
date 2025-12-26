@@ -249,19 +249,17 @@
                 <div class="card-body">
                     <!-- Статистика вопросов -->
                     <div class="row mb-3">
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="card text-center">
                                 <div class="card-body py-2">
                                     <h6 class="card-title mb-0">
                                         {{ totalPoints }}
                                     </h6>
-                                    <small class="text-muted"
-                                        >Всего баллов</small
-                                    >
+                                    <small class="text-muted">Баллы</small>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="card text-center">
                                 <div class="card-body py-2">
                                     <h6 class="card-title mb-0">
@@ -273,7 +271,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="card text-center">
                                 <div class="card-body py-2">
                                     <h6 class="card-title mb-0">
@@ -285,25 +283,35 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="card text-center">
                                 <div class="card-body py-2">
                                     <h6 class="card-title mb-0">
-                                        {{ questionTypes.other }}
+                                        {{ questionTypes.truefalse }}
                                     </h6>
-                                    <small class="text-muted"
-                                        >Другие типы</small
-                                    >
+                                    <small class="text-muted">Да/Нет</small>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
+                            <div class="card text-center">
+                                <div class="card-body py-2">
+                                    <h6 class="card-title mb-0">
+                                        {{ questionTypes.text }}
+                                    </h6>
+                                    <small class="text-muted">Текст</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
                             <div class="card text-center">
                                 <div class="card-body py-2">
                                     <h6 class="card-title mb-0">
                                         {{ questionTypes.sorting }}
                                     </h6>
-                                    <small class="text-muted">Сортировка</small>
+                                    <small class="text-muted"
+                                        >Упорядочивание</small
+                                    >
                                 </div>
                             </div>
                         </div>
@@ -406,14 +414,6 @@
                                         class="form-control"
                                         :id="'imageUpload' + qIndex"
                                     />
-                                    <button
-                                        class="btn btn-outline-secondary"
-                                        type="button"
-                                        @click="openImageManager(qIndex)"
-                                    >
-                                        <i class="bi bi-image"></i> Менеджер
-                                        изображений
-                                    </button>
                                 </div>
                                 <div class="form-text">
                                     Поддерживаемые форматы: JPG, PNG, GIF.
@@ -438,7 +438,7 @@
                                         <option value="multiple">
                                             Множественный выбор
                                         </option>
-                                        <option value="true-false">
+                                        <option value="truefalse">
                                             Да/Нет
                                         </option>
                                         <option value="text">
@@ -448,7 +448,7 @@
                                             Сопоставление
                                         </option>
                                         <option value="sorting">
-                                            Сортировка (ранжирование)
+                                            Упорядочивание (ранжирование)
                                         </option>
                                     </select>
                                 </div>
@@ -573,7 +573,7 @@
 
                             <!-- Да/Нет -->
                             <div
-                                v-if="question.type === 'true-false'"
+                                v-if="question.type === 'truefalse'"
                                 class="mb-3"
                             >
                                 <label class="form-label"
@@ -718,44 +718,6 @@
                                             class="form-control"
                                             placeholder="Правая часть"
                                         />
-
-                                        <!-- Изображение для правой части -->
-                                        <!-- <div class="mt-1">
-                                            <div
-                                                v-if="pair.rightImage"
-                                                class="image-preview-container position-relative d-inline-block"
-                                            >
-                                                <img
-                                                    :src="pair.rightImage"
-                                                    class="img-thumbnail"
-                                                    style="max-height: 80px"
-                                                />
-                                                <button
-                                                    @click="
-                                                        removeRightImage(
-                                                            qIndex,
-                                                            pIndex
-                                                        )
-                                                    "
-                                                    class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1"
-                                                    type="button"
-                                                >
-                                                    <i class="bi bi-x"></i>
-                                                </button>
-                                            </div>
-                                            <input
-                                                type="file"
-                                                @change="
-                                                    handleRightImageUpload(
-                                                        $event,
-                                                        qIndex,
-                                                        pIndex
-                                                    )
-                                                "
-                                                accept="image/*"
-                                                class="form-control form-control-sm mt-1"
-                                            />
-                                        </div> -->
                                     </div>
 
                                     <div class="col-md-1">
@@ -785,7 +747,7 @@
                             </div>
                             <!-- В TestCreator.vue добавьте в шаблон -->
 
-                            <!-- Сортировка (ранжирование) -->
+                            <!-- Упорядочивание (ранжирование) -->
                             <div
                                 v-if="question.type === 'sorting'"
                                 class="mb-3"
@@ -834,110 +796,39 @@
                                                                 iIndex + 1
                                                             }}:</label
                                                         >
-                                                        <input
-                                                            v-model="item.text"
-                                                            type="text"
-                                                            class="form-control"
-                                                            placeholder="Введите текст элемента"
-                                                        />
-                                                    </div>
-
-                                                    <!-- Изображение элемента -->
-                                                    <div class="mb-2">
-                                                        <label
-                                                            class="form-label small mb-1"
-                                                            >Изображение
-                                                            элемента:</label
-                                                        >
-
-                                                        <div
-                                                            v-if="item.image"
-                                                            class="mb-2"
-                                                        >
-                                                            <div
-                                                                class="image-preview-container position-relative d-inline-block"
-                                                            >
-                                                                <img
-                                                                    :src="
-                                                                        item.image
-                                                                    "
-                                                                    class="img-thumbnail"
-                                                                    style="
-                                                                        max-height: 100px;
-                                                                    "
-                                                                />
-                                                                <button
-                                                                    @click="
-                                                                        removeSortingItemImage(
-                                                                            qIndex,
-                                                                            iIndex
-                                                                        )
-                                                                    "
-                                                                    class="btn btn-danger btn-sm position-absolute top-0 end-0 m-1"
-                                                                    type="button"
-                                                                >
-                                                                    <i
-                                                                        class="bi bi-x"
-                                                                    ></i>
-                                                                </button>
-                                                            </div>
-                                                        </div>
-
                                                         <div
                                                             class="input-group"
                                                         >
                                                             <input
-                                                                type="file"
-                                                                @change="
-                                                                    handleSortingItemImageUpload(
-                                                                        $event,
+                                                                v-model="
+                                                                    item.text
+                                                                "
+                                                                type="text"
+                                                                class="form-control"
+                                                                placeholder="Введите текст элемента"
+                                                            />
+                                                            <button
+                                                                @click="
+                                                                    removeSortingItem(
                                                                         qIndex,
                                                                         iIndex
                                                                     )
                                                                 "
-                                                                accept="image/*"
-                                                                class="form-control form-control-sm"
-                                                            />
-                                                            <button
-                                                                class="btn btn-outline-secondary btn-sm"
-                                                                type="button"
-                                                                @click="
-                                                                    openImageManager(
-                                                                        qIndex,
-                                                                        iIndex,
-                                                                        null,
-                                                                        'sorting'
-                                                                    )
+                                                                class="btn btn-outline-danger btn-sm"
+                                                                :disabled="
+                                                                    question
+                                                                        .options
+                                                                        .length <=
+                                                                    2
                                                                 "
+                                                                title="Удалить элемент"
                                                             >
                                                                 <i
-                                                                    class="bi bi-image"
+                                                                    class="bi bi-trash"
                                                                 ></i>
-                                                                Выбрать
                                                             </button>
                                                         </div>
                                                     </div>
-                                                </div>
-
-                                                <div class="ms-3">
-                                                    <button
-                                                        @click="
-                                                            removeSortingItem(
-                                                                qIndex,
-                                                                iIndex
-                                                            )
-                                                        "
-                                                        class="btn btn-outline-danger btn-sm"
-                                                        :disabled="
-                                                            question.options
-                                                                .length <= 2
-                                                        "
-                                                        title="Удалить элемент"
-                                                    >
-                                                        <i
-                                                            class="bi bi-trash"
-                                                        ></i>
-                                                    </button>
                                                 </div>
                                             </div>
 
@@ -991,83 +882,6 @@
                 >
                     <i class="bi bi-x-circle"></i> Отмена
                 </button>
-            </div>
-        </div>
-        <!-- Модальное окно менеджера изображений -->
-        <div class="modal fade" id="imageManagerModal" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Менеджер изображений</h5>
-                        <button
-                            type="button"
-                            class="btn-close"
-                            data-bs-dismiss="modal"
-                        ></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <input
-                                type="file"
-                                @change="handleManagerImageUpload"
-                                accept="image/*"
-                                class="form-control"
-                                multiple
-                            />
-                        </div>
-
-                        <div class="row" v-if="imageManager.images.length > 0">
-                            <div
-                                v-for="(image, index) in imageManager.images"
-                                :key="index"
-                                class="col-md-4 mb-3"
-                            >
-                                <div
-                                    class="image-item card"
-                                    :class="{
-                                        'border-primary':
-                                            imageManager.selectedImage ===
-                                            image,
-                                    }"
-                                    @click="selectImageInManager(image)"
-                                >
-                                    <img
-                                        :src="image"
-                                        class="card-img-top"
-                                        style="height: 100px; object-fit: cover"
-                                    />
-                                    <div class="card-body p-2 text-center">
-                                        <small class="text-muted"
-                                            >Изображение {{ index + 1 }}</small
-                                        >
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div v-else class="text-center text-muted py-4">
-                            <i class="bi bi-image display-4"></i>
-                            <p class="mt-2">Нет загруженных изображений</p>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button
-                            type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal"
-                        >
-                            Отмена
-                        </button>
-                        <button
-                            type="button"
-                            class="btn btn-primary"
-                            @click="applySelectedImage"
-                            :disabled="!imageManager.selectedImage"
-                        >
-                            Выбрать изображение
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -1185,8 +999,6 @@ export default {
                 description: "",
                 timeLimit: 30,
                 settings: {
-                    requireUserName: true,
-                    showUserNameInResults: true,
                     shuffleQuestions: false,
                     shuffleAnswers: false,
                 },
@@ -1202,14 +1014,7 @@ export default {
                 ],
                 questions: [],
             },
-            imageManager: {
-                images: [],
-                selectedImage: null,
-                currentQuestionIndex: null,
-                currentOptionIndex: null,
-                currentPairIndex: null,
-                imageType: null,
-            },
+
             isEditing: false,
             importPreview: null,
             importErrors: [],
@@ -1241,25 +1046,24 @@ export default {
             const types = {
                 single: 0,
                 multiple: 0,
-                sorting: 0, // Добавлено
-                other: 0,
+                sorting: 0,
+                truefalse: 0,
+                text: 0,
+                matching: 0,
             };
 
             this.test.questions.forEach((q) => {
                 if (q.type === "single") types.single++;
                 else if (q.type === "multiple") types.multiple++;
                 else if (q.type === "sorting") types.sorting++;
-                else types.other++;
+                else if (q.type === "matching") types.matching++;
+                else if (q.type === "truefalse") types.truefalse++;
+                else if (q.type === "text") types.text++;
             });
 
             return types;
         },
-        hasQuestionsWithImages() {
-            return this.test.questions.some(
-                (question) => question.options /*&&
-                    question.options.some((option) => option.image)*/
-            );
-        },
+
         errorQuestionsCount() {
             return this.test.questions.filter((q) => this.hasQuestionError(q))
                 .length;
@@ -1290,42 +1094,14 @@ export default {
         },
     },
     methods: {
-        removeSortingItemImage(qIndex, iIndex) {
-            this.test.questions[qIndex].options[iIndex].image = null;
-        },
-        onSortingItemMoved(qIndex, event) {
-            const question = this.test.questions[qIndex];
-            const items = [...question.options];
-            const movedItem = items[event.oldIndex];
-
-            // Удаляем элемент со старой позиции
-            items.splice(event.oldIndex, 1);
-            // Вставляем элемент на новую позицию
-            items.splice(event.newIndex, 0, movedItem);
-
-            // Обновляем массив элементов
-            question.options = items;
-
-            // Обновляем правильный порядок
-            this.updateCorrectOrder(qIndex);
-
-            // Принудительное обновление для реактивности
-            this.$forceUpdate();
-        },
-        getcorrect_answers(question) {
-            if (!question.options || !Array.isArray(question.options)) {
-                question.options = [""];
-            }
-            return question.options;
-        },
         getQuestionTypeLabel(type) {
             const labels = {
                 single: "Одиночный выбор",
                 multiple: "Множественный выбор",
-                "true-false": "Да/Нет",
+                truefalse: "Да/Нет",
                 text: "Свободный ввод",
                 matching: "Сопоставление",
-                sorting: "Сортировка/Ранжирование",
+                sorting: "Упорядочивание",
             };
             return labels[type] || type;
         },
@@ -1394,7 +1170,6 @@ export default {
             if (!question.text || question.text.trim() === "") {
                 return "Не заполнен текст вопроса";
             }
-            console.log(question.options);
 
             // Проверка в зависимости от типа вопроса
             switch (question.type) {
@@ -1450,7 +1225,7 @@ export default {
                     }
                     break;
 
-                case "true-false":
+                case "truefalse":
                     if (
                         question.options === undefined ||
                         question.options === null
@@ -1474,13 +1249,6 @@ export default {
                         }
                     }
 
-                    // Проверяем правильный порядок
-                    if (
-                        !question.correctOrder ||
-                        question.correctOrder.length !== question.options.length
-                    ) {
-                        return "Некорректный правильный порядок";
-                    }
                     break;
                 case "text":
                     if (!question.options || question.options.length === 0) {
@@ -1506,9 +1274,10 @@ export default {
                     // Проверяем каждую пару
                     for (let i = 0; i < question.options.length; i++) {
                         const pair = question.options[i];
-                        const leftEmpty = !pair.left.trim() && !pair.leftImage;
-                        const rightEmpty =
-                            !pair.right.trim() && !pair.rightImage;
+
+                        const leftEmpty =
+                            !(pair.left || "").trim() && !pair.leftImage;
+                        const rightEmpty = !pair.right.trim();
 
                         if (leftEmpty && rightEmpty) {
                             return `Пара ${i + 1} не заполнена`;
@@ -1527,11 +1296,6 @@ export default {
         // Новый метод для проверки, есть ли ошибка в вопросе
         hasQuestionError(question) {
             return this.validateQuestion(question) !== null;
-        },
-
-        // Получить текст ошибки для вопроса
-        getQuestionErrorMessage(question) {
-            return this.validateQuestion(question);
         },
 
         resetQuestionAnswers(question) {
@@ -1558,7 +1322,7 @@ export default {
                         { text: "", correct: false },
                     ];
                     break;
-                case "true-false":
+                case "truefalse":
                     newQuestion.options = undefined;
                     break;
                 case "text":
@@ -1586,13 +1350,11 @@ export default {
                             left: "",
                             right: "",
                             leftImage: null,
-                            rightImage: null,
                         },
                         {
                             left: "",
                             right: "",
                             leftImage: null,
-                            rightImage: null,
                         },
                     ];
                     break;
@@ -1662,7 +1424,6 @@ export default {
                 left: "",
                 right: "",
                 leftImage: null,
-                rightImage: null,
             });
         },
 
@@ -1737,14 +1498,6 @@ export default {
                     el.classList.remove("dragging");
                 });
         },
-        async handleRightImageUpload(event, qIndex, pIndex) {
-            const file = event.target.files[0];
-            if (file && this.validateImageFile(file)) {
-                const base64 = await this.fileToBase64(file);
-                this.test.questions[qIndex].options[pIndex].rightImage = base64;
-            }
-            event.target.value = "";
-        },
 
         removeQuestionImage(qIndex) {
             this.test.questions[qIndex].image = null;
@@ -1756,10 +1509,6 @@ export default {
 
         removeLeftImage(qIndex, pIndex) {
             this.test.questions[qIndex].options[pIndex].leftImage = null;
-        },
-
-        removeRightImage(qIndex, pIndex) {
-            this.test.questions[qIndex].options[pIndex].rightImage = null;
         },
 
         validateImageFile(file) {
@@ -1823,10 +1572,6 @@ export default {
             event.target.value = "";
         },
 
-        removeSortingItemImageremoveSortingItemImage(qIndex, iIndex) {
-            this.test.questions[qIndex].options[iIndex].image = null;
-        },
-
         updateCorrectOrder(qIndex) {
             const question = this.test.questions[qIndex];
             // Правильный порядок - это текущий порядок элементов в массиве
@@ -1838,111 +1583,6 @@ export default {
             });
         },
 
-        openImageManager(
-            qIndex,
-            oIndex = null,
-            pIndex = null,
-            imageType = "question"
-        ) {
-            this.imageManager.currentQuestionIndex = qIndex;
-            this.imageManager.currentOptionIndex = oIndex;
-            this.imageManager.currentPairIndex = pIndex;
-            this.imageManager.imageType = imageType;
-            this.imageManager.selectedImage = null;
-
-            this.collectExistingImages();
-
-            this.$nextTick(() => {
-                const modalElement =
-                    document.getElementById("imageManagerModal");
-                if (modalElement) {
-                    const modal = new bootstrap.Modal(modalElement);
-                    modal.show();
-                }
-            });
-        },
-
-        collectExistingImages() {
-            const images = new Set();
-
-            this.test.questions.forEach((question) => {
-                // if (question.image) images.add(question.image);
-
-                // if (question.options) {
-                //     question.options.forEach((option) => {
-                //         if (option.image) images.add(option.image);
-                //     });
-                // }
-
-                if (question.options) {
-                    question.options.forEach((pair) => {
-                        if (pair.leftImage) images.add(pair.leftImage);
-                        if (pair.rightImage) images.add(pair.rightImage);
-                    });
-                }
-            });
-
-            this.imageManager.images = Array.from(images);
-        },
-
-        async handleManagerImageUpload(event) {
-            const files = Array.from(event.target.files);
-            for (const file of files) {
-                if (this.validateImageFile(file)) {
-                    const base64 = await this.fileToBase64(file);
-                    if (!this.imageManager.images.includes(base64)) {
-                        this.imageManager.images.push(base64);
-                    }
-                }
-            }
-            event.target.value = "";
-        },
-
-        selectImageInManager(image) {
-            this.imageManager.selectedImage = image;
-        },
-
-        applySelectedImage() {
-            if (!this.imageManager.selectedImage) return;
-
-            const {
-                currentQuestionIndex,
-                currentOptionIndex,
-                currentPairIndex,
-                imageType,
-            } = this.imageManager;
-
-            switch (imageType) {
-                case "question":
-                    this.test.questions[currentQuestionIndex].image =
-                        this.imageManager.selectedImage;
-                    break;
-                case "option":
-                    this.test.questions[currentQuestionIndex].options[
-                        currentOptionIndex
-                    ].image = this.imageManager.selectedImage;
-                    break;
-                case "left":
-                    this.test.questions[currentQuestionIndex].options[
-                        currentPairIndex
-                    ].leftImage = this.imageManager.selectedImage;
-                    break;
-                case "right":
-                    this.test.questions[currentQuestionIndex].options[
-                        currentPairIndex
-                    ].rightImage = this.imageManager.selectedImage;
-                    break;
-            }
-
-            const modalElement = document.getElementById("imageManagerModal");
-            if (modalElement) {
-                const modal = bootstrap.Modal.getInstance(modalElement);
-                if (modal) {
-                    modal.hide();
-                }
-            }
-        },
-
         saveTest() {
             this.loading = true;
             this.error = "";
@@ -1950,7 +1590,6 @@ export default {
             try {
                 if (this.isEditing) {
                     this.test.id = this.editTestId;
-                    console.log(this.test);
 
                     this.datasend(`tests/${this.test.id}`, "PUT", this.test)
                         .then((response) => {
@@ -1994,34 +1633,6 @@ export default {
             this.changeCurrentView();
         },
 
-        deleteTest() {
-            if (
-                confirm(
-                    "Вы уверены, что хотите удалить этот тест? Все результаты этого теста также будут удалены."
-                )
-            ) {
-                this.loading = true;
-                this.error = "";
-
-                try {
-                    this.datasend(
-                        `tests/${this.test.id}`,
-                        "DELETE",
-                        this.test
-                    ).then((response) => {
-                        this.resetTest();
-                        this.showToast(response.message, "success");
-                        this.changeCurrentView();
-                    });
-                } catch (error) {
-                    this.error = error.message;
-                    this.$emit("error", error.message);
-                } finally {
-                    this.loading = false;
-                }
-            }
-        },
-
         resetTest() {
             this.test = {
                 id: null,
@@ -2029,8 +1640,6 @@ export default {
                 description: "",
                 timeLimit: 30,
                 settings: {
-                    requireUserName: true,
-                    showUserNameInResults: true,
                     shuffleQuestions: false,
                     shuffleAnswers: false,
                 },
@@ -2173,8 +1782,6 @@ export default {
             // Убедимся, что все необходимые поля существуют
             if (!test.settings) {
                 test.settings = {
-                    requireUserName: true,
-                    showUserNameInResults: true,
                     shuffleQuestions: false,
                     shuffleAnswers: false,
                 };
@@ -2267,29 +1874,15 @@ export default {
                                 left: "",
                                 right: "",
                                 leftImage: null,
-                                rightImage: null,
                             },
                             {
                                 left: "",
                                 right: "",
                                 leftImage: null,
-                                rightImage: null,
                             },
                         ];
                     }
                 }
-
-                // // Убедимся, что у опций есть все необходимые поля
-                // if (question.options) {
-                //     question.options.forEach((option) => {
-                //         if (option.correct === undefined) {
-                //             option.correct = false;
-                //         }
-                //         // if (option.image === undefined) {
-                //         //     option.image = null;
-                //         // }
-                //     });
-                // }
             });
         },
     },

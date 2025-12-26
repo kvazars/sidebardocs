@@ -4,17 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Test;
 use App\Models\Tree;
-// use App\Models\Question;
 use Illuminate\Http\Request;
+use Intervention\Image\Laravel\Facades\Image;
+
 // use Illuminate\Http\JsonResponse;
 
 class TestController extends Controller
 {
-    // public function index()
-    // {
-    //     $tests = Test::with('questions')->get();
-    //     return response()->json(['data' => $tests]);
-    // }
     public function testTree(Tree $tree_id)
     {
         $tests = Test::with('questions')->where("tree_id", $tree_id->id)->get();
@@ -23,8 +19,6 @@ class TestController extends Controller
 
     public function store(Request $request)
     {
-
-
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -40,25 +34,21 @@ class TestController extends Controller
             'timeLimit' => $validated['timeLimit'],
             'tree_id' => $validated['tree_id'],
             'settings' => [
-                'allowDetailedResults' => true,
-                'requireUserName' => $request->input('settings.requireUserName', false),
-                'showUserNameInResults' => $request->input('settings.showUserNameInResults', true),
                 'shuffleQuestions' => $request->input('settings.shuffleQuestions', false),
                 'shuffleAnswers' => $request->input('settings.shuffleAnswers', false),
             ],
             'grading' => $validated['grading'] ?? null
         ]);
 
-        // Сохраняем вопросы
+
         if ($request->has('questions')) {
             foreach ($request->questions as $questionData) {
                 $test->questions()->create([
                     'text' => $questionData['text'],
                     'type' => $questionData['type'],
                     'points' => $questionData['points'],
-                    'image' => $questionData['image'] ?? null,
-                    'options' => $questionData['options'] ?? null,
-                    'correctOrder' => $questionData['correctOrder'] ?? null,
+                    'image' => $this->processImage($questionData['image']),
+                    'options' => $this->processQuestionOptions($questionData),
                     'order' => $questionData['order'] ?? 0
                 ]);
             }
@@ -71,6 +61,35 @@ class TestController extends Controller
     {
 
         return response()->json(['data' => $test->load('questions')]);
+    }
+
+
+    private function processImage($imageData, $maxWidth = 800)
+    {
+        if (!$imageData) {
+            return null;
+        }
+        try {
+            if (strpos($imageData, 'data:image') === 0) {
+                $base64 = substr($imageData, strpos($imageData, ',') + 1);
+                $image = Image::read(base64_decode($base64));
+            } else {
+                $image = Image::read($imageData);
+            }
+            $image = $image->scale($maxWidth);
+
+            $results = [
+                'webp' => 'data:image/webp;base64,' . base64_encode($image->toWebp(80)->toString()),
+                'jpg'  => 'data:image/jpeg;base64,' . base64_encode($image->toJpeg(85)->toString()),
+                'png'  => 'data:image/png;base64,' . base64_encode($image->toPng()->toString())
+            ];
+            $getBytes = fn($uri) => strlen(base64_decode(substr($uri, strpos($uri, ',') + 1)));
+            $sizes = array_map($getBytes, $results);
+            $bestFormat = array_keys($sizes, min($sizes))[0];
+            return $results[$bestFormat];
+        } catch (\Exception $e) {
+            return $imageData;
+        }
     }
 
     public function update(Request $request, Test $test)
@@ -89,9 +108,6 @@ class TestController extends Controller
             'description' => $validated['description'],
             'timeLimit' => $validated['timeLimit'],
             'settings' => [
-                'allowDetailedResults' => true,
-                'requireUserName' => $request->input('settings.requireUserName', false),
-                'showUserNameInResults' => $request->input('settings.showUserNameInResults', true),
                 'shuffleQuestions' => $request->input('settings.shuffleQuestions', false),
                 'shuffleAnswers' => $request->input('settings.shuffleAnswers', false),
             ],
@@ -107,9 +123,8 @@ class TestController extends Controller
                     'text' => $questionData['text'],
                     'type' => $questionData['type'],
                     'points' => $questionData['points'],
-                    'image' => $questionData['image'] ?? null,
-                    'options' => $questionData['options'] ?? null,
-                    'correctOrder' => $questionData['correctOrder'] ?? null,
+                    'image' => $this->processImage($questionData['image']),
+                    'options' => $this->processQuestionOptions($questionData),
                     'order' => $questionData['order'] ?? 0
                 ]);
             }
@@ -117,6 +132,41 @@ class TestController extends Controller
 
         return response()->json(['message' => 'Тест успешно обновлён!']);
     }
+
+
+    private function processQuestionOptions($questionData)
+    {
+        if (!isset($questionData['options'])) {
+            return $questionData['options'] ?? null;
+        }
+
+        $options = $questionData['options'];
+
+        // Обработка в зависимости от типа вопроса
+        switch ($questionData['type']) {
+            case 'single':
+            case 'multiple':
+                // Для вопросов с вариантами выбора
+                foreach ($options as &$option) {
+                    if (isset($option['image']) && $option['image']) {
+                        $option['image'] = $this->processImage($option['image'], 300);
+                    }
+                }
+                break;
+
+            case 'matching':
+                // Для вопросов на сопоставление
+                foreach ($options as &$pair) {
+                    if (isset($pair['leftImage']) && $pair['leftImage']) {
+                        $pair['leftImage'] = $this->processImage($pair['leftImage'], 300);
+                    }
+                }
+                break;
+        }
+
+        return $options;
+    }
+
 
     public function destroy(Test $test)
     {
@@ -161,10 +211,9 @@ class TestController extends Controller
                 'text' => $questionData['text'],
                 'type' => $questionData['type'],
                 'points' => $questionData['points'],
-                'image' => $questionData['image'] ?? null,
-                'options' => $questionData['options'] ?? null,
+                'image' => $this->processImage($questionData['image']),
+                'options' => $this->processQuestionOptions($questionData),
                 'items' => $questionData['items'] ?? null,
-                'correctOrder' => $questionData['correctOrder'] ?? null,
                 'order' => $questionData['order'] ?? 0
             ]);
         }
@@ -191,7 +240,6 @@ class TestController extends Controller
                     'image' => $question->image,
                     'options' => $question->options,
                     'items' => $question['items'] ?? null,
-                    'correctOrder' => $question['correctOrder'] ?? null,
                     'order' => $question->order
                 ];
             })->toArray()

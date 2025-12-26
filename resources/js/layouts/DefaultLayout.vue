@@ -19,6 +19,7 @@
             <CContainer
                 class="p-3 position-sticky border-bottom breadcrumb_container d-flex justify-content-between align-items-center z1"
                 fluid
+                id="bread"
             >
                 <AppBreadcrumb
                     :breadcrumbs="breadcrumbs"
@@ -42,6 +43,7 @@
                         :showToast="showToast"
                         :key="$route.fullPath"
                         :authss="auths.id"
+                        :blockForTest="blockForTest"
                         :setContent="setContent"
                         v-if="
                             !page500 &&
@@ -101,6 +103,7 @@
             :catchError="catchError"
             :getMenu="getMenu"
         />
+        <AntiCopyProtection />
     </div>
 </template>
 
@@ -115,6 +118,7 @@ import ShowFile from "../views/ShowFile.vue";
 import EditFile from "../views/EditFile.vue";
 import Page500 from "../views/pages/Page500.vue";
 import AppBreadcrumb from "../components/AppBreadcrumb.vue";
+import AntiCopyProtection from "../components/AntiCopyProtection.vue";
 
 export default {
     components: {
@@ -126,6 +130,7 @@ export default {
         ShowFile,
         EditFile,
         AppBreadcrumb,
+        AntiCopyProtection,
     },
 
     data() {
@@ -152,6 +157,20 @@ export default {
         },
     },
     methods: {
+        blockForTest(block = true) {
+            if (block) {
+                document.querySelector(".sidebar").classList.add("d-none");
+                document.querySelector("#file").classList.add("d-none");
+                document.querySelector("#headerOne").classList.add("d-none");
+                document.querySelector("#bread").classList.add("d-none");
+            } else {
+                document.querySelector(".sidebar").classList.remove("d-none");
+                document.querySelector("#file").classList.remove("d-none");
+                document.querySelector("#headerOne").classList.remove("d-none");
+                document.querySelector("#bread").classList.remove("d-none");
+            }
+        },
+
         showToast(message, type = "info") {
             const toast = document.createElement("div");
             if (type == "true" || type == true) {

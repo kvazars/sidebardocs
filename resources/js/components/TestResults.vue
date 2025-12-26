@@ -5,6 +5,17 @@
                 <i class="bi bi-graph-up"></i> Результаты тестов
             </h2>
             <div class="d-flex gap-2">
+                <!-- Кнопка массового удаления -->
+                <button
+                    v-if="selectedResults.size > 0"
+                    @click="bulkDeleteResults"
+                    class="btn btn-danger"
+                >
+                    <i class="bi bi-trash"></i> Удалить выбранные ({{
+                        selectedResults.size
+                    }})
+                </button>
+
                 <!-- Переключение режима просмотра -->
                 <div class="btn-group" role="group">
                     <button
@@ -34,7 +45,18 @@
             <div class="card mb-4">
                 <div class="card-body">
                     <div class="row align-items-center">
-                        <div class="col-md-6">
+                        <div class="col-md-3">
+                            <label class="form-label"
+                                >Поиск по названию теста/пользователю:</label
+                            >
+                            <input
+                                v-model="searchQuery"
+                                type="text"
+                                class="form-control"
+                                placeholder="Введите название теста..."
+                            />
+                        </div>
+                        <div class="col-md-3">
                             <label class="form-label">Сортировка:</label>
                             <select v-model="sortBy" class="form-select">
                                 <option value="date">
@@ -51,7 +73,7 @@
                                 </option>
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-3">
                             <label class="form-label">Фильтр по оценке:</label>
                             <select v-model="gradeFilter" class="form-select">
                                 <option value="">Все оценки</option>
@@ -64,6 +86,24 @@
                                     Неудовлетворительно
                                 </option>
                             </select>
+                        </div>
+                        <div class="col-md-3">
+                            <!-- Выделение всех -->
+                            <label class="form-label">Выделение:</label>
+                            <div class="d-flex gap-2">
+                                <button
+                                    @click="selectAllResults"
+                                    class="btn btn-outline-secondary btn-sm w-50"
+                                >
+                                    <i class="bi bi-check-all"></i> Все
+                                </button>
+                                <button
+                                    @click="deselectAllResults"
+                                    class="btn btn-outline-secondary btn-sm w-50"
+                                >
+                                    <i class="bi bi-x-circle"></i> Снять
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -83,10 +123,22 @@
                         <div
                             class="card-header d-flex justify-content-between align-items-center"
                         >
-                            <div>
-                                <small class="text-muted">{{
-                                    formatDate(result.created_at)
-                                }}</small>
+                            <div class="d-flex align-items-center gap-2">
+                                <!-- Чекбокс для массового удаления -->
+                                <input
+                                    type="checkbox"
+                                    class="form-check-input"
+                                    :checked="isResultSelected(result)"
+                                    @change="toggleResultSelection(result)"
+                                />
+                                <div>
+                                    <h5 class="mb-0">
+                                        {{ getTestTitle(result) }}
+                                    </h5>
+                                    <small class="text-muted">{{
+                                        formatDate(result.created_at)
+                                    }}</small>
+                                </div>
                             </div>
                             <div class="d-flex align-items-center gap-2">
                                 <span
@@ -256,8 +308,7 @@
                                         >
                                             {{
                                                 formatUserAnswer(
-                                                    qResult.userAnswer,
-                                                    qResult.correct_answer
+                                                    qResult.userAnswer
                                                 )
                                             }}
                                         </div>
@@ -269,7 +320,7 @@
                                         >
                                         <div class="text-success">
                                             {{
-                                                formatcorrect_answer(
+                                                formatCorrectAnswer(
                                                     qResult.correct_answer
                                                 )
                                             }}
@@ -314,6 +365,16 @@
                 <table class="table table-striped table-hover">
                     <thead class="table-dark">
                         <tr>
+                            <th style="width: 40px">
+                                <!-- Чекбокс для выделения всех -->
+                                <input
+                                    type="checkbox"
+                                    class="form-check-input"
+                                    :checked="isAllFilteredSelected"
+                                    @change="toggleSelectAllFiltered"
+                                />
+                            </th>
+                            <th>Тест</th>
                             <th>Пользователь</th>
                             <th>Баллы</th>
                             <th>Процент</th>
@@ -328,6 +389,17 @@
                             v-for="result in filteredResults"
                             :key="getResultKey(result)"
                         >
+                            <td>
+                                <input
+                                    type="checkbox"
+                                    class="form-check-input"
+                                    :checked="isResultSelected(result)"
+                                    @change="toggleResultSelection(result)"
+                                />
+                            </td>
+                            <td>
+                                <strong>{{ getTestTitle(result) }}</strong>
+                            </td>
                             <td>
                                 <span
                                     v-if="result.user_name"
@@ -419,6 +491,7 @@
                             </span>
                         </h6>
                     </div>
+
                     <div class="card-body">
                         <div
                             v-for="(qResult, qIndex) in getQuestionResults(
@@ -445,19 +518,14 @@
                                             : 'text-danger'
                                     "
                                 >
-                                    {{
-                                        formatUserAnswer(
-                                            qResult.userAnswer,
-                                            qResult.correct_answer
-                                        )
-                                    }}
+                                    {{ formatUserAnswer(qResult.userAnswer) }}
                                 </div>
                             </div>
                             <div v-if="!qResult.isCorrect" class="mb-2">
                                 <strong>Правильный ответ:</strong>
                                 <div class="text-success">
                                     {{
-                                        formatcorrect_answer(
+                                        formatCorrectAnswer(
                                             qResult.correct_answer
                                         )
                                     }}
@@ -510,13 +578,26 @@ export default {
         return {
             sortBy: "date",
             gradeFilter: "",
+            searchQuery: "",
             viewMode: "table", // 'cards' или 'table'
             expandedResults: new Set(),
+            selectedResults: new Set(), // Множество выбранных ID для массового удаления
         };
     },
     computed: {
         filteredResults() {
             let filtered = this.results;
+
+            if (this.searchQuery) {
+                const query = this.searchQuery.toLowerCase().trim();
+                filtered = filtered.filter((result) => {
+                    const testTitle = this.getTestTitle(result).toLowerCase();
+                    const userName = (result.user_name || "").toLowerCase();
+                    return (
+                        testTitle.includes(query) || userName.includes(query)
+                    );
+                });
+            }
 
             // Фильтр по оценке
             if (this.gradeFilter) {
@@ -560,6 +641,19 @@ export default {
 
             return filtered;
         },
+
+        // Проверка, все ли отфильтрованные результаты выбраны
+        isAllFilteredSelected() {
+            if (this.filteredResults.length === 0) return false;
+            return this.filteredResults.every((result) =>
+                this.isResultSelected(result)
+            );
+        },
+
+        // Получение массива ID выбранных результатов
+        selectedResultIds() {
+            return Array.from(this.selectedResults);
+        },
     },
     methods: {
         getResultKey(result) {
@@ -593,6 +687,82 @@ export default {
             this.$forceUpdate();
         },
 
+        // Проверка, выбран ли результат
+        isResultSelected(result) {
+            return this.selectedResults.has(result.id);
+        },
+
+        // Переключение выбора результата
+        toggleResultSelection(result) {
+            if (this.isResultSelected(result)) {
+                this.selectedResults.delete(result.id);
+            } else {
+                this.selectedResults.add(result.id);
+            }
+        },
+
+        // Выбрать все отфильтрованные результаты
+        toggleSelectAllFiltered() {
+            if (this.isAllFilteredSelected) {
+                // Снять выделение со всех отфильтрованных
+                this.filteredResults.forEach((result) => {
+                    this.selectedResults.delete(result.id);
+                });
+            } else {
+                // Выбрать все отфильтрованные
+                this.filteredResults.forEach((result) => {
+                    this.selectedResults.add(result.id);
+                });
+            }
+        },
+
+        // Выбрать все результаты (не только отфильтрованные)
+        selectAllResults() {
+            this.results.forEach((result) => {
+                this.selectedResults.add(result.id);
+            });
+        },
+
+        // Снять выделение со всех результатов
+        deselectAllResults() {
+            this.selectedResults.clear();
+        },
+
+        // Массовое удаление результатов
+        bulkDeleteResults() {
+            if (this.selectedResults.size === 0) {
+                this.showToast(
+                    "Не выбрано ни одного результата для удаления",
+                    "warning"
+                );
+                return;
+            }
+
+            if (
+                !confirm(
+                    `Вы уверены, что хотите удалить выбранные результаты (${this.selectedResults.size} шт.)?`
+                )
+            ) {
+                return;
+            }
+
+            // Формируем маршрут и отправляем массив ID
+            this.datasend("results/bulk-delete/delete", "DELETE", {
+                result_ids: this.selectedResultIds,
+            })
+                .then((response) => {
+                    this.showToast(response.message, "success");
+                    // Очищаем выбранные результаты
+                    this.selectedResults.clear();
+                    // Обновляем список результатов
+                    this.getResult();
+                })
+                .catch((error) => {
+                    this.showToast("Ошибка при удалении результатов", "error");
+                    console.error("Bulk delete error:", error);
+                });
+        },
+
         deleteResult(result) {
             if (!confirm("Вы уверены, что хотите удалить этот результат?")) {
                 return;
@@ -600,6 +770,8 @@ export default {
 
             this.datasend("results/" + result.id, "DELETE").then((response) => {
                 this.showToast(response.message, "success");
+                // Удаляем из выбранных, если был выбран
+                this.selectedResults.delete(result.id);
                 this.getResult();
             });
         },
@@ -624,19 +796,10 @@ export default {
             event.target.style.display = "none";
         },
 
-        formatUserAnswer(userAnswer, correct_answer) {
+        formatUserAnswer(userAnswer) {
             if (userAnswer === null || userAnswer === undefined) {
                 return "Нет ответа";
             }
-            console.log(correct_answer);
-            
-            // if (qResult.questionType === "sorting") {
-            //     if (Array.isArray(userAnswer)) {
-            //         return userAnswer
-            //             .map((item, index) => `${index + 1}. ${item}`)
-            //             .join("; ");
-            //     }
-            // }
 
             if (Array.isArray(userAnswer)) {
                 if (userAnswer.length === 0) return "Нет выбранных вариантов";
@@ -649,23 +812,18 @@ export default {
             return userAnswer.toString() || "Пустой ответ";
         },
 
-        formatcorrect_answer(correct_answer) {
-            // return correct_answer;
-            // console.log(correct_answer);
-            
+        formatCorrectAnswer(correct_answer) {
             if (correct_answer === null || correct_answer === undefined) {
                 return "";
             }
 
             if (Array.isArray(correct_answer)) {
-                // return correct_answer.join(", ");
                 return correct_answer
                     .map((item, index) => `${index + 1}. ${item}`)
                     .join("; ");
             }
 
-            if (correct_answer == "true" || correct_answer == true)
-                return "Да";
+            if (correct_answer == "true" || correct_answer == true) return "Да";
             if (correct_answer == "false" || correct_answer == false)
                 return "Нет";
 
@@ -728,5 +886,14 @@ export default {
     background-color: #0d6efd;
     color: white;
     border-color: #0d6efd;
+}
+
+/* Стили для чекбоксов */
+.form-check-input {
+    cursor: pointer;
+}
+
+.card-header .form-check-input {
+    margin-top: 0;
 }
 </style>

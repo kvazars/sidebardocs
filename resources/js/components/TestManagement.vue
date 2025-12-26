@@ -16,7 +16,6 @@
 
         <div
             class="d-flex justify-content-between align-items-center mb-4 mt-2"
-            v-if="tests.length === 0"
         >
             <div>
                 <button
@@ -280,12 +279,6 @@
                             <!-- Кнопка подтверждения экспорта Word -->
                             <div class="d-flex gap-2 mt-4">
                                 <button
-                                    @click="cancelWordOptions"
-                                    class="btn btn-outline-secondary"
-                                >
-                                    <i class="bi bi-arrow-left"></i> Назад
-                                </button>
-                                <button
                                     @click="performWordExport"
                                     class="btn btn-primary flex-grow-1"
                                 >
@@ -474,7 +467,7 @@
                                 </div>
                                 <div class="mb-2">
                                     <strong>Всего баллов:</strong>
-                                    {{ getTotalPointsPreview(importPreview) }}
+                                    {{ getTotalPoints(importPreview) }}
                                 </div>
                                 <div class="mb-2">
                                     <strong>Типы вопросов:</strong>
@@ -492,14 +485,7 @@
                                 </div>
                                 <div v-if="importPreview.settings" class="mb-2">
                                     <strong>Настройки:</strong>
-                                    <span
-                                        v-if="
-                                            importPreview.settings
-                                                .requireUserName
-                                        "
-                                        class="badge bg-info ms-1"
-                                        >Имя</span
-                                    >
+                                    <span class="badge bg-info ms-1">Имя</span>
                                     <span
                                         v-if="
                                             importPreview.settings
@@ -676,7 +662,7 @@ export default {
                 single: "Один ответ",
                 multiple: "Несколько ответов",
                 matching: "Сопоставление",
-                "true-false": "Да/Нет",
+                truefalse: "Да/Нет",
                 text: "Короткий ответ",
                 essay: "Развернутый ответ",
             },
@@ -685,25 +671,7 @@ export default {
     mounted() {
         this.getTests();
     },
-    computed: {
-        totalQuestions() {
-            return this.tests.reduce(
-                (sum, test) => sum + test.questions.length,
-                0
-            );
-        },
-        totalPoints() {
-            return this.tests.reduce(
-                (sum, test) => sum + this.getTotalPoints(test),
-                0
-            );
-        },
-        averageQuestions() {
-            return this.tests.length > 0
-                ? Math.round(this.totalQuestions / this.tests.length)
-                : 0;
-        },
-    },
+
     methods: {
         getTests() {
             this.datasend(`tests/${this.$route.params.id}/get`, "GET").then(
@@ -1013,7 +981,6 @@ export default {
                                 type,
                                 i
                             );
-                            console.log(question);
 
                             if (question) {
                                 questions.push(question);
@@ -1045,7 +1012,6 @@ export default {
                         timeLimit: 30, // Значение по умолчанию
                         questions: questions,
                         settings: {
-                            requireUserName: true,
                             shuffleQuestions: false,
                             shuffleAnswers: false,
                         },
@@ -1317,9 +1283,6 @@ export default {
                 const questionText = this.extractText(subQ);
                 const leftImage = this.extractImage(subQ);
                 const answerElement = subQ.getElementsByTagName("answer")[0];
-                const rightImage = this.extractImage(
-                    subQ.getElementsByTagName("answer")[0]
-                );
 
                 if (answerElement) {
                     const answerText = this.extractText(answerElement);
@@ -1332,7 +1295,6 @@ export default {
                             keepContent: true,
                         }),
                         leftImage: leftImage,
-                        rightImage: rightImage,
                     });
                 }
             }
@@ -1506,7 +1468,7 @@ export default {
                 matching: "Сопоставление",
                 text: "Короткий ответ",
                 essay: "Развернутый ответ",
-                sorting: "Сортировка/Ранжирование",
+                sorting: "Упорядочивание",
             };
 
             const types = new Set(
@@ -1710,13 +1672,7 @@ export default {
             } finally {
             }
         },
-        getTotalPointsPreview(test) {
-            if (!test || !test.questions) return 0;
-            return test.questions.reduce(
-                (sum, q) => sum + (parseInt(q.points) || 0),
-                0
-            );
-        },
+
         showImportModal() {
             this.importPreview = null;
             this.importErrors = [];

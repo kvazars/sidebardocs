@@ -45,7 +45,7 @@ export default {
             this.datasend("newPass", "POST", form)
                 .then((res) => {
                     if (res.success) {
-                        this.showToast(res.message, res.success);
+                        this.showToast(res.message, "success");
                         setTimeout(() => {
                             this.router.push({
                                 name: "Home",

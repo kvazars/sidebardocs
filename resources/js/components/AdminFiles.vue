@@ -1,5 +1,5 @@
 <template>
-    <div v-if="viewOk" class="table-responsive">
+    <div v-if="viewOk">
         <div class="row">
             <div class="col-md-6">
                 <div class="d-flex flex-row align-items-center gap-3">
@@ -33,177 +33,185 @@
                 </div>
             </div>
         </div>
-
-        <CTable v-if="Object.keys(files.data).length > 0">
-            <CTableHead>
-                <CTableRow>
-                    <CTableHeaderCell
-                        scope="col"
-                        v-if="
-                            Object.values(files.data)[0] && user.role != 'ceo'
-                        "
-                    >
-                        <span>Владелец</span>
-                    </CTableHeaderCell>
-                    <CTableHeaderCell
-                        scope="col"
-                        @click="
-                            () => {
-                                searchFilter.sortBy = 'name';
-                                searchFilter.sortAsc = !searchFilter.sortAsc;
-                                getFiles();
-                            }
-                        "
-                    >
-                        <div class="d-flex flex-row align-items-center">
-                            <span
+        <div class="table-responsive">
+            <CTable v-if="Object.keys(files.data).length > 0">
+                <CTableHead>
+                    <CTableRow>
+                        <CTableHeaderCell
+                            scope="col"
+                            v-if="
+                                Object.values(files.data)[0] &&
+                                user.role != 'ceo'
+                            "
+                        >
+                            <span>Владелец</span>
+                        </CTableHeaderCell>
+                        <CTableHeaderCell
+                            scope="col"
+                            @click="
+                                () => {
+                                    searchFilter.sortBy = 'name';
+                                    searchFilter.sortAsc =
+                                        !searchFilter.sortAsc;
+                                    getFiles();
+                                }
+                            "
+                        >
+                            <div class="d-flex flex-row align-items-center">
+                                <span
+                                    :class="
+                                        searchFilter.sortBy == 'name' &&
+                                        searchFilter.sortAsc
+                                            ? 'sort-down'
+                                            : searchFilter.sortBy == 'name' &&
+                                              !searchFilter.sortAsc
+                                            ? 'sort-up'
+                                            : 'sort-out'
+                                    "
+                                    >Документ</span
+                                >
+                            </div></CTableHeaderCell
+                        >
+                        <CTableHeaderCell scope="col"
+                            ><span>Родитель</span></CTableHeaderCell
+                        >
+                        <CTableHeaderCell scope="col"
+                            ><span
+                                >Доступно авторизованным</span
+                            ></CTableHeaderCell
+                        >
+                        <CTableHeaderCell scope="col"
+                            ><span>Доступно менеджерам</span></CTableHeaderCell
+                        >
+                        <CTableHeaderCell scope="col">Группы</CTableHeaderCell>
+                        <CTableHeaderCell
+                            scope="col"
+                            @click="
+                                () => {
+                                    searchFilter.sortBy = 'updated_at';
+                                    searchFilter.sortAsc =
+                                        !searchFilter.sortAsc;
+                                    getFiles();
+                                }
+                            "
+                            ><span
                                 :class="
-                                    searchFilter.sortBy == 'name' &&
+                                    searchFilter.sortBy == 'updated_at' &&
                                     searchFilter.sortAsc
                                         ? 'sort-down'
-                                        : searchFilter.sortBy == 'name' &&
+                                        : searchFilter.sortBy == 'updated_at' &&
                                           !searchFilter.sortAsc
                                         ? 'sort-up'
                                         : 'sort-out'
                                 "
-                                >Документ</span
-                            >
-                        </div></CTableHeaderCell
-                    >
-                    <CTableHeaderCell scope="col"
-                        ><span>Родитель</span></CTableHeaderCell
-                    >
-                    <CTableHeaderCell scope="col"
-                        ><span>Доступно авторизованным</span></CTableHeaderCell
-                    >
-                    <CTableHeaderCell scope="col"
-                        ><span>Доступно менеджерам</span></CTableHeaderCell
-                    >
-                    <CTableHeaderCell scope="col">Группы</CTableHeaderCell>
-                    <CTableHeaderCell
-                        scope="col"
-                        @click="
-                            () => {
-                                searchFilter.sortBy = 'updated_at';
-                                searchFilter.sortAsc = !searchFilter.sortAsc;
-                                getFiles();
-                            }
-                        "
-                        ><span
-                            :class="
-                                searchFilter.sortBy == 'updated_at' &&
-                                searchFilter.sortAsc
-                                    ? 'sort-down'
-                                    : searchFilter.sortBy == 'updated_at' &&
-                                      !searchFilter.sortAsc
-                                    ? 'sort-up'
-                                    : 'sort-out'
-                            "
-                            >Обновлено</span
-                        ></CTableHeaderCell
-                    >
-                    <CTableHeaderCell scope="col"></CTableHeaderCell>
-                </CTableRow>
-            </CTableHead>
-            <CTableBody>
-                <CTableRow v-for="(val, key) in files.data" :key="val">
-                    <template v-if="user.role != 'ceo'">
-                        <CTableDataCell v-if="val.user"
-                            >{{ val.user.name }}
+                                >Обновлено</span
+                            ></CTableHeaderCell
+                        >
+                        <CTableHeaderCell scope="col"></CTableHeaderCell>
+                    </CTableRow>
+                </CTableHead>
+                <CTableBody>
+                    <CTableRow v-for="(val, key) in files.data" :key="val">
+                        <template v-if="user.role != 'ceo'">
+                            <CTableDataCell v-if="val.user"
+                                >{{ val.user.name }}
+                            </CTableDataCell>
+                            <CTableDataCell v-else
+                                >Удаленный пользователь
+                            </CTableDataCell>
+                        </template>
+
+                        <CTableDataCell>{{ val.name }} </CTableDataCell>
+                        <CTableDataCell>{{ val.parent.name }}</CTableDataCell>
+                        <CTableDataCell>
+                            <CFormSwitch
+                                v-model="val.child.accessibility"
+                                :id="'accessibility_for_' + val.id"
+                            />
                         </CTableDataCell>
-                        <CTableDataCell v-else
-                            >Удаленный пользователь
+                        <CTableDataCell>
+                            <CFormSwitch
+                                v-model="val.child.accessibilitymanagers"
+                                :id="'accessibilitymanagers_for_' + val.id"
+                            />
                         </CTableDataCell>
-                    </template>
-
-                    <CTableDataCell>{{ val.name }} </CTableDataCell>
-                    <CTableDataCell>{{ val.parent.name }}</CTableDataCell>
-                    <CTableDataCell>
-                        <CFormSwitch
-                            v-model="val.child.accessibility"
-                            :id="'accessibility_for_' + val.id"
-                        />
-                    </CTableDataCell>
-                    <CTableDataCell>
-                        <CFormSwitch
-                            v-model="val.child.accessibilitymanagers"
-                            :id="'accessibilitymanagers_for_' + val.id"
-                        />
-                    </CTableDataCell>
-                    <CTableDataCell>
-                        {{
-                            Object.keys(val.groups)
-                                .filter((i) => val.groups[i].checked)
-                                .map((aIndex) => val.groups[aIndex])
-                                .map((el) => el.name)
-                                .join(", ")
-                        }}
-                    </CTableDataCell>
-                    <CTableDataCell>
-                        {{
-                            new Date(val.updated_at).toLocaleDateString() +
-                            " " +
-                            new Date(val.updated_at).toLocaleTimeString()
-                        }}
-                    </CTableDataCell>
-                    <CTableDataCell class="text-end">
-                        <CButtonGroup role="group" v-if="val.parent">
-                            <CButton
-                                :disabled="
-                                    (!val.user || val.deleted_at != null) &&
-                                    (user.role != 'ceo' ||
-                                        val.deleted_at != null)
-                                "
-                                color="primary"
-                                @click="
-                                    () => {
-                                        selGroups = key;
-                                        visibleGroups = true;
-                                    }
-                                "
-                                ><i class="bi bi-pencil"></i
-                            ></CButton>
-                            <CButton
-                                :disabled="
-                                    (!val.user || val.deleted_at != null) &&
-                                    (user.role != 'ceo' ||
-                                        val.deleted_at != null)
-                                "
-                                color="primary"
-                                @click="save(key)"
-                                ><i class="bi bi-floppy2-fill"></i
-                            ></CButton>
-
-                            <router-link
-                                class="btn btn-primary"
-                                target="_blank"
-                                :to="{
-                                    name: 'ShowFile',
-                                    params: { id: this.files.data[key].id },
-                                }"
-                            >
-                                <i class="bi bi-binoculars-fill"></i
-                            ></router-link>
-
-                            <CButton
-                                :disabled="!val.user && user.role != 'ceo'"
-                                class="text-white"
-                                :color="!val.deleted_at ? 'danger' : 'success'"
-                                @click="remove(key)"
-                                ><i
-                                    class="bi"
-                                    :class="
-                                        !val.deleted_at
-                                            ? 'bi-trash'
-                                            : 'bi-check'
+                        <CTableDataCell>
+                            {{
+                                Object.keys(val.groups)
+                                    .filter((i) => val.groups[i].checked)
+                                    .map((aIndex) => val.groups[aIndex])
+                                    .map((el) => el.name)
+                                    .join(", ")
+                            }}
+                        </CTableDataCell>
+                        <CTableDataCell>
+                            {{
+                                new Date(val.updated_at).toLocaleDateString() +
+                                " " +
+                                new Date(val.updated_at).toLocaleTimeString()
+                            }}
+                        </CTableDataCell>
+                        <CTableDataCell class="text-end">
+                            <CButtonGroup role="group" v-if="val.parent">
+                                <CButton
+                                    :disabled="
+                                        (!val.user || val.deleted_at != null) &&
+                                        (user.role != 'ceo' ||
+                                            val.deleted_at != null)
                                     "
-                                ></i
-                            ></CButton>
-                        </CButtonGroup>
-                    </CTableDataCell>
-                </CTableRow>
-            </CTableBody>
-        </CTable>
+                                    color="primary"
+                                    @click="
+                                        () => {
+                                            selGroups = key;
+                                            visibleGroups = true;
+                                        }
+                                    "
+                                    ><i class="bi bi-pencil"></i
+                                ></CButton>
+                                <CButton
+                                    :disabled="
+                                        (!val.user || val.deleted_at != null) &&
+                                        (user.role != 'ceo' ||
+                                            val.deleted_at != null)
+                                    "
+                                    color="primary"
+                                    @click="save(key)"
+                                    ><i class="bi bi-floppy2-fill"></i
+                                ></CButton>
+
+                                <router-link
+                                    class="btn btn-primary"
+                                    target="_blank"
+                                    :to="{
+                                        name: 'ShowFile',
+                                        params: { id: this.files.data[key].id },
+                                    }"
+                                >
+                                    <i class="bi bi-binoculars-fill"></i
+                                ></router-link>
+
+                                <CButton
+                                    :disabled="!val.user && user.role != 'ceo'"
+                                    class="text-white"
+                                    :color="
+                                        !val.deleted_at ? 'danger' : 'success'
+                                    "
+                                    @click="remove(key)"
+                                    ><i
+                                        class="bi"
+                                        :class="
+                                            !val.deleted_at
+                                                ? 'bi-trash'
+                                                : 'bi-check'
+                                        "
+                                    ></i
+                                ></CButton>
+                            </CButtonGroup>
+                        </CTableDataCell>
+                    </CTableRow>
+                </CTableBody>
+            </CTable>
+        </div>
         <div class="d-flex justify-content-end">
             <Bootstrap5Pagination
                 :data="files"
@@ -211,7 +219,6 @@
             />
         </div>
     </div>
-
     <CModal
         :visible="visibleGroups"
         size="lg"
@@ -273,7 +280,17 @@ export default {
     components: {
         Bootstrap5Pagination,
     },
-    props: ["datasend", "catchError", "showToast"],
+    props: [
+        "datasend",
+        "catchError",
+        "showToast",
+        "dashboard",
+        "server",
+        "api",
+        "getMenu",
+        "setContent",
+    ],
+
     data() {
         return {
             files: null,
@@ -308,7 +325,7 @@ export default {
                     .then((res) => {
                         if (res.success) {
                             this.getFiles();
-                            this.showToast(res.message, res.success);
+                            this.showToast(res.message, "success");
                         }
                     })
                     .catch((error) => console.log(error));
@@ -329,7 +346,7 @@ export default {
                 .then((res) => {
                     if (res.success) {
                         this.getFiles();
-                        this.showToast(res.message, res.success);
+                        this.showToast(res.message, "success");
                     }
                 })
                 .catch((error) => console.log(error));
@@ -344,7 +361,7 @@ export default {
                     .then((res) => {
                         if (res.success) {
                             this.getFiles();
-                            this.showToast(res.message, res.success);
+                            this.showToast(res.message, "success");
                         }
                     })
                     .catch((error) => console.log(error));

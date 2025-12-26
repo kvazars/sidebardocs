@@ -1,5 +1,37 @@
 <template>
-    <div class="test-runner">
+    <div class="test-runner my-4">
+        <div
+            v-if="savedTestState && !userName && !tempUserName"
+            class="modal-overlay"
+        >
+            <div class="restore-dialog card">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0">
+                        <i class="bi bi-arrow-clockwise"></i> Восстановление
+                        теста
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p>У вас есть незавершенный тест!</p>
+                    <p>Хотите продолжить с того места, где остановились?</p>
+
+                    <div class="mt-3">
+                        <button
+                            @click="continueSavedTest"
+                            class="btn btn-success me-2"
+                        >
+                            <i class="bi bi-play-circle"></i> Продолжить
+                        </button>
+                        <button
+                            @click="startNewTest"
+                            class="btn btn-outline-secondary"
+                        >
+                            <i class="bi bi-plus-circle"></i> Отмена
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Выбор теста -->
         <div v-if="!selectedTest" class="test-selection">
             <div v-if="tests.length != 0" class="row">
@@ -52,14 +84,7 @@
         </div>
 
         <!-- Ввод имени (если требуется) -->
-        <div
-            v-else-if="
-                selectedTest &&
-                selectedTest.settings.requireUserName &&
-                !userName
-            "
-            class="user-name-section"
-        >
+        <div v-else-if="selectedTest && !userName" class="user-name-section">
             <div class="card">
                 <div class="card-header bg-info text-white">
                     <h5 class="mb-0">
@@ -80,6 +105,7 @@
                             Имя будет сохранено вместе с результатами теста.
                         </div>
                     </div>
+
                     <button
                         @click="startTestWithName"
                         :disabled="!tempUserName.trim()"
@@ -264,11 +290,20 @@
                             v-if="currentQuestion.image"
                             class="mt-3 text-center"
                         >
-                            <img
-                                :src="currentQuestion.image"
-                                class="img-fluid rounded"
-                                style="max-height: 300px"
-                            />
+                            <div class="image-container">
+                                <img
+                                    :src="currentQuestion.image"
+                                    class="img-fluid rounded zoomable-image"
+                                    style="max-height: 300px; cursor: zoom-in"
+                                    @click="
+                                        openImageModal(
+                                            currentQuestion.image,
+                                            'Изображение к вопросу'
+                                        )
+                                    "
+                                    :title="'Нажмите для увеличения'"
+                                />
+                            </div>
                         </div>
                     </div>
 
@@ -313,11 +348,23 @@
                                     }}</span>
                                     <!-- Изображение варианта -->
                                     <div v-if="option.image" class="ms-3">
-                                        <img
-                                            :src="option.image"
-                                            class="img-thumbnail"
-                                            style="max-height: 80px"
-                                        />
+                                        <div class="option-image-container">
+                                            <img
+                                                :src="option.image"
+                                                class="img-thumbnail zoomable-image"
+                                                style="
+                                                    max-height: 80px;
+                                                    cursor: zoom-in;
+                                                "
+                                                @click="
+                                                    openImageModal(
+                                                        option.image,
+                                                        'Изображение варианта ответа'
+                                                    )
+                                                "
+                                                :title="'Нажмите для увеличения'"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </label>
@@ -360,11 +407,23 @@
                                     }}</span>
                                     <!-- Изображение варианта -->
                                     <div v-if="option.image" class="ms-3">
-                                        <img
-                                            :src="option.image"
-                                            class="img-thumbnail"
-                                            style="max-height: 80px"
-                                        />
+                                        <div class="option-image-container">
+                                            <img
+                                                :src="option.image"
+                                                class="img-thumbnail zoomable-image"
+                                                style="
+                                                    max-height: 80px;
+                                                    cursor: zoom-in;
+                                                "
+                                                @click="
+                                                    openImageModal(
+                                                        option.image,
+                                                        'Изображение варианта ответа'
+                                                    )
+                                                "
+                                                :title="'Нажмите для увеличения'"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </label>
@@ -373,7 +432,7 @@
 
                     <!-- Да/Нет -->
                     <div
-                        v-else-if="currentQuestion.type === 'true-false'"
+                        v-else-if="currentQuestion.type === 'truefalse'"
                         class="answers"
                     >
                         <div class="row">
@@ -478,13 +537,25 @@
                                     <span class="fw-bold me-2">{{
                                         pair.left
                                     }}</span>
-                                    <!-- Изображение левой части -->
-                                    <div v-if="pair.leftImage">
-                                        <img
-                                            :src="pair.leftImage"
-                                            class="img-thumbnail"
-                                            style="max-height: 60px"
-                                        />
+
+                                    <div v-if="pair.leftImage" class="ms-2">
+                                        <div class="option-image-container">
+                                            <img
+                                                :src="pair.leftImage"
+                                                class="img-thumbnail zoomable-image"
+                                                style="
+                                                    max-height: 60px;
+                                                    cursor: zoom-in;
+                                                "
+                                                @click="
+                                                    openImageModal(
+                                                        pair.leftImage,
+                                                        'Изображение левой части'
+                                                    )
+                                                "
+                                                :title="'Нажмите для увеличения'"
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -495,7 +566,7 @@
                                 <select
                                     v-model="currentMatchingAnswer[index]"
                                     class="form-select"
-                                    @change="onMatchingChange(index, $event)"
+                                    @change="onMatchingChange(index, event)"
                                 >
                                     <option value="">
                                         Выберите соответствие
@@ -545,23 +616,9 @@
                                         <i class="bi bi-grip-vertical fs-5"></i>
                                     </div>
                                     <div class="flex-grow-1">
-                                        <div>
-                                            {{ getSortingItemText(itemId) }}
-                                        </div>
-                                        <!-- Изображение элемента -->
-                                        <div
-                                            v-if="getSortingItemImage(itemId)"
-                                            class="mt-2 text-center"
-                                        >
-                                            <img
-                                                :src="
-                                                    getSortingItemImage(itemId)
-                                                "
-                                                class="img-thumbnail"
-                                                style="max-height: 100px"
-                                            />
-                                        </div>
+                                        {{ getSortingItemText(itemId) }}
                                     </div>
+
                                     <div class="position-badge ms-3">
                                         <span class="badge bg-secondary">{{
                                             index + 1
@@ -603,13 +660,59 @@
                 </button>
             </div>
         </div>
+        <div
+            v-if="showImageModal"
+            class="modal fade show d-block"
+            tabindex="-1"
+            role="dialog"
+            style="background-color: rgba(0, 0, 0, 0.8)"
+        >
+            <div
+                class="modal-dialog modal-dialog-centered modal-xl"
+                role="document"
+            >
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ modalTitle }}</h5>
+                        <button
+                            type="button"
+                            class="btn-close"
+                            @click="closeImageModal"
+                        ></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img
+                            :src="modalImageUrl"
+                            class="img-fluid"
+                            style="max-height: 70vh"
+                        />
+                    </div>
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            @click="closeImageModal"
+                        >
+                            <i class="bi bi-x-lg"></i> Закрыть
+                        </button>
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            @click="downloadImage"
+                        >
+                            <i class="bi bi-download"></i> Скачать
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
 export default {
     name: "TestRunner",
-    props: ["datasend", "loadData", "tests", "showToast"],
+    props: ["datasend", "tests", "showToast", "blockForTest"],
     data() {
         return {
             selectedTest: null,
@@ -634,6 +737,12 @@ export default {
             // Для навигации по отображенным вопросам
             displayedQuestionToOriginal: new Map(),
             originalToDisplayedQuestion: new Map(),
+            showImageModal: false,
+            modalImageUrl: "",
+            modalTitle: "",
+            lastHiddenTime: null,
+            savedTestState: null,
+            restoreAttempted: false,
         };
     },
     computed: {
@@ -673,7 +782,8 @@ export default {
         currentShuffledPairs() {
             const data = this.shuffledPairsMap.get(this.currentQuestionIndex);
             if (data && data.options) {
-                return data.options;
+                // было: data.pairs
+                return data.options; // было: data.pairs
             }
 
             // Иначе используем оригинальные пары
@@ -702,7 +812,11 @@ export default {
         },
 
         progress() {
-            if (!this.selectedTest) return 0;
+            if (!this.selectedTest) {
+                this.blockForTest(false);
+                return 0;
+            }
+            this.blockForTest();
             return (
                 ((this.currentQuestionIndex + 1) /
                     this.selectedTest.questions.length) *
@@ -720,9 +834,11 @@ export default {
         },
         currentOriginalIndex() {
             if (!this.currentQuestion) return -1;
-            return this.currentQuestion.originalIndex !== undefined
-                ? this.currentQuestion.originalIndex
-                : this.currentQuestionIndex;
+            const idx =
+                this.currentQuestion.originalIndex !== undefined
+                    ? this.currentQuestion.originalIndex
+                    : this.currentQuestionIndex;
+            return idx >= 0 ? idx : -1;
         },
 
         showTimeWarning() {
@@ -764,11 +880,48 @@ export default {
 
         currentMultipleChoiceAnswer: {
             get() {
-                const answer = this.currentUserAnswer;
-                return Array.isArray(answer) ? [...answer] : [];
+                // Получаем ответ напрямую из хранилища
+                if (this.currentOriginalIndex === -1) return [];
+
+                const answer = this.userAnswersByOriginalIndex.get(
+                    this.currentOriginalIndex
+                );
+
+                if (Array.isArray(answer)) {
+                    // Фильтруем пустые значения и преобразуем в числа
+                    return answer
+                        .filter(
+                            (item) =>
+                                item !== null &&
+                                item !== undefined &&
+                                item !== ""
+                        )
+                        .map((item) => Number(item));
+                }
+
+                // Если ответ не массив, возвращаем пустой массив
+                return [];
             },
             set(value) {
-                this.currentUserAnswer = Array.isArray(value) ? [...value] : [];
+                if (this.currentOriginalIndex !== -1) {
+                    // Фильтруем пустые значения и сохраняем как числа
+                    const filteredValue = Array.isArray(value)
+                        ? value
+                              .filter(
+                                  (item) =>
+                                      item !== null &&
+                                      item !== undefined &&
+                                      item !== ""
+                              )
+                              .map((item) => Number(item))
+                        : [];
+
+                    this.userAnswersByOriginalIndex.set(
+                        this.currentOriginalIndex,
+                        filteredValue
+                    );
+                    this.updateAnsweredStatus();
+                }
             },
         },
 
@@ -841,37 +994,184 @@ export default {
             },
         },
     },
-    userAnswers: {
-        handler(newVal) {
-            if (this.currentQuestion) {
-                this.$nextTick(() => {
-                    this.validateCurrentQuestion();
-                });
-            }
-        },
-        deep: true,
+
+    mounted() {
+        document.addEventListener(
+            "visibilitychange",
+            this.handleVisibilityChange
+        );
+        document.addEventListener("keydown", this.handleKeydown);
+        window.addEventListener("beforeunload", this.handleBeforeUnload);
+
+        this.checkForSavedTest();
     },
 
-    currentQuestionIndex() {
-        // При смене вопроса проверяем валидацию
-        this.$nextTick(() => {
-            this.validateCurrentQuestion();
-        });
-    },
     methods: {
-        getSortingItemText(itemId) {
-            if (!this.currentQuestion?.options?.[itemId]) {
-                return `Элемент ${itemId + 1}`;
+        startNewTest() {
+            localStorage.removeItem("testProgress");
+            this.savedTestState = null;
+            this.selectedTest = null;
+        },
+        continueSavedTest() {
+            const state = this.savedTestState;
+            // Ищем тест по ID
+            const testToRestore = this.tests.find(
+                (t) => t.id === this.savedTestState.testId
+            );
+            if (testToRestore) {
+                this.selectedTest = JSON.parse(JSON.stringify(testToRestore));
+                this.userName = this.savedTestState.userName;
+                this.savedTestState = state;
+                this.applyRestoredState();
+            } else {
+                this.showToast("Тест не найден", "error");
+                localStorage.removeItem("testProgress");
             }
-
-            const item = this.currentQuestion.options[itemId];
-            return item.text || item.title || item.name || `${itemId + 1}`;
+            this.savedTestState = null;
+        },
+        handleBeforeUnload(event) {
+            if (this.selectedTest && this.userName) {
+                this.saveTestState();
+            }
         },
 
-        getSortingItemImage(itemId) {
-            return this.currentQuestion?.options?.[itemId]?.image;
+        checkForSavedTest() {
+            if (this.restoreTestState()) {
+                console.log("Есть сохраненный тест");
+            }
+        },
+        saveTestState() {
+            if (!this.selectedTest || !this.userName) return;
+
+            const state = {
+                testId: this.selectedTest.id,
+                userName: this.userName,
+                currentQuestionIndex: this.currentQuestionIndex,
+                timeLeft: this.timeLeft,
+                answers: Object.fromEntries(this.userAnswersByOriginalIndex),
+                shuffledQuestions: this.shuffledQuestions,
+                shuffledOptionsMap: Array.from(
+                    this.shuffledOptionsMap.entries()
+                ),
+                shuffledPairsMap: Array.from(this.shuffledPairsMap.entries()),
+                answeredQuestions: Array.from(this.answeredQuestions),
+                timestamp: Date.now(),
+            };
+
+            localStorage.setItem("testProgress", JSON.stringify(state));
         },
 
+        restoreTestState() {
+            const saved = localStorage.getItem("testProgress");
+            if (!saved) return false;
+
+            try {
+                const state = JSON.parse(saved);
+
+                // Проверяем, не прошло ли более 24 часов
+                const hoursPassed =
+                    (Date.now() - state.timestamp) / (1000 * 60 * 60);
+                if (hoursPassed > 24) {
+                    localStorage.removeItem("testProgress");
+                    return false;
+                }
+
+                this.savedTestState = state;
+                return true;
+            } catch (error) {
+                console.error("Ошибка восстановления теста:", error);
+                localStorage.removeItem("testProgress");
+                return false;
+            }
+        },
+
+        applyRestoredState() {
+            if (!this.savedTestState) return false;
+
+            try {
+                // Восстанавливаем основные данные
+                this.userName = this.savedTestState.userName;
+                this.currentQuestionIndex =
+                    this.savedTestState.currentQuestionIndex;
+                this.timeLeft = this.savedTestState.timeLeft;
+
+                // Восстанавливаем перемешанные вопросы
+                this.shuffledQuestions =
+                    this.savedTestState.shuffledQuestions || [];
+
+                // Восстанавливаем Map'ы
+                this.shuffledOptionsMap = new Map(
+                    this.savedTestState.shuffledOptionsMap
+                );
+                this.shuffledPairsMap = new Map(
+                    this.savedTestState.shuffledPairsMap
+                );
+
+                // Восстанавливаем ответы
+                if (this.savedTestState.answers) {
+                    this.userAnswersByOriginalIndex.clear();
+                    Object.entries(this.savedTestState.answers).forEach(
+                        ([key, value]) => {
+                            const originalIndex = parseInt(key);
+                            this.userAnswersByOriginalIndex.set(
+                                originalIndex,
+                                value
+                            );
+                        }
+                    );
+                }
+
+                // Восстанавливаем отвеченные вопросы
+                this.answeredQuestions = new Set(
+                    this.savedTestState.answeredQuestions
+                );
+
+                // Инициализируем текущий вопрос
+                this.initializeQuestion();
+
+                // Запускаем таймер
+                this.startTimer();
+
+                // Очищаем сохраненное состояние
+                localStorage.removeItem("testProgress");
+                this.savedTestState = null;
+
+                return true;
+            } catch (error) {
+                console.error("Ошибка применения состояния:", error);
+                return false;
+            }
+        },
+        openImageModal(imageUrl, title = "Изображение") {
+            this.modalImageUrl = imageUrl;
+            this.modalTitle = title;
+            this.showImageModal = true;
+            document.body.style.overflow = "hidden"; // Отключаем скролл страницы
+        },
+
+        closeImageModal() {
+            this.showImageModal = false;
+            this.modalImageUrl = "";
+            this.modalTitle = "";
+            document.body.style.overflow = ""; // Восстанавливаем скролл
+        },
+
+        downloadImage() {
+            if (!this.modalImageUrl) return;
+
+            const link = document.createElement("a");
+            link.href = this.modalImageUrl;
+            link.download = `image_${Date.now()}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        },
+
+        handleKeydown(event) {
+            if (event.key === "Escape" && this.showImageModal) {
+                this.closeImageModal();
+            }
+        },
         handleDragStart(event, index) {
             event.dataTransfer.setData("text/plain", index.toString());
         },
@@ -897,13 +1197,6 @@ export default {
             }
         },
 
-        resetSortingOrder() {
-            const defaultOrder = this.currentQuestion?.options
-                ? this.currentQuestion.options.map((_, index) => index)
-                : [];
-            this.currentSortingAnswer = defaultOrder;
-        },
-
         getDefaultAnswerValue() {
             if (!this.currentQuestion) return "";
 
@@ -911,30 +1204,11 @@ export default {
                 case "multiple":
                 case "matching":
                     return [];
+                case "single":
+                    return null;
                 default:
                     return "";
             }
-        },
-        onAnswerChange() {
-            // Для radio и true/false
-            this.updateAnsweredStatus();
-            this.clearValidationError();
-        },
-
-        onMultipleChoiceChange() {
-            // Для множественного выбора
-            // Копируем массив в userAnswers
-            this.userAnswers[this.currentQuestionIndex] = [
-                ...this.multipleChoiceAnswers,
-            ];
-            this.updateAnsweredStatus();
-            this.clearValidationError();
-        },
-
-        onTextInput() {
-            // Для текстового ввода
-            this.updateAnsweredStatus();
-            this.clearValidationError();
         },
 
         onMatchingChange(index) {
@@ -968,15 +1242,32 @@ export default {
 
             switch (question.type) {
                 case "single":
-                case "true-false":
+                case "truefalse":
+                    hasAnswer =
+                        answer !== null &&
+                        answer !== undefined &&
+                        answer !== "" &&
+                        answer.toString().trim() !== "" &&
+                        !isNaN(Number(answer));
+                    break;
+
                 case "text":
                     hasAnswer =
-                        answer !== "" &&
                         answer !== null &&
-                        answer !== undefined;
+                        answer !== undefined &&
+                        answer !== "" &&
+                        answer.toString().trim() !== "";
                     break;
                 case "multiple":
-                    hasAnswer = Array.isArray(answer) && answer.length > 0;
+                    hasAnswer =
+                        Array.isArray(answer) &&
+                        answer.length > 0 &&
+                        !answer.some(
+                            (item) =>
+                                item === null ||
+                                item === undefined ||
+                                item === ""
+                        );
                     break;
                 case "sorting":
                     hasAnswer =
@@ -1018,24 +1309,77 @@ export default {
             } else {
                 this.answeredQuestions.delete(displayedIndex);
             }
+            if (this.selectedTest && this.userName) {
+                this.$nextTick(() => {
+                    this.saveTestState();
+                });
+            }
+        },
+
+        startAutoSave() {
+            if (this.autoSaveTimer) clearInterval(this.autoSaveTimer);
+
+            this.autoSaveTimer = setInterval(() => {
+                if (this.selectedTest && this.userName) {
+                    this.saveTestState();
+                }
+            }, 30000); // 30 секунд
         },
 
         selectTest(test) {
+            const saved = localStorage.getItem("testProgress");
+            if (saved) {
+                try {
+                    const state = JSON.parse(saved);
+                    if (state.testId === test.id) {
+                        // Показываем диалог восстановления
+                        if (
+                            confirm(
+                                "У вас есть незавершенный тест. Хотите продолжить?"
+                            )
+                        ) {
+                            this.selectedTest = JSON.parse(
+                                JSON.stringify(test)
+                            );
+                            this.savedTestState = state;
+                            this.restoreAttempted = true;
+                            return;
+                        } else {
+                            // Удаляем сохраненный прогресс
+                            localStorage.removeItem("testProgress");
+                        }
+                    }
+                } catch (e) {
+                    console.error("Ошибка проверки сохраненного теста:", e);
+                }
+            }
             this.selectedTest = JSON.parse(JSON.stringify(test));
-
-            // Сбрасываем имя пользователя
             this.userName = "";
             this.tempUserName = "";
-
-            // Если имя не требуется, сразу инициализируем тест
-            if (!this.selectedTest.settings.requireUserName) {
-                this.initializeTest();
-            }
+            this.restoreAttempted = false;
         },
 
         startTestWithName() {
             if (this.tempUserName.trim()) {
                 this.userName = this.tempUserName.trim();
+
+                // Если есть сохраненное состояние и это тот же пользователь
+                if (
+                    this.savedTestState &&
+                    this.savedTestState.userName === this.userName
+                ) {
+                    this.initializeTest();
+                    const restored = this.applyRestoredState();
+                    if (restored) {
+                        this.showToast(
+                            "Тест восстановлен из последней сессии",
+                            "info"
+                        );
+                        return;
+                    }
+                }
+
+                // Иначе начинаем новый тест
                 this.initializeTest();
             }
         },
@@ -1080,6 +1424,12 @@ export default {
                     case "matching":
                         this.userAnswersByOriginalIndex.set(originalIndex, []);
                         break;
+                    case "single":
+                        this.userAnswersByOriginalIndex.set(
+                            originalIndex,
+                            null
+                        ); // null вместо ""
+                        break;
                     default:
                         this.userAnswersByOriginalIndex.set(originalIndex, "");
                 }
@@ -1088,75 +1438,8 @@ export default {
             this.timeLeft = this.selectedTest.timeLimit * 60;
             this.startTimer();
             this.initializeQuestion();
-        },
-
-        createIndexMapping() {
-            if (this.selectedTest.settings.shuffleQuestions) {
-                this.shuffleQuestions();
-                // Создаем маппинг: отображаемый индекс -> оригинальный индекс
-                this.displayToOriginalIndex = new Map();
-                this.originalToDisplayIndex = new Map();
-
-                this.shuffledQuestions.forEach((question, displayIndex) => {
-                    const originalIndex = question.originalIndex;
-                    this.displayToOriginalIndex.set(
-                        displayIndex,
-                        originalIndex
-                    );
-                    this.originalToDisplayIndex.set(
-                        originalIndex,
-                        displayIndex
-                    );
-                });
-            } else {
-                this.shuffledQuestions = [...this.selectedTest.questions];
-                // Без перемешивания индексы совпадают
-                this.displayToOriginalIndex = new Map(
-                    this.selectedTest.questions.map((_, index) => [
-                        index,
-                        index,
-                    ])
-                );
-                this.originalToDisplayIndex = new Map(
-                    this.selectedTest.questions.map((_, index) => [
-                        index,
-                        index,
-                    ])
-                );
-            }
-        },
-
-        getCurrentAnswer() {
-            const originalIndex = this.getOriginalIndex(
-                this.currentQuestionIndex
-            );
-            return this.userAnswers[originalIndex];
-        },
-
-        // Установка ответа для текущего отображаемого вопроса
-        setCurrentAnswer(value) {
-            const originalIndex = this.getOriginalIndex(
-                this.currentQuestionIndex
-            );
-            // В Vue 3 простое присваивание работает для реактивных массивов
-            this.userAnswers[originalIndex] = value;
-
-            // Если нужно форсировать обновление (редко требуется)
-            // this.userAnswers = [...this.userAnswers];
-        },
-
-        // Получение оригинального индекса по отображаемому
-        getOriginalIndex(displayIndex) {
-            return (
-                this.displayToOriginalIndex.get(displayIndex) || displayIndex
-            );
-        },
-
-        // Получение отображаемого индекса по оригинальному
-        getDisplayIndex(originalIndex) {
-            return (
-                this.originalToDisplayIndex.get(originalIndex) || originalIndex
-            );
+            this.startAutoSave();
+            // this.blockForTest();
         },
 
         shuffleQuestions() {
@@ -1167,23 +1450,6 @@ export default {
                     originalIndex: originalIndex, // Сохраняем оригинальный индекс
                 }))
                 .sort(() => Math.random() - 0.5);
-        },
-
-        shuffleSortingItems() {
-            if (!this.currentQuestion.options) return;
-
-            const items = [...this.currentQuestion.options];
-            const shuffledOrder = items
-                .map((_, index) => index)
-                .sort(() => Math.random() - 0.5);
-
-            const originalIndex = this.currentOriginalIndex;
-            if (originalIndex !== undefined) {
-                this.userAnswersByOriginalIndex.set(
-                    originalIndex,
-                    shuffledOrder
-                );
-            }
         },
 
         initializeQuestion() {
@@ -1298,32 +1564,7 @@ export default {
             this.updateAnsweredStatus();
         },
         shouldShuffleAnswers() {
-            // Основная проверка - если shuffleAnswers = false, не перемешиваем
-            if (!this.selectedTest.settings.shuffleAnswers) {
-                return false;
-            }
-            return true;
-            // const questionType = this.currentQuestion.type;
-
-            // Если shuffleAnswers = true, проверяем настройки для конкретных типов вопросов
-            // (если они заданы, иначе считаем что перемешивать можно)
-            // switch (questionType) {
-            //     case "single":
-            //         return (
-            //             this.selectedTest.settings.shuffleSingleChoice !== false
-            //         );
-            //     case "multiple":
-            //         return (
-            //             this.selectedTest.settings.shuffleMultipleChoice !==
-            //             false
-            //         );
-            //     case "matching":
-            //         return this.selectedTest.settings.shuffleMatching !== false;
-            //     case "sorting":
-            //         return this.selectedTest.settings.shuffleSorting !== false;
-            //     default:
-            //         return false; // Для других типов не перемешиваем
-            // }
+            return this.selectedTest.settings.shuffleAnswers === true;
         },
         shuffleSortingItems() {
             if (!this.currentQuestion.options) return;
@@ -1369,7 +1610,7 @@ export default {
                 .sort(() => Math.random() - 0.5);
 
             this.shuffledPairsMap.set(this.currentQuestionIndex, {
-                pairs: shuffledPairs,
+                options: shuffledPairs, // было: pairs: shuffledPairs
                 rightOptions: shuffledRightOptions,
             });
 
@@ -1422,7 +1663,7 @@ export default {
 
                     switch (originalQuestion.type) {
                         case "single":
-                        case "true-false":
+                        case "truefalse":
                         case "text":
                             isAnswered =
                                 userAnswer !== "" &&
@@ -1430,11 +1671,6 @@ export default {
                                 userAnswer !== undefined &&
                                 userAnswer.toString().trim() !== "";
                             break;
-                        // case "multiple":
-                        //     isAnswered =
-                        //         Array.isArray(userAnswer) &&
-                        //         userAnswer.length > 0;
-                        //     break;
                         case "multiple":
                             isAnswered =
                                 Array.isArray(userAnswer) &&
@@ -1457,7 +1693,6 @@ export default {
                     if (!isAnswered) {
                         questionResults.push({
                             question: originalQuestion.text,
-                            questionImage: originalQuestion.image,
                             userAnswer: "Не отвечено (время истекло)",
                             correct_answer:
                                 this.getCorrectAnswer(originalQuestion),
@@ -1500,53 +1735,6 @@ export default {
                             score = isCorrect ? originalQuestion.points : 0;
                             break;
 
-                        // case "multiple":
-                        //     if (
-                        //         !Array.isArray(userAnswer) ||
-                        //         userAnswer.length === 0
-                        //     ) {
-                        //         score = 0;
-                        //         isCorrect = false;
-                        //         break;
-                        //     }
-
-                        //     const correctOriginalIndices = [];
-                        //     if (originalQuestion.options) {
-                        //         originalQuestion.options.forEach((opt, idx) => {
-                        //             if (opt.correct === true) {
-                        //                 correctOriginalIndices.push(idx);
-                        //             }
-                        //         });
-                        //     }
-
-                        //     const selectedOriginalIndices = userAnswer.map(
-                        //         (idx) => Number(idx)
-                        //     );
-
-                        //     const correctSelections =
-                        //         selectedOriginalIndices.filter((idx) =>
-                        //             correctOriginalIndices.includes(idx)
-                        //         ).length;
-                        //     const wrongSelections =
-                        //         selectedOriginalIndices.filter(
-                        //             (idx) =>
-                        //                 !correctOriginalIndices.includes(idx)
-                        //         ).length;
-
-                        //     if (correctOriginalIndices.length > 0) {
-                        //         const effectiveCorrect = Math.max(
-                        //             0,
-                        //             correctSelections - wrongSelections
-                        //         );
-                        //         score =
-                        //             (effectiveCorrect /
-                        //                 correctOriginalIndices.length) *
-                        //             originalQuestion.points;
-                        //     } else {
-                        //         score = 0;
-                        //     }
-                        //     isCorrect = score > 0;
-                        //     break;
                         case "multiple":
                             if (
                                 !Array.isArray(userAnswer) ||
@@ -1585,10 +1773,26 @@ export default {
                             score = isCorrect ? originalQuestion.points : 0;
                             break;
 
-                        case "true-false":
+                        case "truefalse":
+                            // Обработка разных форматов
+                            let correctPartialAnswer;
+
+                            if (typeof originalQuestion.options === "string") {
+                                correctPartialAnswer = originalQuestion.options;
+                            } else if (
+                                Array.isArray(originalQuestion.options)
+                            ) {
+                                correctPartialAnswer =
+                                    originalQuestion.options[0] || "false";
+                            } else {
+                                correctPartialAnswer =
+                                    originalQuestion.options?.toString() ||
+                                    "false";
+                            }
+
+                            const userPartialAnswerStr = userAnswer?.toString();
                             isCorrect =
-                                userAnswer ===
-                                originalQuestion.options?.toString();
+                                userPartialAnswerStr === correctPartialAnswer;
                             score = isCorrect ? originalQuestion.points : 0;
                             break;
 
@@ -1625,24 +1829,123 @@ export default {
                             }
 
                             let correctPairs = 0;
-                            userAnswer.forEach((userRightAnswer, pairIndex) => {
-                                const originalPair =
-                                    originalQuestion.options[pairIndex];
-                                if (
-                                    originalPair &&
-                                    originalPair.right === userRightAnswer
-                                ) {
-                                    correctPairs++;
-                                }
-                            });
+
+                            // Получаем данные о перемешивании для этого вопроса
+                            const displayedIndex =
+                                this.originalToDisplayedQuestion.get(
+                                    originalIndex
+                                );
+                            const matchingData =
+                                displayedIndex !== undefined
+                                    ? this.shuffledPairsMap.get(displayedIndex)
+                                    : null;
+
+                            if (matchingData && matchingData.options) {
+                                // Если варианты были перемешаны
+                                userAnswer.forEach(
+                                    (userRightAnswer, displayedPairIndex) => {
+                                        const shuffledPair =
+                                            matchingData.options[
+                                                displayedPairIndex
+                                            ];
+                                        if (
+                                            shuffledPair &&
+                                            shuffledPair.right ===
+                                                userRightAnswer
+                                        ) {
+                                            correctPairs++;
+                                        }
+                                    }
+                                );
+                            } else {
+                                // Если варианты не перемешаны
+                                userAnswer.forEach(
+                                    (userRightAnswer, pairIndex) => {
+                                        const originalPair =
+                                            originalQuestion.options[pairIndex];
+                                        if (
+                                            originalPair &&
+                                            originalPair.right ===
+                                                userRightAnswer
+                                        ) {
+                                            correctPairs++;
+                                        }
+                                    }
+                                );
+                            }
 
                             score =
-                                (correctPairs /
-                                    originalQuestion.options.length) *
-                                originalQuestion.points;
+                                correctPairs === originalQuestion.options.length
+                                    ? originalQuestion.points
+                                    : 0;
                             isCorrect =
                                 correctPairs ===
                                 originalQuestion.options.length;
+                            break;
+                        case "sorting":
+                            if (
+                                !originalQuestion.options ||
+                                originalQuestion.options.length === 0
+                            ) {
+                                score = 0;
+                                isCorrect = false;
+                                break;
+                            }
+
+                            if (
+                                !Array.isArray(userAnswer) ||
+                                userAnswer.length === 0
+                            ) {
+                                score = 0;
+                                isCorrect = false;
+                                break;
+                            }
+
+                            // Получаем правильный порядок из correctPosition
+                            const correctOrder = [];
+                            const positionMap = new Map();
+
+                            // Собираем правильный порядок
+                            originalQuestion.options.forEach((opt, index) => {
+                                positionMap.set(
+                                    index,
+                                    opt.correctPosition || index
+                                );
+                            });
+
+                            // Сортируем по correctPosition
+                            const sortedByPosition = [
+                                ...originalQuestion.options.keys(),
+                            ].sort((a, b) => {
+                                const posA = positionMap.get(a);
+                                const posB = positionMap.get(b);
+                                return posA - posB;
+                            });
+
+                            // Создаем маппинг: originalIndex -> его правильная позиция
+                            const correctPositionForIndex = new Map();
+                            sortedByPosition.forEach(
+                                (originalIndex, correctPosition) => {
+                                    correctPositionForIndex.set(
+                                        originalIndex,
+                                        correctPosition
+                                    );
+                                }
+                            );
+
+                            // Проверяем, полностью ли совпадает порядок
+                            let isFullyCorrect = true;
+                            userAnswer.forEach((userItemId, userPosition) => {
+                                const shouldBeAtPosition =
+                                    correctPositionForIndex.get(userItemId);
+                                if (shouldBeAtPosition !== userPosition) {
+                                    isFullyCorrect = false;
+                                }
+                            });
+
+                            // Только полностью правильный ответ дает баллы
+                            isCorrect = isFullyCorrect;
+                            score = isCorrect ? originalQuestion.points : 0;
                             break;
 
                         default:
@@ -1655,7 +1958,6 @@ export default {
 
                     questionResults.push({
                         question: originalQuestion.text,
-                        questionImage: originalQuestion.image,
                         userAnswer: this.formatUserAnswerForDisplay(
                             originalQuestion,
                             originalIndex,
@@ -1691,18 +1993,9 @@ export default {
                 completed_with_timeout: true,
                 answered_questions_count: this.answeredQuestions.size,
                 total_questions_count: this.selectedTest.questions.length,
-                settings: {
-                    show_user_name_in_results:
-                        this.selectedTest.settings.showUserNameInResults,
-                },
             };
 
-            if (
-                this.selectedTest.settings.requireUserName &&
-                this.selectedTest.settings.showUserNameInResults
-            ) {
-                result.user_name = this.userName;
-            }
+            result.user_name = this.userName;
 
             result.question_results = questionResults;
 
@@ -1715,6 +2008,13 @@ export default {
                 clearInterval(this.timer);
                 this.timer = null;
             }
+            if (this.autoSaveTimer) {
+                clearInterval(this.autoSaveTimer);
+                this.autoSaveTimer = null;
+            }
+
+            // Очищаем сохраненное состояние
+            localStorage.removeItem("testProgress");
 
             // Собираем результат
             const result = this.calculatePartialResult();
@@ -1741,26 +2041,86 @@ export default {
                         : 0;
 
                 // Показываем сообщение
-                this.showToast(
-                    "⏰ Время истекло! Тест завершен автоматически.<br>" +
-                        "Отвечено вопросов: " +
-                        result.answered_questions_count +
-                        " из " +
-                        result.total_questions_count +
-                        " (" +
-                        answeredPercentage +
-                        "%)<br>" +
-                        "Набрано баллов: " +
-                        result.total_score +
-                        " из " +
-                        result.max_score +
-                        " (" +
-                        result.percentage +
-                        "%)",
-                    "warning"
-                );
+                const messageType = this.getMessageTypeByGrade(result.grade);
+
+                // Формируем сообщение
+                const toastMessage = `
+            <div style="text-align: left; line-height: 1.5;">
+                <strong>⏰ Время истекло! Тест завершен автоматически.</strong><br>
+                Отвечено вопросов: ${result.answered_questions_count} из ${
+                    result.total_questions_count
+                } (${answeredPercentage}%)<br>
+                Набрано баллов: ${result.total_score} из ${result.max_score} (${
+                    result.percentage
+                }%)<br>
+                <strong style="font-size: 1.2em; color: ${this.getGradeColor(
+                    result.grade
+                )};">
+                    Оценка: ${result.grade}
+                </strong>
+            </div>
+        `;
+
+                this.showToast(toastMessage, messageType);
                 this.resetTestState();
             });
+        },
+
+        getMessageTypeByGrade(grade) {
+            if (!grade || typeof grade !== "string") {
+                return "info";
+            }
+
+            // Приводим оценку к нижнему регистру для сравнения
+            const gradeLower = grade.toLowerCase().trim();
+
+            // Максимальные оценки
+            const excellentGrades = [
+                "отлично",
+                "отл",
+                "5",
+                "5/5",
+                "a",
+                "a+",
+                "a++",
+                "excellent",
+                "превосходно",
+                "идеально",
+                "100%",
+                "max",
+            ];
+
+            // Минимальные/неудовлетворительные оценки
+            const poorGrades = [
+                "неудовлетворительно",
+                "неуд",
+                "2",
+                "2/5",
+                "f",
+                "e",
+                "плохо",
+                "очень плохо",
+                "0",
+                "0%",
+                "не сдал",
+                "fail",
+                "провал",
+                "низший балл",
+                "минимальный",
+            ];
+
+            // Проверяем на максимальную оценку
+            if (excellentGrades.some((g) => gradeLower.includes(g))) {
+                return "success";
+            }
+
+            // Проверяем на низкую оценку
+            if (poorGrades.some((g) => gradeLower.includes(g))) {
+                return "danger";
+            }
+
+            // Все остальные - info
+            return "info";
         },
         resetTestState() {
             // Сброс всех основных данных
@@ -1791,8 +2151,14 @@ export default {
             this.userAnswersByOriginalIndex.clear();
             this.displayedQuestionToOriginal.clear();
             this.originalToDisplayedQuestion.clear();
-            this.displayToOriginalIndex?.clear();
-            this.originalToDisplayIndex?.clear();
+            if (this.autoSaveTimer) {
+                clearInterval(this.autoSaveTimer);
+                this.autoSaveTimer = null;
+            }
+            localStorage.removeItem("testProgress");
+            this.savedTestState = null;
+            this.restoreAttempted = false;
+            this.blockForTest(false);
         },
 
         formatTime(seconds) {
@@ -1816,14 +2182,16 @@ export default {
 
             switch (question.type) {
                 case "single":
-                    // Проверяем, что ответ не пустой и является допустимым значением
-                    const isNumber =
-                        typeof answer === "number" ||
-                        (typeof answer === "string" && !isNaN(answer));
+                    // Проверяем, что ответ не null, не undefined и не пустая строка
+                    const isNumber = typeof answer === "number";
                     const isStringWithValue =
                         typeof answer === "string" && answer.trim() !== "";
 
-                    isValid = (isNumber && answer !== "") || isStringWithValue;
+                    isValid =
+                        answer !== null &&
+                        answer !== undefined &&
+                        answer !== "" &&
+                        (isNumber || isStringWithValue);
 
                     if (!isValid) {
                         this.validationError =
@@ -1832,15 +2200,44 @@ export default {
                     break;
 
                 case "multiple":
-                    isValid = Array.isArray(answer) && answer.length > 0;
+                    // Для multiple используем currentMultipleChoiceAnswer напрямую
+                    const multipleAnswer = this.currentMultipleChoiceAnswer;
+
+                    // Проверка 1: Это массив
+                    if (Array.isArray(multipleAnswer)) {
+                        // Проверка 2: Массив не пустой
+                        if (multipleAnswer.length > 0) {
+                            // Проверка 3: Все элементы валидны (не пустые строки)
+                            isValid = multipleAnswer.every(
+                                (item) =>
+                                    item !== null &&
+                                    item !== undefined &&
+                                    item.toString().trim() !== ""
+                            );
+
+                            // Проверка 4: Все элементы - числа (индексы)
+                            if (isValid) {
+                                isValid = multipleAnswer.every(
+                                    (item) =>
+                                        typeof Number(item) === "number" &&
+                                        !isNaN(Number(item))
+                                );
+                            }
+                        } else {
+                            isValid = false; // Пустой массив
+                        }
+                    } else {
+                        isValid = false; // Не массив
+                    }
+
                     if (!isValid) {
                         this.validationError =
                             "Пожалуйста, выберите хотя бы один вариант ответа";
                     }
                     break;
 
-                case "true-false":
-                    isValid = answer === "true" || answer === "false";
+                case "truefalse":
+                    isValid = answer == "true" || answer == "false";
                     if (!isValid) {
                         this.validationError =
                             "Пожалуйста, выберите Да или Нет";
@@ -1872,7 +2269,11 @@ export default {
                     break;
 
                 case "text":
-                    isValid = answer && answer.toString().trim() !== "";
+                    isValid =
+                        answer !== null &&
+                        answer !== undefined &&
+                        answer.toString().trim() !== "";
+
                     if (!isValid) {
                         this.validationError = "Пожалуйста, введите ваш ответ";
                     }
@@ -1938,15 +2339,6 @@ export default {
         validateAndNextQuestion() {
             if (this.validateCurrentQuestion()) {
                 this.nextQuestion();
-            } else {
-                // Прокрутка к ошибке
-                // this.$nextTick(() => {
-                //     const errorElement =
-                //         document.querySelector(".alert-danger");
-                //     if (errorElement) {
-                //         errorElement.scrollIntoView({ behavior: "smooth" });
-                //     }
-                // });
             }
         },
         validateAllQuestions() {
@@ -1969,14 +2361,28 @@ export default {
 
                 switch (question.type) {
                     case "single":
-                    case "true-false":
+                    case "truefalse":
                         isValid =
                             answer !== "" &&
                             answer !== null &&
                             answer !== undefined;
                         break;
                     case "multiple":
+                        // Проверка, что выбрано хотя бы один вариант
                         isValid = Array.isArray(answer) && answer.length > 0;
+
+                        // Дополнительная проверка валидности выбранных значений
+                        if (
+                            isValid &&
+                            answer.some(
+                                (item) =>
+                                    item === null ||
+                                    item === undefined ||
+                                    item === ""
+                            )
+                        ) {
+                            isValid = false;
+                        }
                         break;
                     case "sorting":
                         // ОБНОВЛЕННАЯ ПРОВЕРКА ДЛЯ СОРТИРОВКИ
@@ -2001,7 +2407,11 @@ export default {
                         }
                         break;
                     case "text":
-                        isValid = answer && answer.toString().trim() !== "";
+                        // Проверка заполненности текстового поля
+                        isValid =
+                            answer !== null &&
+                            answer !== undefined &&
+                            answer.toString().trim() !== "";
                         break;
                     case "matching":
                         if (Array.isArray(answer) && question.options) {
@@ -2036,14 +2446,6 @@ export default {
                 return;
             }
             if (!this.validateCurrentQuestion()) {
-                // Прокрутка к ошибке
-                this.$nextTick(() => {
-                    const errorElement =
-                        document.querySelector(".alert-danger");
-                    // if (errorElement) {
-                    //     errorElement.scrollIntoView({ behavior: "smooth" });
-                    // }
-                });
                 return;
             }
 
@@ -2056,14 +2458,6 @@ export default {
                     validationResult.questionIndex + 1
                 } не отвечен. Пожалуйста, ответьте на него`;
 
-                // Прокрутка к ошибке
-                this.$nextTick(() => {
-                    const errorElement =
-                        document.querySelector(".alert-danger");
-                    // if (errorElement) {
-                    //     errorElement.scrollIntoView({ behavior: "smooth" });
-                    // }
-                });
                 return;
             }
 
@@ -2086,15 +2480,7 @@ export default {
                 this.currentQuestionIndex++;
                 this.validationError = "";
                 this.initializeQuestion();
-
-                // Прокрутка к началу вопроса
-                this.$nextTick(() => {
-                    const questionElement =
-                        document.querySelector(".card.mb-4");
-                    // if (questionElement) {
-                    //     questionElement.scrollIntoView({ behavior: "smooth" });
-                    // }
-                });
+                this.saveTestState();
             }
         },
 
@@ -2106,15 +2492,7 @@ export default {
                 this.currentQuestionIndex--;
                 this.validationError = "";
                 this.initializeQuestion();
-
-                // Прокрутка к началу вопроса
-                this.$nextTick(() => {
-                    const questionElement =
-                        document.querySelector(".card.mb-4");
-                    // if (questionElement) {
-                    //     questionElement.scrollIntoView({ behavior: "smooth" });
-                    // }
-                });
+                this.saveTestState(); // Сохраняем состояние
             }
         },
 
@@ -2126,19 +2504,20 @@ export default {
                 this.currentQuestionIndex = displayIndex;
                 this.validationError = "";
                 this.initializeQuestion();
-
-                this.$nextTick(() => {
-                    const questionElement =
-                        document.querySelector(".card.mb-4");
-                });
+                this.saveTestState(); // Сохраняем состояние
             }
         },
 
         finishTest() {
             clearInterval(this.timer);
-            const result = this.calculateResult();
 
-            this.datasend("results", "POST", result).then((response) => {
+            if (this.autoSaveTimer) {
+                clearInterval(this.autoSaveTimer);
+                this.autoSaveTimer = null;
+            }
+            localStorage.removeItem("testProgress");
+            const result = this.calculateResult();
+            this.datasend("results", "POST", result).then(() => {
                 this.selectedTest = null;
                 this.userName = "";
                 this.tempUserName = "";
@@ -2146,83 +2525,100 @@ export default {
                 this.shuffledPairsMap.clear();
                 this.answeredQuestions.clear();
                 this.validationError = "";
+                const messageType = this.getMessageTypeByGrade(result.grade);
 
-                this.showToast(
-                    "Тест завершен!<br>" +
-                        "Набрано баллов: " +
-                        result.total_score +
-                        " из " +
-                        result.max_score +
-                        " (" +
-                        result.percentage +
-                        "%)",
-                    "success"
-                );
+                const toastMessage = `
+            <div style="text-align: left; line-height: 1.5;">
+                <strong>✅ Тест завершен успешно!</strong><br>
+                Набрано баллов: ${result.total_score} из ${result.max_score} (${
+                    result.percentage
+                }%)<br>
+                <strong style="font-size: 1.2em; color: ${this.getGradeColor(
+                    result.grade
+                )};">
+                    Оценка: ${result.grade}
+                </strong>
+            </div>
+        `;
+
+                this.showToast(toastMessage, messageType);
 
                 this.resetTestState();
             });
         },
-        isOptionSelected(optionIndex) {
-            const answer = this.getCurrentAnswer();
-            if (!Array.isArray(answer)) return false;
-            return answer.includes(optionIndex);
-        },
-
-        toggleMultipleChoiceOption(optionIndex, event) {
-            // Создаем копию массива или инициализируем новый
-            let currentAnswers = this.userAnswers[this.currentQuestionIndex];
-
-            // Если массив не инициализирован или не является массивом
-            if (!Array.isArray(currentAnswers)) {
-                currentAnswers = [];
+        getGradeColor(grade) {
+            if (!grade || typeof grade !== "string") {
+                return "#6c757d"; // серый по умолчанию
             }
 
-            // Создаем новый массив для реактивности
-            let newAnswers = [...currentAnswers];
+            const gradeLower = grade.toLowerCase().trim();
 
-            if (event.target.checked) {
-                // Добавляем индекс, если его еще нет
-                if (!newAnswers.includes(optionIndex)) {
-                    newAnswers.push(optionIndex);
-                }
-            } else {
-                // Удаляем индекс
-                newAnswers = newAnswers.filter((idx) => idx !== optionIndex);
+            // Максимальные оценки - зеленый
+            const excellentGrades = [
+                "отлично",
+                "отл",
+                "5",
+                "5/5",
+                "a",
+                "a+",
+                "a++",
+                "excellent",
+                "превосходно",
+                "идеально",
+                "100%",
+                "max",
+            ];
+
+            // Минимальные/неудовлетворительные оценки - красный
+            const poorGrades = [
+                "неудовлетворительно",
+                "неуд",
+                "2",
+                "2/5",
+                "f",
+                "e",
+                "плохо",
+                "очень плохо",
+                "0",
+                "0%",
+                "не сдал",
+                "fail",
+                "провал",
+                "низший балл",
+                "минимальный",
+            ];
+
+            // Средние/хорошие оценки - синий/оранжевый
+            const goodGrades = [
+                "хорошо",
+                "хор",
+                "4",
+                "4/5",
+                "b",
+                "c",
+                "c+",
+                "b+",
+                "good",
+                "удовлетворительно",
+                "уд",
+                "3",
+                "3/5",
+                "d",
+            ];
+
+            if (excellentGrades.some((g) => gradeLower.includes(g))) {
+                return "#198754"; // зеленый
             }
 
-            // Обновляем реактивно
-            this.userAnswers[this.currentQuestionIndex] = newAnswers;
-
-            // Обновляем answeredQuestions
-            if (newAnswers.length > 0) {
-                this.answeredQuestions.add(this.currentQuestionIndex);
-            } else {
-                this.answeredQuestions.delete(this.currentQuestionIndex);
+            if (poorGrades.some((g) => gradeLower.includes(g))) {
+                return "#dc3545"; // красный
             }
 
-            // Принудительно вызываем обновление валидации
-            this.$nextTick(() => {
-                this.validateCurrentQuestion();
-            });
-        },
-
-        updateMatchingAnswer(pairIndex, value) {
-            const answer = this.getCurrentAnswer();
-            let currentAnswers = Array.isArray(answer)
-                ? [...answer]
-                : new Array(this.currentQuestion.options.length).fill("");
-
-            if (pairIndex < currentAnswers.length) {
-                currentAnswers[pairIndex] = value;
-            } else {
-                currentAnswers[pairIndex] = value;
+            if (goodGrades.some((g) => gradeLower.includes(g))) {
+                return "#0dcaf0"; // голубой для хороших оценок
             }
 
-            this.setCurrentAnswer(currentAnswers);
-        },
-        handleMatchingChange(pairIndex, event) {
-            this.updateMatchingAnswer(pairIndex, event.target.value);
-            this.clearValidationError();
+            return "#6c757d"; // серый по умолчанию
         },
 
         calculateResult() {
@@ -2275,57 +2671,6 @@ export default {
                             score = isCorrect ? question.points : 0;
                             break;
 
-                        // case "multiple":
-                        //     if (
-                        //         !Array.isArray(userAnswer) ||
-                        //         userAnswer.length === 0
-                        //     ) {
-                        //         score = 0;
-                        //         isCorrect = false;
-                        //         break;
-                        //     }
-
-                        //     // Находим оригинальные индексы правильных ответов
-                        //     const correctOriginalIndices = [];
-                        //     if (originalQuestion.options) {
-                        //         originalQuestion.options.forEach((opt, idx) => {
-                        //             if (opt.correct === true) {
-                        //                 correctOriginalIndices.push(idx);
-                        //             }
-                        //         });
-                        //     }
-
-                        //     // Получаем выбранные пользователем оригинальные индексы
-                        //     const selectedOriginalIndices = userAnswer.map(
-                        //         (idx) => Number(idx)
-                        //     );
-
-                        //     // Подсчитываем правильные и неправильные
-                        //     const correctSelections =
-                        //         selectedOriginalIndices.filter((idx) =>
-                        //             correctOriginalIndices.includes(idx)
-                        //         ).length;
-                        //     const wrongSelections =
-                        //         selectedOriginalIndices.filter(
-                        //             (idx) =>
-                        //                 !correctOriginalIndices.includes(idx)
-                        //         ).length;
-
-                        //     if (correctOriginalIndices.length > 0) {
-                        //         // Вычитаем неправильные из правильных
-                        //         const effectiveCorrect = Math.max(
-                        //             0,
-                        //             correctSelections - wrongSelections
-                        //         );
-                        //         score =
-                        //             (effectiveCorrect /
-                        //                 correctOriginalIndices.length) *
-                        //             originalQuestion.points;
-                        //     } else {
-                        //         score = 0;
-                        //     }
-                        //     isCorrect = score > 0;
-                        //     break;
                         case "multiple":
                             if (
                                 !Array.isArray(userAnswer) ||
@@ -2385,36 +2730,74 @@ export default {
                                 break;
                             }
 
-                            // Проверяем правильность порядка
-                            const correctOrder =
-                                originalQuestion.correctOrder ||
-                                originalQuestion.options.map(
-                                    (_, index) => index
-                                );
+                            // Получаем правильный порядок из correctPosition
+                            const correctOrder = [];
+                            const positionMap = new Map();
 
-                            let correctPositions = 0;
-                            userAnswer.forEach((itemId, position) => {
-                                if (itemId === correctOrder[position]) {
-                                    correctPositions++;
+                            // Собираем правильный порядок
+                            originalQuestion.options.forEach((opt, index) => {
+                                positionMap.set(
+                                    index,
+                                    opt.correctPosition || index
+                                );
+                            });
+
+                            // Сортируем по correctPosition
+                            const sortedByPosition = [
+                                ...originalQuestion.options.keys(),
+                            ].sort((a, b) => {
+                                const posA = positionMap.get(a);
+                                const posB = positionMap.get(b);
+                                return posA - posB;
+                            });
+
+                            // Создаем маппинг: originalIndex -> его правильная позиция
+                            const correctPositionForIndex = new Map();
+                            sortedByPosition.forEach(
+                                (originalIndex, correctPosition) => {
+                                    correctPositionForIndex.set(
+                                        originalIndex,
+                                        correctPosition
+                                    );
+                                }
+                            );
+
+                            // Проверяем, полностью ли совпадает порядок
+                            let isFullyCorrect = true;
+                            userAnswer.forEach((userItemId, userPosition) => {
+                                const shouldBeAtPosition =
+                                    correctPositionForIndex.get(userItemId);
+                                if (shouldBeAtPosition !== userPosition) {
+                                    isFullyCorrect = false;
                                 }
                             });
 
-                            // Рассчитываем баллы пропорционально количеству правильно расположенных элементов
-                            score =
-                                (correctPositions /
-                                    originalQuestion.options.length) *
-                                originalQuestion.points;
-                            isCorrect =
-                                correctPositions ===
-                                originalQuestion.options.length;
+                            // Только полностью правильный ответ дает баллы
+                            isCorrect = isFullyCorrect;
+                            score = isCorrect ? originalQuestion.points : 0;
                             break;
 
-                        case "true-false":
-                            isCorrect =
-                                userAnswer ==
-                                originalQuestion.options?.toString();
-                            score = isCorrect ? originalQuestion.points : 0;
+                        case "truefalse":
+                            // Обработка разных форматов хранения правильного ответа
+                            let correctAnswer;
 
+                            if (typeof originalQuestion.options === "string") {
+                                correctAnswer = originalQuestion.options; // "true" или "false"
+                            } else if (
+                                Array.isArray(originalQuestion.options)
+                            ) {
+                                correctAnswer =
+                                    originalQuestion.options[0] || "false";
+                            } else {
+                                correctAnswer =
+                                    originalQuestion.options?.toString() ||
+                                    "false";
+                            }
+
+                            // Приводим userAnswer к строке для сравнения
+                            const userAnswerStr = userAnswer?.toString();
+                            isCorrect = userAnswerStr === correctAnswer;
+                            score = isCorrect ? originalQuestion.points : 0;
                             break;
 
                         case "text":
@@ -2453,29 +2836,46 @@ export default {
                                 break;
                             }
 
-                            let correctPairs = 0;
-
+                            // Ключевое исправление начинается здесь
                             if (matchingData) {
                                 // Если пары были перемешаны
-                                const shuffledPairs = matchingData.pairs;
-                                // console.log(matchingData);
+                                const shuffledPairs =
+                                    matchingData.options || [];
+
+                                // Проверяем каждое сопоставление
+                                let correctPairs = 0;
 
                                 userAnswer.forEach(
                                     (userRightAnswer, displayedPairIndex) => {
-                                        // Находим перемешанную пару по отображаемому индексу
+                                        // Получаем перемешанную пару по отображаемому индексу
                                         const shuffledPair =
                                             shuffledPairs[displayedPairIndex];
-                                        if (
-                                            shuffledPair &&
-                                            shuffledPair.right ===
+
+                                        if (shuffledPair) {
+                                            // Находим оригинальную правую часть этой перемешанной пары
+                                            const originalRightPart =
+                                                shuffledPair.right;
+
+                                            // Сравниваем с ответом пользователя
+                                            if (
+                                                originalRightPart ===
                                                 userRightAnswer
-                                        ) {
-                                            correctPairs++;
+                                            ) {
+                                                correctPairs++;
+                                            }
                                         }
                                     }
                                 );
+
+                                // Все пары должны быть правильными
+                                isCorrect =
+                                    correctPairs ===
+                                    originalQuestion.options.length;
+                                score = isCorrect ? originalQuestion.points : 0;
                             } else {
-                                // Если пары не перемешаны
+                                // Если пары не перемешаны - обычная проверка
+                                let correctPairs = 0;
+
                                 userAnswer.forEach(
                                     (userRightAnswer, pairIndex) => {
                                         const originalPair =
@@ -2489,15 +2889,16 @@ export default {
                                         }
                                     }
                                 );
-                            }
 
-                            score =
-                                (correctPairs /
-                                    originalQuestion.options.length) *
-                                originalQuestion.points;
-                            isCorrect =
-                                correctPairs ===
-                                originalQuestion.options.length;
+                                score =
+                                    correctPairs ===
+                                    originalQuestion.options.length
+                                        ? originalQuestion.points
+                                        : 0;
+                                isCorrect =
+                                    correctPairs ===
+                                    originalQuestion.options.length;
+                            }
                             break;
 
                         default:
@@ -2509,7 +2910,6 @@ export default {
                     totalScore += score;
                     questionResults.push({
                         question: originalQuestion.text,
-                        questionImage: originalQuestion.image,
                         userAnswer: this.formatUserAnswerForDisplay(
                             originalQuestion,
                             originalIndex,
@@ -2546,18 +2946,9 @@ export default {
                 completed_with_timeout: false,
                 answered_questions_count: this.selectedTest.questions.length,
                 total_questions_count: this.selectedTest.questions.length,
-                settings: {
-                    show_user_name_in_results:
-                        this.selectedTest.settings.showUserNameInResults,
-                },
             };
 
-            if (
-                this.selectedTest.settings.requireUserName &&
-                this.selectedTest.settings.showUserNameInResults
-            ) {
-                result.user_name = this.userName;
-            }
+            result.user_name = this.userName;
 
             result.question_results = questionResults;
 
@@ -2628,22 +3019,30 @@ export default {
                     });
 
                     return answerTexts.join(", ");
+
                 case "sorting":
                     if (!Array.isArray(userAnswer) || userAnswer.length === 0) {
                         return "";
                     }
 
-                    return userAnswer
-                        .map((itemId, index) => {
-                            const item = originalQuestion.options?.[itemId];
-                            return `${index + 1}. ${
-                                item?.text || `Элемент ${itemId + 1}`
-                            }`;
-                        })
-                        .join("; ");
+                    // Получаем текст элементов
+                    const sortedItemsText = userAnswer.map((itemId, index) => {
+                        const item = originalQuestion.options?.[itemId];
+                        // Исправлено: получаем текст из правильного поля объекта
+                        const itemText =
+                            item?.text ||
+                            item?.content ||
+                            item?.title ||
+                            item?.name ||
+                            `Элемент ${itemId + 1}`;
+                        return `${index + 1}. ${itemText}`;
+                    });
 
-                case "true-false":
-                    return userAnswer === "true" ? "Да" : "Нет";
+                    // Единый формат: перечисление позиций и текстов
+                    return sortedItemsText.join("; ");
+
+                case "truefalse":
+                    return userAnswer == "true" ? "Да" : "Нет";
 
                 case "text":
                     return userAnswer.toString();
@@ -2661,19 +3060,26 @@ export default {
                         (rightAnswer, idx) => {
                             const leftText =
                                 pairs[idx]?.left || `Элемент ${idx + 1}`;
-                            return `${leftText} → ${
-                                rightAnswer || "Не выбрано"
-                            }`;
+                            // Исправлено: проверяем, является ли rightAnswer объектом
+                            const rightText =
+                                typeof rightAnswer === "object"
+                                    ? rightAnswer.text ||
+                                      rightAnswer.content ||
+                                      rightAnswer.title ||
+                                      rightAnswer.name ||
+                                      "Не выбрано"
+                                    : String(rightAnswer || "Не выбрано");
+                            return `${leftText} → ${rightText}`;
                         }
                     );
 
+                    // Единый формат: перечисление сопоставлений через точку с запятой
                     return formattedPairs.join("; ");
 
                 default:
                     return userAnswer.toString();
             }
         },
-
         getCorrectAnswer(originalQuestion) {
             if (!originalQuestion) return "";
 
@@ -2689,142 +3095,132 @@ export default {
                             ?.filter((opt) => opt.correct === true)
                             ?.map((opt) => opt.text) || []
                     );
-                case "true-false":
-                    return originalQuestion.options === "true" ? "Да" : "Нет";
+                case "truefalse":
+                    if (typeof originalQuestion.options === "string") {
+                        return originalQuestion.options == "true"
+                            ? "Да"
+                            : "Нет";
+                    }
+                    if (Array.isArray(originalQuestion.options)) {
+                        return originalQuestion.options[0] == "true"
+                            ? "Да"
+                            : "Нет";
+                    }
+                    return originalQuestion.options == "true" ? "Да" : "Нет";
                 case "text":
                     return originalQuestion.options || [];
                 case "matching":
-                    return (
-                        originalQuestion.options?.map((pair) => ({
-                            left: pair.left,
+                    if (!originalQuestion.options) return [];
 
-                            right: pair.right,
-                        })) || []
+                    // Единый формат для сопоставления: список пар через точку с запятой
+                    const matchingPairs = originalQuestion.options.map(
+                        (pair) => {
+                            return `${pair.left} → ${pair.right}`;
+                        }
                     );
+
+                    return matchingPairs.join("; ");
+                case "sorting":
+                    if (!originalQuestion.options) return [];
+
+                    // Получаем правильный порядок из correctPosition
+                    const positionMap = new Map();
+                    originalQuestion.options.forEach((opt, index) => {
+                        positionMap.set(index, opt.correctPosition || index);
+                    });
+
+                    // Сортируем по correctPosition
+                    const sortedByPosition = [
+                        ...originalQuestion.options.keys(),
+                    ].sort((a, b) => {
+                        const posA = positionMap.get(a);
+                        const posB = positionMap.get(b);
+                        return posA - posB;
+                    });
+
+                    // Формируем текст правильного порядка
+                    const correctOrderText = sortedByPosition.map(
+                        (originalIndex, position) => {
+                            const item =
+                                originalQuestion.options[originalIndex];
+                            const itemText =
+                                item?.text || `Элемент ${originalIndex + 1}`;
+                            return `${position + 1}. ${itemText}`;
+                        }
+                    );
+
+                    return correctOrderText.join("; ");
                 default:
                     return "";
             }
         },
 
-        debugShuffledOptions(displayedIndex) {
-            console.log(`Вопрос ${displayedIndex}:`);
-            if (this.shuffledOptionsMap.has(displayedIndex)) {
-                const shuffled = this.shuffledOptionsMap.get(displayedIndex);
-                console.log(
-                    "Перемешанные варианты:",
-                    shuffled.map((opt) => ({
-                        text: opt.text,
-                        originalIndex: opt.originalIndex,
-                        correct:
-                            this.selectedTest.questions[
-                                this.displayedQuestionToOriginal.get(
-                                    displayedIndex
-                                )
-                            ]?.options?.[opt.originalIndex]?.correct,
-                    }))
+        calculateGrade(percentage) {
+            if (
+                !this.selectedTest.grading ||
+                !Array.isArray(this.selectedTest.grading)
+            ) {
+                return "Не оценено";
+            }
+
+            const gradeSystem = this.selectedTest.grading;
+
+            // Сортируем по minScore для надежности
+            const sortedGrades = [...gradeSystem].sort(
+                (a, b) => b.minScore - a.minScore
+            );
+
+            // Находим первую оценку, для которой процент >= minScore
+            const grade = sortedGrades.find((g) => percentage >= g.minScore);
+
+            return grade ? grade.grade : "Не оценено";
+        },
+        getSortingItemText(itemId) {
+            if (!this.currentQuestion?.options?.[itemId]) {
+                return `Элемент ${itemId + 1}`;
+            }
+
+            const item = this.currentQuestion.options[itemId];
+            return item.text || item.title || item.name || `${itemId + 1}`;
+        },
+
+        handleVisibilityChange() {
+            if (document.hidden) {
+                // Запоминаем время ухода
+                this.lastHiddenTime = Date.now();
+            } else if (this.lastHiddenTime && this.selectedTest) {
+                // При возвращении корректируем время
+                const timeHidden = Date.now() - this.lastHiddenTime;
+                this.timeLeft = Math.max(
+                    0,
+                    this.timeLeft - Math.floor(timeHidden / 1000)
                 );
-            } else {
-                console.log("Варианты не перемешаны");
-            }
-        },
 
-        calculateGrade(percentage) {
-            if (!this.selectedTest.grading) return "Не оценено";
-
-            const gradeSystem = this.selectedTest.grading;
-            const grade = gradeSystem.find(
-                (g) => percentage >= g.minScore && percentage <= g.max_score // Используйте то название, которое есть в ваших данных
-            );
-            return grade ? grade.grade : "Не оценено";
-        },
-        handleTextInput(event) {
-            this.setCurrentAnswer(event.target.value);
-            this.clearValidationError();
-        },
-
-        getcorrect_answer(question) {
-            if (!question) return "";
-
-            switch (question.type) {
-                case "single":
-                    const correctOption = question.options?.find(
-                        (opt) => opt.correct
-                    );
-                    return correctOption ? correctOption.text : "";
-                case "multiple":
-                    return (
-                        question.options
-                            ?.filter((opt) => opt.correct)
-                            ?.map((opt) => opt.text) || []
-                    );
-                case "true-false":
-                    return question.options === "true" ? "Да" : "Нет";
-                case "text":
-                    return question.options || [];
-                case "matching":
-                    return (
-                        question.options?.map((pair) => ({
-                            left: pair.left,
-                            right: pair.right,
-                        })) || []
-                    );
-                default:
-                    return "";
-            }
-        },
-
-        calculateGrade(percentage) {
-            if (!this.selectedTest.grading) return "Не оценено";
-
-            const gradeSystem = this.selectedTest.grading;
-            const grade = gradeSystem.find(
-                (g) => percentage >= g.minScore && percentage <= g.max_score
-            );
-            return grade ? grade.grade : "Не оценено";
-        },
-
-        isOptionSelected(optionIndex) {
-            const answer = this.userAnswers[this.currentQuestionIndex];
-            if (!Array.isArray(answer)) return false;
-            return answer.includes(optionIndex);
-        },
-
-        toggleMultipleChoiceOption(optionIndex, event) {
-            // Создаем копию массива или инициализируем новый
-            let currentAnswers = this.userAnswers[this.currentQuestionIndex];
-
-            // Если массив не инициализирован или не является массивом
-            if (!Array.isArray(currentAnswers)) {
-                currentAnswers = [];
-            }
-
-            // Создаем новый массив для реактивности
-            let newAnswers = [...currentAnswers];
-
-            if (event.target.checked) {
-                // Добавляем индекс, если его еще нет
-                if (!newAnswers.includes(optionIndex)) {
-                    newAnswers.push(optionIndex);
+                // Проверяем, не истекло ли время
+                if (this.timeLeft <= 0) {
+                    this.forceFinishTest();
                 }
-            } else {
-                // Удаляем индекс
-                newAnswers = newAnswers.filter((idx) => idx !== optionIndex);
-            }
-
-            // Обновляем реактивно (просто присваиваем новый массив)
-            this.userAnswers[this.currentQuestionIndex] = newAnswers;
-
-            // Обновляем answeredQuestions
-            if (newAnswers.length > 0) {
-                this.answeredQuestions.add(this.currentQuestionIndex);
-            } else {
-                this.answeredQuestions.delete(this.currentQuestionIndex);
             }
         },
     },
     beforeUnmount() {
+        document.removeEventListener(
+            "visibilitychange",
+            this.handleVisibilityChange
+        );
+        window.removeEventListener("beforeunload", this.handleBeforeUnload);
         if (this.timer) {
             clearInterval(this.timer);
+            this.timer = null;
+        }
+        if (this.autoSaveTimer) {
+            clearInterval(this.autoSaveTimer);
+            this.autoSaveTimer = null;
+        }
+
+        // Сохраняем при размонтировании компонента
+        if (this.selectedTest && this.userName) {
+            this.saveTestState();
         }
     },
 };
@@ -2975,5 +3371,34 @@ export default {
 .position-badge {
     min-width: 40px;
     text-align: center;
+}
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+}
+
+.restore-dialog {
+    max-width: 500px;
+    width: 90%;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 </style>

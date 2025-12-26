@@ -18,13 +18,30 @@ class TestResultController extends Controller
     // }
     public function resultTree(Tree $tree_id): JsonResponse
     {
-        $test = Test::where("tree_id", $tree_id->id)->first();
+        $test = Test::where("tree_id", $tree_id->id)->pluck('id')->toArray();
         if ($test) {
-            $results = TestResult::with('test', 'user')->where("test_id", $test->id)->get();
+            $results = TestResult::with('test', 'user')->whereIn("test_id", $test)->get();
             return response()->json(['data' => $results]);
         }
         return response()->json(['data' => []]);
     }
+    public function resultAll(): JsonResponse
+    {
+        $tree = Tree::where("user_id", Auth::id())->pluck("id")->toArray();
+
+        $test = Test::whereIn("tree_id", $tree)->pluck('id')->toArray();
+
+        $results = TestResult::with('test', 'user')->whereIn("test_id", $test)->orderBy("created_at", "desc")->get();
+        return response()->json(['data' => $results]);
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        TestResult::whereIn("id", $request->result_ids)->delete();
+        return response()->json(['message' => 'Успешно удалены выбранные резульаты']);
+    }
+
+
 
 
     public function store(Request $request): JsonResponse
@@ -37,7 +54,6 @@ class TestResultController extends Controller
             'percentage' => 'required|numeric',
             'grade' => 'required|string',
             'time_spent' => 'required|integer',
-            'settings' => 'nullable|array',
             'question_results' => 'nullable|array'
         ]);
 
