@@ -247,7 +247,6 @@ export default {
                         this.dataBlock = JSON.parse(res.content.data);
                         this.setContent(res.content);
                         this.createEditor();
-         
                     })
                     .catch((error) => {
                         console.log(error);
@@ -264,7 +263,7 @@ export default {
                                 this.groupAvailables[firstletter].push(el);
                             });
                         } else {
-                            this.showToast(res.success, "Что-то пошло не так");
+                            this.showToast("Что-то пошло не так", res.success);
                         }
                     })
                     .catch((error) => {

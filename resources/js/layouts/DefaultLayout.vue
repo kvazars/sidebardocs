@@ -154,6 +154,9 @@ export default {
     methods: {
         showToast(message, type = "info") {
             const toast = document.createElement("div");
+            if (type == "true" || type == true) {
+                type = "success";
+            }
             toast.className = `alert alert-${type} alert-dismissible fade show`;
             toast.innerHTML = `
         ${message}
@@ -230,9 +233,7 @@ export default {
         catchError(error) {
             for (let index = 0; index < Object.keys(error).length; index++) {
                 Object.values(error)[index].forEach((element) => {
-                    // this.showToast(false, element);
                     this.showToast(element, "danger");
-                    // message, type = "info"
                 });
             }
         },

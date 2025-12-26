@@ -613,7 +613,7 @@ export default {
         clearCache() {
             this.datasend("checkImageResource", "GET", {})
                 .then((res) => {
-                    this.showToast(res.success, res.message);
+                    this.showToast(res.message, res.success);
                 })
                 .catch((error) => {
                     console.log(error);
@@ -633,7 +633,7 @@ export default {
             if (confirm("Вы действительно хотите удалить группу?")) {
                 this.datasend(`group/${id}`, "DELETE", {})
                     .then((res) => {
-                        this.showToast(res.success, res.message);
+                        this.showToast(res.message, res.success);
                         if (res.success) {
                             this.visibleModal = false;
                             this.cardName = null;
@@ -657,7 +657,7 @@ export default {
             ) {
                 this.datasend(`user/${id}`, "DELETE", {})
                     .then((res) => {
-                        this.showToast(res.success, res.message);
+                        this.showToast(res.message, res.success);
                         if (res.success) {
                             this.getList();
                             this.visibleModal = false;
@@ -708,7 +708,7 @@ export default {
                 }
                 this.datasend("about", "POST", form, true)
                     .then((res) => {
-                        this.showToast(res.success, res.message);
+                        this.showToast(res.message, res.success);
                         if (res.success) {
                             this.getList();
                             this.visibleModal = false;
@@ -746,7 +746,7 @@ export default {
 
             this.datasend("group", this.groupId ? "PUT" : "POST", form)
                 .then((res) => {
-                    this.showToast(res.success, res.message);
+                    this.showToast(res.message, res.success);
                     if (res.success) {
                         this.getList();
                         this.visibleModal = false;
@@ -781,7 +781,7 @@ export default {
             }
             this.datasend("user", this.userId ? "PUT" : "POST", form)
                 .then((res) => {
-                    this.showToast(res.success, res.message);
+                    this.showToast(res.message, res.success);
                     if (res.success) {
                         this.getList();
                         this.visibleModal = false;

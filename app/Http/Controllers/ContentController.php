@@ -299,4 +299,9 @@ class ContentController extends Controller
 
         return response()->json(['success' => true, 'data' => ['files' => $files, 'users' => $users]], 200);
     }
+    public function changeFolder(Tree $id, Request $request)
+    {
+        $id->update(["tree_id" => $request->tree_id]);
+        return response()->json(['success' => true, 'message' => 'Успешно перемещено!'], 200);
+    }
 }

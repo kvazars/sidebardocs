@@ -61,6 +61,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/getGroups', [AvailableController::class, 'index']);
         Route::get('/getFiles', [ContentController::class, 'getFiles']);
         Route::post('/newPass', [UserController::class, 'newPassword']);
+        Route::post('/file/{id}/change-folder', [ContentController::class, 'changeFolder']);
+       
     });
     //admin
     Route::middleware(["role:admin"])->group(function () {

@@ -35,6 +35,7 @@ const props = defineProps([
     "showContextMenu",
     "getBreadcrumbs",
 ]);
+
 const store = useSidebarIdStore();
 const emits = defineEmits({
     "item-click"(event, item) {

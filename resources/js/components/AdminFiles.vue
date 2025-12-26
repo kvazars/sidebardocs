@@ -308,7 +308,7 @@ export default {
                     .then((res) => {
                         if (res.success) {
                             this.getFiles();
-                            this.showToast(res.success, res.message);
+                            this.showToast(res.message, res.success);
                         }
                     })
                     .catch((error) => console.log(error));
@@ -325,11 +325,11 @@ export default {
                 groups: JSON.stringify(this.files.data[id].groups),
             };
 
-            this.datasend("saveresourceadmin", "POST",  form)
+            this.datasend("saveresourceadmin", "POST", form)
                 .then((res) => {
                     if (res.success) {
                         this.getFiles();
-                        this.showToast(res.success, res.message);
+                        this.showToast(res.message, res.success);
                     }
                 })
                 .catch((error) => console.log(error));
@@ -344,7 +344,7 @@ export default {
                     .then((res) => {
                         if (res.success) {
                             this.getFiles();
-                            this.showToast(res.success, res.message);
+                            this.showToast(res.message, res.success);
                         }
                     })
                     .catch((error) => console.log(error));
