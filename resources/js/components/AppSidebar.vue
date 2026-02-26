@@ -61,6 +61,7 @@ export default {
             ],
             visibleModalFolder: false,
             visibleModalChangeFolder: false,
+            visibleSearchModal: false, // Новое модальное окно для поиска
             sidebar: useSidebarStore(),
 
             showMenu: false,
@@ -79,6 +80,15 @@ export default {
             selectedFileCurrentFolderId: null,
             folderOptions: [],
             expandedFolders: new Set(),
+            
+            // Данные для поиска
+            searchQuery: "",
+            searchResults: [],
+            isSearching: false,
+            searchError: null,
+            searchFilters: {
+                type: "all", // all, folders, files
+            },
         };
     },
     mounted() {
@@ -96,6 +106,128 @@ export default {
         closeContextMenu() {
             this.showMenu = false;
         },
+        
+        // Методы для поиска
+        openSearchModal() {
+            this.visibleSearchModal = true;
+            this.searchQuery = "";
+            this.searchResults = [];
+            this.searchError = null;
+            
+            // Фокус на поле поиска после открытия
+            this.$nextTick(() => {
+                const searchInput = this.$refs.searchInput;
+                if (searchInput) {
+                    searchInput.focus();
+                }
+            });
+        },
+        
+        closeSearchModal() {
+            this.visibleSearchModal = false;
+            this.searchQuery = "";
+            this.searchResults = [];
+            this.searchError = null;
+        },
+        
+        // Обработчик поиска (вы будете сами обрабатывать)
+        handleSearch() {
+            if (!this.searchQuery || this.searchQuery.length < 2) {
+                this.searchError = "Введите минимум 2 символа";
+                return;
+            }
+            
+            this.isSearching = true;
+            this.searchError = null;
+            
+            // Здесь вы будете обрабатывать поиск самостоятельно
+            // Например, эмитить событие или вызывать props метод
+            this.$emit('search', {
+                query: this.searchQuery,
+                filters: this.searchFilters
+            });
+            
+            // Для демонстрации пока просто эмулируем окончание поиска
+            setTimeout(() => {
+                this.isSearching = false;
+            }, 500);
+        },
+        
+        // Очистка поиска
+        clearSearch() {
+            this.searchQuery = "";
+            this.searchResults = [];
+            this.searchError = null;
+        },
+        
+        // Переход к результату
+        navigateToResult(result) {
+            this.closeSearchModal();
+            
+            if (result.type === 'folder') {
+                // Раскрываем папку в дереве
+                this.expandFolderPath(result.id);
+                // Подсвечиваем элемент
+                this.highlightElement(`folder-${result.id}`);
+            } else if (result.type === 'file') {
+                this.$router.push({
+                    name: "EditFile",
+                    params: { id: result.id },
+                });
+            }
+            
+            this.showToast(`Открыт: ${result.name}`, "success");
+        },
+        
+        // Вспомогательные методы для навигации
+        expandFolderPath(folderId) {
+            const findAndExpandPath = (items, targetId, parents = []) => {
+                if (!items) return false;
+                
+                for (const item of items) {
+                    if (item.id === targetId) {
+                        parents.forEach(p => this.expandedFolders.add(p));
+                        return true;
+                    }
+                    
+                    if (item.children || item.items) {
+                        const children = item.children || item.items;
+                        if (findAndExpandPath(children, targetId, [...parents, item.id])) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            };
+            
+            if (this.menu && Array.isArray(this.menu)) {
+                findAndExpandPath(this.menu, folderId);
+            }
+        },
+        
+        highlightElement(elementId) {
+            this.$nextTick(() => {
+                const element = document.getElementById(elementId);
+                if (element) {
+                    element.classList.add('search-highlight');
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    
+                    setTimeout(() => {
+                        element.classList.remove('search-highlight');
+                    }, 2000);
+                }
+            });
+        },
+        
+        // Фильтрация результатов по типу
+        setFilter(type) {
+            this.searchFilters.type = type;
+            if (this.searchQuery.length >= 2) {
+                this.handleSearch();
+            }
+        },
+        
+        // Остальные методы (save, prepareFolderOptions, и т.д.) остаются без изменений
         save() {
             let form = { name: this.folderTitle };
 
@@ -134,7 +266,6 @@ export default {
 
             if (!data) return folders;
 
-            // Если это массив
             if (Array.isArray(data)) {
                 data.forEach((item, index) => {
                     const newPath = `${path}[${index}]`;
@@ -146,9 +277,7 @@ export default {
                     folders.push(...childFolders);
                 });
             }
-            // Если это объект
             else if (typeof data === "object" && data !== null) {
-                // Проверяем, является ли этот объект папкой
                 const isFolder = this.isFolderObject(data);
                 if (isFolder) {
                     folders.push({
@@ -160,11 +289,10 @@ export default {
                             data.name || data.title || `Папка ${data.id}`,
                         level: level,
                         path: path,
-                        rawData: data, // Сохраняем исходные данные для отладки
+                        rawData: data,
                     });
                 }
 
-                // Рекурсивно обходим все свойства объекта
                 for (const key in data) {
                     if (data.hasOwnProperty(key) && key !== "rawData") {
                         const newPath = `${path}.${key}`;
@@ -186,9 +314,6 @@ export default {
         isFolderObject(obj) {
             if (!obj || typeof obj !== "object") return false;
 
-            // Критерии для определения папки:
-            // 1. Есть id и (name или title)
-            // 2. type === 'folder' ИЛИ нет type (но есть children/items)
             const hasId = obj.id !== undefined && obj.id !== null;
             const hasName = obj.name !== undefined || obj.title !== undefined;
             const isFolderType = obj.type === "folder";
@@ -198,11 +323,9 @@ export default {
             return hasId && (isFolderType || (hasName && hasChildren));
         },
 
-        // Универсальный метод поиска родительской папки файла
         findParentFolderForFile(fileId, data, currentParent = null, path = "") {
             if (!data) return null;
 
-            // Если это массив
             if (Array.isArray(data)) {
                 for (let i = 0; i < data.length; i++) {
                     const item = data[i];
@@ -218,9 +341,7 @@ export default {
                     }
                 }
             }
-            // Если это объект
             else if (typeof data === "object" && data !== null) {
-                // Проверяем, является ли этот объект нашим файлом
                 const isTargetFile =
                     data.id === fileId &&
                     (data.type === "file" ||
@@ -232,11 +353,9 @@ export default {
                     return currentParent;
                 }
 
-                // Определяем, является ли текущий объект папкой
                 const isFolder = this.isFolderObject(data);
                 const newParent = isFolder ? data.id : currentParent;
 
-                // Рекурсивно ищем в дочерних свойствах
                 for (const key in data) {
                     if (
                         data.hasOwnProperty(key) &&
@@ -260,7 +379,6 @@ export default {
             return null;
         },
 
-        // Альтернативный метод: поиск через глубокое клонирование и анализ
         findParentFolderDeep(fileId) {
             const menuCopy = JSON.parse(JSON.stringify(this.menu));
             const findParentRecursive = (data, parentId = null) => {
@@ -309,7 +427,6 @@ export default {
             return result;
         },
 
-        // Улучшенный метод поиска с полной отладкой
         findFileParentWithDebug(fileId) {
             const method1Result = this.findParentFolderForFile(
                 fileId,
@@ -328,7 +445,6 @@ export default {
             return method2Result !== null ? method2Result : method1Result;
         },
 
-        // Поиск данных файла в структуре
         findFileData(fileId) {
             const findRecursive = (data) => {
                 if (!data) return null;
@@ -357,7 +473,6 @@ export default {
             return findRecursive(this.menu);
         },
 
-        // Анализ структуры меню для понимания
         analyzeMenuStructure() {
             const stats = {
                 totalItems: 0,
@@ -376,7 +491,6 @@ export default {
                 if (Array.isArray(data)) {
                     data.forEach((item) => analyze(item, depth, parentType));
                 } else if (typeof data === "object") {
-                    // Определяем тип элемента
                     if (this.isFolderObject(data)) {
                         stats.folders++;
                     } else if (
@@ -388,7 +502,6 @@ export default {
                         stats.unknown++;
                     }
 
-                    // Рекурсивно анализируем свойства
                     for (const key in data) {
                         if (data.hasOwnProperty(key)) {
                             analyze(
@@ -406,7 +519,6 @@ export default {
             return stats;
         },
 
-        // Переключение видимости подпапок
         toggleFolderExpansion(folderId) {
             if (this.expandedFolders.has(folderId)) {
                 this.expandedFolders.delete(folderId);
@@ -415,20 +527,16 @@ export default {
             }
         },
 
-        // Выбор папки
         selectFolder(folderId) {
             this.selectedNewFolderId = folderId;
         },
 
-        // Сохранение изменения папки
         saveFolderChange() {
             if (!this.selectedFileId || !this.selectedNewFolderId) {
                 this.showToast("Выберите папку", "warning");
                 return;
             }
 
-            // Если не удалось определить текущую папку, все равно разрешаем перемещение
-            // но с предупреждением
             if (this.selectedNewFolderId === this.selectedFileCurrentFolderId) {
                 this.showToast("Файл уже находится в этой папке", "warning");
                 return;
@@ -438,7 +546,6 @@ export default {
                 tree_id: this.selectedNewFolderId,
             };
 
-            // Информация для подтверждения
             let confirmationMessage = `Переместить файл "${this.selectedFileName}"?`;
 
             if (this.selectedFileCurrentFolderId !== null) {
@@ -457,12 +564,6 @@ export default {
             if (!confirm(confirmationMessage)) {
                 return;
             }
-
-            // console.log("Отправляем запрос на изменение папки:", {
-            //     fileId: this.selectedFileId,
-            //     newFolderId: this.selectedNewFolderId,
-            //     currentFolderId: this.selectedFileCurrentFolderId,
-            // });
 
             this.datasend(
                 `file/${this.selectedFileId}/change-folder`,
@@ -488,7 +589,6 @@ export default {
                 });
         },
 
-        // Открытие модального окна для изменения папки
         changeFolder(id, name) {
             this.selectedFileId = id;
             this.selectedFileName = name;
@@ -640,6 +740,30 @@ export default {
                 @click="sidebar.toggleVisible()"
             />
         </CSidebarHeader>
+        
+        <!-- Поле поиска в сайдбаре -->
+        <div class="sidebar-search p-2 border-bottom">
+            <div class="input-group">
+                <span class="input-group-text bg-transparent border-end-0">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input 
+                    type="text" 
+                    class="form-control border-start-0 ps-0"
+                    placeholder="Поиск..."
+                    @click="openSearchModal"
+                    readonly
+                />
+                <button 
+                    class="btn btn-outline-secondary" 
+                    type="button"
+                    @click="openSearchModal"
+                >
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+        
         <SidebarNav :showContextMenu="showContextMenu" :menu="menu" />
 
         <button
@@ -868,6 +992,224 @@ export default {
             </CModalFooter>
         </CModal>
 
+        <!-- Модальное окно поиска -->
+        <CModal
+            :visible="visibleSearchModal"
+            @close="closeSearchModal"
+            aria-labelledby="SearchModalLabel"
+            size="lg"
+            backdrop="static"
+        >
+            <CModalHeader>
+                <CModalTitle id="SearchModalLabel">
+                    <i class="bi bi-search me-2"></i>
+                    Поиск по объектам
+                </CModalTitle>
+            </CModalHeader>
+            <CModalBody>
+                <div class="search-container">
+                    <!-- Поле ввода поиска -->
+                    <div class="search-input-wrapper mb-4">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="bi bi-search text-muted"></i>
+                            </span>
+                            <input
+                                ref="searchInput"
+                                type="text"
+                                class="form-control border-start-0 border-end-0"
+                                placeholder="Введите текст для поиска (минимум 2 символа)..."
+                                v-model="searchQuery"
+                                @keyup.enter="handleSearch"
+                            />
+                            <button
+                                class="btn btn-primary"
+                                type="button"
+                                @click="handleSearch"
+                                :disabled="isSearching || searchQuery.length < 2"
+                            >
+                                <span v-if="isSearching">
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    Поиск...
+                                </span>
+                                <span v-else>
+                                    <i class="bi bi-arrow-right me-2"></i>
+                                    Найти
+                                </span>
+                            </button>
+                        </div>
+                        <small class="text-muted mt-2 d-block">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Минимум 2 символа. Поиск осуществляется по названиям и содержимому.
+                        </small>
+                    </div>
+
+                    <!-- Фильтры поиска -->
+                    <div class="search-filters mb-4" v-if="searchQuery.length >= 2">
+                        <div class="btn-group w-100" role="group">
+                            <input
+                                type="radio"
+                                class="btn-check"
+                                name="searchFilter"
+                                id="filterAll"
+                                value="all"
+                                v-model="searchFilters.type"
+                                @change="handleSearch"
+                            />
+                            <label class="btn btn-outline-secondary" for="filterAll">
+                                <i class="bi bi-grid-3x3-gap-fill me-2"></i>
+                                Все
+                            </label>
+
+                            <input
+                                type="radio"
+                                class="btn-check"
+                                name="searchFilter"
+                                id="filterFolders"
+                                value="folders"
+                                v-model="searchFilters.type"
+                                @change="handleSearch"
+                            />
+                            <label class="btn btn-outline-secondary" for="filterFolders">
+                                <i class="bi bi-folder me-2"></i>
+                                Папки
+                            </label>
+
+                            <input
+                                type="radio"
+                                class="btn-check"
+                                name="searchFilter"
+                                id="filterFiles"
+                                value="files"
+                                v-model="searchFilters.type"
+                                @change="handleSearch"
+                            />
+                            <label class="btn btn-outline-secondary" for="filterFiles">
+                                <i class="bi bi-file-text me-2"></i>
+                                Файлы
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Состояния поиска -->
+                    <div v-if="searchError" class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        {{ searchError }}
+                    </div>
+
+                    <div v-else-if="isSearching" class="text-center py-5">
+                        <div class="spinner-border text-primary mb-3" role="status">
+                            <span class="visually-hidden">Поиск...</span>
+                        </div>
+                        <p class="text-muted">Выполняется поиск...</p>
+                    </div>
+
+                    <div v-else-if="searchQuery.length >= 2 && searchResults.length === 0" class="text-center py-5">
+                        <i class="bi bi-search-heart display-1 text-muted mb-3"></i>
+                        <h5>Ничего не найдено</h5>
+                        <p class="text-muted">
+                            Попробуйте изменить поисковый запрос или фильтры
+                        </p>
+                    </div>
+
+                    <!-- Результаты поиска -->
+                    <div v-else-if="searchResults.length > 0" class="search-results">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0">
+                                Найдено: {{ searchResults.length }}
+                            </h6>
+                            <button class="btn btn-sm btn-outline-secondary" @click="clearSearch">
+                                <i class="bi bi-x-circle me-1"></i>
+                                Очистить
+                            </button>
+                        </div>
+
+                        <div class="list-group">
+                            <div
+                                v-for="result in searchResults"
+                                :key="result.id"
+                                class="list-group-item list-group-item-action search-result-item"
+                                @click="navigateToResult(result)"
+                            >
+                                <div class="d-flex align-items-center">
+                                    <!-- Иконка в зависимости от типа -->
+                                    <div class="result-icon me-3">
+                                        <i 
+                                            class="bi" 
+                                            :class="{
+                                                'bi-folder text-warning': result.type === 'folder',
+                                                'bi-file-text text-primary': result.type === 'file',
+                                                'bi-file-earmark-text text-info': result.type === 'document',
+                                                'bi-file-earmark text-secondary': !result.type
+                                            }"
+                                            style="font-size: 1.5rem;"
+                                        ></i>
+                                    </div>
+
+                                    <!-- Информация о результате -->
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex align-items-center">
+                                            <h6 class="mb-0 me-2">{{ result.name || result.title }}</h6>
+                                            <span class="badge" :class="{
+                                                'bg-warning': result.type === 'folder',
+                                                'bg-primary': result.type === 'file',
+                                                'bg-info': result.type === 'document',
+                                                'bg-secondary': !result.type
+                                            }">
+                                                {{ result.type || 'объект' }}
+                                            </span>
+                                        </div>
+                                        
+                                        <!-- Путь к объекту -->
+                                        <div class="result-path small text-muted mt-1" v-if="result.path">
+                                            <i class="bi bi-folder me-1"></i>
+                                            {{ result.path }}
+                                        </div>
+                                        
+                                        <!-- Дополнительная информация -->
+                                        <div class="result-meta small text-muted mt-1">
+                                            <span v-if="result.created_at" class="me-3">
+                                                <i class="bi bi-calendar me-1"></i>
+                                                {{ new Date(result.created_at).toLocaleDateString() }}
+                                            </span>
+                                            <span v-if="result.size">
+                                                <i class="bi bi-hdd me-1"></i>
+                                                {{ result.size }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Стрелка для перехода -->
+                                    <div class="result-action ms-3">
+                                        <i class="bi bi-chevron-right text-muted"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Подсказка при пустом поиске -->
+                    <div v-else-if="!searchQuery" class="search-hint text-center py-5">
+                        <i class="bi bi-arrow-up display-4 text-muted mb-3"></i>
+                        <p class="text-muted">
+                            Введите текст для поиска в поле выше
+                        </p>
+                        <small class="text-muted">
+                            Можно искать по названиям файлов, папок и их содержимому
+                        </small>
+                    </div>
+                </div>
+            </CModalBody>
+            <CModalFooter>
+                <CButton
+                    color="secondary"
+                    @click="closeSearchModal"
+                >
+                    Закрыть
+                </CButton>
+            </CModalFooter>
+        </CModal>
+
         <ContextMenu
             v-if="showMenu && auths.id && auths.role != 'user'"
             :actions="
@@ -903,5 +1245,71 @@ export default {
     opacity: 0.6;
     cursor: not-allowed !important;
     background-color: #f8f9fa;
+}
+
+/* Стили для поиска */
+.sidebar-search .input-group-text,
+.sidebar-search .form-control,
+.sidebar-search .btn {
+    background-color: transparent;
+    border-color: #dee2e6;
+}
+
+.sidebar-search .form-control {
+    cursor: pointer;
+}
+
+.sidebar-search .form-control:focus {
+    box-shadow: none;
+    border-color: #dee2e6;
+}
+
+.search-result-item {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.search-result-item:hover {
+    background-color: #f8f9fa;
+    transform: translateX(5px);
+}
+
+.search-highlight {
+    background-color: #fff3cd;
+    transition: background-color 1s;
+}
+
+/* Анимации */
+.search-result-item {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Для модального окна поиска */
+:deep(.modal-content) {
+    border: none;
+    border-radius: 1rem;
+}
+
+:deep(.modal-header) {
+    border-bottom: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+    border-radius: 1rem 1rem 0 0;
+}
+
+:deep(.modal-footer) {
+    border-top: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+    border-radius: 0 0 1rem 1rem;
 }
 </style>
