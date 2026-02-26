@@ -80,7 +80,7 @@ export default {
             selectedFileCurrentFolderId: null,
             folderOptions: [],
             expandedFolders: new Set(),
-            
+
             // Данные для поиска
             searchQuery: "",
             searchResults: [],
@@ -106,14 +106,14 @@ export default {
         closeContextMenu() {
             this.showMenu = false;
         },
-        
+
         // Методы для поиска
         openSearchModal() {
             this.visibleSearchModal = true;
             this.searchQuery = "";
             this.searchResults = [];
             this.searchError = null;
-            
+
             // Фокус на поле поиска после открытия
             this.$nextTick(() => {
                 const searchInput = this.$refs.searchInput;
@@ -122,48 +122,48 @@ export default {
                 }
             });
         },
-        
+
         closeSearchModal() {
             this.visibleSearchModal = false;
             this.searchQuery = "";
             this.searchResults = [];
             this.searchError = null;
         },
-        
+
         // Обработчик поиска (вы будете сами обрабатывать)
         handleSearch() {
             if (!this.searchQuery || this.searchQuery.length < 2) {
                 this.searchError = "Введите минимум 2 символа";
                 return;
             }
-            
+
             this.isSearching = true;
             this.searchError = null;
-            
+
             // Здесь вы будете обрабатывать поиск самостоятельно
             // Например, эмитить событие или вызывать props метод
             this.$emit('search', {
                 query: this.searchQuery,
                 filters: this.searchFilters
             });
-            
+
             // Для демонстрации пока просто эмулируем окончание поиска
             setTimeout(() => {
                 this.isSearching = false;
             }, 500);
         },
-        
+
         // Очистка поиска
         clearSearch() {
             this.searchQuery = "";
             this.searchResults = [];
             this.searchError = null;
         },
-        
+
         // Переход к результату
         navigateToResult(result) {
             this.closeSearchModal();
-            
+
             if (result.type === 'folder') {
                 // Раскрываем папку в дереве
                 this.expandFolderPath(result.id);
@@ -175,21 +175,21 @@ export default {
                     params: { id: result.id },
                 });
             }
-            
+
             this.showToast(`Открыт: ${result.name}`, "success");
         },
-        
+
         // Вспомогательные методы для навигации
         expandFolderPath(folderId) {
             const findAndExpandPath = (items, targetId, parents = []) => {
                 if (!items) return false;
-                
+
                 for (const item of items) {
                     if (item.id === targetId) {
                         parents.forEach(p => this.expandedFolders.add(p));
                         return true;
                     }
-                    
+
                     if (item.children || item.items) {
                         const children = item.children || item.items;
                         if (findAndExpandPath(children, targetId, [...parents, item.id])) {
@@ -199,26 +199,26 @@ export default {
                 }
                 return false;
             };
-            
+
             if (this.menu && Array.isArray(this.menu)) {
                 findAndExpandPath(this.menu, folderId);
             }
         },
-        
+
         highlightElement(elementId) {
             this.$nextTick(() => {
                 const element = document.getElementById(elementId);
                 if (element) {
                     element.classList.add('search-highlight');
                     element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    
+
                     setTimeout(() => {
                         element.classList.remove('search-highlight');
                     }, 2000);
                 }
             });
         },
-        
+
         // Фильтрация результатов по типу
         setFilter(type) {
             this.searchFilters.type = type;
@@ -226,7 +226,7 @@ export default {
                 this.handleSearch();
             }
         },
-        
+
         // Остальные методы (save, prepareFolderOptions, и т.д.) остаются без изменений
         save() {
             let form = { name: this.folderTitle };
@@ -709,84 +709,44 @@ export default {
 </script>
 
 <template>
-    <CSidebar
-        class="border-end"
-        colorScheme="light"
-        position="fixed"
-        :unfoldable="sidebar.unfoldable"
-        :visible="sidebar.visible"
-        @visible-change="(value) => sidebar.toggleVisible(value)"
-    >
+    <CSidebar class="border-end" colorScheme="light" position="fixed" :unfoldable="sidebar.unfoldable"
+        :visible="sidebar.visible" @visible-change="(value) => sidebar.toggleVisible(value)">
         <CSidebarHeader class="border-bottom">
             <RouterLink custom to="/" v-slot="{ href, navigate }">
-                <CSidebarBrand
-                    v-bind="$attrs"
-                    class="w-100"
-                    as="a"
-                    :href="href"
-                    @click="navigate"
-                >
-                    <img
-                        class="w-100 object-fit-contain"
-                        :src="logo"
-                        alt=""
-                        v-if="logo"
-                    />
+                <CSidebarBrand v-bind="$attrs" class="w-100" as="a" :href="href" @click="navigate">
+                    <img class="w-100 object-fit-contain" :src="logo" alt="" v-if="logo" />
                 </CSidebarBrand>
             </RouterLink>
-            <CCloseButton
-                class="d-lg-none"
-                dark
-                @click="sidebar.toggleVisible()"
-            />
+            <!-- <CCloseButton class="d-lg-none11" dark @click="sidebar.toggleVisible()" /> -->
         </CSidebarHeader>
-        
-        <!-- Поле поиска в сайдбаре -->
+
         <div class="sidebar-search p-2 border-bottom">
-            <div class="input-group">
-                <span class="input-group-text bg-transparent border-end-0">
+            <div class="input-group d-flex justify-content-end">
+
+                <button class="btn btn-outline-secondary" type="button" @click="openSearchModal">
                     <i class="bi bi-search"></i>
-                </span>
-                <input 
-                    type="text" 
-                    class="form-control border-start-0 ps-0"
-                    placeholder="Поиск..."
-                    @click="openSearchModal"
-                    readonly
-                />
-                <button 
-                    class="btn btn-outline-secondary" 
-                    type="button"
-                    @click="openSearchModal"
-                >
-                    <i class="bi bi-arrow-right"></i>
                 </button>
+                <button class="btn btn-outline-secondary" type="button" @click="addFirstLevel"
+                    v-if="auths.role == 'ceo' || auths.role == 'admin'">
+                    <i class="bi bi-plus"></i>
+                </button>
+
             </div>
         </div>
-        
+
         <SidebarNav :showContextMenu="showContextMenu" :menu="menu" />
 
-        <button
-            class="btn btn btn-light p-0"
-            @click="addFirstLevel"
-            v-if="auths.role == 'ceo' || auths.role == 'admin'"
-        >
-            <i class="bi bi-plus fs-4" aria-hidden="true"></i>
-        </button>
+
         <CSidebarFooter class="border-top d-none d-lg-flex">
             <CSidebarToggler @click="sidebar.toggleUnfoldable()" />
         </CSidebarFooter>
 
         <!-- Модальное окно для создания/редактирования папки -->
-        <CModal
-            :visible="visibleModalFolder"
-            @close="
-                () => {
-                    visibleModalFolder = false;
-                }
-            "
-            aria-labelledby="FolderLabel"
-        >
+        <CModal :visible="visibleModalFolder" @close="
+            () => {
+                visibleModalFolder = false;
+            }
+        " aria-labelledby="FolderLabel">
             <CModalHeader>
                 <CModalTitle id="FolderLabel">
                     {{ folderId ? "Редактирование папки" : "Новая папка" }}
@@ -795,56 +755,38 @@ export default {
             <CModalBody>
                 <div class="w-100 d-flex flex-column gap-4">
                     <div class="w-100 d-flex flex-column gap-2">
-                        <CFormInput
-                            v-model="folderTitle"
-                            v-on:keyup.enter="
-                                () => {
-                                    save();
-                                }
-                            "
-                            name="folderName"
-                            type="text"
-                            placeholder="Новое имя папки"
-                        />
+                        <CFormInput v-model="folderTitle" v-on:keyup.enter="
+                            () => {
+                                save();
+                            }
+                        " name="folderName" type="text" placeholder="Новое имя папки" />
                     </div>
                 </div>
             </CModalBody>
             <CModalFooter>
-                <CButton
-                    color="secondary"
-                    @click="
-                        () => {
-                            visibleModalFolder = false;
-                        }
-                    "
-                >
+                <CButton color="secondary" @click="
+                    () => {
+                        visibleModalFolder = false;
+                    }
+                ">
                     Отмена
                 </CButton>
-                <CButton
-                    color="primary"
-                    @click="
-                        () => {
-                            save();
-                        }
-                    "
-                    >Сохранить</CButton
-                >
+                <CButton color="primary" @click="
+                    () => {
+                        save();
+                    }
+                ">Сохранить</CButton>
             </CModalFooter>
         </CModal>
 
         <!-- Модальное окно для изменения родительской папки файла -->
-        <CModal
-            :visible="visibleModalChangeFolder"
-            @close="
-                () => {
-                    visibleModalChangeFolder = false;
-                    selectedNewFolderId = null;
-                    selectedFileCurrentFolderId = null;
-                }
-            "
-            aria-labelledby="ChangeFolderLabel"
-            size="lg"
-        >
+        <CModal :visible="visibleModalChangeFolder" @close="
+            () => {
+                visibleModalChangeFolder = false;
+                selectedNewFolderId = null;
+                selectedFileCurrentFolderId = null;
+            }
+        " aria-labelledby="ChangeFolderLabel" size="lg">
             <CModalHeader>
                 <CModalTitle id="ChangeFolderLabel">
                     Изменение папки для файла
@@ -875,76 +817,48 @@ export default {
 
                     <div class="folder-selector">
                         <h6>Выберите новую папку:</h6>
-                        <div
-                            class="folder-list border rounded p-3"
-                            style="max-height: 300px; overflow-y: auto"
-                        >
-                            <div
-                                v-for="folder in folderOptions"
-                                :key="folder.id"
-                                class="folder-item py-2 px-3 border-bottom cursor-pointer"
-                                :class="{
+                        <div class="folder-list border rounded p-3" style="max-height: 300px; overflow-y: auto">
+                            <div v-for="folder in folderOptions" :key="folder.id"
+                                class="folder-item py-2 px-3 border-bottom cursor-pointer" :class="{
                                     'bg-primary text-white':
                                         selectedNewFolderId === folder.id,
                                     'disabled-item':
                                         folder.id ===
                                         selectedFileCurrentFolderId,
-                                }"
-                                @click="
+                                }" @click="
                                     folder.id !== selectedFileCurrentFolderId &&
-                                        selectFolder(folder.id)
-                                "
-                                :style="{
+                                    selectFolder(folder.id)
+                                    " :style="{
                                     paddingLeft:
                                         folder.level * 20 +
                                         10 +
                                         'px !important',
-                                }"
-                                :title="
-                                    folder.id === selectedFileCurrentFolderId
+                                }" :title="folder.id === selectedFileCurrentFolderId
                                         ? 'Файл уже находится в этой папке'
                                         : ''
-                                "
-                            >
+                                    ">
                                 <div class="d-flex align-items-center">
-                                    <i
-                                        class="bi me-2"
-                                        :class="
-                                            folder.id ===
+                                    <i class="bi me-2" :class="folder.id ===
                                             selectedFileCurrentFolderId
-                                                ? 'bi-folder-check text-success'
-                                                : 'bi-folder'
-                                        "
-                                    ></i>
+                                            ? 'bi-folder-check text-success'
+                                            : 'bi-folder'
+                                        "></i>
                                     {{ folder.name }}
-                                    <span
-                                        v-if="
-                                            folder.id ===
-                                            selectedFileCurrentFolderId
-                                        "
-                                        class="badge bg-secondary ms-2"
-                                        >текущая</span
-                                    >
-                                    <small
-                                        v-else-if="folder.level > 0"
-                                        class="text-muted ms-2"
-                                        >(уровень {{ folder.level }})</small
-                                    >
+                                    <span v-if="
+                                        folder.id ===
+                                        selectedFileCurrentFolderId
+                                    " class="badge bg-secondary ms-2">текущая</span>
+                                    <small v-else-if="folder.level > 0" class="text-muted ms-2">(уровень {{ folder.level
+                                        }})</small>
                                 </div>
                             </div>
-                            <div
-                                v-if="folderOptions.length === 0"
-                                class="text-muted text-center py-3"
-                            >
+                            <div v-if="folderOptions.length === 0" class="text-muted text-center py-3">
                                 Нет доступных папок
                             </div>
                         </div>
                     </div>
 
-                    <div
-                        class="selected-folder-info alert alert-success"
-                        v-if="selectedNewFolderId"
-                    >
+                    <div class="selected-folder-info alert alert-success" v-if="selectedNewFolderId">
                         <strong>Выбрана папка:</strong>
                         {{
                             folderOptions.find(
@@ -953,53 +867,35 @@ export default {
                         }}
                     </div>
 
-                    <div
-                        class="alert alert-warning"
-                        v-if="
-                            selectedNewFolderId === selectedFileCurrentFolderId
-                        "
-                    >
-                        <small
-                            >Выбрана текущая папка файла. Выберите другую папку
-                            для перемещения.</small
-                        >
+                    <div class="alert alert-warning" v-if="
+                        selectedNewFolderId === selectedFileCurrentFolderId
+                    ">
+                        <small>Выбрана текущая папка файла. Выберите другую папку
+                            для перемещения.</small>
                     </div>
                 </div>
             </CModalBody>
             <CModalFooter>
-                <CButton
-                    color="secondary"
-                    @click="
-                        () => {
-                            visibleModalChangeFolder = false;
-                            selectedNewFolderId = null;
-                            selectedFileCurrentFolderId = null;
-                        }
-                    "
-                >
+                <CButton color="secondary" @click="
+                    () => {
+                        visibleModalChangeFolder = false;
+                        selectedNewFolderId = null;
+                        selectedFileCurrentFolderId = null;
+                    }
+                ">
                     Отмена
                 </CButton>
-                <CButton
-                    color="primary"
-                    @click="saveFolderChange"
-                    :disabled="
-                        !selectedNewFolderId ||
-                        selectedNewFolderId === selectedFileCurrentFolderId
-                    "
-                >
+                <CButton color="primary" @click="saveFolderChange" :disabled="!selectedNewFolderId ||
+                    selectedNewFolderId === selectedFileCurrentFolderId
+                    ">
                     Сохранить
                 </CButton>
             </CModalFooter>
         </CModal>
 
         <!-- Модальное окно поиска -->
-        <CModal
-            :visible="visibleSearchModal"
-            @close="closeSearchModal"
-            aria-labelledby="SearchModalLabel"
-            size="lg"
-            backdrop="static"
-        >
+        <CModal :visible="visibleSearchModal" @close="closeSearchModal" aria-labelledby="SearchModalLabel" size="lg"
+            backdrop="static">
             <CModalHeader>
                 <CModalTitle id="SearchModalLabel">
                     <i class="bi bi-search me-2"></i>
@@ -1014,20 +910,11 @@ export default {
                             <span class="input-group-text bg-white border-end-0">
                                 <i class="bi bi-search text-muted"></i>
                             </span>
-                            <input
-                                ref="searchInput"
-                                type="text"
-                                class="form-control border-start-0 border-end-0"
-                                placeholder="Введите текст для поиска (минимум 2 символа)..."
-                                v-model="searchQuery"
-                                @keyup.enter="handleSearch"
-                            />
-                            <button
-                                class="btn btn-primary"
-                                type="button"
-                                @click="handleSearch"
-                                :disabled="isSearching || searchQuery.length < 2"
-                            >
+                            <input ref="searchInput" type="text" class="form-control border-start-0 border-end-0"
+                                placeholder="Введите текст для поиска (минимум 2 символа)..." v-model="searchQuery"
+                                @keyup.enter="handleSearch" />
+                            <button class="btn btn-primary" type="button" @click="handleSearch"
+                                :disabled="isSearching || searchQuery.length < 2">
                                 <span v-if="isSearching">
                                     <span class="spinner-border spinner-border-sm me-2" role="status"></span>
                                     Поиск...
@@ -1047,43 +934,22 @@ export default {
                     <!-- Фильтры поиска -->
                     <div class="search-filters mb-4" v-if="searchQuery.length >= 2">
                         <div class="btn-group w-100" role="group">
-                            <input
-                                type="radio"
-                                class="btn-check"
-                                name="searchFilter"
-                                id="filterAll"
-                                value="all"
-                                v-model="searchFilters.type"
-                                @change="handleSearch"
-                            />
+                            <input type="radio" class="btn-check" name="searchFilter" id="filterAll" value="all"
+                                v-model="searchFilters.type" @change="handleSearch" />
                             <label class="btn btn-outline-secondary" for="filterAll">
                                 <i class="bi bi-grid-3x3-gap-fill me-2"></i>
                                 Все
                             </label>
 
-                            <input
-                                type="radio"
-                                class="btn-check"
-                                name="searchFilter"
-                                id="filterFolders"
-                                value="folders"
-                                v-model="searchFilters.type"
-                                @change="handleSearch"
-                            />
+                            <input type="radio" class="btn-check" name="searchFilter" id="filterFolders" value="folders"
+                                v-model="searchFilters.type" @change="handleSearch" />
                             <label class="btn btn-outline-secondary" for="filterFolders">
                                 <i class="bi bi-folder me-2"></i>
                                 Папки
                             </label>
 
-                            <input
-                                type="radio"
-                                class="btn-check"
-                                name="searchFilter"
-                                id="filterFiles"
-                                value="files"
-                                v-model="searchFilters.type"
-                                @change="handleSearch"
-                            />
+                            <input type="radio" class="btn-check" name="searchFilter" id="filterFiles" value="files"
+                                v-model="searchFilters.type" @change="handleSearch" />
                             <label class="btn btn-outline-secondary" for="filterFiles">
                                 <i class="bi bi-file-text me-2"></i>
                                 Файлы
@@ -1125,25 +991,18 @@ export default {
                         </div>
 
                         <div class="list-group">
-                            <div
-                                v-for="result in searchResults"
-                                :key="result.id"
+                            <div v-for="result in searchResults" :key="result.id"
                                 class="list-group-item list-group-item-action search-result-item"
-                                @click="navigateToResult(result)"
-                            >
+                                @click="navigateToResult(result)">
                                 <div class="d-flex align-items-center">
                                     <!-- Иконка в зависимости от типа -->
                                     <div class="result-icon me-3">
-                                        <i 
-                                            class="bi" 
-                                            :class="{
-                                                'bi-folder text-warning': result.type === 'folder',
-                                                'bi-file-text text-primary': result.type === 'file',
-                                                'bi-file-earmark-text text-info': result.type === 'document',
-                                                'bi-file-earmark text-secondary': !result.type
-                                            }"
-                                            style="font-size: 1.5rem;"
-                                        ></i>
+                                        <i class="bi" :class="{
+                                            'bi-folder text-warning': result.type === 'folder',
+                                            'bi-file-text text-primary': result.type === 'file',
+                                            'bi-file-earmark-text text-info': result.type === 'document',
+                                            'bi-file-earmark text-secondary': !result.type
+                                        }" style="font-size: 1.5rem;"></i>
                                     </div>
 
                                     <!-- Информация о результате -->
@@ -1159,13 +1018,13 @@ export default {
                                                 {{ result.type || 'объект' }}
                                             </span>
                                         </div>
-                                        
+
                                         <!-- Путь к объекту -->
                                         <div class="result-path small text-muted mt-1" v-if="result.path">
                                             <i class="bi bi-folder me-1"></i>
                                             {{ result.path }}
                                         </div>
-                                        
+
                                         <!-- Дополнительная информация -->
                                         <div class="result-meta small text-muted mt-1">
                                             <span v-if="result.created_at" class="me-3">
@@ -1201,27 +1060,16 @@ export default {
                 </div>
             </CModalBody>
             <CModalFooter>
-                <CButton
-                    color="secondary"
-                    @click="closeSearchModal"
-                >
+                <CButton color="secondary" @click="closeSearchModal">
                     Закрыть
                 </CButton>
             </CModalFooter>
         </CModal>
 
-        <ContextMenu
-            v-if="showMenu && auths.id && auths.role != 'user'"
-            :actions="
-                treeType == 'folder'
-                    ? contextMenuActionsFolder
-                    : contextMenuActionsFile
-            "
-            @action-clicked="handleActionClick"
-            :x="menuX"
-            :y="menuY"
-            :treeUserId="treeUserId"
-        />
+        <ContextMenu v-if="showMenu && auths.id && auths.role != 'user'" :actions="treeType == 'folder'
+                ? contextMenuActionsFolder
+                : contextMenuActionsFile
+            " @action-clicked="handleActionClick" :x="menuX" :y="menuY" :treeUserId="treeUserId" />
 
         <div class="overlay" @click="closeContextMenu" v-if="showMenu" />
     </CSidebar>
@@ -1232,15 +1080,19 @@ export default {
     cursor: pointer;
     transition: background-color 0.2s;
 }
+
 .folder-item:hover:not(.disabled-item) {
     background-color: #7c7e80;
 }
+
 .cursor-pointer {
     cursor: pointer;
 }
+
 .folder-list {
     min-height: 150px;
 }
+
 .disabled-item {
     opacity: 0.6;
     cursor: not-allowed !important;
@@ -1289,6 +1141,7 @@ export default {
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
