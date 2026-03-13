@@ -5,7 +5,7 @@
             <RouterLink custom to="/" v-slot="{ href, navigate }">
                 <CSidebarBrand v-bind="$attrs" class="w-100" as="a" :href="href" @click="navigate">
                     <img class="w-100 object-fit-contain" :src="logo" alt="" v-if="logo" />
-                    
+
                 </CSidebarBrand>
                 <CSidebarToggler @click="sidebar.toggleUnfoldable()" />
             </RouterLink>
