@@ -77,6 +77,7 @@ class TreeController extends Controller
         $about = About::first();
         $content = Content::first();
         $tree = null;
+
         switch ($role) {
             case 'ceo':
                 $tree = Tree::where("user_id", Auth::user()->id)->get();
@@ -84,7 +85,7 @@ class TreeController extends Controller
                 $cd = Content::where('accessibilitymanagers', true)->pluck('tree_id')->toArray();
 
                 foreach ($cd as $key => $c) {
-                    
+
                     if (
                         Tree::where('id', $c)->where('user_id', Auth::user()->id)->first()
                     ) {
@@ -96,20 +97,26 @@ class TreeController extends Controller
                     $all = array_merge($cd, $this->uploadTree($cd));
                     $s = Tree::whereIn('id', $all)->whereIn('user_id', User::pluck('id')->toArray())->get();
                     $users = User::whereIn('id', $s->pluck("user_id")->toArray())->get()->keyBy("id");
-
                     $userArray = [];
                     foreach ($users as $user) {
                         $userArray[] = ['id' => "user_" . $user->id, 'user_id' => $user->id, 'name' => $user->name, 'type' => 'folder', 'tree_id' => null];
                     }
                     $new_collection = collect($s)->map(function ($arr) use ($users) {
+
                         $arr['tree_id'] = $arr['tree_id'] ?: "user_" . $users[$arr->user_id]['id'];
+
                         return $arr;
                     });
 
                     $managersFiles = array_merge($userArray, $new_collection->toArray());
                     // return $tree;
                 }
+
                 $tree = array_merge($tree->toArray(), $managersFiles);
+                $fileIds = array_column(
+                    array_filter($tree, fn($item) => $item['type'] === 'file'),
+                    'id'
+                );
                 break;
             case 'admin':
                 $tree = Tree::whereIn('user_id', User::pluck('id')->toArray())->get();
@@ -123,6 +130,10 @@ class TreeController extends Controller
                     return $arr;
                 });
                 $tree = array_merge($userArray, $new_collection->toArray());
+                $fileIds = array_column(
+                    array_filter($tree, fn($item) => $item['type'] === 'file'),
+                    'id'
+                );
                 break;
             case 'user':
                 $a = UserGroups::where("user_id", Auth::user()->id)->first("group_id");
@@ -131,8 +142,8 @@ class TreeController extends Controller
                     $c = Available::where('group_id', $a->group_id)->pluck('tree_id')->toArray();
                 }
                 $cd = Content::where('accessibility', true)->pluck('tree_id')->toArray();
+                $tree=[];
                 $c = array_merge($c, $cd);
-
                 if (count($c) > 0) {
                     $all = array_merge($c, $this->uploadTree($c));
                     $tree = Tree::whereIn('id', $all)->whereIn('user_id', User::pluck('id')->toArray())->get();
@@ -147,9 +158,13 @@ class TreeController extends Controller
                     });
                     $tree = array_merge($userArray, $new_collection->toArray());
                 }
+                $fileIds = array_column(
+                    array_filter($tree, fn($item) => $item['type'] === 'file'),
+                    'id'
+                );
                 break;
         }
-        return response()->json(['success' => true, 'user' => ["id" => Auth::user()->id, "name" => Auth::user()->name, "role" => $role], 'menu' => $tree, "about" => $about, "content" => $content]);
+        return response()->json(['success' => true, 'allId' => $fileIds, 'user' => ["id" => Auth::user()->id, "name" => Auth::user()->name, "role" => $role], 'menu' => $tree, "about" => $about, "content" => $content]);
     }
     protected $fatherChild = [];
     public function uploadTree($childTree)

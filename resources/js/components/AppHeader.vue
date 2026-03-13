@@ -1,85 +1,90 @@
 <template>
-    <CHeader position="sticky" :class="headerClassNames" id="headerOne" >
+    <CHeader position="sticky" :class="headerClassNames" id="headerOne">
+
         <CContainer class="border-bottom px-4" fluid>
-            <CHeaderToggler
-                @click="sidebar.toggleVisible()"
-                style="margin-inline-start: -14px"
-            >
+            <CHeaderToggler @click="sidebar.toggleVisible()" style="margin-inline-start: -14px">
                 <i class="bi bi-list" aria-hidden="true" v-if="auths.id"></i>
             </CHeaderToggler>
             <CHeaderNav>
                 <li class="nav-item py-1">
                     <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
                 </li>
-                <li
-                    class="nav-item d-flex align-items-center justify-content-center"
-                >
-                    <div
-                        v-if="modeTheme == 'light'"
-                        :active="colorMode === 'light'"
-                        class="d-flex align-items-center"
-                        component="button"
-                        type="button"
-                        @click="
+                <li class="nav-item d-flex align-items-center justify-content-center">
+                    <div v-if="modeTheme == 'light'" :active="colorMode === 'light'" class="d-flex align-items-center"
+                        component="button" type="button" @click="
                             setColorMode('dark');
-                            modeTheme = 'dark';
-                        "
-                    >
+                        modeTheme = 'dark';
+                        ">
                         <i class="bi bi-sun-fill"></i>
                     </div>
-                    <div
-                        v-if="modeTheme == 'dark'"
-                        :active="colorMode === 'dark'"
-                        class="d-flex align-items-center"
-                        component="button"
-                        type="button"
-                        @click="
+                    <div v-if="modeTheme == 'dark'" :active="colorMode === 'dark'" class="d-flex align-items-center"
+                        component="button" type="button" @click="
                             setColorMode('light');
-                            modeTheme = 'light';
-                        "
-                    >
+                        modeTheme = 'light';
+                        ">
                         <i class="bi bi-moon-fill"></i>
                     </div>
                 </li>
 
+                <template v-if="auths.id">
+                    <li class="nav-item py-1">
+                        <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
+                    </li>
+
+                    <li class="nav-item d-flex align-items-center justify-content-center">
+                        <div class="d-flex align-items-center">
+                            <div @click="openSearchModal" class="ps-1 d-flex align-items-center" component="button"
+                                type="button">
+                                <i class="bi bi-search"></i>
+                            </div>
+                        </div>
+                    </li>
+                </template>
+
+
+                <template v-if="auths.id">
+                    <template v-if="auths.role == 'ceo'">
+                        <li class="nav-item py-1">
+                            <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
+                        </li>
+
+                        <li class="nav-item d-flex align-items-center justify-content-center">
+                            <div class="d-flex align-items-center">
+                                <div @click="addFirstLevel" class="ps-1 d-flex align-items-center" component="button"
+                                    type="button">
+                                    <i class="bi bi-folder-plus"></i>
+                                </div>
+                            </div>
+                        </li>
+                    </template>
+
+                </template>
+
+
+
+
                 <li class="nav-item py-1">
                     <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
                 </li>
-                <li
-                    v-if="!auths.id"
-                    class="nav-item d-flex align-items-center justify-content-center"
-                >
+
+                <li v-if="!auths.id" class="nav-item d-flex align-items-center justify-content-center">
                     <div class="d-flex align-items-center">
-                        <div
-                            @click="openWindowFunction"
-                            class="ps-1 d-flex align-items-center"
-                            component="button"
-                            type="button"
-                        >
+                        <div @click="openWindowFunction" class="ps-1 d-flex align-items-center" component="button"
+                            type="button">
                             <i class="bi bi-person-fill"></i>
                         </div>
                     </div>
                 </li>
                 <li>
-                    <CDropdown
-                        placement="bottom-end"
-                        variant="nav-item"
-                        v-if="auths.id"
-                    >
+                    <CDropdown placement="bottom-end" variant="nav-item" v-if="auths.id">
                         <CDropdownToggle class="pe-0" :caret="false">
-                            <i class="bi bi-person-fill"></i>
+                            <i class="bi bi-person-lines-fill"></i>
                         </CDropdownToggle>
                         <CDropdownMenu>
-                            <CDropdownItem
-                                @click="goToAdmin"
-                                v-if="auths.role != 'user'"
-                            >
+                            <CDropdownItem @click="goToAdmin" v-if="auths.role != 'user'">
                                 <i class="bi bi-sliders2"></i> Управление
                             </CDropdownItem>
-                            <CDropdownItem
-                                @click="goToSettings"
-                                v-if="auths.role != 'user'"
-                            >
+                            <CDropdownItem @click="goToSettings" v-if="auths.role != 'user'">
                                 <i class="bi bi-pencil-fill"></i> Смена пароля
                             </CDropdownItem>
 
@@ -92,6 +97,8 @@
             </CHeaderNav>
         </CContainer>
     </CHeader>
+
+
 </template>
 
 <script setup>
@@ -110,7 +117,7 @@ const sidebar = useSidebarStore();
 const auths = useAuthIdStore();
 const router = useRouter();
 
-const props = defineProps(["openWindowFunction", "datasend", "logoutFun"]);
+const props = defineProps(["openWindowFunction", "datasend", "logoutFun", "openSearchModal", "addFirstLevel"]);
 
 onMounted(() => {
     document.addEventListener("scroll", () => {

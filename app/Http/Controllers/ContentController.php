@@ -259,6 +259,58 @@ class ContentController extends Controller
         return response()->json(['success' => true, 'message' => 'Кэш очищен']);
     }
 
+    public function search(Request $request)
+    {
+        //$request->search
+        //  return Tree::all();
+
+        $tree = Tree::whereIn('id', json_decode($request->allId))->whereRaw("upper(name) LIKE '%" . mb_strtoupper($request->search) . "%'")->get();
+        $content = Content::whereIn('tree_id', json_decode($request->allId))->with('tree')->get();
+
+
+        function isFound($jsonArray, $searchTerm)
+        {
+
+            $data = is_string($jsonArray) ? json_decode($jsonArray, true) : $jsonArray;
+
+            if ($data === null) {
+                return false;
+            }
+
+            $searchLower = mb_strtolower($searchTerm, 'UTF-8');
+
+
+            $searchInArray = function ($array) use (&$searchInArray, $searchLower) {
+                foreach ($array as $value) {
+                    if (is_string($value) || is_numeric($value)) {
+
+                        $stringValue = mb_strtolower((string)$value, 'UTF-8');
+                        if (mb_strpos($stringValue, $searchLower) !== false) {
+                            return true;
+                        }
+                    } elseif (is_array($value)) {
+                        if ($searchInArray($value)) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            };
+
+            return $searchInArray($data);
+        }
+
+
+        $results = [];
+        foreach ($content as $cont) {
+
+            isFound(json_decode($cont->data, true), $request->search) ? $results[] = $cont : '';
+        }
+
+
+        return ['tree' => $tree, 'content' => $results];
+    }
+
 
     public function getFiles(Request $request)
     {

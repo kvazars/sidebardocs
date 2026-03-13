@@ -15,7 +15,7 @@ Route::post("/auth", [UserController::class, "auth"]);
 Route::get("/resource/{content}", [ContentController::class, "getResource"]);
 Route::get("/homepage", [TreeController::class, "index"]);
 
-
+Route::post("/search", [ContentController::class, "search"]);
 
 
 
