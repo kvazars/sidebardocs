@@ -8,6 +8,7 @@
     "devDependencies": {
         "@popperjs/core": "^2.11.8",
         "@vitejs/plugin-vue": "^4.6.2",
+        "baseline-browser-mapping": "^2.10.15",
         "eslint": "^9.13.0",
         "eslint-plugin-vue": "^9.30.0",
         "laravel-vite-plugin": "^1.0",

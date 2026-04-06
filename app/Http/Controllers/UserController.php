@@ -56,7 +56,7 @@ class UserController extends Controller
             $token = $user->createToken('api');
             return response()->json(['success' => true, 'token' => $token->plainTextToken, 'name' => $user->name, 'role' => $user->role]);
         } else {
-            return response()->json(['errors' => ["passsword" => ["Ошибка авторизации"]]]);
+            return response()->json(['errors' => ["password" => ["Ошибка авторизации"]]]);
         }
     }
     public function authadmin(Request $request)

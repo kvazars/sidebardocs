@@ -54,10 +54,28 @@ class ContentController extends Controller
         if (!is_dir(filename: $dir)) {
             mkdir($dir);
         }
-        $name = Str::random(40) . "." . $request->file('file')->extension();
+        $uploaded = $request->file('file');
+        $originalName = $uploaded->getClientOriginalName();
+        $size = $uploaded->getSize();
+        $extension = strtolower($uploaded->getClientOriginalExtension());
+        $name = Str::random(40) . "." . $uploaded->extension();
         $pathshort = $dirshort . '/' . $name;
-        Storage::disk("public")->putFileAs($dir, $request->file('file'), $name);
-        return response()->json(['success' => 1, 'file' => ['url' => URL::to('/') . "/" . $pathshort]], 200);
+        Storage::disk("public")->putFileAs($dir, $uploaded, $name);
+        $withoutExt = $originalName !== ''
+            ? pathinfo($originalName, PATHINFO_FILENAME)
+            : pathinfo($name, PATHINFO_FILENAME);
+        $displayName = $withoutExt !== '' ? $withoutExt : $originalName;
+
+        return response()->json([
+            'success' => 1,
+            'file' => [
+                'url' => URL::to('/') . "/" . $pathshort,
+                'name' => $displayName,
+                'title' => $displayName,
+                'size' => $size,
+                'extension' => $extension,
+            ],
+        ], 200);
     }
 
     public function saveImageByUrl(Request $request)
