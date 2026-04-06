@@ -178,18 +178,11 @@ ace.config.setModuleUrl("ace/mode/javascript_worker", modeJSWorker);
 ace.config.setModuleUrl("ace/mode/php_worker", modePHPWorker);
 import RawTool from "@editorjs/raw";
 import Alert from "editorjs-alert";
-import { computed } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthIdStore } from "../stores/authId";
 import TestManagement from "../components/TestManagement.vue";
 import TestCreator from "../components/TestCreator.vue";
 export default {
-    setup() {
-        const postId = computed(() => route.params.id);
-        return {
-            postId,
-        };
-    },
     components: {
         TestManagement,
         TestCreator,

@@ -22,31 +22,31 @@
     </div>
 </template>
 
-<script setup>
+<script>
 import { useSidebarIdStore } from "../stores/sidebarId";
 import { initSidebar } from "vue-sidebar-menu/src/use/useSidebar";
 import SidebarMenuItem from "vue-sidebar-menu/src/components/SidebarMenuItem.vue";
 import SidebarMenuScroll from "vue-sidebar-menu/src/components/SidebarMenuScroll.vue";
 import "vue-sidebar-menu/src/scss/vue-sidebar-menu.scss";
 
-const props = defineProps([
-    "menu",
-    "collapsed",
-    "showContextMenu",
-    "getBreadcrumbs",
-]);
-
-const store = useSidebarIdStore();
-const emits = defineEmits({
-    "item-click"(event, item) {
-        const store = useSidebarIdStore();
-        store.changeId(item.id, item.name);
-        return !!(event && item);
+export default {
+    name: "SidebarNav",
+    components: {
+        SidebarMenuItem,
+        SidebarMenuScroll,
     },
-    "update:collapsed"(collapsed) {
-        return !!(typeof collapsed === "boolean");
+    props: ["menu", "collapsed", "showContextMenu", "getBreadcrumbs"],
+    emits: ["item-click", "update:collapsed"],
+    created() {
+        initSidebar(this.$props, (eventName, ...args) => {
+            if (eventName === "item-click") {
+                const item = args[1];
+                if (item) {
+                    useSidebarIdStore().changeId(item.id, item.name);
+                }
+            }
+            this.$emit(eventName, ...args);
+        });
     },
-});
-
-initSidebar(props, emits);
+};
 </script>

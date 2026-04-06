@@ -15,21 +15,22 @@
     </div>
 </template>
 
-<script setup>
-import { ref, defineProps, defineEmits } from "vue";
+<script>
 import { useAuthIdStore } from "../stores/authId";
 
-const { actions, x, y, treeUserId } = defineProps([
-    "actions",
-    "x",
-    "y",
-    "treeUserId",
-]);
-const emit = defineEmits(["action-clicked"]);
-
-const emitAction = (action) => {
-    emit("action-clicked", action);
+export default {
+    name: "ContextMenu",
+    props: ["actions", "x", "y", "treeUserId"],
+    emits: ["action-clicked"],
+    computed: {
+        store() {
+            return useAuthIdStore();
+        },
+    },
+    methods: {
+        emitAction(action) {
+            this.$emit("action-clicked", action);
+        },
+    },
 };
-
-const store = useAuthIdStore();
 </script>
