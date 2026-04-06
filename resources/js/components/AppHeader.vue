@@ -10,19 +10,16 @@
                     <div class="vr h-100 mx-2 text-body text-opacity-75"></div>
                 </li>
                 <li class="nav-item d-flex align-items-center justify-content-center">
-                    <div v-if="modeTheme == 'light'" :active="colorMode === 'light'" class="d-flex align-items-center"
-                        component="button" type="button" @click="
-                            setColorMode('dark');
-                        modeTheme = 'dark';
-                        ">
-                        <i class="bi bi-sun-fill"></i>
-                    </div>
-                    <div v-if="modeTheme == 'dark'" :active="colorMode === 'dark'" class="d-flex align-items-center"
-                        component="button" type="button" @click="
-                            setColorMode('light');
-                        modeTheme = 'light';
-                        ">
-                        <i class="bi bi-moon-fill"></i>
+                    <div
+                        class="btn btn-link px-2 py-1 text-body text-decoration-none"
+                        role="button"
+                        tabindex="0"
+                        :title="themeCycleTitle"
+                        style="cursor: pointer"
+                        @click="cycleTheme"
+                        @keydown.enter.prevent="cycleTheme"
+                    >
+                        <i :class="themeIconClass"></i>
                     </div>
                 </li>
 
@@ -102,22 +99,74 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useColorModes } from "@coreui/vue";
 
 import { useSidebarStore } from "../stores/sidebar.js";
 import { useAuthIdStore } from "../stores/authId";
+import { useThemeStore } from "../stores/theme.js";
 import { useRouter } from "vue-router";
 
 const headerClassNames = ref("p-0");
 const { colorMode, setColorMode } = useColorModes(
     "coreui-free-vue-admin-template-theme"
 );
+const themeStore = useThemeStore();
 const sidebar = useSidebarStore();
 const auths = useAuthIdStore();
 const router = useRouter();
 
 const props = defineProps(["openWindowFunction", "datasend", "logoutFun", "openSearchModal", "addFirstLevel"]);
+
+const themeIconClass = computed(() => {
+    switch (colorMode.value) {
+        case "dark":
+            return "bi bi-moon-fill";
+        case "light":
+            return "bi bi-sun-fill";
+        default:
+            return "bi bi-circle-half";
+    }
+});
+
+const themeMenuTitle = computed(() => {
+    switch (colorMode.value) {
+        case "dark":
+            return "Тёмная тема";
+        case "light":
+            return "Светлая тема";
+        default:
+            return "Тема как в системе";
+    }
+});
+
+const themeCycleLabels = {
+    light: "Светлая",
+    dark: "Тёмная",
+    auto: "Как в системе",
+};
+
+const themeCycleTitle = computed(() => {
+    const order = ["light", "dark", "auto"];
+    const cur = colorMode.value;
+    const i = order.indexOf(cur);
+    const nextIdx = i === -1 ? 0 : (i + 1) % order.length;
+    const next = order[nextIdx];
+    return `${themeMenuTitle.value} · далее: ${themeCycleLabels[next]} (нажмите)`;
+});
+
+function applyTheme(mode) {
+    setColorMode(mode);
+    themeStore.toggleTheme(mode);
+}
+
+function cycleTheme() {
+    const order = ["light", "dark", "auto"];
+    const cur = colorMode.value;
+    const i = order.indexOf(cur);
+    const nextIdx = i === -1 ? 0 : (i + 1) % order.length;
+    applyTheme(order[nextIdx]);
+}
 
 onMounted(() => {
     document.addEventListener("scroll", () => {
@@ -128,10 +177,6 @@ onMounted(() => {
         }
     });
 });
-
-const modeTheme = ref(
-    localStorage.getItem("coreui-free-vue-admin-template-theme") ?? "light"
-);
 
 function logout() {
     props

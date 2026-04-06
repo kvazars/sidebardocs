@@ -54,7 +54,7 @@
                             <div class="d-flex justify-content-between text-sm">
                                 <small
                                     ><i class="bi bi-question-circle"></i>
-                                    {{ test.questions.length }} вопросов</small
+                                    {{ questionCountLabel(test) }}</small
                                 >
                                 <small
                                     ><i class="bi bi-clock"></i>
@@ -75,6 +75,15 @@
                                 >
                                     <i class="bi bi-shuffle"></i> Перемеш.
                                     ответы
+                                </small>
+                                <small
+                                    v-if="randomSubsetCount(test) > 0"
+                                    class="text-secondary d-block mt-1"
+                                >
+                                    <i class="bi bi-dice5"></i>
+                                    К прохождению случайно
+                                    {{ randomSubsetCount(test) }} из
+                                    {{ test.questions.length }}
                                 </small>
                             </div>
                         </div>
@@ -129,12 +138,25 @@
             <div
                 v-if="
                     selectedTest.settings.shuffleQuestions ||
-                    selectedTest.settings.shuffleAnswers
+                    selectedTest.settings.shuffleAnswers ||
+                    randomSubsetCount(selectedTest) > 0
                 "
                 class="alert alert-info mb-3"
             >
                 <i class="bi bi-shuffle"></i>
                 <strong>Настройки теста:</strong>
+                <span
+                    v-if="randomSubsetCount(selectedTest) > 0"
+                    class="ms-2 d-block mt-1"
+                >
+                    <i class="bi bi-dice5"></i>
+                    Задаётся случайная выборка:
+                    {{ randomSubsetCount(selectedTest) }} вопросов из
+                    {{ selectedTest._bankQuestionCount ||
+                        selectedTest.questions.length
+                    }}
+                    в банке
+                </span>
                 <span
                     v-if="selectedTest.settings.shuffleQuestions"
                     class="ms-2"
@@ -1007,6 +1029,23 @@ export default {
     },
 
     methods: {
+        randomSubsetCount(test) {
+            if (!test?.settings) return 0;
+            const n = parseInt(test.settings.randomQuestionCount, 10);
+            if (!n || n <= 0) return 0;
+            const bank =
+                test._bankQuestionCount ?? test.questions?.length ?? 0;
+            if (n >= bank) return 0;
+            return n;
+        },
+        questionCountLabel(test) {
+            const bank = test.questions?.length ?? 0;
+            const n = this.randomSubsetCount(test);
+            if (n > 0 && n < bank) {
+                return `${bank} в банке, к прохождению - ${n}`;
+            }
+            return `${bank} вопросов`;
+        },
         startNewTest() {
             localStorage.removeItem("testProgress");
             this.savedTestState = null;
@@ -1022,6 +1061,14 @@ export default {
                 this.selectedTest = JSON.parse(JSON.stringify(testToRestore));
                 this.userName = this.savedTestState.userName;
                 this.savedTestState = state;
+                if (
+                    this.savedTestState.selectedQuestionIds &&
+                    this.savedTestState.selectedQuestionIds.length
+                ) {
+                    this.applyQuestionSubsetByIds(
+                        this.savedTestState.selectedQuestionIds
+                    );
+                }
                 this.applyRestoredState();
             } else {
                 this.showToast("Тест не найден", "error");
@@ -1055,6 +1102,9 @@ export default {
                 ),
                 shuffledPairsMap: Array.from(this.shuffledPairsMap.entries()),
                 answeredQuestions: Array.from(this.answeredQuestions),
+                selectedQuestionIds: this.selectedTest.questions.map(
+                    (q) => q.id
+                ),
                 timestamp: Date.now(),
             };
 
@@ -1363,12 +1413,21 @@ export default {
             if (this.tempUserName.trim()) {
                 this.userName = this.tempUserName.trim();
 
-                // Если есть сохраненное состояние и это тот же пользователь
-                if (
+                const restoreMode =
                     this.savedTestState &&
-                    this.savedTestState.userName === this.userName
-                ) {
-                    this.initializeTest();
+                    this.savedTestState.userName === this.userName;
+
+                // Если есть сохраненное состояние и это тот же пользователь
+                if (restoreMode) {
+                    if (
+                        this.savedTestState.selectedQuestionIds &&
+                        this.savedTestState.selectedQuestionIds.length
+                    ) {
+                        this.applyQuestionSubsetByIds(
+                            this.savedTestState.selectedQuestionIds
+                        );
+                    }
+                    this.initializeTest({ skipRandomSubset: true });
                     const restored = this.applyRestoredState();
                     if (restored) {
                         this.showToast(
@@ -1384,7 +1443,46 @@ export default {
             }
         },
 
-        initializeTest() {
+        applyQuestionSubsetByIds(ids) {
+            if (!ids?.length || !this.selectedTest?.questions?.length) {
+                return;
+            }
+            const full = [...this.selectedTest.questions];
+            this.selectedTest._bankQuestionCount = full.length;
+            this.selectedTest.questions = ids
+                .map((id) => full.find((q) => q.id === id))
+                .filter(Boolean);
+        },
+
+        applyRandomQuestionSubset() {
+            const pool = [...this.selectedTest.questions];
+            const bank = pool.length;
+            this.selectedTest._bankQuestionCount = bank;
+            const settings = this.selectedTest.settings || {};
+            const n = parseInt(settings.randomQuestionCount, 10);
+            if (!n || n <= 0 || n >= bank) {
+                return;
+            }
+            for (let i = pool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [pool[i], pool[j]] = [pool[j], pool[i]];
+            }
+            this.selectedTest.questions = pool.slice(0, n);
+        },
+
+        initializeTest(options = {}) {
+            if (!this.selectedTest.settings) {
+                this.selectedTest.settings = {};
+            }
+            if (!options.skipRandomSubset) {
+                this.applyRandomQuestionSubset();
+            } else if (
+                this.selectedTest &&
+                this.selectedTest._bankQuestionCount === undefined
+            ) {
+                this.selectedTest._bankQuestionCount =
+                    this.selectedTest.questions.length;
+            }
             // Перемешиваем вопросы если нужно
             if (this.selectedTest.settings.shuffleQuestions) {
                 this.shuffleQuestions();

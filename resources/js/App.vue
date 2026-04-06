@@ -17,12 +17,21 @@ onBeforeMount(() => {
         theme = theme.match(/^[A-Za-z0-9\s]+/)[0];
     }
 
-    if (theme) {
+    const known = ["light", "dark", "auto"];
+
+    if (theme && known.includes(theme)) {
         setColorMode(theme);
+        currentTheme.toggleTheme(theme);
         return;
     }
 
     if (isColorModeSet()) {
+        const stored = localStorage.getItem(
+            "coreui-free-vue-admin-template-theme"
+        );
+        if (stored && known.includes(stored)) {
+            currentTheme.toggleTheme(stored);
+        }
         return;
     }
 

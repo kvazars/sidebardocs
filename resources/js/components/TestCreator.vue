@@ -141,6 +141,31 @@
                                         </label>
                                     </div>
                                 </div>
+                                <div class="col-12">
+                                    <label class="form-label"
+                                        >Случайная выборка вопросов при
+                                        прохождении</label
+                                    >
+                                    <input
+                                        v-model.number="
+                                            test.settings.randomQuestionCount
+                                        "
+                                        type="number"
+                                        class="form-control"
+                                        style="max-width: 12rem"
+                                        min="0"
+                                        :max="Math.max(test.questions.length, 1)"
+                                        placeholder="0"
+                                    />
+                                    <div class="form-text">
+                                        Укажите, сколько вопросов задавать из
+                                        банка (случайно). Значение
+                                        <strong>0</strong> или пусто —
+                                        задаются все вопросы. Не больше числа
+                                        вопросов в тесте (сейчас в банке:
+                                        {{ test.questions.length }}).
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1001,6 +1026,7 @@ export default {
                 settings: {
                     shuffleQuestions: false,
                     shuffleAnswers: false,
+                    randomQuestionCount: 0,
                 },
                 grading: [
                     {
@@ -1588,6 +1614,16 @@ export default {
             this.error = "";
 
             try {
+                if (this.test.settings) {
+                    let r = parseInt(this.test.settings.randomQuestionCount, 10);
+                    if (isNaN(r) || r < 0) {
+                        r = 0;
+                    }
+                    this.test.settings.randomQuestionCount = Math.min(
+                        r,
+                        this.test.questions.length
+                    );
+                }
                 if (this.isEditing) {
                     this.test.id = this.editTestId;
 
@@ -1642,6 +1678,7 @@ export default {
                 settings: {
                     shuffleQuestions: false,
                     shuffleAnswers: false,
+                    randomQuestionCount: 0,
                 },
                 grading: [
                     {
@@ -1784,7 +1821,11 @@ export default {
                 test.settings = {
                     shuffleQuestions: false,
                     shuffleAnswers: false,
+                    randomQuestionCount: 0,
                 };
+            }
+            if (test.settings.randomQuestionCount === undefined) {
+                test.settings.randomQuestionCount = 0;
             }
 
             if (!test.grading || test.grading.length === 0) {

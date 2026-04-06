@@ -36,6 +36,7 @@ class TestController extends Controller
             'settings' => [
                 'shuffleQuestions' => $request->input('settings.shuffleQuestions', false),
                 'shuffleAnswers' => $request->input('settings.shuffleAnswers', false),
+                'randomQuestionCount' => max(0, min(10000, (int) $request->input('settings.randomQuestionCount', 0))),
             ],
             'grading' => $validated['grading'] ?? null
         ]);
@@ -110,6 +111,7 @@ class TestController extends Controller
             'settings' => [
                 'shuffleQuestions' => $request->input('settings.shuffleQuestions', false),
                 'shuffleAnswers' => $request->input('settings.shuffleAnswers', false),
+                'randomQuestionCount' => max(0, min(10000, (int) $request->input('settings.randomQuestionCount', 0))),
             ],
             'grading' => $validated['grading'] ?? null
         ]);
