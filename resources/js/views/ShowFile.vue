@@ -109,7 +109,7 @@
                 <VCodeBlock
                     :code="val.data.code"
                     highlightjs
-                    label="Пример кода"
+                    label=""
                     :lang="val.data.language"
                     theme="monokai"
                     persistent-copy-button

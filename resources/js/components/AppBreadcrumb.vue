@@ -6,11 +6,7 @@
     </CBreadcrumb>
     <div
         class="dropdown"
-        v-if="
-            $route.name == 'CreateFile' ||
-            $route.name == 'EditFile' ||
-            $route.name == 'ShowFile'
-        "
+        v-if="$route.name == 'ShowFile'"
     >
         <button
             class="btn btn-primary btn-sm"
@@ -21,33 +17,6 @@
             <i class="bi bi-sliders2"></i>
         </button>
         <ul class="dropdown-menu">
-            <template
-                v-if="$route.name == 'EditFile' || $route.name == 'CreateFile'"
-            >
-                <li>
-                    <button class="dropdown-item" @click="save">
-                        <i class="bi bi-floppy2-fill" aria-hidden="true"></i>
-                        Сохранить
-                    </button>
-                </li>
-                <li
-                    v-if="
-                        $route.name == 'EditFile' || $route.name == 'CreateFile'
-                    "
-                >
-                    <button class="dropdown-item" @click="redirectToHome(true)">
-                        <i class="bi bi-x" aria-hidden="true"></i> Отмена
-                    </button>
-                </li>
-                <li v-if="$route.name == 'EditFile'">
-                    <hr class="dropdown-divider" />
-                </li>
-                <li v-if="$route.name == 'EditFile'">
-                    <button class="dropdown-item" @click="deleteFile">
-                        <i class="bi bi-trash" aria-hidden="true"></i> Удалить
-                    </button>
-                </li>
-            </template>
             <template v-if="$route.name == 'ShowFile' && content">
                 <li>
                     <router-link

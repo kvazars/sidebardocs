@@ -25,23 +25,43 @@ class ContentController extends Controller
 
     public function saveImage(Request $request)
     {
-        if (!is_dir(public_path("contentImages"))) {
-            mkdir(public_path("contentImages"));
-        }
+        try {
+            if (!$request->file('image')) {
+                return response()->json(['success' => 0, 'message' => 'Файл не найден'], 400);
+            }
 
-        $dirshort = "contentImages/" . Auth::user()->id;
-        $dir = public_path($dirshort);
-        if (!is_dir($dir)) {
-            mkdir($dir);
-        }
-        if ($request->file('image')) {
-            $path   = Image::read($request->file('image'));
-            $resize = $path->scaleDown(1024, 1024)->toWebp(90);
-            $name = Str::random(40) . ".webp";
-            $path = "{$dir}/{$name}";
-            $pathshort = "{$dirshort}/{$name}";
-            Storage::disk("public")->put($path, $resize);
-            return response()->json(['success' => 1, 'file' => ['url' => URL::to('/') . "/" . $pathshort]], 200);
+            $userId = Auth::user()->id;
+            $dirshort = "contentImages/{$userId}";
+            
+            // Получаем файл
+            $file = $request->file('image');
+            $mimeType = $file->getMimeType();
+            
+            // Определяем расширение
+            if ($mimeType === 'image/png') {
+                $extension = 'png';
+            } elseif ($mimeType === 'image/jpeg') {
+                $extension = 'jpg';
+            } elseif ($mimeType === 'image/gif') {
+                $extension = 'gif';
+            } else {
+                $extension = $file->getClientOriginalExtension() ?: 'bin';
+            }
+            
+            $name = Str::random(40) . "." . $extension;
+            $fullPath = "{$dirshort}/{$name}";
+            
+            // Сохраняем файл напрямую
+            $file->storeAs($dirshort, $name, 'public');
+            
+            \Log::info("Изображение успешно сохранено: $fullPath");
+            
+            // Возвращаем URL, доступный из браузера
+            $url = asset("storage/{$fullPath}");
+            return response()->json(['success' => 1, 'file' => ['url' => $url]], 200);
+        } catch (\Exception $e) {
+            \Log::error('Ошибка сохранения изображения: ' . $e->getMessage());
+            return response()->json(['success' => 0, 'message' => $e->getMessage()], 500);
         }
     }
     public function saveFile(UploadFileRequest $request)

@@ -115,8 +115,65 @@
                     </CCardBody>
                 </CCard>
                 <CCard>
-                    <CCardHeader>Содержимое</CCardHeader>
+                    <CCardHeader class="d-flex justify-content-between align-items-center">
+                        <span>Содержимое</span>
+                        <div class="d-flex gap-2">
+                            <button 
+                                class="btn btn-sm btn-danger text-white"
+                                @click="deleteResource"
+                                v-if="this.$route.params.id"
+                                title="Удалить документ"
+                            >
+                                <i class="bi bi-trash me-1"></i>Удалить
+                            </button>
+                            <button 
+                                class="btn btn-sm btn-secondary text-white"
+                                @click="cancel"
+                                title="Отменить и вернуться"
+                            >
+                                <i class="bi bi-x-circle me-1"></i>Отмена
+                            </button>
+                            <button 
+                                class="btn btn-sm btn-success text-white"
+                                @click="save"
+                                title="Сохранить документ"
+                            >
+                                <i class="bi bi-check-circle me-1"></i>Сохранить
+                            </button>
+                            <button 
+                                class="btn btn-sm btn-info text-white"
+                                @click="triggerImportDocx"
+                                title="Импортировать содержимое из DOCX файла"
+                            >
+                                <i class="bi bi-file-word me-1"></i>Импорт DOCX
+                            </button>
+                            <button 
+                                class="btn btn-sm btn-info text-white"
+                                @click="triggerImportPptx"
+                                title="Импортировать содержимое из PPTX файла"
+                            >
+                                <i class="bi bi-file-slides me-1"></i>Импорт PPTX
+                            </button>
+                            <input
+                                ref="docxFileInput"
+                                type="file"
+                                accept=".docx"
+                                style="display: none"
+                                @change="handleDocxImport"
+                            />
+                            <input
+                                ref="pptxFileInput"
+                                type="file"
+                                accept=".pptx"
+                                style="display: none"
+                                @change="handlePptxImport"
+                            />
+                        </div>
+                    </CCardHeader>
                     <CCardBody class="p-1">
+                        <div v-if="importError" class="alert alert-danger mb-2">
+                            {{ importError }}
+                        </div>
                         <div id="editorjs"></div>
                     </CCardBody>
                 </CCard>
@@ -182,6 +239,8 @@ import { useRouter } from "vue-router";
 import { useAuthIdStore } from "../stores/authId";
 import TestManagement from "../components/TestManagement.vue";
 import TestCreator from "../components/TestCreator.vue";
+import { importDocxToEditorJS, validateDocxFile } from "../utils/importFromDocx";
+import { importPptxToEditorJS, validatePptxFile } from "../utils/importFromPptx";
 export default {
     components: {
         TestManagement,
@@ -287,6 +346,7 @@ export default {
             tabPaneActiveKey: 1,
             currentView: "management",
             editTestId: null,
+            importError: null,
         };
     },
     methods: {
@@ -294,6 +354,195 @@ export default {
             this.currentView = view;
             this.editTestId = id;
         },
+
+        // Открывает диалог выбора файла DOCX
+        triggerImportDocx() {
+            this.$refs.docxFileInput.click();
+        },
+
+        // Открывает диалог выбора файла PPTX
+        triggerImportPptx() {
+            this.$refs.pptxFileInput.click();
+        },
+
+        // Обрабатывает импорт DOCX файла
+        async handleDocxImport(event) {
+            this.importError = null;
+            const file = event.target.files[0];
+
+            if (!file) return;
+
+            try {
+                // Валидируем файл
+                validateDocxFile(file);
+
+                // Показываем сообщение о загрузке
+                this.showToast("Импортирование документа...", "info");
+
+                // Импортируем содержимое из DOCX
+                const blocks = await importDocxToEditorJS(file);
+
+                if (!blocks || blocks.length === 0) {
+                    throw new Error("Не удалось извлечь содержимое из документа");
+                }
+
+                // Получаем последний блок для вставки после него
+                const lastBlockIndex = this.editor.blocks.getBlocksCount() - 1;
+
+                // Добавляем импортированные блоки в конец редактора
+                for (const block of blocks) {
+                    if (block && block.type) {
+                        try {
+                            await this.editor.blocks.insert(
+                                block.type,
+                                block.data,
+                                undefined,
+                                false
+                            );
+                        } catch (error) {
+                            console.warn(
+                                `Не удалось добавить блок типа ${block.type}:`,
+                                error
+                            );
+                        }
+                    }
+                }
+
+                this.showToast(
+                    `Успешно добавлено ${blocks.length} блоков из документа`,
+                    "success"
+                );
+
+                // Очищаем input для возможности повторного выбора того же файла
+                event.target.value = "";
+            } catch (error) {
+                console.error("Ошибка импорта DOCX:", error);
+                this.importError = error.message || "Ошибка при импорте документа";
+                this.showToast(this.importError, "danger");
+                event.target.value = "";
+            }
+        },
+
+        // Обрабатывает импорт PPTX файла
+        async handlePptxImport(event) {
+            this.importError = null;
+            const file = event.target.files[0];
+
+            if (!file) return;
+
+            try {
+                // Валидируем файл
+                validatePptxFile(file);
+
+                // Показываем сообщение о загрузке
+                this.showToast("Импортирование презентации...", "info");
+
+                // Функция для загрузки изображения на сервер
+                const uploadImage = async (imageBlob) => {
+                    // Пропускаем большие файлы (>2MB)
+                    if (imageBlob.size > 2000000) {
+                        console.warn('Изображение слишком большое, пропускаем:', imageBlob.size, 'байт');
+                        return null;
+                    }
+                    
+                    console.log('Загружаю изображение, размер:', imageBlob.size, 'байт, тип:', imageBlob.type);
+                    const formData = new FormData();
+                    formData.append('image', imageBlob, 'image.jpg');
+                    
+                    try {
+                        const response = await this.datasend('saveImage', 'POST', formData, true);
+                        console.log('Ответ сервера:', response);
+                        if (response.success) {
+                            return response.file.url;
+                        } else {
+                            throw new Error('Ошибка загрузки изображения: ' + (response.message || 'Unknown error'));
+                        }
+                    } catch (error) {
+                        console.error('Ошибка загрузки изображения:', error);
+                        return null;
+                    }
+                };
+
+                // Импортируем содержимое из PPTX
+                const blocks = await importPptxToEditorJS(file, uploadImage);
+
+                if (!blocks || blocks.length === 0) {
+                    throw new Error("Не удалось извлечь содержимое из презентации");
+                }
+
+                // Добавляем импортированные блоки в конец редактора
+                for (const block of blocks) {
+                    if (block && block.type) {
+                        try {
+                            await this.editor.blocks.insert(
+                                block.type,
+                                block.data,
+                                undefined,
+                                false
+                            );
+                        } catch (error) {
+                            console.warn(
+                                `Не удалось добавить блок типа ${block.type}:`,
+                                error
+                            );
+                        }
+                    }
+                }
+
+                this.showToast(
+                    `Успешно добавлено ${blocks.length} блоков из презентации`,
+                    "success"
+                );
+
+                // Очищаем input для возможности повторного выбора того же файла
+                event.target.value = "";
+            } catch (error) {
+                console.error("Ошибка импорта PPTX:", error);
+                this.importError = error.message || "Ошибка при импорте презентации";
+                this.showToast(this.importError, "danger");
+                event.target.value = "";
+            }
+        },
+
+        // Отмена и возврат назад
+        cancel() {
+            this.$router.go(-1);
+        },
+
+        // Удаление документа
+        deleteResource() {
+            if (!confirm('Вы уверены, что хотите удалить этот документ?')) {
+                return;
+            }
+
+            if (!this.$route.params.id) {
+                this.showToast("Ошибка: ID документа не найден", "danger");
+                return;
+            }
+
+            try {
+                this.datasend("resource/" + this.$route.params.id, "DELETE", {})
+                    .then((res) => {
+                        if (res.success) {
+                            this.showToast("Документ успешно удален", "success");
+                            this.getMenu();
+                            this.$router.push({ name: "Home" });
+                        } else if (res.errors) {
+                            this.catchError(res.errors);
+                        } else {
+                            this.showToast("Ошибка при удалении документа", "danger");
+                        }
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                        this.showToast("Ошибка при удалении документа", "danger");
+                    });
+            } catch (error) {
+                console.error("Ошибка удаления:", error);
+                this.showToast("Ошибка при удалении документа", "danger");
+            }
+        },
+
         save() {
             this.editor
                 .save()
