@@ -16,7 +16,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-
         User::create([
             'name' => 'admin',
             'login' => 'admin',
@@ -24,7 +23,7 @@ class DatabaseSeeder extends Seeder
             'role'=>'admin'
         ]);
         User::create([
-            'name' => fake()->name(),
+            'name' => 'Иван Иванов',
             'login' => 'ivanov',
             'password' => 'ivanov',
             'role'=>'ceo'
@@ -36,6 +35,7 @@ class DatabaseSeeder extends Seeder
         ]);
         Tree::create([
             'name' => 'New course2',
+            'slug' => 'new-course2',
             'user_id' => 2,
             'tree_id' => 1,
             'type' => 'file',
@@ -51,7 +51,7 @@ class DatabaseSeeder extends Seeder
             'data'=>'[]'
         ]);
         About::create([
-            'name'=>fake()->paragraph(),
+            'name'=>'Тестовый портал знаний',
             'logo'=>'notfound.png',
         ]);
     }

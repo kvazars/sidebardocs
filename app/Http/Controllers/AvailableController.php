@@ -13,6 +13,7 @@ class AvailableController extends Controller
     public function index()
     {
         $all = Group::get();
+        $availablesGroups = [];
         foreach ($all as $value) {
             $availablesGroups[] = ['id' => $value->id, 'name' => $value->name, 'checked' => false];
         }

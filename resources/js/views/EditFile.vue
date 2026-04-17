@@ -70,6 +70,13 @@
                                                     id="accessibility_for"
                                                 />
                                             </div>
+                                            <div>
+                                                <CFormSwitch
+                                                    v-model="accessibilitylink"
+                                                    label="Только для авторизованных по ссылке"
+                                                    id="accessibility_link"
+                                                />
+                                            </div>
                                         </div>
                                         <div
                                             v-if="!accessibility"
@@ -289,6 +296,9 @@ export default {
                             .accessibilitymanagers
                             ? true
                             : false;
+                        this.accessibilitylink = res.content.accessibilitylink
+                            ? true
+                            : false;
 
                         res.groups.forEach((el) => {
                             let firstletter = el.name.substr(0, 1);
@@ -340,6 +350,7 @@ export default {
             user: useAuthIdStore(),
             accessibility: false,
             accessibilitymanagers: false,
+            accessibilitylink: false,
             groupAvailables: {},
             editor: null,
             visibleGroups: false,
@@ -557,6 +568,7 @@ export default {
                         accessibilitymanagers: this.accessibilitymanagers
                             ? 1
                             : 0,
+                        accessibilitylink: this.accessibilitylink ? 1 : 0,
                         availables: JSON.stringify(
                             Object.values(
                                 Object.assign(this.groupAvailables)
@@ -575,7 +587,9 @@ export default {
                                 this.getMenu();
                                 this.router.push({
                                     name: "ShowFile",
-                                    params: { id: res.id },
+                                    params: {
+                                        slug: res.slug,
+                                    },
                                 });
                             } else if (res.errors) {
                                 this.catchError(res.errors);

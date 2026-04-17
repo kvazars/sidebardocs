@@ -125,6 +125,7 @@ class ContentController extends Controller
 
             $tree = Tree::create([
                 'name' => $request->name,
+                'slug' => $this->generateUniqueTreeSlug($request->name),
                 'tree_id' => $request->tree_id,
                 'user_id' => $tr->user_id,
                 'position' => $position,
@@ -133,29 +134,60 @@ class ContentController extends Controller
                 'tree_id' => $tree->id,
                 'accessibility' => $request->accessibility,
                 'accessibilitymanagers' => $request->accessibilitymanagers,
+                'accessibilitylink' => $request->boolean('accessibilitylink'),
                 'data' => $request->data,
             ]);
 
             $this->changeAvailables($tree->id, $request->availables, $request->accessibility);
 
-            return response()->json(['success' => true, 'message' => 'Файл успешно создан', 'id' => $fileId->tree_id]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Файл успешно создан',
+                'id' => $fileId->tree_id,
+                'slug' => $tree->slug,
+            ]);
         } else {
             $tree = Tree::find($request->id);
             $fileId = Content::where("tree_id", $request->id)->first();
 
+            if (empty($tree->slug) && $tree->type === 'file') {
+                $tree->slug = $this->generateUniqueTreeSlug($request->name, $tree->id);
+            }
+
             $fileId->update([
                 'accessibility' => $request->accessibility,
                 'accessibilitymanagers' => $request->accessibilitymanagers,
+                'accessibilitylink' => $request->boolean('accessibilitylink'),
                 'data' => $request->data,
             ]);
             $tree->update([
                 'name' => $request->name,
+                'slug' => $tree->slug,
             ]);
 
             $this->changeAvailables($tree->id, $request->availables, $request->accessibility);
 
-            return response()->json(['success' => true, 'message' => 'Данные файла обновлены', 'id' => $fileId->tree_id]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Данные файла обновлены',
+                'id' => $fileId->tree_id,
+                'slug' => $tree->slug,
+            ]);
         }
+    }
+
+    public function getResourceBySlug($slug)
+    {
+        $tree = Tree::withTrashed()
+            ->where('slug', $slug)
+            ->where('type', 'file')
+            ->first();
+
+        if (!$tree) {
+            return response()->json(['success' => false, "message" => 'Файла не существует']);
+        }
+
+        return $this->getResource($tree->id);
     }
 
     public function changeAvailables($tree, $availables, $accessibility)
@@ -181,23 +213,41 @@ class ContentController extends Controller
         if (!$tree) {
             return response()->json(['success' => false, "message" => 'Файла не существует']);
         }
-        if (!Auth::user()) {
-            $res = Content::where("tree_id", $content)->where("accessibility", true)->first();
-            if (!$res) {
+        $res = Content::with("tree")->where("tree_id", $content)->first();
+        if (!$res) {
+            return response()->json(['success' => false, "message" => 'Файла не существует']);
+        }
+
+        // На публичных роутингах без middleware auth:sanctum Auth::user() может быть null,
+        // даже если передан Bearer-токен. Берем пользователя из sanctum-guard напрямую.
+        $user = auth('sanctum')->user() ?? Auth::user();
+        $isPublic = (bool) $res->accessibility;
+        $isLinkOnly = (bool) $res->accessibilitylink;
+
+        if (!$user) {
+            // Гость может открыть только публичный файл без режима "только по ссылке для авторизованных".
+            if (!$isPublic || $isLinkOnly) {
                 return response()->json(['success' => false, "message" => 'Доступ к файлу запрещен']);
             }
         } else {
-            $user = Auth::user();
-            if ($user->role == 'user') {
-                $gr = UserGroups::where("user_id", $user->id)->first();
-                $avia = Available::where("group_id", $gr->group_id)->where("tree_id", $content)->first();
-                $access = Content::where("tree_id", $content)->where("accessibility", true)->first();
-                if (!$avia and !$access) {
-                    return response()->json(['success' => false, "message" => 'Доступ к файлу запрещен']);
+            $isOwner = (int) $user->id === (int) $tree->user_id;
+            $isAdmin = $user->role === 'admin';
+
+            // Владелец и администратор всегда имеют доступ.
+            if (!$isOwner && !$isAdmin) {
+                // Для авторизованных пользователей режим "по ссылке" разрешает просмотр.
+                if (!$isLinkOnly && !$isPublic) {
+                    $gr = UserGroups::where("user_id", $user->id)->first();
+                    $avia = null;
+                    if ($gr) {
+                        $avia = Available::where("group_id", $gr->group_id)->where("tree_id", $content)->first();
+                    }
+                    if (!$avia) {
+                        return response()->json(['success' => false, "message" => 'Доступ к файлу запрещен']);
+                    }
                 }
             }
         }
-        $res = Content::with("tree")->where("tree_id", $content)->first();
 
         $availablesGroups = [];
 
@@ -458,6 +508,28 @@ class ContentController extends Controller
         }
 
         return null;
+    }
+
+    private function generateUniqueTreeSlug(string $name, ?int $ignoreTreeId = null): string
+    {
+        $base = Str::slug($name);
+        if ($base === '') {
+            $base = 'document';
+        }
+
+        $slug = $base;
+        $suffix = 2;
+
+        while (
+            Tree::where('slug', $slug)
+                ->when($ignoreTreeId, fn($q) => $q->where('id', '!=', $ignoreTreeId))
+                ->exists()
+        ) {
+            $slug = $base . '-' . $suffix;
+            $suffix++;
+        }
+
+        return $slug;
     }
 
     public function search(Request $request)

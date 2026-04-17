@@ -93,6 +93,9 @@ class TreeController extends Controller
                     }
                 }
 
+                $hiddenByLink = Content::where('accessibilitylink', true)->pluck('tree_id')->toArray();
+                $cd = array_values(array_diff($cd, $hiddenByLink));
+
                 if (count($cd) > 0) {
                     $all = array_merge($cd, $this->uploadTree($cd));
                     $s = Tree::whereIn('id', $all)->whereIn('user_id', User::pluck('id')->toArray())->get();
@@ -142,8 +145,13 @@ class TreeController extends Controller
                     $c = Available::where('group_id', $a->group_id)->pluck('tree_id')->toArray();
                 }
                 $cd = Content::where('accessibility', true)->pluck('tree_id')->toArray();
+                $ownTreeIds = Tree::where('user_id', Auth::user()->id)->pluck('id')->toArray();
+                $hiddenByLink = Content::where('accessibilitylink', true)
+                    ->whereNotIn('tree_id', $ownTreeIds)
+                    ->pluck('tree_id')
+                    ->toArray();
                 $tree=[];
-                $c = array_merge($c, $cd);
+                $c = array_values(array_diff(array_merge($c, $cd), $hiddenByLink));
                 if (count($c) > 0) {
                     $all = array_merge($c, $this->uploadTree($c));
                     $tree = Tree::whereIn('id', $all)->whereIn('user_id', User::pluck('id')->toArray())->get();
@@ -164,6 +172,15 @@ class TreeController extends Controller
                 );
                 break;
         }
+        $linkOnlyTreeIds = Content::where('accessibilitylink', true)->pluck('tree_id')->toArray();
+        $tree = is_array($tree) ? $tree : $tree->toArray();
+        $tree = array_map(function ($item) use ($linkOnlyTreeIds) {
+            if (($item['type'] ?? null) === 'file') {
+                $item['accessibilitylink'] = in_array($item['id'], $linkOnlyTreeIds);
+            }
+            return $item;
+        }, $tree);
+
         return response()->json(['success' => true, 'allId' => $fileIds, 'user' => ["id" => Auth::user()->id, "name" => Auth::user()->name, "role" => $role], 'menu' => $tree, "about" => $about, "content" => $content]);
     }
     protected $fatherChild = [];

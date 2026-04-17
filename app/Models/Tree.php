@@ -11,6 +11,7 @@ class Tree extends Model
     use HasFactory, SoftDeletes;
     protected $fillable = [
         "name",
+        "slug",
         "tree_id",
         "user_id",
         "type",

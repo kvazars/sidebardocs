@@ -299,7 +299,7 @@ export default {
         TestResults,
     },
     props: [
-        "id",
+        "slug",
         "datasend",
         "showToast",
         "dashboard",
@@ -325,15 +325,14 @@ export default {
             tests: [],
             results: [],
             my: false,
+            resourceId: null,
         };
     },
 
     mounted() {
-        if (this.datasend && this.id) {
+        if (this.datasend && this.slug) {
             this.datasend(
-                !this.auths.id
-                    ? "resource/" + this.id
-                    : "resourceauth/" + this.id,
+                "resource-by-slug/" + this.slug,
                 "GET",
                 {}
             )
@@ -355,6 +354,7 @@ export default {
                         }
 
                         this.pagetitle = res.name;
+                        this.resourceId = res.content.tree_id;
                         this.parseDoc(res.content);
                         this.setContent(res.content);
                         this.groups = Object.keys(res.groups)
@@ -366,7 +366,11 @@ export default {
                             this.groups = "всем";
                         }
                     }
-                    this.getTests();
+                    if (this.auths.id) {
+                        this.getTests();
+                    } else {
+                        this.tests = [];
+                    }
                 })
                 .catch();
         } else {
@@ -376,14 +380,22 @@ export default {
     },
     methods: {
         getResult() {
-            this.datasend(`results/${this.$route.params.id}/get`, "GET").then(
+            if (!this.auths.id || !this.resourceId) {
+                this.results = [];
+                return;
+            }
+            this.datasend(`results/${this.resourceId}/get`, "GET").then(
                 (response) => {
                     this.results = response.data;
                 }
             );
         },
         getTests() {
-            this.datasend(`tests/${this.$route.params.id}/get`, "GET").then(
+            if (!this.auths.id || !this.resourceId) {
+                this.tests = [];
+                return;
+            }
+            this.datasend(`tests/${this.resourceId}/get`, "GET").then(
                 (response) => {
                     this.tests = response.data;
                 }

@@ -184,7 +184,9 @@
                                     target="_blank"
                                     :to="{
                                         name: 'ShowFile',
-                                        params: { id: this.files.data[key].id },
+                                        params: {
+                                            slug: this.files.data[key].slug,
+                                        },
                                     }"
                                 >
                                     <i class="bi bi-binoculars-fill"></i

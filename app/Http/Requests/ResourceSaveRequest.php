@@ -25,6 +25,7 @@ class ResourceSaveRequest extends FormRequest
             "name" => "required|min:5",
             'data' => 'string|required|min:3',
             'accessibility' => 'required',
+            'accessibilitylink' => 'nullable|boolean',
             'availables' => 'required',
         ];
     }

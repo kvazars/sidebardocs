@@ -14,6 +14,7 @@ class Content extends Model
         'tree_id',
         'accessibility',
         'accessibilitymanagers',
+        'accessibilitylink',
         'data',
     ];
     public function tree(){

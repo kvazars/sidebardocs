@@ -117,7 +117,7 @@
                         <div class="list-group">
                             <div v-for="result in searchResults.tree" :key="result.id"
                                 class="list-group-item list-group-item-action search-result-item"
-                                @click="navigateToResult(result.id)">
+                                @click="navigateToResult(result)">
 
                                 <div class="d-flex align-items-center">
 
@@ -144,7 +144,7 @@
                             </div>
                             <div v-for="result in searchResults.content" :key="result.id"
                                 class="list-group-item list-group-item-action search-result-item"
-                                @click="navigateToResult(result.tree_id)">
+                                @click="navigateToResult(result)">
                                 <div class="d-flex align-items-center">
 
 
@@ -378,7 +378,20 @@ export default {
 
         navigateToResult(result) {
             this.closeSearchModal();
-            this.$router.push({ name: "ShowFile", params: { id: result } });
+            const slug =
+                typeof result === "object"
+                    ? result.slug || (result.tree && result.tree.slug) || null
+                    : null;
+
+            if (!slug) {
+                this.showToast("Ссылка для документа не найдена", "danger");
+                return;
+            }
+
+            this.$router.push({
+                name: "ShowFile",
+                params: { slug },
+            });
         },
         blockForTest(block = true) {
             if (block) {
@@ -491,6 +504,7 @@ export default {
                 this.datasend("homepage", "GET", {}).then((res) => {
                     this.dashboard = res.content;
                     this.about = res.about;
+                    this.viewSuccess = true;
                 });
             } else {
                 this.datasend("userFolder", "GET", {})
@@ -533,12 +547,14 @@ export default {
                             menus.forEach((e) => {
                                 if (e.tree_id == i) {
                                     if (e.type == "file") {
-                                        e.href = "/files/" + e.id;
+                                        e.href = "/files/" + e.slug;
                                     }
                                     e.title = e.name;
                                     e.icon =
                                         e.type == "folder"
                                             ? "bi bi-folder2"
+                                            : e.accessibilitylink
+                                            ? "bi bi-file text-primary"
                                             : "bi bi-file";
                                     e.child = menucreate(e.id);
                                     rrr.push(e);

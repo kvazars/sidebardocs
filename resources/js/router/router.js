@@ -1,5 +1,5 @@
 import { h, resolveComponent } from "vue";
-import { createRouter, createWebHashHistory } from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 
 import DefaultLayout from "../layouts/DefaultLayout.vue";
 
@@ -11,17 +11,17 @@ const routes = [
         component: DefaultLayout,
         children: [
             {
-                path: "/files/:id",
-                name: "ShowFile",
-                meta: { title: "Просмотр файла" },
-                component: () => import("../views/ShowFile.vue"),
-                props: true,
-            },
-            {
                 path: "/files/:id/edit",
                 name: "EditFile",
                 meta: { title: "Редактирование документа" },
                 component: () => import("../views/EditFile.vue"),
+                props: true,
+            },
+            {
+                path: "/files/:slug",
+                name: "ShowFile",
+                meta: { title: "Просмотр файла" },
+                component: () => import("../views/ShowFile.vue"),
                 props: true,
             },
             {
@@ -59,7 +59,7 @@ const routes = [
 ];
 
 const router = createRouter({
-    history: createWebHashHistory(import.meta.env.BASE_URL),
+    history: createWebHistory(import.meta.env.BASE_URL),
     routes,
     scrollBehavior() {
         // always scroll to top
