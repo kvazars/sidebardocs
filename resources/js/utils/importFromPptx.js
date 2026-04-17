@@ -14,10 +14,8 @@ export async function importPptxToEditorJS(file, uploadImageCallback) {
         const zipData = await zip.loadAsync(file);
         
         // Логируем все файлы в архиве для отладки
-        console.log('Файлы в PPTX архиве:');
         Object.keys(zipData.files).forEach(name => {
             if (name.includes('media') || name.includes('slide')) {
-                console.log(name);
             }
         });
         
@@ -27,7 +25,6 @@ export async function importPptxToEditorJS(file, uploadImageCallback) {
             name.match(/ppt\/slides\/slide\d+\.xml$/i)
         );
         
-        console.log('Найденные слайды:', slideFiles);
         
         // Сортируем по номерам слайдов
         slideFiles.sort((a, b) => {
@@ -40,10 +37,8 @@ export async function importPptxToEditorJS(file, uploadImageCallback) {
         for (let i = 0; i < slideFiles.length; i++) {
             const slideFile = slideFiles[i];
             const slideNumber = parseInt(slideFile.match(/\d+/)[0]);
-            console.log(`Обработка слайда ${slideNumber}...`);
             const slideContent = await zipData.file(slideFile).async('string');
             const slideBlocks = await parseSlide(slideContent, zipData, slideNumber);
-            console.log(`На слайде ${slideNumber} найдено ${slideBlocks.length} блоков`);
             slides.push(...slideBlocks);
         }
         
@@ -62,7 +57,6 @@ export async function importPptxToEditorJS(file, uploadImageCallback) {
                             block.data.file.url = uploadedUrl;
                         }
                     } catch (error) {
-                        console.error('Ошибка загрузки изображения на сервер:', error);
                     }
                 }
             }
@@ -70,10 +64,8 @@ export async function importPptxToEditorJS(file, uploadImageCallback) {
         
         // Разворачиваем массив чтобы восстановить правильный порядок
         const reversedSlides = slides.reverse();
-        console.log('Порядок блоков после разворота:', reversedSlides.map((b, i) => `${i}:${b.type}`).join(', '));
         return reversedSlides;
     } catch (error) {
-        console.error('Ошибка импорта PPTX:', error);
         throw error;
     }
 }
@@ -104,13 +96,11 @@ async function parseSlide(slideXml, zip, slideNumber = 1) {
             return Array.isArray(val) ? val : [val];
         };
         
-        console.log(`\n🔍 Парсинг слайда ${slideNumber}...`);
         
         // Обрабатываем все элементы в порядке: фигуры, картинки, таблицы, группы, фреймы
         
         // 1. Все текстовые фигуры (p:sp)
         const shapes = ensureArray(spTree['p:sp']);
-        console.log(`📦 Найдено фигур (p:sp): ${shapes.length}`);
         for (let shape of shapes) {
             const block = await parseShape(shape);
             if (block) {
@@ -120,7 +110,6 @@ async function parseSlide(slideXml, zip, slideNumber = 1) {
         
         // 2. Все картинки (p:pic)
         const pictures = ensureArray(spTree['p:pic']);
-        console.log(`🖼 Найдено картинок (p:pic): ${pictures.length}`);
         for (let picture of pictures) {
             const block = await parsePicture(picture, zip, slideNumber);
             if (block) blocks.push(block);
@@ -128,7 +117,6 @@ async function parseSlide(slideXml, zip, slideNumber = 1) {
         
         // 3. Все соединительные фигуры (p:cxnSp)
         const cxnShapes = ensureArray(spTree['p:cxnSp']);
-        console.log(`🔗 Найдено соединительных фигур (p:cxnSp): ${cxnShapes.length}`);
         for (let cxnShape of cxnShapes) {
             const block = await parseShape(cxnShape);
             if (block) blocks.push(block);
@@ -136,7 +124,6 @@ async function parseSlide(slideXml, zip, slideNumber = 1) {
         
         // 4. Все таблицы (p:tbl)
         const tables = ensureArray(spTree['p:tbl']);
-        console.log(`📋 Найдено таблиц (p:tbl): ${tables.length}`);
         for (let table of tables) {
             const block = await parseTable(table);
             if (block) blocks.push(block);
@@ -144,24 +131,20 @@ async function parseSlide(slideXml, zip, slideNumber = 1) {
         
         // 5. Все группы (p:grpSp)
         const groups = ensureArray(spTree['p:grpSp']);
-        console.log(`👥 Найдено групп (p:grpSp): ${groups.length}`);
         for (let group of groups) {
-            const block = await parseGroup(group);
-            if (block) blocks.push(block);
+            const block = await parseGroup(group, zip, slideNumber);
+            appendBlocks(blocks, block);
         }
         
         // 6. Все графические фреймы (p:graphicFrame)
         const graphicFrames = ensureArray(spTree['p:graphicFrame']);
-        console.log(`📊 Найдено графических фреймов (p:graphicFrame): ${graphicFrames.length}`);
         for (let gFrame of graphicFrames) {
-            const block = await parseGraphicFrame(gFrame);
-            if (block) blocks.push(block);
+            const block = await parseGraphicFrame(gFrame, zip, slideNumber);
+            appendBlocks(blocks, block);
         }
         
-        console.log(`Слайд ${slideNumber}: обработано ${blocks.length} блоков`);
         return blocks.filter(b => b !== null);
     } catch (error) {
-        console.error('Ошибка парсинга слайда:', error);
         return [];
     }
 }
@@ -173,90 +156,12 @@ async function parseSlide(slideXml, zip, slideNumber = 1) {
  */
 async function parseShape(shape) {
     try {
-        if (!shape['p:txBody']) {
-            console.log('⚠️ Shape без текстового тела (p:txBody)');
-            return null;
-        }
-        
-        const txBody = shape['p:txBody'][0];
-        if (!txBody['a:p']) {
-            console.log('⚠️ txBody без параграфов (a:p)');
-            return null;
-        }
-        
-        // Обработка массива vs объекта параграфов
-        let paragraphs = txBody['a:p'];
-        if (!Array.isArray(paragraphs)) {
-            paragraphs = paragraphs ? [paragraphs] : [];
-        }
-        
-        console.log(`  📝 Параграфов в shape: ${paragraphs.length}`);
-        
-        if (paragraphs.length === 0) return null;
-        
-        let fullText = '';
-        
-        for (let pIdx = 0; pIdx < paragraphs.length; pIdx++) {
-            const para = paragraphs[pIdx];
-            let paragraphText = '';
-            
-            // Обрабатываем все возможные элементы в параграфе
-            for (const key in para) {
-                if (key.startsWith('$')) continue; // Пропускаем атрибуты
-                
-                if (key === 'a:r') {
-                    // Текстовые runs
-                    let runs = para[key];
-                    if (!Array.isArray(runs)) runs = runs ? [runs] : [];
-                    
-                    for (const run of runs) {
-                        const text = run['a:t'];
-                        if (text) {
-                            // Обработка как массива или строки
-                            const runText = Array.isArray(text) ? text[0] : text;
-                            paragraphText += runText;
-                        }
-                    }
-                } else if (key === 'a:fld') {
-                    // Fields (могут содержать текст)
-                    let fields = para[key];
-                    if (!Array.isArray(fields)) fields = fields ? [fields] : [];
-                    
-                    for (const field of fields) {
-                        let fieldRuns = field['a:r'];
-                        if (!Array.isArray(fieldRuns)) fieldRuns = fieldRuns ? [fieldRuns] : [];
-                        
-                        for (const run of fieldRuns) {
-                            const t = run['a:t'];
-                            if (t) {
-                                paragraphText += Array.isArray(t) ? t[0] : t;
-                            }
-                        }
-                    }
-                } else if (key === 'a:br') {
-                    // Line breaks
-                    paragraphText += '\n';
-                } else if (key !== 'a:pPr' && key !== 'a:endParaRPr') {
-                    // Логируем необработанные ключи
-                    console.log(`⚠️ Необработанный ключ в параграфе ${pIdx}: ${key}`);
-                }
-            }
-            
-            paragraphText = paragraphText.trim();
-            if (paragraphText) {
-                console.log(`    ✓ Параграф ${pIdx}: "${paragraphText.substring(0, 80)}"`);
-                fullText += paragraphText + '\n';
-            }
-        }
-        
-        fullText = fullText.trim();
-        
+        const fullText = extractTextsFromTxBody(shape['p:txBody'] && shape['p:txBody'][0]).join('\n').trim();
+
         if (!fullText) {
-            console.log('⚠️ В shape не найден текст');
             return null;
         }
         
-        console.log(`✅ Shape с текстом (${fullText.length} символов): "${fullText.substring(0, 100)}"`);
         
         return {
             type: 'paragraph',
@@ -265,7 +170,6 @@ async function parseShape(shape) {
             }
         };
     } catch (error) {
-        console.error('Ошибка парсинга фигуры:', error);
         return null;
     }
 }
@@ -299,22 +203,18 @@ async function parsePicture(picture, zip, slideNumber = 1) {
         }
         
         if (!blip || !blip['$'] || !blip['$']['r:embed']) {
-            console.log('Blip не найден или нет r:embed атрибута');
             return null;
         }
         
         const rEmbed = blip['$']['r:embed'];
-        console.log(`Ищу изображение с r:embed: ${rEmbed}`);
         
         // Получаем информацию о взаимосвязях для конкретного слайда
         const imageBuffer = await getRelationshipTarget(zip, rEmbed, slideNumber);
         
         if (!imageBuffer) {
-            console.warn(`Не удалось найти изображение для r:embed ${rEmbed}`);
             return null;
         }
         
-        console.log(`Найдено изображение ${rEmbed}, размер: ${imageBuffer.byteLength} байт`);
         
         // Определяем тип изображения
         let mimeType = 'image/jpeg';
@@ -348,7 +248,6 @@ async function parsePicture(picture, zip, slideNumber = 1) {
             }
         };
     } catch (error) {
-        console.error('Ошибка парсинга изображения:', error);
         return null;
     }
 }
@@ -364,12 +263,10 @@ async function getRelationshipTarget(zip, rId, slideNumber = 1) {
     try {
         // Правильный путь для relationships в PPTX: ppt/slides/_rels/slideX.xml.rels
         const relsPath = `ppt/slides/_rels/slide${slideNumber}.xml.rels`;
-        console.log(`Ищу relationships файл: ${relsPath}`);
         
         let relsFile = zip.file(relsPath);
         
         if (!relsFile) {
-            console.log(`Файл не найден: ${relsPath}`);
             // Если файл не найден, ищем список всех доступных files
             const allFiles = Object.keys(zip.files);
             const relsFolderFiles = allFiles.filter(name =>
@@ -377,21 +274,17 @@ async function getRelationshipTarget(zip, rId, slideNumber = 1) {
             );
             
             if (relsFolderFiles.length === 0) {
-                console.warn('Не найдены файлы relationships для слайдов');
                 return null;
             }
             
             relsFile = zip.file(relsFolderFiles[0]);
-            console.log(`Использую relationships файл: ${relsFolderFiles[0]}`);
         }
         
         const relsContent = await relsFile.async('string');
-        console.log('Содержимое relationships (первые 500 символов):', relsContent.substring(0, 500));
         
         const parsed = await parseStringPromise(relsContent);
         
         const relationships = parsed['Relationships']['Relationship'] || [];
-        console.log(`Найдено relationships: ${relationships.length}`);
         
         const relationship = relationships.find(rel => {
             const relId = rel['$'] && rel['$'].Id;
@@ -399,18 +292,14 @@ async function getRelationshipTarget(zip, rId, slideNumber = 1) {
         });
         
         if (!relationship) {
-            console.warn(`Взаимосвязь с ID ${rId} не найдена`);
-            console.log('Все найденные relationships:');
             relationships.forEach(rel => {
                 if (rel['$'].Type.includes('image')) {
-                    console.log(`  ID: ${rel['$'].Id}, Target: ${rel['$'].Target}, Type: ${rel['$'].Type}`);
                 }
             });
             return null;
         }
         
         const target = relationship['$'].Target;
-        console.log(`Найдена взаимосвязь для ${rId}, target: ${target}`);
         
         // Ищем медиафайл в архиве
         const allFiles = Object.keys(zip.files);
@@ -426,13 +315,11 @@ async function getRelationshipTarget(zip, rId, slideNumber = 1) {
             mediaPath = `ppt/media/${target}`;
         }
         
-        console.log(`Ищу медиафайл по пути: ${mediaPath}`);
         
         // Пытаемся найти файл
         let mediaFile = zip.file(mediaPath);
         
         if (!mediaFile) {
-            console.log(`Файл не найден: ${mediaPath}`);
             // Пробуем альтернативные пути
             const fileName = target.split('/').pop();
             const alternativePaths = [
@@ -442,31 +329,23 @@ async function getRelationshipTarget(zip, rId, slideNumber = 1) {
             ];
             
             for (const altPath of alternativePaths) {
-                console.log(`Пробую альтернативный путь: ${altPath}`);
                 mediaFile = zip.file(altPath);
                 if (mediaFile) {
-                    console.log(`✓ Файл найден: ${altPath}`);
                     mediaPath = altPath;
                     break;
                 }
             }
         } else {
-            console.log(`✓ Файл найден: ${mediaPath}`);
         }
         
         if (!mediaFile) {
-            console.warn(`Не найден медиафайл для ${rId}`);
             // Выводим все медиафайлы для отладки
-            console.log('Доступные медиафайлы:');
-            allFiles.filter(f => f.includes('media')).forEach(f => console.log(`  ${f}`));
             return null;
         }
         
         const buffer = await mediaFile.async('arraybuffer');
-        console.log(`✓ Загружен медиафайл ${rId}, размер: ${buffer.byteLength} байт`);
         return buffer;
     } catch (error) {
-        console.error('Ошибка получения взаимосвязи:', error);
         return null;
     }
 }
@@ -476,8 +355,9 @@ async function getRelationshipTarget(zip, rId, slideNumber = 1) {
  * @param {Object} graphicFrame - XML объект графического фрейма
  * @returns {Promise<Object|null>} - EditorJS блок или null
  */
-async function parseGraphicFrame(graphicFrame) {
+async function parseGraphicFrame(graphicFrame, zip, slideNumber = 1) {
     try {
+        const blocks = [];
         let frameText = '';
         
         // 1. Сначала ищем текст в p:txBody самого фрейма
@@ -519,7 +399,6 @@ async function parseGraphicFrame(graphicFrame) {
                 
                 // Если это диаграмма DrawingML
                 if (graphicUri && graphicUri.includes('diagram')) {
-                    console.log('🔗 Обнаружена диаграмма (SmartArt)');
                     
                     // Ищем dgm:relIds с ссылками на файлы диаграммы
                     const dgmRelIds = gData['dgm:relIds'] || [];
@@ -529,7 +408,6 @@ async function parseGraphicFrame(graphicFrame) {
                         if (relIds && relIds['$']) {
                             const dmId = relIds['$']['r:dm']; // Ссылка на data файл диаграммы
                             if (dmId) {
-                                console.log(`  Загружаю диаграмму с r:dm="${dmId}"`);
                                 const diagramText = await loadDiagramData(zip, dmId, slideNumber);
                                 if (diagramText) {
                                     frameText += diagramText + ' ';
@@ -540,20 +418,29 @@ async function parseGraphicFrame(graphicFrame) {
                 }
             }
         }
+
+        if (graphic && graphic[0] && graphic[0]['a:graphicData'] && graphic[0]['a:graphicData'][0]) {
+            const gData = graphic[0]['a:graphicData'][0];
+            if (gData['a:tbl']) {
+                const tableBlock = await parseTable(gData);
+                appendBlocks(blocks, tableBlock);
+            }
+        }
         
         frameText = frameText.trim();
-        if (!frameText) return null;
+        if (frameText) {
+            blocks.unshift({
+                type: 'paragraph',
+                data: {
+                    text: frameText
+                }
+            });
+        }
         
-        console.log(`✅ GraphicFrame (${frameText.length} символов): "${frameText.substring(0, 100)}"`);
+        if (blocks.length === 0) return null;
         
-        return {
-            type: 'paragraph',
-            data: {
-                text: frameText
-            }
-        };
+        return blocks.length === 1 ? blocks[0] : blocks;
     } catch (error) {
-        console.error('Ошибка парсинга графического фрейма:', error);
         return null;
     }
 }
@@ -572,7 +459,6 @@ async function loadDiagramData(zip, rId, slideNumber = 1) {
         const relsFile = zip.file(relsPath);
         
         if (!relsFile) {
-            console.warn(`Файл relationships не найден: ${relsPath}`);
             return null;
         }
         
@@ -586,18 +472,15 @@ async function loadDiagramData(zip, rId, slideNumber = 1) {
         const relationship = relArray.find(rel => rel['$'] && rel['$'].Id === rId);
         
         if (!relationship) {
-            console.warn(`Relationship ${rId} не найдена для диаграммы`);
             return null;
         }
         
         const target = relationship['$'].Target;
-        const diagramPath = `ppt/${target}`;
+        const diagramPath = normalizePath(`ppt/slides/${target}`);
         
-        console.log(`  📂 Загружаю диаграмму: ${diagramPath}`);
         
         const diagramFile = zip.file(diagramPath);
         if (!diagramFile) {
-            console.warn(`Файл диаграммы не найден: ${diagramPath}`);
             return null;
         }
         
@@ -678,13 +561,11 @@ async function loadDiagramData(zip, rId, slideNumber = 1) {
         diagramText = diagramText.trim().replace(/\s+/g, ' ');
         
         if (diagramText) {
-            console.log(`  ✅ Извлечено из диаграммы: "${diagramText.substring(0, 100)}"`);
             return diagramText;
         }
         
         return null;
     } catch (error) {
-        console.error('Ошибка загрузки диаграммы:', error);
         return null;
     }
 }
@@ -697,11 +578,8 @@ async function loadDiagramData(zip, rId, slideNumber = 1) {
 async function parseTable(table) {
     try {
         let tableText = '';
-        
-        // Ищем строки таблицы (a:tr)
-        if (!table['a:tbl']) return null;
-        
-        const tblBody = table['a:tbl'][0];
+        const tblBody = table['a:tbl'] ? table['a:tbl'][0] : table;
+        if (!tblBody) return null;
         
         // Обработка строк как массива или объекта
         let rows = tblBody['a:tr'];
@@ -761,16 +639,16 @@ async function parseTable(table) {
         tableText = tableText.trim();
         if (!tableText) return null;
         
-        console.log('✓ Извлечен текст из таблицы:', tableText.substring(0, 100));
         
         return {
-            type: 'paragraph',
+            type: 'table',
             data: {
-                text: 'Таблица: ' + tableText
+                content: tableText.split('\n').map((row) => row.split(' | ')),
+                stretched: true,
+                withHeadings: false
             }
         };
     } catch (error) {
-        console.error('Ошибка парсинга таблицы:', error);
         return null;
     }
 }
@@ -780,38 +658,107 @@ async function parseTable(table) {
  * @param {Object} group - XML объект группы
  * @returns {Promise<Object|null>} - EditorJS блок или null
  */
-async function parseGroup(group) {
+async function parseGroup(group, zip, slideNumber = 1) {
     try {
-        let groupText = '';
-        
-        // Ищем все фигуры внутри группы
-        let shapes = group['p:sp'];
-        if (!Array.isArray(shapes)) {
-            shapes = shapes ? [shapes] : [];
+        const blocks = [];
+        const ensureArray = (val) => (!val ? [] : Array.isArray(val) ? val : [val]);
+
+        for (const shape of ensureArray(group['p:sp'])) {
+            appendBlocks(blocks, await parseShape(shape));
         }
-        
-        for (const shape of shapes) {
-            const block = await parseShape(shape);
-            if (block && block.data.text) {
-                groupText += block.data.text.replace(/<br>/g, ' ') + ' ';
-            }
+
+        for (const cxn of ensureArray(group['p:cxnSp'])) {
+            appendBlocks(blocks, await parseShape(cxn));
         }
-        
-        groupText = groupText.trim();
-        if (!groupText) return null;
-        
-        console.log('✓ Извлечен текст из группы:', groupText.substring(0, 100));
-        
-        return {
-            type: 'paragraph',
-            data: {
-                text: groupText
-            }
-        };
+
+        for (const picture of ensureArray(group['p:pic'])) {
+            appendBlocks(blocks, await parsePicture(picture, zip, slideNumber));
+        }
+
+        for (const gFrame of ensureArray(group['p:graphicFrame'])) {
+            appendBlocks(blocks, await parseGraphicFrame(gFrame, zip, slideNumber));
+        }
+
+        for (const nestedGroup of ensureArray(group['p:grpSp'])) {
+            appendBlocks(blocks, await parseGroup(nestedGroup, zip, slideNumber));
+        }
+
+        return blocks.length ? blocks : null;
     } catch (error) {
-        console.error('Ошибка парсинга группы:', error);
         return null;
     }
+}
+
+function appendBlocks(target, blockOrBlocks) {
+    if (!blockOrBlocks) return;
+    if (Array.isArray(blockOrBlocks)) {
+        for (const block of blockOrBlocks) {
+            if (block) target.push(block);
+        }
+        return;
+    }
+    target.push(blockOrBlocks);
+}
+
+function extractTextsFromTxBody(txBody) {
+    if (!txBody || !txBody['a:p']) return [];
+
+    const paragraphs = Array.isArray(txBody['a:p']) ? txBody['a:p'] : [txBody['a:p']];
+    return paragraphs
+        .map((para) => extractParagraphText(para).trim())
+        .filter(Boolean);
+}
+
+function extractParagraphText(para) {
+    if (!para) return '';
+    let text = '';
+
+    const runs = para['a:r'] ? (Array.isArray(para['a:r']) ? para['a:r'] : [para['a:r']]) : [];
+    for (const run of runs) {
+        if (run['a:t']) text += readTextNode(run['a:t']);
+    }
+
+    const fields = para['a:fld'] ? (Array.isArray(para['a:fld']) ? para['a:fld'] : [para['a:fld']]) : [];
+    for (const field of fields) {
+        const fieldRuns = field['a:r'] ? (Array.isArray(field['a:r']) ? field['a:r'] : [field['a:r']]) : [];
+        for (const run of fieldRuns) {
+            if (run['a:t']) text += readTextNode(run['a:t']);
+        }
+    }
+
+    if (para['a:br']) {
+        const breaks = Array.isArray(para['a:br']) ? para['a:br'].length : 1;
+        text += '\n'.repeat(Math.max(1, breaks));
+    }
+
+    if (!text && para['a:t']) {
+        text = readTextNode(para['a:t']);
+    }
+
+    return text;
+}
+
+function readTextNode(node) {
+    if (Array.isArray(node)) {
+        return node.map((item) => readTextNode(item)).join('');
+    }
+    if (typeof node === 'string') return node;
+    if (node && typeof node === 'object' && typeof node._ === 'string') return node._;
+    return '';
+}
+
+function normalizePath(path) {
+    const parts = String(path).replace(/\\/g, '/').split('/');
+    const result = [];
+    for (const part of parts) {
+        if (!part || part === '.') continue;
+        if (part === '..') {
+            result.pop();
+            continue;
+        }
+        result.push(part);
+    }
+    return result.join('/');
 }
 
 /**

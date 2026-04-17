@@ -386,27 +386,19 @@ export default {
                     throw new Error("Не удалось извлечь содержимое из документа");
                 }
 
-                // Получаем последний блок для вставки после него
-                const lastBlockIndex = this.editor.blocks.getBlocksCount() - 1;
+                const currentContent = await this.editor.save();
+                const currentBlocks = Array.isArray(currentContent.blocks)
+                    ? currentContent.blocks
+                    : [];
+                const importBlocks = blocks.filter(
+                    (block) => block && block.type && block.data
+                );
 
-                // Добавляем импортированные блоки в конец редактора
-                for (const block of blocks) {
-                    if (block && block.type) {
-                        try {
-                            await this.editor.blocks.insert(
-                                block.type,
-                                block.data,
-                                undefined,
-                                false
-                            );
-                        } catch (error) {
-                            console.warn(
-                                `Не удалось добавить блок типа ${block.type}:`,
-                                error
-                            );
-                        }
-                    }
-                }
+                await this.editor.render({
+                    time: Date.now(),
+                    version: currentContent.version || "2.30.6",
+                    blocks: [...currentBlocks, ...importBlocks],
+                });
 
                 this.showToast(
                     `Успешно добавлено ${blocks.length} блоков из документа`,
