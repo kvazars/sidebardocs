@@ -32,11 +32,11 @@ class ContentController extends Controller
 
             $userId = Auth::user()->id;
             $dirshort = "contentImages/{$userId}";
-            
+
             // Получаем файл
             $file = $request->file('image');
             $mimeType = $file->getMimeType();
-            
+
             // Определяем расширение
             if ($mimeType === 'image/png') {
                 $extension = 'png';
@@ -47,15 +47,15 @@ class ContentController extends Controller
             } else {
                 $extension = $file->getClientOriginalExtension() ?: 'bin';
             }
-            
+
             $name = Str::random(40) . "." . $extension;
             $fullPath = "{$dirshort}/{$name}";
-            
+
             // Сохраняем файл напрямую
             $file->storeAs($dirshort, $name, 'public');
-            
+
             \Log::info("Изображение успешно сохранено: $fullPath");
-            
+
             // Возвращаем URL, доступный из браузера
             $url = asset("storage/{$fullPath}");
             return response()->json(['success' => 1, 'file' => ['url' => $url]], 200);

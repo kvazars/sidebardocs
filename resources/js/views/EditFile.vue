@@ -118,7 +118,7 @@
                     <CCardHeader class="d-flex justify-content-between align-items-center">
                         <span>Содержимое</span>
                         <div class="d-flex gap-2">
-                            <button 
+                            <button
                                 class="btn btn-sm btn-danger text-white"
                                 @click="deleteResource"
                                 v-if="this.$route.params.id"
@@ -126,28 +126,28 @@
                             >
                                 <i class="bi bi-trash me-1"></i>Удалить
                             </button>
-                            <button 
+                            <button
                                 class="btn btn-sm btn-secondary text-white"
                                 @click="cancel"
                                 title="Отменить и вернуться"
                             >
                                 <i class="bi bi-x-circle me-1"></i>Отмена
                             </button>
-                            <button 
+                            <button
                                 class="btn btn-sm btn-success text-white"
                                 @click="save"
                                 title="Сохранить документ"
                             >
                                 <i class="bi bi-check-circle me-1"></i>Сохранить
                             </button>
-                            <button 
+                            <button
                                 class="btn btn-sm btn-info text-white"
                                 @click="triggerImportDocx"
                                 title="Импортировать содержимое из DOCX файла"
                             >
                                 <i class="bi bi-file-word me-1"></i>Импорт DOCX
                             </button>
-                            <button 
+                            <button
                                 class="btn btn-sm btn-info text-white"
                                 @click="triggerImportPptx"
                                 title="Импортировать содержимое из PPTX файла"
@@ -444,11 +444,11 @@ export default {
                         console.warn('Изображение слишком большое, пропускаем:', imageBlob.size, 'байт');
                         return null;
                     }
-                    
+
                     console.log('Загружаю изображение, размер:', imageBlob.size, 'байт, тип:', imageBlob.type);
                     const formData = new FormData();
                     formData.append('image', imageBlob, 'image.jpg');
-                    
+
                     try {
                         const response = await this.datasend('saveImage', 'POST', formData, true);
                         console.log('Ответ сервера:', response);
