@@ -588,6 +588,47 @@
             >
         </CModalFooter>
     </CModal>
+
+    <CModal
+        :visible="visibleCacheModal"
+        @close="
+            () => {
+                visibleCacheModal = false;
+            }
+        "
+    >
+        <CModalHeader>
+            <CModalTitle>Отчёт очистки</CModalTitle>
+        </CModalHeader>
+        <CModalBody>
+            <p class="mb-2" v-if="cacheCleanupMessage">{{ cacheCleanupMessage }}</p>
+            <div v-if="cacheCleanupStats">
+                <p class="mb-1">
+                    Обновлено документов:
+                    <strong>{{ cacheCleanupStats.content_updated }}</strong>
+                </p>
+                <p class="mb-1">
+                    Удалено битых ссылок:
+                    <strong>{{ cacheCleanupStats.broken_refs_removed }}</strong>
+                </p>
+                <p class="mb-1">
+                    Удалено лишних файлов:
+                    <strong>{{ cacheCleanupStats.files_deleted }}</strong>
+                </p>
+            </div>
+        </CModalBody>
+        <CModalFooter>
+            <CButton
+                color="primary"
+                @click="
+                    () => {
+                        visibleCacheModal = false;
+                    }
+                "
+                >Закрыть</CButton
+            >
+        </CModalFooter>
+    </CModal>
 </template>
 
 <script>
@@ -625,6 +666,9 @@ export default {
             systemName: null,
             systemLogo: null,
             visibleModal: false,
+            visibleCacheModal: false,
+            cacheCleanupStats: null,
+            cacheCleanupMessage: "",
             results: [],
         };
     },
@@ -657,6 +701,9 @@ export default {
             this.datasend("checkImageResource", "GET", {})
                 .then((res) => {
                     this.showToast(res.message, "success");
+                    this.cacheCleanupStats = res.stats || null;
+                    this.cacheCleanupMessage = res.message || "";
+                    this.visibleCacheModal = true;
                 })
                 .catch((error) => {
                     console.log(error);

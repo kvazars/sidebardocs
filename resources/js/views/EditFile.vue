@@ -433,24 +433,20 @@ export default {
                 const uploadImage = async (imageBlob) => {
                     // Пропускаем большие файлы (>2MB)
                     if (imageBlob.size > 2000000) {
-                        console.warn('Изображение слишком большое, пропускаем:', imageBlob.size, 'байт');
                         return null;
                     }
 
-                    console.log('Загружаю изображение, размер:', imageBlob.size, 'байт, тип:', imageBlob.type);
                     const formData = new FormData();
                     formData.append('image', imageBlob, 'image.jpg');
 
                     try {
                         const response = await this.datasend('saveImage', 'POST', formData, true);
-                        console.log('Ответ сервера:', response);
                         if (response.success) {
                             return response.file.url;
                         } else {
                             throw new Error('Ошибка загрузки изображения: ' + (response.message || 'Unknown error'));
                         }
                     } catch (error) {
-                        console.error('Ошибка загрузки изображения:', error);
                         return null;
                     }
                 };
@@ -473,10 +469,7 @@ export default {
                                 false
                             );
                         } catch (error) {
-                            console.warn(
-                                `Не удалось добавить блок типа ${block.type}:`,
-                                error
-                            );
+                            // Пропускаем неподдерживаемые блоки без вывода в консоль
                         }
                     }
                 }
@@ -489,7 +482,6 @@ export default {
                 // Очищаем input для возможности повторного выбора того же файла
                 event.target.value = "";
             } catch (error) {
-                console.error("Ошибка импорта PPTX:", error);
                 this.importError = error.message || "Ошибка при импорте презентации";
                 this.showToast(this.importError, "danger");
                 event.target.value = "";

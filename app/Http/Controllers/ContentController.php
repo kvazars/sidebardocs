@@ -235,66 +235,229 @@ class ContentController extends Controller
         Tree::onlyTrashed()->forceDelete();
         Content::onlyTrashed()->forceDelete();
 
-        $dirFiles = [];
-        $u = User::where('role', '!=', 'user')->pluck('id')->toArray();
+        $stats = [
+            'content_updated' => 0,
+            'broken_refs_removed' => 0,
+            'files_deleted' => 0,
+        ];
 
-        $dirs = ['/contentImages/', '/contentFiles/'];
-        foreach ($dirs as $dirss) {
-            foreach ($u as $value) {
-                $dir = public_path('') . $dirss . $value;
+        $physicalFiles = $this->collectManagedFiles();
+        $physicalRelSet = [];
+        foreach ($physicalFiles as $item) {
+            $physicalRelSet[$item['rel']] = true;
+        }
 
-                if (is_dir($dir)) {
-                    if ($dh = opendir($dir)) {
-                        while (($file = readdir($dh)) !== false) {
-                            if ($file != '.' && $file != '..') {
-                                $dirFiles[] = $dirss . $value . '/' . $file;
-                            }
-                        }
-                        closedir($dh);
-                    }
+        $usedRelSet = [];
+
+        $contents = Content::query()->get(['id', 'data']);
+        foreach ($contents as $content) {
+            $blocks = json_decode($content->data, true);
+            if (!is_array($blocks)) {
+                continue;
+            }
+
+            $changed = false;
+            $cleanedBlocks = [];
+
+            foreach ($blocks as $block) {
+                $cleanedBlock = $this->sanitizeBlockReferences($block, $physicalRelSet, $usedRelSet, $stats);
+                if ($cleanedBlock === null) {
+                    $changed = true;
+                    continue;
                 }
+
+                if ($cleanedBlock !== $block) {
+                    $changed = true;
+                }
+
+                $cleanedBlocks[] = $cleanedBlock;
+            }
+
+            if ($changed) {
+                $content->update(['data' => json_encode($cleanedBlocks, JSON_UNESCAPED_UNICODE)]);
+                $stats['content_updated']++;
             }
         }
 
-        $dir = public_path('logo');
-        if (is_dir($dir)) {
-            if ($dh = opendir($dir)) {
-                while (($file = readdir($dh)) !== false) {
-                    if ($file != '.' && $file != '..') {
-                        $dirFiles[] =   'logo/' . $file;
-                    }
-                }
-                closedir($dh);
-            }
-        }
-        $savedImages = [];
-        $savedFiles = [];
-        $c = Content::pluck('data');
-        foreach ($c as $value) {
-            $value = json_decode($value);
-            foreach ($value as $v) {
-                if (isset($v->type))
-                    switch ((string)$v->type) {
-                        case 'image':
-                            $savedImages[] = $v->data->file->url;
-                            break;
-                        case 'gallery':
-                            for ($i = 0; $i < count($v->data->files); $i++) {
-                                $savedImages[] = $v->data->files[$i]->url;
-                            }
-                            break;
-                        case 'attaches':
-                            $savedFiles[] = $v->data->file->url;
-                            break;
-                    }
-            }
-        }
         $about = About::find(1);
-        $del = array_diff($dirFiles, array_merge($savedImages, $savedFiles, [$about->logo]));
-        Storage::disk('public')->delete($del);
+        if ($about && !empty($about->logo)) {
+            $normalizedLogo = $this->normalizeManagedPath($about->logo);
+            if ($normalizedLogo) {
+                if (isset($physicalRelSet[$normalizedLogo])) {
+                    $usedRelSet[$normalizedLogo] = true;
+                } else {
+                    $about->logo = null;
+                    $about->save();
+                    $stats['broken_refs_removed']++;
+                }
+            }
+        }
+
+        foreach ($physicalFiles as $file) {
+            if (!isset($usedRelSet[$file['rel']])) {
+                if (@unlink($file['abs'])) {
+                    $stats['files_deleted']++;
+                }
+            }
+        }
+
         Artisan::call('route:clear');
         Artisan::call('cache:clear');
-        return response()->json(['success' => true, 'message' => 'Кэш очищен']);
+
+        return response()->json([
+            'success' => true,
+            'message' => sprintf(
+                'Кэш очищен. Обновлено файлов: %d, удалено битых ссылок: %d, удалено лишних файлов: %d',
+                $stats['content_updated'],
+                $stats['broken_refs_removed'],
+                $stats['files_deleted']
+            ),
+            'stats' => $stats,
+        ]);
+    }
+
+    private function collectManagedFiles(): array
+    {
+        $result = [];
+
+        $roots = [
+            ['dir' => public_path('contentImages'), 'prefix' => 'contentImages'],
+            ['dir' => public_path('contentFiles'), 'prefix' => 'contentFiles'],
+            ['dir' => public_path('logo'), 'prefix' => 'logo'],
+            ['dir' => storage_path('app/public/contentImages'), 'prefix' => 'contentImages'],
+            ['dir' => storage_path('app/public/contentFiles'), 'prefix' => 'contentFiles'],
+            ['dir' => storage_path('app/public/logo'), 'prefix' => 'logo'],
+        ];
+
+        foreach ($roots as $root) {
+            $dir = $root['dir'];
+            $prefix = $root['prefix'];
+
+            if (!is_dir($dir)) {
+                continue;
+            }
+
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS)
+            );
+
+            foreach ($iterator as $fileInfo) {
+                if (!$fileInfo->isFile()) {
+                    continue;
+                }
+
+                $relativeInside = str_replace('\\', '/', $iterator->getSubPathname());
+                $relativePath = $prefix . '/' . ltrim($relativeInside, '/');
+
+                $result[] = [
+                    'abs' => $fileInfo->getPathname(),
+                    'rel' => $relativePath,
+                ];
+            }
+        }
+
+        return $result;
+    }
+
+    private function sanitizeBlockReferences(array $block, array $physicalRelSet, array &$usedRelSet, array &$stats): ?array
+    {
+        if (!isset($block['type']) || !isset($block['data']) || !is_array($block['data'])) {
+            return $block;
+        }
+
+        $type = (string)$block['type'];
+        $data = $block['data'];
+
+        if ($type === 'image') {
+            $url = $data['file']['url'] ?? ($data['url'] ?? null);
+            if ($url) {
+                $normalized = $this->normalizeManagedPath((string)$url);
+                if ($normalized) {
+                    if (!isset($physicalRelSet[$normalized])) {
+                        $stats['broken_refs_removed']++;
+                        return null;
+                    }
+                    $usedRelSet[$normalized] = true;
+                }
+            }
+            return $block;
+        }
+
+        if ($type === 'gallery') {
+            $files = $data['files'] ?? [];
+            if (!is_array($files)) {
+                return $block;
+            }
+
+            $cleanedFiles = [];
+            foreach ($files as $fileItem) {
+                if (!is_array($fileItem) || !isset($fileItem['url'])) {
+                    continue;
+                }
+                $normalized = $this->normalizeManagedPath((string)$fileItem['url']);
+                if ($normalized && !isset($physicalRelSet[$normalized])) {
+                    $stats['broken_refs_removed']++;
+                    continue;
+                }
+                if ($normalized) {
+                    $usedRelSet[$normalized] = true;
+                }
+                $cleanedFiles[] = $fileItem;
+            }
+
+            if (count($cleanedFiles) === 0) {
+                $stats['broken_refs_removed']++;
+                return null;
+            }
+
+            if ($cleanedFiles !== $files) {
+                $block['data']['files'] = $cleanedFiles;
+            }
+
+            return $block;
+        }
+
+        if ($type === 'attaches') {
+            $url = $data['file']['url'] ?? null;
+            if ($url) {
+                $normalized = $this->normalizeManagedPath((string)$url);
+                if ($normalized) {
+                    if (!isset($physicalRelSet[$normalized])) {
+                        $stats['broken_refs_removed']++;
+                        return null;
+                    }
+                    $usedRelSet[$normalized] = true;
+                }
+            }
+            return $block;
+        }
+
+        return $block;
+    }
+
+    private function normalizeManagedPath(string $path): ?string
+    {
+        $rawPath = trim($path);
+        if ($rawPath === '') {
+            return null;
+        }
+
+        $parsed = parse_url($rawPath, PHP_URL_PATH);
+        $normalized = str_replace('\\', '/', $parsed ?: $rawPath);
+        $normalized = preg_replace('/\/+/', '/', $normalized);
+        $normalized = ltrim($normalized, '/');
+
+        if (str_starts_with($normalized, 'storage/')) {
+            $normalized = substr($normalized, strlen('storage/'));
+        }
+
+        foreach (['contentImages/', 'contentFiles/', 'logo/'] as $prefix) {
+            if (str_starts_with($normalized, $prefix)) {
+                return $normalized;
+            }
+        }
+
+        return null;
     }
 
     public function search(Request $request)
