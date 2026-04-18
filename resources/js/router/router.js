@@ -1,4 +1,3 @@
-import { h, resolveComponent } from "vue";
 import { createRouter, createWebHistory } from "vue-router";
 
 import DefaultLayout from "../layouts/DefaultLayout.vue";
@@ -6,10 +5,14 @@ import DefaultLayout from "../layouts/DefaultLayout.vue";
 const routes = [
     {
         path: "/",
-        name: "Home",
-        meta: { title: "Главная" },
         component: DefaultLayout,
         children: [
+            {
+                path: "",
+                name: "Home",
+                meta: { title: "Главная" },
+                component: () => import("../views/ShowFile.vue"),
+            },
             {
                 path: "/files/:id/edit",
                 name: "EditFile",
@@ -32,7 +35,7 @@ const routes = [
                 props: true,
             },
             {
-                path: "/:catchAll(.*)*",
+                path: ":catchAll(.*)*",
                 name: "NotFound",
                 meta: { title: "Ресурс не найден" },
                 component: () => import("../views/pages/Page404.vue"),

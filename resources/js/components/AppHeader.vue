@@ -138,6 +138,7 @@ import { useSidebarStore } from "../stores/sidebar.js";
 import { useAuthIdStore } from "../stores/authId";
 import { useThemeStore } from "../stores/theme.js";
 import { COREUI_THEME_STORAGE_KEY } from "../utils/coreuiTheme.js";
+import { getErrorMessage } from "../utils/uiHelpers";
 
 const themeCycleLabels = {
     light: "Светлая",
@@ -153,6 +154,7 @@ export default {
         "logoutFun",
         "openSearchModal",
         "addFirstLevel",
+        "showToast",
     ],
     setup() {
         return {
@@ -229,7 +231,10 @@ export default {
                     }
                 })
                 .catch((error) => {
-                    console.log(error);
+                    this.showToast?.(
+                        getErrorMessage(error, "Не удалось выйти из системы"),
+                        "danger"
+                    );
                 });
         },
         goToAdmin() {

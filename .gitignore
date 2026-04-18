@@ -28,4 +28,3 @@ yarn-error.log
 /public/contentFiles/*
 /public/contentImages/*
 .DS_STORE
-laravel.log

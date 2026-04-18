@@ -1,66 +1,129 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SidebarDocs
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Внутреннее веб-приложение на Laravel 11 и Vue 3 для работы с деревом документов, редактором контента и тестами.
 
-## About Laravel
+## Что умеет проект
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Дерево папок и документов с правами доступа
+- Просмотр и редактирование документов через Editor.js
+- Импорт документов из `docx`, `pptx`, `pdf`
+- Экспорт документов в Word
+- Управление пользователями, группами и доступами
+- Создание, прохождение и просмотр результатов тестов
+- Публичные и ссылочные документы по slug
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Технологии
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Backend: Laravel 11, Sanctum, Eloquent
+- Frontend: Vue 3, Vue Router, Pinia, CoreUI, Bootstrap 5
+- Сборка: Vite 5
+- Работа с файлами: `mammoth`, `jszip`, `pdfjs-dist`, `docx`, `intervention/image`
 
-## Learning Laravel
+## Требования
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- PHP `^8.2`
+- Composer
+- Node.js 18+ и npm
+- SQLite или другая поддерживаемая Laravel БД
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Быстрый запуск
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+1. Установить PHP-зависимости:
 
-## Laravel Sponsors
+```bash
+composer install
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+2. Установить frontend-зависимости:
 
-### Premium Partners
+```bash
+npm install
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+3. Создать `.env`:
 
-## Contributing
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+4. Подготовить базу данных:
 
-## Code of Conduct
+```bash
+php artisan migrate
+php artisan db:seed
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+5. Убедиться, что есть символическая ссылка на публичное хранилище:
 
-## Security Vulnerabilities
+```bash
+php artisan storage:link
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+6. Запустить backend и frontend:
 
-## License
+```bash
+php artisan serve
+npm run dev
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+По умолчанию Vite работает на `http://localhost:3001`, а Laravel API на `http://127.0.0.1:8000`.
+
+## Сборка production
+
+```bash
+npm run build
+```
+
+## Основные каталоги
+
+- [app/Http/Controllers](/Users/macos/projects/sidebardocs/app/Http/Controllers) — API-контроллеры
+- [resources/js/components](/Users/macos/projects/sidebardocs/resources/js/components) — крупные Vue-компоненты интерфейса
+- [resources/js/views](/Users/macos/projects/sidebardocs/resources/js/views) — страницы
+- [resources/js/utils](/Users/macos/projects/sidebardocs/resources/js/utils) — импорт/экспорт документов
+- [routes/api.php](/Users/macos/projects/sidebardocs/routes/api.php) — API-маршруты
+- [database/migrations](/Users/macos/projects/sidebardocs/database/migrations) — структура БД
+
+## Права доступа
+
+- `admin` — полный доступ, включая управление пользователями и группами
+- `ceo` — работа со своими материалами и административными разделами, где это разрешено
+- `user` — доступ к разрешённым документам и тестам
+
+Отдельно поддерживаются:
+
+- публичные документы
+- документы только по ссылке
+- документы с групповыми ограничениями
+
+## Импорт и экспорт
+
+Импорт реализован на клиенте и доступен из редактора документа:
+
+- `DOCX`
+- `PPTX`
+- `PDF`
+
+Экспорт документа поддерживает сохранение в Word / DOCX с попыткой максимально близко повторить структуру содержимого.
+
+## Текущее состояние проекта
+
+- Проект активно дорабатывается
+- Ключевые зоны сложности: редактор документов, импорт/экспорт и модуль тестирования
+- Автоматическое тестовое покрытие пока не добавлено
+
+## Полезные команды
+
+```bash
+php artisan route:list
+php artisan migrate:fresh --seed
+php artisan cache:clear
+php artisan route:clear
+npm run build
+```
+
+## Замечания по сопровождению
+
+- В проекте много крупной клиентской логики, поэтому перед большими изменениями стоит проверять `npm run build`
+- Для прав доступа лучше проверять как авторизованные, так и гостевые сценарии
+- При изменениях в импорте документов полезно перепроверять реальные файлы `docx/pptx/pdf`

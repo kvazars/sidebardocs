@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Test;
 use App\Models\Tree;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Intervention\Image\Laravel\Facades\Image;
 
 // use Illuminate\Http\JsonResponse;
@@ -28,32 +30,22 @@ class TestController extends Controller
             'tree_id' => 'required|exists:trees,id'
         ]);
 
-        $test = Test::create([
-            'title' => $validated['title'],
-            'description' => $validated['description'],
-            'timeLimit' => $validated['timeLimit'],
-            'tree_id' => $validated['tree_id'],
-            'settings' => [
-                'shuffleQuestions' => $request->input('settings.shuffleQuestions', false),
-                'shuffleAnswers' => $request->input('settings.shuffleAnswers', false),
-                'randomQuestionCount' => max(0, min(10000, (int) $request->input('settings.randomQuestionCount', 0))),
-            ],
-            'grading' => $validated['grading'] ?? null
-        ]);
+        DB::transaction(function () use ($request, $validated) {
+            $test = Test::create([
+                'title' => $validated['title'],
+                'description' => $validated['description'] ?? null,
+                'timeLimit' => $validated['timeLimit'],
+                'tree_id' => $validated['tree_id'],
+                'settings' => [
+                    'shuffleQuestions' => $request->input('settings.shuffleQuestions', false),
+                    'shuffleAnswers' => $request->input('settings.shuffleAnswers', false),
+                    'randomQuestionCount' => max(0, min(10000, (int) $request->input('settings.randomQuestionCount', 0))),
+                ],
+                'grading' => $validated['grading'] ?? null
+            ]);
 
-
-        if ($request->has('questions')) {
-            foreach ($request->questions as $questionData) {
-                $test->questions()->create([
-                    'text' => $questionData['text'],
-                    'type' => $questionData['type'],
-                    'points' => $questionData['points'],
-                    'image' => $this->processImage($questionData['image']),
-                    'options' => $this->processQuestionOptions($questionData),
-                    'order' => $questionData['order'] ?? 0
-                ]);
-            }
-        }
+            $this->syncQuestions($test, $request->input('questions', []));
+        });
 
         return response()->json(['message' => 'Тест успешно создан!'], 201);
     }
@@ -104,33 +96,24 @@ class TestController extends Controller
             'grading' => 'nullable|array'
         ]);
 
-        $test->update([
-            'title' => $validated['title'],
-            'description' => $validated['description'],
-            'timeLimit' => $validated['timeLimit'],
-            'settings' => [
-                'shuffleQuestions' => $request->input('settings.shuffleQuestions', false),
-                'shuffleAnswers' => $request->input('settings.shuffleAnswers', false),
-                'randomQuestionCount' => max(0, min(10000, (int) $request->input('settings.randomQuestionCount', 0))),
-            ],
-            'grading' => $validated['grading'] ?? null
-        ]);
+        DB::transaction(function () use ($request, $validated, $test) {
+            $test->update([
+                'title' => $validated['title'],
+                'description' => $validated['description'] ?? null,
+                'timeLimit' => $validated['timeLimit'],
+                'settings' => [
+                    'shuffleQuestions' => $request->input('settings.shuffleQuestions', false),
+                    'shuffleAnswers' => $request->input('settings.shuffleAnswers', false),
+                    'randomQuestionCount' => max(0, min(10000, (int) $request->input('settings.randomQuestionCount', 0))),
+                ],
+                'grading' => $validated['grading'] ?? null
+            ]);
 
-        // Обновляем вопросы
-        if ($request->has('questions')) {
-            $test->questions()->delete(); // Удаляем старые вопросы
-
-            foreach ($request->questions as $questionData) {
-                $test->questions()->create([
-                    'text' => $questionData['text'],
-                    'type' => $questionData['type'],
-                    'points' => $questionData['points'],
-                    'image' => $this->processImage($questionData['image']),
-                    'options' => $this->processQuestionOptions($questionData),
-                    'order' => $questionData['order'] ?? 0
-                ]);
+            if ($request->has('questions')) {
+                $test->questions()->delete();
+                $this->syncQuestions($test, $request->input('questions', []));
             }
-        }
+        });
 
         return response()->json(['message' => 'Тест успешно обновлён!']);
     }
@@ -184,41 +167,44 @@ class TestController extends Controller
             'tree_id' => 'required|integer|exists:trees,id',
             'file' => 'required|file|mimes:json,xml',
             'format' => 'required|in:json,xml',
+            'xml_data' => 'required_if:format,xml|string',
         ]);
         $format = $request->input('format');
 
         $file = $request->file('file');
         if ($format === 'json') {
             $testData = json_decode(file_get_contents($file->getPathname()), true);
-        } elseif ($format === 'xml') {
-            if ($request->has('xml_data')) {
-                $testData = ["grading" => json_decode($request->grading)] + json_decode($request->input('xml_data'), true);
-
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    throw new \Exception('Ошибка декодирования XML данных');
-                }
+            if (json_last_error() !== JSON_ERROR_NONE || !is_array($testData)) {
+                throw ValidationException::withMessages([
+                    'file' => 'Не удалось прочитать JSON-файл теста.',
+                ]);
             }
-        }
-        $test = Test::create([
-            'title' => $testData['title'] . ' (импорт)',
-            'description' => $testData['description'],
-            'timeLimit' => $testData['timeLimit'],
-            'settings' => $testData['settings'],
-            'grading' => $testData['grading'],
-            'tree_id' => $request->tree_id,
-        ]);
+        } elseif ($format === 'xml') {
+            $decodedXmlData = json_decode($request->input('xml_data'), true);
+            if (json_last_error() !== JSON_ERROR_NONE || !is_array($decodedXmlData)) {
+                throw ValidationException::withMessages([
+                    'xml_data' => 'Ошибка декодирования XML данных.',
+                ]);
+            }
 
-        foreach ($testData['questions'] as $questionData) {
-            $test->questions()->create([
-                'text' => $questionData['text'],
-                'type' => $questionData['type'],
-                'points' => $questionData['points'],
-                'image' => $this->processImage($questionData['image']),
-                'options' => $this->processQuestionOptions($questionData),
-                'items' => $questionData['items'] ?? null,
-                'order' => $questionData['order'] ?? 0
-            ]);
+            $grading = json_decode($request->input('grading', 'null'), true);
+            $testData = ['grading' => is_array($grading) ? $grading : null] + $decodedXmlData;
         }
+
+        $testData = $this->normalizeImportedTestData($testData);
+
+        DB::transaction(function () use ($request, $testData) {
+            $test = Test::create([
+                'title' => $testData['title'] . ' (импорт)',
+                'description' => $testData['description'],
+                'timeLimit' => $testData['timeLimit'],
+                'settings' => $testData['settings'],
+                'grading' => $testData['grading'],
+                'tree_id' => $request->tree_id,
+            ]);
+
+            $this->syncQuestions($test, $testData['questions']);
+        });
 
         return response()->json(['message' => 'Импорт произошёл успешно!']);
     }
@@ -241,7 +227,6 @@ class TestController extends Controller
                     'points' => $question->points,
                     'image' => $question->image,
                     'options' => $question->options,
-                    'items' => $question['items'] ?? null,
                     'order' => $question->order
                 ];
             })->toArray()
@@ -253,5 +238,83 @@ class TestController extends Controller
         file_put_contents($filepath, json_encode($testData, JSON_PRETTY_PRINT));
 
         return response()->download($filepath)->deleteFileAfterSend(true);
+    }
+
+    private function syncQuestions(Test $test, array $questions): void
+    {
+        foreach ($questions as $index => $questionData) {
+            $normalizedQuestion = $this->normalizeQuestionData($questionData);
+
+            $test->questions()->create([
+                'text' => $normalizedQuestion['text'],
+                'type' => $normalizedQuestion['type'],
+                'points' => $normalizedQuestion['points'],
+                'image' => $this->processImage($normalizedQuestion['image'] ?? null),
+                'options' => $this->processQuestionOptions($normalizedQuestion),
+                'order' => $normalizedQuestion['order'] ?? $index,
+            ]);
+        }
+    }
+
+    private function normalizeImportedTestData(array $testData): array
+    {
+        if (empty($testData['title']) || !is_string($testData['title'])) {
+            throw ValidationException::withMessages([
+                'file' => 'В импортируемом тесте отсутствует название.',
+            ]);
+        }
+
+        if (empty($testData['questions']) || !is_array($testData['questions'])) {
+            throw ValidationException::withMessages([
+                'file' => 'В импортируемом тесте отсутствуют вопросы.',
+            ]);
+        }
+
+        $normalizedQuestions = [];
+        foreach ($testData['questions'] as $index => $questionData) {
+            $normalizedQuestions[] = $this->normalizeQuestionData($questionData, $index);
+        }
+
+        return [
+            'title' => $testData['title'],
+            'description' => $testData['description'] ?? null,
+            'timeLimit' => max(1, (int) ($testData['timeLimit'] ?? 30)),
+            'settings' => [
+                'shuffleQuestions' => (bool) data_get($testData, 'settings.shuffleQuestions', false),
+                'shuffleAnswers' => (bool) data_get($testData, 'settings.shuffleAnswers', false),
+                'randomQuestionCount' => max(0, min(10000, (int) data_get($testData, 'settings.randomQuestionCount', 0))),
+            ],
+            'grading' => isset($testData['grading']) && is_array($testData['grading']) ? $testData['grading'] : null,
+            'questions' => $normalizedQuestions,
+        ];
+    }
+
+    private function normalizeQuestionData(array $questionData, ?int $index = null): array
+    {
+        $type = $questionData['type'] ?? null;
+        $supportedTypes = ['single', 'multiple', 'truefalse', 'text', 'matching', 'sorting'];
+
+        if (!$type || !in_array($type, $supportedTypes, true)) {
+            throw ValidationException::withMessages([
+                'questions' => 'Обнаружен неподдерживаемый тип вопроса при сохранении теста.',
+            ]);
+        }
+
+        $options = $questionData['options'] ?? null;
+        if ($options === null && isset($questionData['items']) && is_array($questionData['items'])) {
+            $options = $questionData['items'];
+        }
+        if ($options === null && isset($questionData['answers']) && is_array($questionData['answers'])) {
+            $options = $questionData['answers'];
+        }
+
+        return [
+            'text' => (string) ($questionData['text'] ?? ''),
+            'type' => $type,
+            'points' => max(1, (int) ($questionData['points'] ?? 1)),
+            'image' => $questionData['image'] ?? null,
+            'options' => $options,
+            'order' => $questionData['order'] ?? $index ?? 0,
+        ];
     }
 }

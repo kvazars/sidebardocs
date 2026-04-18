@@ -14,23 +14,9 @@
         </div>
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="mb-0">
-                <i
-                    class="bi"
-                    :class="isEditing ? 'bi-pencil' : 'bi-pencil-square'"
-                ></i>
-                {{
-                    isEditing ? "Редактирование теста" : "Создание нового теста"
-                }}
+
             </h2>
             <div>
-                <button
-                    v-if="!isEditing"
-                    @click="showImportModal"
-                    class="btn btn-success me-2"
-                >
-                    <i class="bi bi-upload"></i> Импорт теста
-                </button>
-
                 <button
                     v-if="isEditing"
                     @click="cancelEdit"
@@ -55,8 +41,17 @@
                     class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
                 >
                     <h5 class="mb-0">Основная информация</h5>
-                    <div v-if="isEditing" class="text-warning">
-                        <i class="bi bi-info-circle"></i> Режим редактирования
+                    <div class="d-flex align-items-center gap-2">
+                        <button
+                            v-if="!isEditing"
+                            @click="showImportModal"
+                            class="btn btn-success text-white"
+                        >
+                            <i class="bi bi-upload"></i> Импорт теста
+                        </button>
+                        <div v-if="isEditing" class="text-warning">
+                            <i class="bi bi-info-circle"></i> Режим редактирования
+                        </div>
                     </div>
                 </div>
                 <div class="card-body">
@@ -1011,6 +1006,7 @@
 
 <script>
 import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
+import { confirmAction } from "../utils/uiHelpers";
 export default {
     name: "TestCreator",
     emits: ["error"],
@@ -1137,18 +1133,17 @@ export default {
             this.error = "";
 
             try {
-                this.datasend("tests/" + testId, "GET").then((response) => {
-                    const testToEdit = response.data;
-                    this.test = JSON.parse(JSON.stringify(testToEdit));
-                    this.isEditing = true;
+                const response = await this.datasend("tests/" + testId, "GET");
+                const testToEdit = response.data;
+                this.test = JSON.parse(JSON.stringify(testToEdit));
+                this.isEditing = true;
 
-                    this.normalizeTestData(this.test);
+                this.normalizeTestData(this.test);
 
-                    this.test.questions.forEach((question, index) => {
-                        if (!question.id) {
-                            question.id = Date.now() + index;
-                        }
-                    });
+                this.test.questions.forEach((question, index) => {
+                    if (!question.id) {
+                        question.id = Date.now() + index;
+                    }
                 });
             } catch (error) {
                 this.error = error.message;
@@ -1413,8 +1408,8 @@ export default {
             this.test.questions.push(newQuestion);
         },
 
-        removeQuestion(index) {
-            if (confirm("Вы уверены, что хотите удалить этот вопрос?")) {
+        async removeQuestion(index) {
+            if (await confirmAction("Вы уверены, что хотите удалить этот вопрос?")) {
                 this.test.questions.splice(index, 1);
             }
         },
@@ -1547,12 +1542,18 @@ export default {
             const maxSize = 2 * 1024 * 1024; // 2MB
 
             if (!validTypes.includes(file.type)) {
-                alert("Пожалуйста, выберите файл в формате JPG, PNG или GIF");
+                this.showToast(
+                    "Пожалуйста, выберите файл в формате JPG, PNG или GIF",
+                    "warning"
+                );
                 return false;
             }
 
             if (file.size > maxSize) {
-                alert("Размер файла не должен превышать 2MB");
+                this.showToast(
+                    "Размер файла не должен превышать 2MB",
+                    "warning"
+                );
                 return false;
             }
 
@@ -1609,7 +1610,7 @@ export default {
             });
         },
 
-        saveTest() {
+        async saveTest() {
             this.loading = true;
             this.error = "";
 
@@ -1627,38 +1628,33 @@ export default {
                 if (this.isEditing) {
                     this.test.id = this.editTestId;
 
-                    this.datasend(`tests/${this.test.id}`, "PUT", this.test)
-                        .then((response) => {
-                            this.resetTest();
-                            this.changeCurrentView();
-                            this.showToast(response.message, "success");
-                        })
-                        .catch((err) => {
-                            console.log(err);
-                        });
+                    const response = await this.datasend(
+                        `tests/${this.test.id}`,
+                        "PUT",
+                        this.test
+                    );
+                    this.resetTest();
+                    this.changeCurrentView();
+                    this.showToast(response.message, "success");
                 } else {
                     const testToSend = { ...this.test };
                     testToSend.tree_id = this.$route.params.id;
                     delete testToSend.id;
 
-                    this.datasend(`tests`, "POST", testToSend)
-                        .then((response) => {
-                            this.resetTest();
-                            this.changeCurrentView();
-                            this.showToast(response.message, "success");
-                        })
-                        .catch((err) => {
-                            console.error("Ошибка создания теста:", err);
-                            this.error = "Ошибка при создании теста";
-                            this.showToast(
-                                "Ошибка при создании теста",
-                                "danger"
-                            );
-                        });
+                    const response = await this.datasend(
+                        `tests`,
+                        "POST",
+                        testToSend
+                    );
+                    this.resetTest();
+                    this.changeCurrentView();
+                    this.showToast(response.message, "success");
                 }
             } catch (error) {
-                this.error = error.message;
+                this.error =
+                    error?.message || "Ошибка при сохранении теста";
                 this.$emit("error", error.message);
+                this.showToast(this.error, "danger");
             } finally {
                 this.loading = false;
             }

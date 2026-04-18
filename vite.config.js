@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import laravel from "laravel-vite-plugin";
 import vue from "@vitejs/plugin-vue";
 import autoprefixer from "autoprefixer";
-import path from "node:path";
+import { nodePolyfills } from "vite-plugin-node-polyfills";
 
 export default defineConfig({
     base: "./",
@@ -15,6 +15,7 @@ export default defineConfig({
         preprocessorOptions: {
             scss: {
                 quietDeps: true,
+                silenceDeprecations: ["import"],
                 api: "modern-compiler",
             },
         },
@@ -23,6 +24,10 @@ export default defineConfig({
         laravel({
             input: ["resources/js/app.js"],
             refresh: true,
+        }),
+        nodePolyfills({
+            include: ["stream", "events", "timers", "util", "buffer", "process"],
+            protocolImports: true,
         }),
         vue({
             template: {
@@ -33,33 +38,37 @@ export default defineConfig({
             },
         }),
     ],
-    // resolve: {
-    //     alias: [
-    //         // webpack path resolve to vitejs
-    //         {
-    //             find: /^~(.*)$/,
-    //             replacement: "$1",
-    //         },
-    //         {
-    //             find: "@/",
-    //             replacement: `${path.resolve(__dirname, "src")}/`,
-    //         },
-    //         {
-    //             find: "@",
-    //             replacement: path.resolve(__dirname, "/src"),
-    //         },
-    //     ],
-    //     extensions: [
-    //         ".mjs",
-    //         ".js",
-    //         ".ts",
-    //         ".jsx",
-    //         ".tsx",
-    //         ".json",
-    //         ".vue",
-    //         ".scss",
-    //     ],
-    // },
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks(id) {
+                    if (!id.includes("node_modules")) {
+                        return;
+                    }
+
+                    if (id.includes("pdfjs-dist")) {
+                        return "pdf";
+                    }
+
+                    if (id.includes("docx")) {
+                        return "docx";
+                    }
+
+                    if (
+                        id.includes("@editorjs") ||
+                        id.includes("editorjs") ||
+                        id.includes("ace-builds")
+                    ) {
+                        return "editor";
+                    }
+
+                    if (id.includes("@coreui")) {
+                        return "coreui";
+                    }
+                },
+            },
+        },
+    },
     server: {
         port: 3001,
         proxy: {

@@ -59,14 +59,5 @@
 <script>
 export default {
   props: ['datasend'],
-
-  mounted() {
-    this.datasend('group', 'GET', {}).then(res => {
-      console.log(res);
-
-    }).catch(error => {
-      console.log(error);
-    });
-  },
 }
 </script>

@@ -636,6 +636,7 @@
 
 <script>
 import bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
+import { confirmAction } from "../utils/uiHelpers";
 import {
     exportTestToWord,
     exportTestToWordWithoutAnswers,
@@ -686,7 +687,7 @@ export default {
 
         async confirmDelete(test) {
             if (
-                confirm(
+                await confirmAction(
                     `Вы уверены, что хотите удалить тест "${test.title}"? Все результаты этого теста также будут удалены.`
                 )
             ) {

@@ -57,6 +57,8 @@
 
 <script>
 import { useAuthIdStore } from "../stores/authId";
+import { exportCurrentDocumentToDocx } from "../utils/exportDocumentToDocx";
+import { confirmAction } from "../utils/uiHelpers";
 
 import { useRouter } from "vue-router";
 export default {
@@ -71,16 +73,16 @@ export default {
         save() {
             this.saveEditFile();
         },
-        redirectToHome(mess = false) {
+        async redirectToHome(mess = false) {
             if (mess) {
-                if (!confirm("Вы уверены?")) return;
+                if (!(await confirmAction("Вы уверены?"))) return;
             }
             this.router.push({ name: "Home" });
         },
-        deleteFile() {
-            if (confirm("Вы уверены?")) {
+        async deleteFile() {
+            if (await confirmAction("Вы уверены?")) {
                 if (this.$route.name == "CreateFile") {
-                    this.redirectToHome();
+                    await this.redirectToHome();
                 } else {
                     this.datasend(
                         "resourcedel/" + this.content.tree_id,
@@ -93,41 +95,18 @@ export default {
                                 this.getMenu();
                             }
                         })
-                        .catch((error) => console.log(error));
+                        .catch(() => null);
                 }
             }
         },
-        html2doc() {
-            let els = document.querySelector("#file").innerHTML;
-
-            let html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-  <head>
-  <meta charset='utf-8'>
-  <title>Export HTML To Doc</title>
-  </head>
-  <body>
-   ${els}
-  </body>
- </html>`;
-            var blob = new Blob(["\ufeff", html], {
-                type: "application/msword",
-            });
-            let url =
-                "data:application/vnd.ms-word;charset=utf-8," +
-                encodeURIComponent(html);
-
-            let filename =
-                this.breadcrumbs[this.breadcrumbs.length - 1] + ".doc";
-            var downloadLink = document.createElement("a");
-            document.body.appendChild(downloadLink);
-            if (navigator.msSaveOrOpenBlob) {
-                navigator.msSaveOrOpenBlob(blob, filename);
-            } else {
-                downloadLink.href = url;
-                downloadLink.download = filename;
-                downloadLink.click();
+        async html2doc() {
+            try {
+                const filename =
+                    this.breadcrumbs[this.breadcrumbs.length - 1] + ".docx";
+                await exportCurrentDocumentToDocx(filename);
+            } catch (error) {
+                console.error("Ошибка экспорта документа в Word:", error);
             }
-            document.body.removeChild(downloadLink);
         },
     },
 };

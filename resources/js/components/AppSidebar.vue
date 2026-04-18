@@ -143,6 +143,7 @@ import SidebarNav from "../components/SidebarNav.vue";
 import { useSidebarStore } from "../stores/sidebar.js";
 import ContextMenu from "../components/ContextMenu.vue";
 import { useAuthIdStore } from "../stores/authId";
+import { confirmAction, getErrorMessage } from "../utils/uiHelpers";
 
 export default {
     components: { SidebarNav, ContextMenu },
@@ -513,7 +514,7 @@ export default {
             this.selectedNewFolderId = folderId;
         },
 
-        saveFolderChange() {
+        async saveFolderChange() {
             if (!this.selectedFileId || !this.selectedNewFolderId) {
                 this.showToast("Выберите папку", "warning");
                 return;
@@ -543,7 +544,7 @@ export default {
                 }
             }
 
-            if (!confirm(confirmationMessage)) {
+            if (!(await confirmAction(confirmationMessage))) {
                 return;
             }
 
@@ -566,8 +567,10 @@ export default {
                     }
                 })
                 .catch((error) => {
-                    console.log(error);
-                    this.showToast("Ошибка при изменении папки", "warning");
+                    this.showToast(
+                        getErrorMessage(error, "Ошибка при изменении папки"),
+                        "warning"
+                    );
                 });
         },
 
@@ -599,7 +602,12 @@ export default {
                     this.showToast(res.message, "success");
                     this.getMenu();
                 })
-                .catch((error) => console.log(error));
+                .catch((error) =>
+                    this.showToast(
+                        getErrorMessage(error, "Не удалось переместить документ"),
+                        "danger"
+                    )
+                );
         },
         downdoc(id) {
             this.datasend("doc/down/" + id, "POST", {})
@@ -607,16 +615,26 @@ export default {
                     this.showToast(res.message, "success");
                     this.getMenu();
                 })
-                .catch((error) => console.log(error));
+                .catch((error) =>
+                    this.showToast(
+                        getErrorMessage(error, "Не удалось переместить документ"),
+                        "danger"
+                    )
+                );
         },
-        deleteFolder(id) {
-            if (confirm("Вы уверены?")) {
+        async deleteFolder(id) {
+            if (await confirmAction("Вы уверены?")) {
                 this.datasend("folder/" + id, "DELETE", {})
                     .then((res) => {
                         this.showToast(res.message, "success");
                         this.getMenu();
                     })
-                    .catch((error) => console.log(error));
+                    .catch((error) =>
+                        this.showToast(
+                            getErrorMessage(error, "Не удалось удалить папку"),
+                            "danger"
+                        )
+                    );
             }
         },
         showContextMenu(event, item) {
@@ -634,7 +652,7 @@ export default {
             }
         },
 
-        handleActionClick(action) {
+        async handleActionClick(action) {
             this.closeContextMenu();
 
             if (action == "editFolder") {
@@ -657,7 +675,7 @@ export default {
             } else if (action == "changeFolder") {
                 this.changeFolder(this.treeId, this.treeName);
             } else if (action == "deleteFile") {
-                if (confirm("Вы уверены?")) {
+                if (await confirmAction("Вы уверены?")) {
                     this.datasend("resourcedel/" + this.treeId, "DELETE", {})
                         .then((res) => {
                             if (res.success) {
@@ -666,7 +684,12 @@ export default {
                                 this.$router.push({ name: "Home" });
                             }
                         })
-                        .catch((error) => console.log(error));
+                        .catch((error) =>
+                            this.showToast(
+                                getErrorMessage(error, "Не удалось удалить документ"),
+                                "danger"
+                            )
+                        );
                 }
             }
         },

@@ -1,11 +1,21 @@
 <template>
     <div class="vh-100 position-relative">
-        <AppSidebar v-if="menu.length > 0 || auths.id" :catchError="catchError" :showToast="showToast" :menu="menu"
+        <AppSidebar
+            v-if="showChrome && (menu.length > 0 || auths.id)"
+            :catchError="catchError"
+            :showToast="showToast"
+            :menu="menu"
             :datasend="datasend" :getMenu="getMenu" :about="about" :server="server" :editFolder="editFolder" :newFolder="newFolder" />
         <div class="wrapper d-flex flex-column">
-            <AppHeader :openWindowFunction="openWindowFunction" :datasend="datasend" :logoutFun="logoutFun"
+            <AppHeader
+                v-if="showChrome"
+                :openWindowFunction="openWindowFunction"
+                :datasend="datasend"
+                :logoutFun="logoutFun"
+                :showToast="showToast"
                 :openSearchModal="openSearchModal" :addFirstLevel="addFirstLevel" />
             <CContainer
+                v-if="showChrome"
                 class="p-3 position-sticky border-bottom breadcrumb_container d-flex justify-content-between align-items-center z1"
                 fluid id="bread">
                 <AppBreadcrumb :breadcrumbs="breadcrumbs" :content="content" :saveEditFile="saveEditFile"
@@ -13,33 +23,25 @@
             </CContainer>
             <div class="body flex-grow-1">
                 <CContainer>
-                    <template v-if="page500">
-                        <Page500 />
-                    </template>
-                    <router-view :server="server" :catchError="catchError" :datasend="datasend" :api="api"
-                        :getMenu="getMenu" :showToast="showToast" :key="$route.fullPath" :authss="auths.id"
-                        :blockForTest="blockForTest" :setContent="setContent" v-if="
-                            !page500 &&
-                            $route.name != 'Home' &&
-                            $route.name != 'EditFile' &&
-                            $route.name != 'CreateFile' &&
-                            $route.name != 'Page500' &&
-                            $route.name != 'admin' &&
-                            viewSuccess
-                        " />
-                    <router-view :server="server" :catchError="catchError" :datasend="datasend" :showToast="showToast"
-                        :key="$route.fullPath" :dashboard="dashboard" :setContent="setContent" :api="api"
-                        :userRole="auths.role" v-if="auths.id && dashboard && $route.name == 'admin'" />
-
-                    <template v-if="$route.name == 'Home' && dashboard">
-                        <ShowFile :server="server" :dashboard="dashboard" :about="about" :showToast="showToast" />
-                    </template>
-                    <EditFile v-if="
-                        $route.name == 'EditFile' ||
-                        $route.name == 'CreateFile'
-                    " ref="EditFile" :server="server" :key="$route.fullPath" :datasend="datasend" :getMenu="getMenu"
-                        :catchError="catchError" :dashboard="dashboard" :showToast="showToast" :api="api"
-                        :setContent="setContent" />
+                    <router-view v-if="canRenderRoute" v-slot="{ Component }">
+                        <component
+                            :is="Component"
+                            ref="routeViewComponent"
+                            :server="server"
+                            :catchError="catchError"
+                            :datasend="datasend"
+                            :api="api"
+                            :getMenu="getMenu"
+                            :showToast="showToast"
+                            :authss="auths.id"
+                            :blockForTest="blockForTest"
+                            :setContent="setContent"
+                            :dashboard="dashboard"
+                            :about="about"
+                            :userRole="auths.role"
+                            :key="$route.fullPath"
+                        />
+                    </router-view>
                 </CContainer>
             </div>
             <AppFooter :about="about" />
@@ -218,6 +220,36 @@
                 ">Сохранить</CButton>
             </CModalFooter>
         </CModal>
+        <CModal
+            :visible="confirmDialog.visible"
+            @close="closeGlobalConfirm(false)"
+            alignment="center"
+            backdrop="static"
+            aria-labelledby="GlobalConfirmLabel"
+        >
+            <CModalHeader>
+                <CModalTitle id="GlobalConfirmLabel">
+                    {{ confirmDialog.title }}
+                </CModalTitle>
+            </CModalHeader>
+            <CModalBody>
+                {{ confirmDialog.message }}
+            </CModalBody>
+            <CModalFooter>
+                <CButton
+                    color="secondary"
+                    @click="closeGlobalConfirm(false)"
+                >
+                    {{ confirmDialog.cancelText }}
+                </CButton>
+                <CButton
+                    color="primary"
+                    @click="closeGlobalConfirm(true)"
+                >
+                    {{ confirmDialog.confirmText }}
+                </CButton>
+            </CModalFooter>
+        </CModal>
 
     </div>
 </template>
@@ -227,23 +259,17 @@ import AppFooter from "../components/AppFooter.vue";
 import AppHeader from "../components/AppHeader.vue";
 import AppSidebar from "../components/AppSidebar.vue";
 import AuthWindow from "../components/AuthWindow.vue";
-import { toast } from "vue3-toastify";
 import { useAuthIdStore } from "../stores/authId";
-import ShowFile from "../views/ShowFile.vue";
-import EditFile from "../views/EditFile.vue";
-import Page500 from "../views/pages/Page500.vue";
 import AppBreadcrumb from "../components/AppBreadcrumb.vue";
 import AntiCopyProtection from "../components/AntiCopyProtection.vue";
+import { closeConfirmDialog, confirmState } from "../utils/uiConfirm";
 
 export default {
     components: {
         AppFooter,
         AppHeader,
-        Page500,
         AppSidebar,
         AuthWindow,
-        ShowFile,
-        EditFile,
         AppBreadcrumb,
         AntiCopyProtection,
     },
@@ -258,7 +284,7 @@ export default {
             dashboard: null,
             about: null,
             viewSuccess: false,
-            page500: false,
+            testUiBlocked: false,
             content: null,
             breadcrumbs: ["Документы"],
             allId: [],
@@ -271,6 +297,7 @@ export default {
             folderParent: null,
             folderId: null,
             folderTitle: "",
+            confirmDialog: confirmState,
         };
     },
     mounted() {
@@ -278,10 +305,26 @@ export default {
     },
     watch: {
         $route() {
-            setTimeout(this.getBreadcrumbs, 1000);
+            this.scheduleBreadcrumbsUpdate();
+        },
+    },
+    computed: {
+        showChrome() {
+            return !this.testUiBlocked;
+        },
+        canRenderRoute() {
+            return this.viewSuccess || this.isStandaloneRoute;
+        },
+        isStandaloneRoute() {
+            return ["NotFound", "Page500"].includes(this.$route.name);
         },
     },
     methods: {
+        scheduleBreadcrumbsUpdate() {
+            this.$nextTick(() => {
+                this.getBreadcrumbs();
+            });
+        },
         addFirstLevel() {
             this.visibleModalFolder = true;
             this.folderTitle = "";
@@ -323,7 +366,7 @@ export default {
                     }
                 })
                 .catch((error) => {
-                    console.log(error);
+                    this.showToast("Не удалось сохранить папку", "danger");
                 });
         },
         openSearchModal() {
@@ -365,7 +408,7 @@ export default {
 
                 })
                 .catch((error) => {
-                    console.log(error);
+                    this.showToast("Не удалось выполнить поиск", "danger");
                     this.isSearching = false;
                 });
         },
@@ -374,6 +417,9 @@ export default {
             this.searchQuery = "";
             this.searchResults = { tree: [], content: [] };
             this.searchError = null;
+        },
+        closeGlobalConfirm(result) {
+            closeConfirmDialog(result);
         },
 
         navigateToResult(result) {
@@ -394,17 +440,7 @@ export default {
             });
         },
         blockForTest(block = true) {
-            if (block) {
-                document.querySelector(".sidebar").classList.add("d-none");
-                document.querySelector("#file").classList.add("d-none");
-                document.querySelector("#headerOne").classList.add("d-none");
-                document.querySelector("#bread").classList.add("d-none");
-            } else {
-                document.querySelector(".sidebar").classList.remove("d-none");
-                document.querySelector("#file").classList.remove("d-none");
-                document.querySelector("#headerOne").classList.remove("d-none");
-                document.querySelector("#bread").classList.remove("d-none");
-            }
+            this.testUiBlocked = block;
         },
 
         showToast(message, type = "info") {
@@ -471,18 +507,21 @@ export default {
                     this.api + path,
                     requestOptions
                 ).catch((error) => {
-                    console.log(error);
-                    this.page500 = true;
+                    this.$router.push({ name: "Page500" });
                 });
+                if (!response) {
+                    return Promise.reject(
+                        new Error("Не удалось получить ответ от сервера")
+                    );
+                }
                 if (response.status == 403 || response.status == 401) {
                     this.logoutFun();
+                    return response.json();
                 }
                 return (await !isBlob) ? response.json() : response.blob();
             } catch (error) {
-                console.log(error);
-
-                this.page500 = true;
-                // this.$router.push({ name: "Page500" });
+                this.$router.push({ name: "Page500" });
+                return Promise.reject(error);
             }
         },
         catchError(error) {
@@ -566,10 +605,10 @@ export default {
 
                         this.menu = menucreateparent();
                         this.menu = this.transformItems(this.menu);
-                        setTimeout(this.getBreadcrumbs, 1000);
+                        this.scheduleBreadcrumbsUpdate();
                     })
                     .catch((error) => {
-                        console.log(error);
+                        this.showToast("Не удалось загрузить дерево документов", "danger");
                     });
             }
         },
@@ -608,20 +647,23 @@ export default {
         //     }
         // },
         saveEditFile() {
-            this.$refs.EditFile.save();
+            this.$refs.routeViewComponent?.save?.();
         },
         getBreadcrumbs() {
-            let arr = [];
+            const routeTitle = this.$router.currentRoute.value.meta.title;
+            const arr = ["Документы"];
 
-            document
-                .querySelectorAll(".vsm--link_active>.vsm--title>span")
-                .forEach((el) => {
-                    arr.push(el.textContent);
-                });
-
-            if (!arr.length) {
-                arr = [this.$router.currentRoute.value.meta.title];
+            if (
+                this.content?.name &&
+                ["ShowFile", "EditFile", "CreateFile"].includes(
+                    this.$route.name
+                )
+            ) {
+                arr.push(this.content.name);
+            } else if (routeTitle && this.$route.name !== "Home") {
+                arr.push(routeTitle);
             }
+
             this.breadcrumbs = arr;
         },
     },

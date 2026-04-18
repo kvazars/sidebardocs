@@ -121,6 +121,20 @@ class ContentController extends Controller
         $fileId = null;
         if (isset($request->tree_id)) {
             $tr = Tree::find($request->tree_id);
+            if (!$tr) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Родительская папка не найдена',
+                ], 404);
+            }
+
+            if (!$this->canManageTree($request->user(), $tr)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Доступ запрещен',
+                ], 403);
+            }
+
             $position = Tree::where("tree_id", $tr->id)->count();
 
             $tree = Tree::create([
@@ -149,8 +163,21 @@ class ContentController extends Controller
         } else {
             $tree = Tree::find($request->id);
             $fileId = Content::where("tree_id", $request->id)->first();
+            if (!$tree || !$fileId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Файл не найден',
+                ], 404);
+            }
 
-            if (empty($tree->slug) && $tree->type === 'file') {
+            if (!$this->canManageTree($request->user(), $tree)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Доступ запрещен',
+                ], 403);
+            }
+
+            if ($tree->type === 'file') {
                 $tree->slug = $this->generateUniqueTreeSlug($request->name, $tree->id);
             }
 
@@ -194,7 +221,12 @@ class ContentController extends Controller
     {
         Available::where('tree_id', $tree)->delete();
         if (!$accessibility) {
-            foreach (json_decode($availables) as $available) {
+            $decodedAvailables = json_decode($availables);
+            if (!is_array($decodedAvailables)) {
+                return;
+            }
+
+            foreach ($decodedAvailables as $available) {
                 if ($available->checked) {
                     Available::create(
                         [
@@ -205,6 +237,25 @@ class ContentController extends Controller
                 }
             }
         }
+    }
+
+    public function getResourceForEdit(Request $request, $content)
+    {
+        $tree = Tree::withTrashed()->find($content);
+        if (!$tree || $tree->type !== 'file') {
+            return response()->json(['success' => false, "message" => 'Файла не существует']);
+        }
+
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['success' => false, "message" => 'Доступ запрещен']);
+        }
+
+        if (!$this->canManageTree($user, $tree)) {
+            return response()->json(['success' => false, "message" => 'Доступ запрещен']);
+        }
+
+        return $this->getResource($content);
     }
 
     public function getResource($content)
@@ -264,8 +315,18 @@ class ContentController extends Controller
     public function delResource(Request $request, $content)
     {
         $tree = Tree::withTrashed()->find($content);
-        if ($request->user()->role == 'ceo' and $request->user()->id != $tree->user_id) {
-            return response()->json(["success" => false, 'message' => 'Недостаточно прав']);
+        if (!$tree) {
+            return response()->json([
+                "success" => false,
+                'message' => 'Файл не найден',
+            ], 404);
+        }
+
+        if (!$this->canManageTree($request->user(), $tree)) {
+            return response()->json([
+                "success" => false,
+                'message' => 'Недостаточно прав',
+            ], 403);
         }
 
         $mess = '';
@@ -534,11 +595,26 @@ class ContentController extends Controller
 
     public function search(Request $request)
     {
-        //$request->search
-        //  return Tree::all();
+        $validated = $request->validate([
+            'search' => 'required|string|min:2',
+            'allId' => 'nullable',
+        ]);
 
-        $tree = Tree::whereIn('id', json_decode($request->allId))->whereRaw("upper(name) LIKE '%" . mb_strtoupper($request->search) . "%'")->get();
-        $content = Content::whereIn('tree_id', json_decode($request->allId))->with('tree')->get();
+        $allIds = json_decode($validated['allId'] ?? '[]', true);
+        if (!is_array($allIds)) {
+            $allIds = [];
+        }
+
+        $allIds = array_values(
+            array_filter($allIds, fn($id) => is_numeric($id))
+        );
+
+        $searchTerm = trim($validated['search']);
+
+        $tree = Tree::whereIn('id', $allIds)
+            ->where('name', 'like', '%' . $searchTerm . '%')
+            ->get();
+        $content = Content::whereIn('tree_id', $allIds)->with('tree')->get();
 
 
         function isFound($jsonArray, $searchTerm)
@@ -577,11 +653,24 @@ class ContentController extends Controller
         $results = [];
         foreach ($content as $cont) {
 
-            isFound(json_decode($cont->data, true), $request->search) ? $results[] = $cont : '';
+            isFound(json_decode($cont->data, true), $searchTerm) ? $results[] = $cont : '';
         }
 
 
         return ['tree' => $tree, 'content' => $results];
+    }
+
+    private function canManageTree(?User $user, Tree $tree): bool
+    {
+        if (!$user) {
+            return false;
+        }
+
+        if ($user->role === 'admin') {
+            return true;
+        }
+
+        return (int) $user->id === (int) $tree->user_id;
     }
 
 
@@ -590,6 +679,12 @@ class ContentController extends Controller
         $userRole = Auth::user()->role;
         $files = [];
         $users = [];
+        $allowedSortColumns = ['name', 'created_at', 'updated_at', 'id'];
+        $sortBy = in_array($request->sortBy, $allowedSortColumns, true)
+            ? $request->sortBy
+            : 'name';
+        $sortDirection = $request->sortAsc == 'true' ? 'asc' : 'desc';
+
         if ($userRole == 'ceo') {
             $files = Tree::where('user_id', Auth::user()->id)->where('type', 'file')->with(['child', 'parent', 'available'])->withTrashed();
         } else {
@@ -607,7 +702,7 @@ class ContentController extends Controller
             $files->where('user_id', $request->user);
         }
 
-        $files->orderBy($request->sortBy ?: 'name', $request->sortAsc == 'true' ? 'asc' : 'desc');
+        $files->orderBy($sortBy, $sortDirection);
         $files = $files->paginate(15);
 
         foreach ($files as $file) {

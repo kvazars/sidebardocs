@@ -25,6 +25,7 @@
 
 <script>
 import { useRouter } from "vue-router";
+import { getErrorMessage } from "../utils/uiHelpers";
 
 export default {
     props: ["datasend", "showToast", "catchError"],
@@ -56,7 +57,10 @@ export default {
                     }
                 })
                 .catch((error) => {
-                    console.log(error);
+                    this.showToast(
+                        getErrorMessage(error, "Не удалось сменить пароль"),
+                        "danger"
+                    );
                 });
         },
     },

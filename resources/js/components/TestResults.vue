@@ -571,6 +571,8 @@
 </template>
 
 <script>
+import { confirmAction, getErrorMessage } from "../utils/uiHelpers";
+
 export default {
     name: "TestResults",
     props: ["results", "datasend", "showToast", "getResult"],
@@ -729,7 +731,7 @@ export default {
         },
 
         // Массовое удаление результатов
-        bulkDeleteResults() {
+        async bulkDeleteResults() {
             if (this.selectedResults.size === 0) {
                 this.showToast(
                     "Не выбрано ни одного результата для удаления",
@@ -739,9 +741,9 @@ export default {
             }
 
             if (
-                !confirm(
+                !(await confirmAction(
                     `Вы уверены, что хотите удалить выбранные результаты (${this.selectedResults.size} шт.)?`
-                )
+                ))
             ) {
                 return;
             }
@@ -758,13 +760,19 @@ export default {
                     this.getResult();
                 })
                 .catch((error) => {
-                    this.showToast("Ошибка при удалении результатов", "error");
-                    console.error("Bulk delete error:", error);
+                    this.showToast(
+                        getErrorMessage(error, "Ошибка при удалении результатов"),
+                        "error"
+                    );
                 });
         },
 
-        deleteResult(result) {
-            if (!confirm("Вы уверены, что хотите удалить этот результат?")) {
+        async deleteResult(result) {
+            if (
+                !(await confirmAction(
+                    "Вы уверены, что хотите удалить этот результат?"
+                ))
+            ) {
                 return;
             }
 

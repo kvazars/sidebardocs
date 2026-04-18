@@ -49,6 +49,7 @@
 
 <script>
 import { useAuthIdStore } from "../stores/authId";
+import { getErrorMessage } from "../utils/uiHelpers";
 
 export default {
     props: [
@@ -91,7 +92,9 @@ export default {
                     }
                 })
                 .catch((error) => {
-                    console.log(error);
+                    this.catchError({
+                        auth: [getErrorMessage(error, "Ошибка авторизации")],
+                    });
                 });
         },
     },

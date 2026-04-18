@@ -43,7 +43,15 @@
                             label="Название документа"
                             placeholder="Введите название документа"
                             v-model="name"
+                            :class="{ 'is-invalid': !!validationErrors.name }"
+                            @input="clearFieldError('name')"
                         />
+                        <div
+                            v-if="validationErrors.name"
+                            class="invalid-feedback d-block"
+                        >
+                            {{ validationErrors.name }}
+                        </div>
                         <CAccordion class="mt-4">
                             <CAccordionItem :item-key="1">
                                 <CAccordionHeader>
@@ -124,64 +132,115 @@
                 <CCard>
                     <CCardHeader class="d-flex justify-content-between align-items-center">
                         <span>Содержимое</span>
-                        <div class="d-flex gap-2">
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Document actions">
                             <button
-                                class="btn btn-sm btn-danger text-white"
-                                @click="deleteResource"
-                                v-if="this.$route.params.id"
-                                title="Удалить документ"
-                            >
-                                <i class="bi bi-trash me-1"></i>Удалить
-                            </button>
-                            <button
-                                class="btn btn-sm btn-secondary text-white"
-                                @click="cancel"
-                                title="Отменить и вернуться"
-                            >
-                                <i class="bi bi-x-circle me-1"></i>Отмена
-                            </button>
-                            <button
-                                class="btn btn-sm btn-success text-white"
+                                class="btn btn-success text-white"
                                 @click="save"
                                 title="Сохранить документ"
                             >
                                 <i class="bi bi-check-circle me-1"></i>Сохранить
                             </button>
                             <button
-                                class="btn btn-sm btn-info text-white"
-                                @click="triggerImportDocx"
-                                title="Импортировать содержимое из DOCX файла"
+                                class="btn btn-secondary text-white"
+                                @click="cancel"
+                                title="Отменить и вернуться"
                             >
-                                <i class="bi bi-file-word me-1"></i>Импорт DOCX
+                                <i class="bi bi-x-circle me-1"></i>Отмена
                             </button>
                             <button
-                                class="btn btn-sm btn-info text-white"
-                                @click="triggerImportPptx"
-                                title="Импортировать содержимое из PPTX файла"
+                                class="btn btn-danger text-white"
+                                @click="deleteResource"
+                                v-if="this.$route.params.id"
+                                title="Удалить документ"
                             >
-                                <i class="bi bi-file-slides me-1"></i>Импорт PPTX
+                                <i class="bi bi-trash me-1"></i>Удалить
                             </button>
-                            <input
-                                ref="docxFileInput"
-                                type="file"
-                                accept=".docx"
-                                style="display: none"
-                                @change="handleDocxImport"
-                            />
-                            <input
-                                ref="pptxFileInput"
-                                type="file"
-                                accept=".pptx"
-                                style="display: none"
-                                @change="handlePptxImport"
-                            />
+                            <div class="btn-group" role="group">
+                                <button
+                                    class="btn btn-info text-white dropdown-toggle"
+                                    type="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                    title="Импортировать содержимое из файла"
+                                >
+                                    <i class="bi bi-upload me-1"></i>Импорт
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <button
+                                            class="dropdown-item"
+                                            type="button"
+                                            @click="triggerImportDocx"
+                                        >
+                                            <i class="bi bi-file-word me-2"></i
+                                            >DOCX
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button
+                                            class="dropdown-item"
+                                            type="button"
+                                            @click="triggerImportPptx"
+                                        >
+                                            <i class="bi bi-file-slides me-2"></i
+                                            >PPTX
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button
+                                            class="dropdown-item"
+                                            type="button"
+                                            @click="triggerImportPdf"
+                                        >
+                                            <i
+                                                class="bi bi-file-earmark-pdf me-2"
+                                            ></i
+                                            >PDF
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
+                        <input
+                            ref="docxFileInput"
+                            type="file"
+                            accept=".docx"
+                            style="display: none"
+                            @change="handleDocxImport"
+                        />
+                        <input
+                            ref="pptxFileInput"
+                            type="file"
+                            accept=".pptx"
+                            style="display: none"
+                            @change="handlePptxImport"
+                        />
+                        <input
+                            ref="pdfFileInput"
+                            type="file"
+                            accept=".pdf,application/pdf"
+                            style="display: none"
+                            @change="handlePdfImport"
+                        />
                     </CCardHeader>
                     <CCardBody class="p-1">
                         <div v-if="importError" class="alert alert-danger mb-2">
                             {{ importError }}
                         </div>
-                        <div id="editorjs"></div>
+                        <div
+                            :class="{
+                                'border border-danger rounded p-2':
+                                    !!validationErrors.data,
+                            }"
+                        >
+                            <div id="editorjs"></div>
+                        </div>
+                        <div
+                            v-if="validationErrors.data"
+                            class="invalid-feedback d-block"
+                        >
+                            {{ validationErrors.data }}
+                        </div>
                     </CCardBody>
                 </CCard>
             </CTabPane>
@@ -248,6 +307,8 @@ import TestManagement from "../components/TestManagement.vue";
 import TestCreator from "../components/TestCreator.vue";
 import { importDocxToEditorJS, validateDocxFile } from "../utils/importFromDocx";
 import { importPptxToEditorJS, validatePptxFile } from "../utils/importFromPptx";
+import { importPdfToEditorJS, validatePdfFile } from "../utils/importFromPdf";
+import { confirmAction, getErrorMessage } from "../utils/uiHelpers";
 export default {
     components: {
         TestManagement,
@@ -273,18 +334,30 @@ export default {
                     {}
                 )
                     .then((res) => {
+                        if (!res || res.success === false || !res.content) {
+                            this.showToast(
+                                (res && res.message) ||
+                                    "Доступ запрещен",
+                                "warning"
+                            );
+                            this.$router.push({ name: "NotFound" });
+                            return;
+                        }
+
                         if (
                             this.user.role == "user" ||
                             !this.user ||
                             !localStorage.getItem("token")
                         ) {
                             this.$router.push({ name: "NotFound" });
+                            return;
                         }
                         if (
                             this.user.role == "ceo" &&
                             res.content.tree.user_id != this.user.id
                         ) {
                             this.$router.push({ name: "NotFound" });
+                            return;
                         }
 
                         this.name = res.name;
@@ -313,7 +386,10 @@ export default {
                         this.createEditor();
                     })
                     .catch((error) => {
-                        console.log(error);
+                        this.showToast(
+                            getErrorMessage(error, "Не удалось загрузить документ"),
+                            "danger"
+                        );
                     });
             } else {
                 this.datasend("getGroups", "GET", {})
@@ -331,7 +407,10 @@ export default {
                         }
                     })
                     .catch((error) => {
-                        console.log(error);
+                        this.showToast(
+                            getErrorMessage(error, "Не удалось загрузить группы"),
+                            "danger"
+                        );
                     });
                 this.createEditor();
             }
@@ -358,9 +437,52 @@ export default {
             currentView: "management",
             editTestId: null,
             importError: null,
+            validationErrors: {
+                name: null,
+                data: null,
+            },
         };
     },
     methods: {
+        clearFieldError(field) {
+            if (this.validationErrors[field]) {
+                this.validationErrors[field] = null;
+            }
+        },
+        validateFormBeforeSave(blocks) {
+            let valid = true;
+
+            const title = (this.name || "").trim();
+            if (!title) {
+                this.validationErrors.name = "Введите название документа";
+                valid = false;
+            } else if (title.length < 5) {
+                this.validationErrors.name =
+                    "Название должно содержать минимум 5 символов";
+                valid = false;
+            } else {
+                this.validationErrors.name = null;
+            }
+
+            if (!Array.isArray(blocks) || blocks.length === 0) {
+                this.validationErrors.data =
+                    "Добавьте содержимое документа перед сохранением";
+                valid = false;
+            } else {
+                this.validationErrors.data = null;
+            }
+
+            return valid;
+        },
+        applyServerValidation(errors) {
+            if (!errors || typeof errors !== "object") return;
+            if (errors.name && errors.name.length) {
+                this.validationErrors.name = errors.name[0];
+            }
+            if (errors.data && errors.data.length) {
+                this.validationErrors.data = errors.data[0];
+            }
+        },
         changeCurrentView(view = "management", id = null) {
             this.currentView = view;
             this.editTestId = id;
@@ -374,6 +496,10 @@ export default {
         // Открывает диалог выбора файла PPTX
         triggerImportPptx() {
             this.$refs.pptxFileInput.click();
+        },
+        // Открывает диалог выбора файла PDF
+        triggerImportPdf() {
+            this.$refs.pdfFileInput.click();
         },
 
         // Обрабатывает импорт DOCX файла
@@ -498,6 +624,75 @@ export default {
                 event.target.value = "";
             }
         },
+        // Обрабатывает импорт PDF файла
+        async handlePdfImport(event) {
+            this.importError = null;
+            const file = event.target.files[0];
+
+            if (!file) return;
+
+            try {
+                validatePdfFile(file);
+
+                this.showToast("Импортирование PDF...", "info");
+
+                const uploadImage = async (imageBlob) => {
+                    // Для PDF изображения могут быть тяжелее, чем из PPTX
+                    if (imageBlob.size > 50000000) {
+                        return null;
+                    }
+
+                    const formData = new FormData();
+                    formData.append("image", imageBlob, "pdf-page.jpg");
+
+                    try {
+                        const response = await this.datasend(
+                            "saveImage",
+                            "POST",
+                            formData,
+                            true
+                        );
+                        if (response.success) {
+                            return response.file.url;
+                        }
+                        return null;
+                    } catch {
+                        return null;
+                    }
+                };
+
+                const blocks = await importPdfToEditorJS(file, uploadImage);
+
+                if (!blocks || blocks.length === 0) {
+                    throw new Error("Не удалось извлечь текст из PDF файла");
+                }
+
+                const currentContent = await this.editor.save();
+                const currentBlocks = Array.isArray(currentContent.blocks)
+                    ? currentContent.blocks
+                    : [];
+                const importBlocks = blocks.filter(
+                    (block) => block && block.type && block.data
+                );
+
+                await this.editor.render({
+                    time: Date.now(),
+                    version: currentContent.version || "2.30.6",
+                    blocks: [...currentBlocks, ...importBlocks],
+                });
+
+                this.showToast(
+                    `Успешно добавлено ${importBlocks.length} блоков из PDF`,
+                    "success"
+                );
+
+                event.target.value = "";
+            } catch (error) {
+                this.importError = error.message || "Ошибка при импорте PDF";
+                this.showToast(this.importError, "danger");
+                event.target.value = "";
+            }
+        },
 
         // Отмена и возврат назад
         cancel() {
@@ -505,8 +700,12 @@ export default {
         },
 
         // Удаление документа
-        deleteResource() {
-            if (!confirm('Вы уверены, что хотите удалить этот документ?')) {
+        async deleteResource() {
+            if (
+                !(await confirmAction(
+                    "Вы уверены, что хотите удалить этот документ?"
+                ))
+            ) {
                 return;
             }
 
@@ -529,12 +728,11 @@ export default {
                         }
                     })
                     .catch((error) => {
-                        console.log(error);
+                        this.showToast(getErrorMessage(error, "Ошибка при удалении документа"), "danger");
                         this.showToast("Ошибка при удалении документа", "danger");
                     });
             } catch (error) {
-                console.error("Ошибка удаления:", error);
-                this.showToast("Ошибка при удалении документа", "danger");
+                this.showToast(getErrorMessage(error, "Ошибка при удалении документа"), "danger");
             }
         },
 
@@ -542,7 +740,19 @@ export default {
             this.editor
                 .save()
                 .then((outputData) => {
-                    outputData.blocks.forEach((el) => {
+                    const normalizedBlocks = this.normalizeBlocksBeforeSave(
+                        outputData.blocks
+                    );
+
+                    if (!this.validateFormBeforeSave(normalizedBlocks)) {
+                        this.showToast(
+                            "Проверьте заполнение обязательных полей",
+                            "warning"
+                        );
+                        return;
+                    }
+
+                    normalizedBlocks.forEach((el) => {
                         if (el.type == "image" || el.type == "attaches") {
                             el.data.file.url = el.data.file.url.split(
                                 this.server
@@ -562,7 +772,7 @@ export default {
                         }
                     });
                     let form = {
-                        data: JSON.stringify(outputData.blocks),
+                        data: JSON.stringify(normalizedBlocks),
                         name: this.name ?? "",
                         accessibility: this.accessibility ? 1 : 0,
                         accessibilitymanagers: this.accessibilitymanagers
@@ -584,6 +794,8 @@ export default {
                     this.datasend("resource", "POST", form)
                         .then((res) => {
                             if (res.success) {
+                                this.validationErrors.name = null;
+                                this.validationErrors.data = null;
                                 this.getMenu();
                                 this.router.push({
                                     name: "ShowFile",
@@ -592,15 +804,22 @@ export default {
                                     },
                                 });
                             } else if (res.errors) {
+                                this.applyServerValidation(res.errors);
                                 this.catchError(res.errors);
                             }
                         })
                         .catch((error) => {
-                            console.log(error);
+                            this.showToast(
+                                getErrorMessage(error, "Ошибка при сохранении документа"),
+                                "danger"
+                            );
                         });
                 })
                 .catch((error) => {
-                    console.log("Saving failed: ", error);
+                    this.showToast(
+                        getErrorMessage(error, "Ошибка при сохранении документа"),
+                        "danger"
+                    );
                 });
         },
 
@@ -880,22 +1099,143 @@ export default {
 
                 onReady: () => {
                     this.dataBlock.forEach((element) => {
-                        if (
-                            element.type == "image" ||
-                            element.type == "attaches"
-                        ) {
-                            element.data.file.url =
-                                this.server + element.data.file.url;
+                        const normalized = this.normalizeEditorBlock(element);
+                        if (!normalized) {
+                            return;
                         }
-                        if (element.type == "gallery") {
-                            element.data.files.forEach((el) => {
+
+                        if (
+                            normalized.type == "image" ||
+                            normalized.type == "attaches"
+                        ) {
+                            normalized.data.file.url =
+                                this.server + normalized.data.file.url;
+                        }
+                        if (normalized.type == "gallery") {
+                            normalized.data.files.forEach((el) => {
                                 el.url = this.server + el.url;
                             });
                         }
-                        this.editor.blocks.insert(element.type, element.data);
+                        try {
+                            this.editor.blocks.insert(
+                                normalized.type,
+                                normalized.data
+                            );
+                        } catch (e) {
+                            // silently skip broken block
+                        }
                     });
                 },
+                onChange: () => {
+                    this.clearFieldError("data");
+                },
             });
+        },
+        normalizeEditorBlock(block) {
+            if (!block || !block.type || !block.data) return null;
+
+            if (block.type === "paragraph") {
+                const text = (block.data.text || "").toString().trim();
+                if (!text) return null;
+                return { type: "paragraph", data: { text } };
+            }
+
+            if (block.type === "table") {
+                const rows = Array.isArray(block.data.content)
+                    ? block.data.content
+                    : [];
+                if (!rows.length) return null;
+
+                const width = Math.max(
+                    ...rows.map((row) => (Array.isArray(row) ? row.length : 0)),
+                    0
+                );
+                if (!width) return null;
+
+                const content = rows
+                    .map((row) => (Array.isArray(row) ? row : []))
+                    .map((row) => {
+                        const normalized = row
+                            .slice(0, width)
+                            .map((cell) =>
+                                cell === null || cell === undefined
+                                    ? ""
+                                    : cell.toString()
+                            );
+                        while (normalized.length < width) normalized.push("");
+                        return normalized;
+                    });
+
+                return {
+                    type: "table",
+                    data: {
+                        content,
+                        withHeadings: Boolean(block.data.withHeadings),
+                        stretched:
+                            block.data.stretched === undefined
+                                ? true
+                                : Boolean(block.data.stretched),
+                    },
+                };
+            }
+
+            if (block.type === "list") {
+                const items = Array.isArray(block.data.items)
+                    ? block.data.items
+                          .map((item) =>
+                              item === null || item === undefined
+                                  ? ""
+                                  : item.toString().trim()
+                          )
+                          .filter(Boolean)
+                    : [];
+                if (!items.length) return null;
+                return {
+                    type: "list",
+                    data: {
+                        style:
+                            block.data.style === "ordered"
+                                ? "ordered"
+                                : "unordered",
+                        items,
+                    },
+                };
+            }
+
+            return block;
+        },
+        normalizeBlocksBeforeSave(blocks) {
+            if (!Array.isArray(blocks)) return [];
+
+            const normalized = [];
+            for (const block of blocks) {
+                const cleaned = this.normalizeEditorBlock(block);
+                if (!cleaned) continue;
+
+                // Для сохранения галереи и файлов обязательно корректная структура
+                if (cleaned.type === "gallery") {
+                    const files = Array.isArray(cleaned.data.files)
+                        ? cleaned.data.files.filter(
+                              (f) => f && typeof f.url === "string" && f.url
+                          )
+                        : [];
+                    if (!files.length) continue;
+                    cleaned.data.files = files;
+                }
+
+                if (
+                    (cleaned.type === "image" || cleaned.type === "attaches") &&
+                    (!cleaned.data.file ||
+                        typeof cleaned.data.file.url !== "string" ||
+                        !cleaned.data.file.url)
+                ) {
+                    continue;
+                }
+
+                normalized.push(cleaned);
+            }
+
+            return normalized;
         },
     },
 };

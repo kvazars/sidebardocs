@@ -636,6 +636,7 @@ import EditFile from "./EditFile.vue";
 import AdminFiles from "../components/AdminFiles.vue";
 import { CButtonGroup } from "@coreui/vue";
 import TestResults from "../components/TestResults.vue";
+import { confirmAction, getErrorMessage } from "../utils/uiHelpers";
 export default {
     props: [
         "datasend",
@@ -683,8 +684,10 @@ export default {
                 this.results = response.data;
             });
         },
-        authUser(user) {
-            if (confirm("Вы действительно хотите авторизоваться?")) {
+        async authUser(user) {
+            if (
+                await confirmAction("Вы действительно хотите авторизоваться?")
+            ) {
                 let form = { user: user };
 
                 this.datasend(`authUser`, "POST", form)
@@ -693,7 +696,10 @@ export default {
                         location.reload();
                     })
                     .catch((error) => {
-                        console.log(error);
+                        this.showToast(
+                            getErrorMessage(error, "Не удалось авторизоваться"),
+                            "danger"
+                        );
                     });
             }
         },
@@ -706,7 +712,10 @@ export default {
                     this.visibleCacheModal = true;
                 })
                 .catch((error) => {
-                    console.log(error);
+                    this.showToast(
+                        getErrorMessage(error, "Не удалось очистить кэш"),
+                        "danger"
+                    );
                 });
         },
         generatePassword() {
@@ -719,8 +728,8 @@ export default {
             }
             return retVal;
         },
-        removeGroups(id) {
-            if (confirm("Вы действительно хотите удалить группу?")) {
+        async removeGroups(id) {
+            if (await confirmAction("Вы действительно хотите удалить группу?")) {
                 this.datasend(`group/${id}`, "DELETE", {})
                     .then((res) => {
                         this.showToast(res.success, "success");
@@ -733,13 +742,16 @@ export default {
                         }
                     })
                     .catch((error) => {
-                        console.log(error);
+                        this.showToast(
+                            getErrorMessage(error, "Не удалось удалить группу"),
+                            "danger"
+                        );
                     });
             }
         },
-        removeUser(id, del = null) {
+        async removeUser(id, del = null) {
             if (
-                confirm(
+                await confirmAction(
                     `Вы действительно хотите ${
                         del ? "восстановить" : "удалить"
                     } пользователя?`
@@ -757,7 +769,13 @@ export default {
                         }
                     })
                     .catch((error) => {
-                        console.log(error);
+                        this.showToast(
+                            getErrorMessage(
+                                error,
+                                "Не удалось изменить пользователя"
+                            ),
+                            "danger"
+                        );
                     });
             }
         },
@@ -808,7 +826,10 @@ export default {
                         }
                     })
                     .catch((error) => {
-                        console.log(error);
+                        this.showToast(
+                            getErrorMessage(error, "Не удалось обновить систему"),
+                            "danger"
+                        );
                     });
             });
         },
@@ -825,7 +846,10 @@ export default {
                     }
                 })
                 .catch((error) => {
-                    console.log(error);
+                    this.showToast(
+                        getErrorMessage(error, "Не удалось загрузить данные"),
+                        "danger"
+                    );
                 });
         },
         createGroup() {
@@ -846,7 +870,10 @@ export default {
                     }
                 })
                 .catch((error) => {
-                    console.log(error);
+                    this.showToast(
+                        getErrorMessage(error, "Не удалось сохранить группу"),
+                        "danger"
+                    );
                 });
         },
         createUser() {
@@ -881,7 +908,10 @@ export default {
                     }
                 })
                 .catch((error) => {
-                    console.log(error);
+                    this.showToast(
+                        getErrorMessage(error, "Не удалось сохранить пользователя"),
+                        "danger"
+                    );
                 });
         },
     },

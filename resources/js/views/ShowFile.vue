@@ -338,12 +338,10 @@ export default {
             )
                 .then((res) => {
                     if (!res.content) {
-                        this.showToast(res.message, "success");
-                        setTimeout(() => {
-                            this.$router.push({
-                                name: "NotFound",
-                            });
-                        }, 2000);
+                        this.$router.replace({
+                            name: "NotFound",
+                        });
+                        return;
                     } else {
                         if (
                             this.auths.id == res.content.tree.user_id ||

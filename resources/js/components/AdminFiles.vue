@@ -277,6 +277,7 @@
 import { Bootstrap5Pagination } from "laravel-vue-pagination";
 import { useAuthIdStore } from "../stores/authId";
 import { CButton } from "@coreui/vue";
+import { confirmAction, getErrorMessage } from "../utils/uiHelpers";
 
 export default {
     components: {
@@ -321,8 +322,8 @@ export default {
             this.searchFilter.user = event.target.value;
             this.getFiles();
         },
-        clearmyaccessfiles() {
-            if (confirm("Вы уверены?")) {
+        async clearmyaccessfiles() {
+            if (await confirmAction("Вы уверены?")) {
                 this.datasend("clearmyaccessfiles", "POST")
                     .then((res) => {
                         if (res.success) {
@@ -330,7 +331,12 @@ export default {
                             this.showToast(res.message, "success");
                         }
                     })
-                    .catch((error) => console.log(error));
+                    .catch((error) =>
+                        this.showToast(
+                            getErrorMessage(error, "Не удалось сбросить доступы"),
+                            "danger"
+                        )
+                    );
             }
         },
         save(id) {
@@ -351,10 +357,15 @@ export default {
                         this.showToast(res.message, "success");
                     }
                 })
-                .catch((error) => console.log(error));
+                .catch((error) =>
+                    this.showToast(
+                        getErrorMessage(error, "Не удалось сохранить изменения"),
+                        "danger"
+                    )
+                );
         },
-        remove(id) {
-            if (confirm("Вы уверены?")) {
+        async remove(id) {
+            if (await confirmAction("Вы уверены?")) {
                 this.datasend(
                     "resourcedel/" + this.files.data[id].id,
                     "DELETE",
@@ -366,7 +377,12 @@ export default {
                             this.showToast(res.message, "success");
                         }
                     })
-                    .catch((error) => console.log(error));
+                    .catch((error) =>
+                        this.showToast(
+                            getErrorMessage(error, "Не удалось удалить файл"),
+                            "danger"
+                        )
+                    );
             }
         },
         setPage(page) {
@@ -417,7 +433,10 @@ export default {
                     this.viewOk = true;
                 })
                 .catch((error) => {
-                    console.log(error);
+                    this.showToast(
+                        getErrorMessage(error, "Не удалось загрузить файлы"),
+                        "danger"
+                    );
                 });
         },
     },

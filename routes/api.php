@@ -27,7 +27,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('tests/import', [TestController::class, 'import']);
     Route::get('tests/{test}/export', [TestController::class, 'export']);
-    Route::get('tests/{test}/results', [TestController::class, 'results']);
     Route::apiResources([
         'tests' => TestController::class,
         'results' => TestResultController::class,
@@ -47,7 +46,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //admin,ceo,user
     Route::get("/userFolder", [TreeController::class, "userFolder"]);
     Route::get('/logout', [UserController::class, 'logout']);
-    Route::get("/resourceauth/{content}", [ContentController::class, "getResource"]);
+    Route::get("/resourceauth/{content}", [ContentController::class, "getResourceForEdit"]);
 
     //admin,ceo
     Route::middleware(["role:admin|ceo"])->group(function () {
@@ -66,7 +65,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/getFiles', [ContentController::class, 'getFiles']);
         Route::post('/newPass', [UserController::class, 'newPassword']);
         Route::post('/file/{id}/change-folder', [ContentController::class, 'changeFolder']);
-       
+
     });
     //admin
     Route::middleware(["role:admin"])->group(function () {
