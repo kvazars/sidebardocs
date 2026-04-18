@@ -61,9 +61,19 @@
                             <input
                                 v-model="test.title"
                                 type="text"
+                                :class="[
+                                    'form-control',
+                                    { 'is-invalid': !test.title.trim() },
+                                ]"
                                 class="form-control"
                                 placeholder="Введите название теста"
                             />
+                            <div
+                                v-if="!test.title.trim()"
+                                class="invalid-feedback d-block"
+                            >
+                                Укажите название теста
+                            </div>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label"
@@ -259,7 +269,7 @@
                                     <span
                                         class="badge bg-danger bg-opacity-25 text-danger border border-danger me-2 mb-1"
                                     >
-                                        Вопрос {{ item.index + 1 }}
+                                        Вопрос {{ item.index + 1 }}: {{ item.error }}
                                     </span>
                                 </template>
                             </div>
@@ -340,7 +350,10 @@
                     <div
                         v-for="(question, qIndex) in test.questions"
                         :key="question.id"
-                        class="question-card card mb-3"
+                        :class="[
+                            'question-card card mb-3',
+                            { 'border border-danger': hasQuestionError(question) },
+                        ]"
                     >
                         <div
                             class="card-header d-flex justify-content-between align-items-center"
@@ -386,6 +399,15 @@
                             </div>
                         </div>
                         <div class="card-body">
+                            <div
+                                v-if="validateQuestion(question)"
+                                class="alert alert-danger py-2 mb-3"
+                                role="alert"
+                            >
+                                <strong>Ошибка в вопросе:</strong>
+                                {{ validateQuestion(question) }}
+                            </div>
+
                             <!-- Текст вопроса -->
                             <div class="mb-3">
                                 <label class="form-label">Текст вопроса:</label>
@@ -511,15 +533,19 @@
                                         />
                                         <span class="input-group-text">
                                             <input
-                                                v-model="option.correct"
-                                                :type="
-                                                    question.type === 'single'
-                                                        ? 'radio'
-                                                        : 'checkbox'
-                                                "
+                                                :checked="!!option.correct"
+                                                :type="question.type === 'single' ? 'radio' : 'checkbox'"
                                                 :name="'q' + qIndex"
-                                                :value="true"
                                                 class="form-check-input"
+                                                @change="
+                                                    question.type === 'single'
+                                                        ? setSingleCorrectAnswer(
+                                                              qIndex,
+                                                              oIndex
+                                                          )
+                                                        : (option.correct =
+                                                              $event.target.checked)
+                                                "
                                             />
                                         </span>
                                         <button
@@ -893,6 +919,12 @@
                     <i class="bi bi-check-circle"></i>
                     {{ isEditing ? "Обновить тест" : "Сохранить тест" }}
                 </button>
+                <div
+                    v-if="testValidationErrors.length > 0"
+                    class="text-danger align-self-center small"
+                >
+                    {{ testValidationErrors.join(" • ") }}
+                </div>
 
                 <!-- Опционально можно добавить кнопку отмены -->
                 <button
@@ -1047,16 +1079,27 @@ export default {
     },
     computed: {
         isTestValid() {
-            let valid =
-                this.test.title.trim() &&
+            return this.testValidationErrors.length === 0;
+        },
+        testValidationErrors() {
+            const errors = [];
+
+            if (!this.test.title.trim()) {
+                errors.push("не указано название теста");
+            }
+
+            if (this.test.questions.length === 0) {
+                errors.push("не добавлено ни одного вопроса");
+            }
+
+            if (
                 this.test.questions.length > 0 &&
-                this.test.questions.every((q) => {
-                    let valid = this.validateQuestion(q) == null;
+                this.test.questions.some((q) => this.validateQuestion(q) !== null)
+            ) {
+                errors.push("в вопросах есть ошибки");
+            }
 
-                    return valid;
-                });
-
-            return valid;
+            return errors;
         },
         totalPoints() {
             return this.test.questions.reduce(
@@ -1423,6 +1466,17 @@ export default {
 
         removeOption(qIndex, oIndex) {
             this.test.questions[qIndex].options.splice(oIndex, 1);
+        },
+
+        setSingleCorrectAnswer(qIndex, selectedOptionIndex) {
+            const question = this.test.questions[qIndex];
+            if (!question?.options) {
+                return;
+            }
+
+            question.options.forEach((option, index) => {
+                option.correct = index === selectedOptionIndex;
+            });
         },
 
         addcorrect_answer(qIndex) {
