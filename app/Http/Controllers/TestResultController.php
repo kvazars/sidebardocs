@@ -19,6 +19,8 @@ class TestResultController extends Controller
     // }
     public function resultTree(Tree $tree_id): JsonResponse
     {
+        $this->authorizeResultsAccess($tree_id->user_id);
+
         $test = Test::where("tree_id", $tree_id->id)->pluck('id')->toArray();
         if ($test) {
             $results = TestResult::with('test', 'user')->whereIn("test_id", $test)->get();
@@ -52,10 +54,16 @@ class TestResultController extends Controller
             'user_name' => 'nullable|string|max:255',
             'time_spent' => 'required|integer',
             'user_answers' => 'required|array',
+            'question_ids' => 'nullable|array',
+            'question_ids.*' => 'integer',
         ]);
 
         $test = Test::with('questions')->findOrFail($validated['test_id']);
-        $calculatedResult = $this->calculateResult($test, $validated['user_answers']);
+        $calculatedResult = $this->calculateResult(
+            $test,
+            $validated['user_answers'],
+            $validated['question_ids'] ?? null
+        );
 
         TestResult::create([
             'user_id' => Auth::id(),
@@ -92,13 +100,36 @@ class TestResultController extends Controller
 
     public function testResults($testId): JsonResponse
     {
+        $test = Test::findOrFail($testId);
+        $treeOwnerId = Tree::where('id', $test->tree_id)->value('user_id');
+
+        $this->authorizeResultsAccess($treeOwnerId);
+
         $results = TestResult::where('test_id', $testId)->with('test')->get();
         return response()->json(['data' => $results]);
     }
 
-    private function calculateResult(Test $test, array $submittedAnswers): array
+    private function authorizeResultsAccess(?int $ownerId): void
     {
-        $questions = $test->questions->values();
+        $user = Auth::user();
+        if (!$user) {
+            abort(401);
+        }
+
+        if ((int) $user->id === (int) $ownerId || $user->role === 'admin') {
+            return;
+        }
+
+        abort(403, 'Недостаточно прав для просмотра результатов теста.');
+    }
+
+    private function calculateResult(
+        Test $test,
+        array $submittedAnswers,
+        ?array $questionIds = null
+    ): array
+    {
+        $questions = $this->resolveQuestionsForAttempt($test, $questionIds);
         $questionResults = [];
         $totalScore = 0;
         $maxScore = 0;
@@ -121,6 +152,7 @@ class TestResultController extends Controller
                 'max_score' => $maxPoints,
                 'originalIndex' => $originalIndex,
                 'answered' => $evaluation['answered'],
+                'question_id' => $question->id,
             ];
         }
 
@@ -133,6 +165,30 @@ class TestResultController extends Controller
             'grade' => $this->calculateGrade($test, $percentage),
             'question_results' => $questionResults,
         ];
+    }
+
+    private function resolveQuestionsForAttempt(Test $test, ?array $questionIds = null)
+    {
+        $questions = $test->questions->values();
+
+        if (!$questionIds || count($questionIds) === 0) {
+            return $questions;
+        }
+
+        $uniqueIds = array_values(array_unique(array_map('intval', $questionIds)));
+        $questionMap = $questions->keyBy('id');
+        $resolvedQuestions = collect($uniqueIds)
+            ->map(fn($id) => $questionMap->get($id))
+            ->filter()
+            ->values();
+
+        if ($resolvedQuestions->count() !== count($uniqueIds)) {
+            throw ValidationException::withMessages([
+                'question_ids' => 'Передан некорректный набор вопросов для проверки результата.',
+            ]);
+        }
+
+        return $resolvedQuestions;
     }
 
     private function evaluateQuestion(string $type, array $options, mixed $userAnswer, float $maxPoints): array

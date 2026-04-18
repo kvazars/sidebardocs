@@ -1,20 +1,22 @@
 <template>
     <div id="file" class="print-container p-4">
-        <h1 class="text-center" v-html="pagetitle"></h1>
-        <div class="alert alert-success p-1" v-if="groups">
-            <strong>Доступно группам: </strong>{{ groups }}
-        </div>
+        <template v-if="!isTestRunning">
+            <h1 class="text-center" v-html="pagetitle"></h1>
+            <div class="alert alert-success p-1" v-if="groups">
+                <strong>Доступно группам: </strong>{{ groups }}
+            </div>
 
-        <TestResults
-            :results="results"
-            :datasend="datasend"
-            :showToast="showToast"
-            :getResult="getResult"
-            v-if="my && results.length > 0"
-        />
-        <hr />
+            <TestResults
+                :results="results"
+                :datasend="datasend"
+                :showToast="showToast"
+                :getResult="getResult"
+                v-if="my && results.length > 0"
+            />
+            <hr />
+        </template>
 
-        <div v-for="val in fileData" :key="val">
+        <div v-if="!isTestRunning" v-for="val in fileData" :key="val">
             <p
                 v-if="val.type == 'paragraph'"
                 v-html="val.data.text"
@@ -272,7 +274,7 @@
         :tests="tests"
         :datasend="datasend"
         :showToast="showToast"
-        :blockForTest="blockForTest"
+        :blockForTest="handleBlockForTest"
     />
 </template>
 
@@ -326,6 +328,7 @@ export default {
             results: [],
             my: false,
             resourceId: null,
+            isTestRunning: false,
         };
     },
 
@@ -343,14 +346,6 @@ export default {
                         });
                         return;
                     } else {
-                        if (
-                            this.auths.id == res.content.tree.user_id ||
-                            this.auths.role == "admin"
-                        ) {
-                            this.my = true;
-                            this.getResult();
-                        }
-
                         this.pagetitle = res.name;
                         this.resourceId = res.content.tree_id;
                         this.parseDoc(res.content);
@@ -362,6 +357,14 @@ export default {
                             .join(", ");
                         if (res.content.accessibility) {
                             this.groups = "всем";
+                        }
+
+                        if (
+                            this.auths.id == res.content.tree.user_id ||
+                            this.auths.role == "admin"
+                        ) {
+                            this.my = true;
+                            this.getResult();
                         }
                     }
                     if (this.auths.id) {
@@ -377,6 +380,13 @@ export default {
         }
     },
     methods: {
+        handleBlockForTest(isBlocked = true) {
+            this.isTestRunning = Boolean(isBlocked);
+
+            if (typeof this.blockForTest === "function") {
+                this.blockForTest(isBlocked);
+            }
+        },
         getResult() {
             if (!this.auths.id || !this.resourceId) {
                 this.results = [];

@@ -588,7 +588,7 @@
                                 <select
                                     v-model="currentMatchingAnswer[index]"
                                     class="form-select"
-                                    @change="onMatchingChange(index, event)"
+                                    @change="onMatchingChange(index, $event)"
                                 >
                                     <option value="">
                                         Выберите соответствие
@@ -1080,6 +1080,7 @@ export default {
                 currentQuestionIndex: this.currentQuestionIndex,
                 timeLeft: this.timeLeft,
                 answers: Object.fromEntries(this.userAnswersByOriginalIndex),
+                questionIds: this.selectedTest.questions.map((q) => q.id),
                 shuffledQuestions: this.shuffledQuestions,
                 shuffledOptionsMap: Array.from(
                     this.shuffledOptionsMap.entries()
@@ -1711,6 +1712,7 @@ export default {
 
         shuffleQuestionOptions() {
             if (!this.currentQuestion.options) return;
+            if (this.shuffledOptionsMap.has(this.currentQuestionIndex)) return;
 
             const options = [...this.currentQuestion.options];
             const shuffledOptions = options
@@ -1725,6 +1727,13 @@ export default {
 
         shuffleMatchingOptions() {
             if (!this.currentQuestion.options) return;
+
+            const existingShuffle = this.shuffledPairsMap.get(
+                this.currentQuestionIndex
+            );
+            if (existingShuffle?.options && existingShuffle?.rightOptions) {
+                return;
+            }
 
             const pairs = [...this.currentQuestion.options];
             const shuffledPairs = pairs
@@ -2112,6 +2121,7 @@ export default {
 
             result.question_results = questionResults;
             result.user_answers = this.buildSubmissionAnswers();
+            result.question_ids = this.selectedTest.questions.map((q) => q.id);
 
             return result;
         },
@@ -2815,6 +2825,7 @@ export default {
 
             result.question_results = questionResults;
             result.user_answers = this.buildSubmissionAnswers();
+            result.question_ids = this.selectedTest.questions.map((q) => q.id);
 
             return result;
         },

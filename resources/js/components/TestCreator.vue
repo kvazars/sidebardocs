@@ -266,11 +266,13 @@
                                     v-for="item in questionsWithErrors"
                                     :key="item.index"
                                 >
-                                    <span
-                                        class="badge bg-danger bg-opacity-25 text-danger border border-danger me-2 mb-1"
+                                    <button
+                                        type="button"
+                                        class="badge bg-danger bg-opacity-25 text-danger border border-danger me-2 mb-1 error-jump-badge"
+                                        @click="openQuestion(item.question.id)"
                                     >
                                         Вопрос {{ item.index + 1 }}: {{ item.error }}
-                                    </span>
+                                    </button>
                                 </template>
                             </div>
                         </div>
@@ -352,20 +354,60 @@
                         :key="question.id"
                         :class="[
                             'question-card card mb-3',
-                            { 'border border-danger': hasQuestionError(question) },
+                            {
+                                'border border-danger': hasQuestionError(question),
+                                'question-card-expanded':
+                                    activeQuestionId === question.id,
+                            },
                         ]"
                     >
                         <div
-                            class="card-header d-flex justify-content-between align-items-center"
+                            class="card-header question-card-header"
                         >
-                            <div>
-                                <h6 class="mb-0">Вопрос {{ qIndex + 1 }}</h6>
-                                <small class="text-muted"
-                                    >{{ getQuestionTypeLabel(question.type) }} •
-                                    {{ question.points }} баллов</small
-                                >
-                            </div>
-                            <div>
+                            <button
+                                type="button"
+                                class="question-card-toggle"
+                                @click="toggleQuestion(question.id)"
+                            >
+                                <div class="question-card-main">
+                                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                                        <h6 class="mb-0">Вопрос {{ qIndex + 1 }}</h6>
+                                        <span class="badge text-bg-light">
+                                            {{ getQuestionTypeLabel(question.type) }}
+                                        </span>
+                                        <span class="badge text-bg-secondary">
+                                            {{ question.points }}
+                                            {{ getPointsLabel(question.points) }}
+                                        </span>
+                                        <span
+                                            v-if="hasQuestionError(question)"
+                                            class="badge text-bg-danger text-white"
+                                        >
+                                            Ошибка
+                                        </span>
+                                        <span
+                                            v-else
+                                            class="badge text-bg-success text-white"
+                                        >
+                                            Готов
+                                        </span>
+                                    </div>
+                                    <div class="question-preview text-muted">
+                                        {{ getQuestionPreview(question) }}
+                                    </div>
+                                </div>
+                                <span class="question-card-chevron">
+                                    <i
+                                        class="bi"
+                                        :class="
+                                            activeQuestionId === question.id
+                                                ? 'bi-chevron-up'
+                                                : 'bi-chevron-down'
+                                        "
+                                    ></i>
+                                </span>
+                            </button>
+                            <div class="question-actions">
                                 <button
                                     v-if="qIndex > 0"
                                     @click="moveQuestionUp(qIndex)"
@@ -398,7 +440,10 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="card-body">
+                        <div
+                            v-show="activeQuestionId === question.id"
+                            class="card-body"
+                        >
                             <div
                                 v-if="validateQuestion(question)"
                                 class="alert alert-danger py-2 mb-3"
@@ -421,11 +466,10 @@
 
                             <!-- Изображение вопроса -->
                             <div class="mb-3">
-                                <label class="form-label"
-                                    >Изображение к вопросу (опционально):</label
+                                <label class="form-label d-block mb-2"
+                                    >Изображение к вопросу:</label
                                 >
 
-                                <!-- Предпросмотр изображения -->
                                 <div v-if="question.image" class="mb-3">
                                     <div
                                         class="image-preview-container position-relative d-inline-block"
@@ -445,22 +489,30 @@
                                     </div>
                                 </div>
 
-                                <!-- Загрузка изображения -->
-                                <div class="input-group">
-                                    <input
-                                        type="file"
-                                        @change="
-                                            handleImageUpload($event, qIndex)
-                                        "
-                                        accept="image/*"
-                                        class="form-control"
-                                        :id="'imageUpload' + qIndex"
-                                    />
-                                </div>
-                                <div class="form-text">
-                                    Поддерживаемые форматы: JPG, PNG, GIF.
-                                    Максимальный размер: 2MB
-                                </div>
+                                <details class="compact-media-panel">
+                                    <summary>
+                                        {{
+                                            question.image
+                                                ? "Заменить изображение"
+                                                : "Добавить изображение"
+                                        }}
+                                    </summary>
+                                    <div class="input-group mt-2">
+                                        <input
+                                            type="file"
+                                            @change="
+                                                handleImageUpload($event, qIndex)
+                                            "
+                                            accept="image/*"
+                                            class="form-control"
+                                            :id="'imageUpload' + qIndex"
+                                        />
+                                    </div>
+                                    <div class="form-text">
+                                        Поддерживаемые форматы: JPG, PNG, GIF.
+                                        Максимальный размер: 2MB
+                                    </div>
+                                </details>
                             </div>
 
                             <!-- Тип вопроса и баллы -->
@@ -522,7 +574,7 @@
                                 <div
                                     v-for="(option, oIndex) in question.options"
                                     :key="oIndex"
-                                    class="option-item mb-2"
+                                    class="option-item compact-option-item mb-2"
                                 >
                                     <div class="input-group">
                                         <input
@@ -563,11 +615,6 @@
 
                                     <!-- Изображение для варианта ответа -->
                                     <div class="mt-2 ps-4">
-                                        <label class="form-label small"
-                                            >Изображение для варианта
-                                            (опционально):</label
-                                        >
-
                                         <div v-if="option.image" class="mb-2">
                                             <div
                                                 class="image-preview-container position-relative d-inline-block"
@@ -592,20 +639,29 @@
                                             </div>
                                         </div>
 
-                                        <div class="input-group input-group-sm">
-                                            <input
-                                                type="file"
-                                                @change="
-                                                    handleOptionImageUpload(
-                                                        $event,
-                                                        qIndex,
-                                                        oIndex
-                                                    )
-                                                "
-                                                accept="image/*"
-                                                class="form-control form-control-sm"
-                                            />
-                                        </div>
+                                        <details class="compact-media-panel compact-media-panel-inline">
+                                            <summary>
+                                                {{
+                                                    option.image
+                                                        ? "Заменить изображение варианта"
+                                                        : "Добавить изображение к варианту"
+                                                }}
+                                            </summary>
+                                            <div class="input-group input-group-sm mt-2">
+                                                <input
+                                                    type="file"
+                                                    @change="
+                                                        handleOptionImageUpload(
+                                                            $event,
+                                                            qIndex,
+                                                            oIndex
+                                                        )
+                                                    "
+                                                    accept="image/*"
+                                                    class="form-control form-control-sm"
+                                                />
+                                            </div>
+                                        </details>
                                     </div>
                                 </div>
                                 <button
@@ -630,13 +686,13 @@
                                         <input
                                             v-model="question.options"
                                             type="radio"
-                                            id="trues"
+                                            :id="`true-${question.id}`"
                                             value="true"
                                             class="form-check-input"
                                         />
                                         <label
                                             class="form-check-label"
-                                            for="trues"
+                                            :for="`true-${question.id}`"
                                             >Да</label
                                         >
                                     </div>
@@ -645,12 +701,12 @@
                                             v-model="question.options"
                                             type="radio"
                                             value="false"
-                                            id="falses"
+                                            :id="`false-${question.id}`"
                                             class="form-check-input"
                                         />
                                         <label
                                             class="form-check-label"
-                                            for="falses"
+                                            :for="`false-${question.id}`"
                                             >Нет</label
                                         >
                                     </div>
@@ -738,18 +794,27 @@
                                                     <i class="bi bi-x"></i>
                                                 </button>
                                             </div>
-                                            <input
-                                                type="file"
-                                                @change="
-                                                    handleLeftImageUpload(
-                                                        $event,
-                                                        qIndex,
-                                                        pIndex
-                                                    )
-                                                "
-                                                accept="image/*"
-                                                class="form-control form-control-sm mt-1"
-                                            />
+                                            <details class="compact-media-panel compact-media-panel-inline mt-2">
+                                                <summary>
+                                                    {{
+                                                        pair.leftImage
+                                                            ? "Заменить изображение слева"
+                                                            : "Добавить изображение слева"
+                                                    }}
+                                                </summary>
+                                                <input
+                                                    type="file"
+                                                    @change="
+                                                        handleLeftImageUpload(
+                                                            $event,
+                                                            qIndex,
+                                                            pIndex
+                                                        )
+                                                    "
+                                                    accept="image/*"
+                                                    class="form-control form-control-sm mt-2"
+                                                />
+                                            </details>
                                         </div>
                                     </div>
 
@@ -1075,6 +1140,7 @@ export default {
             selectedFile: null,
             loading: false,
             error: "",
+            activeQuestionId: null,
         };
     },
     computed: {
@@ -1171,6 +1237,58 @@ export default {
             return labels[type] || type;
         },
 
+        getQuestionPreview(question) {
+            if (question.text && question.text.trim()) {
+                const preview = question.text.trim().replace(/\s+/g, " ");
+                return preview.length > 110
+                    ? `${preview.slice(0, 110)}...`
+                    : preview;
+            }
+
+            if (["single", "multiple"].includes(question.type)) {
+                return "Заполните текст вопроса и варианты ответов";
+            }
+
+            if (question.type === "matching") {
+                return "Заполните пары для сопоставления";
+            }
+
+            if (question.type === "sorting") {
+                return "Добавьте элементы для правильного порядка";
+            }
+
+            if (question.type === "text") {
+                return "Заполните текст вопроса и правильные ответы";
+            }
+
+            return "Заполните вопрос";
+        },
+
+        getPointsLabel(points) {
+            const value = Math.abs(Number(points)) || 0;
+            const mod10 = value % 10;
+            const mod100 = value % 100;
+
+            if (mod10 === 1 && mod100 !== 11) {
+                return "балл";
+            }
+
+            if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) {
+                return "балла";
+            }
+
+            return "баллов";
+        },
+
+        toggleQuestion(questionId) {
+            this.activeQuestionId =
+                this.activeQuestionId === questionId ? null : questionId;
+        },
+
+        openQuestion(questionId) {
+            this.activeQuestionId = questionId;
+        },
+
         async loadTestForEditing(testId) {
             this.loading = true;
             this.error = "";
@@ -1188,6 +1306,7 @@ export default {
                         question.id = Date.now() + index;
                     }
                 });
+                this.activeQuestionId = this.test.questions[0]?.id ?? null;
             } catch (error) {
                 this.error = error.message;
             } finally {
@@ -1227,6 +1346,7 @@ export default {
 
             // Вставляем после оригинального вопроса
             this.test.questions.splice(index + 1, 0, duplicatedQuestion);
+            this.openQuestion(duplicatedQuestion.id);
         },
 
         validateQuestion(question) {
@@ -1430,6 +1550,7 @@ export default {
             );
             if (index !== -1) {
                 this.test.questions.splice(index, 1, newQuestion);
+                this.openQuestion(newQuestion.id);
             }
         },
         generateId() {
@@ -1449,11 +1570,19 @@ export default {
             };
 
             this.test.questions.push(newQuestion);
+            this.openQuestion(newQuestion.id);
         },
 
         async removeQuestion(index) {
             if (await confirmAction("Вы уверены, что хотите удалить этот вопрос?")) {
+                const removedId = this.test.questions[index]?.id;
                 this.test.questions.splice(index, 1);
+                if (this.activeQuestionId === removedId) {
+                    this.activeQuestionId =
+                        this.test.questions[index]?.id ??
+                        this.test.questions[index - 1]?.id ??
+                        null;
+                }
             }
         },
 
@@ -1743,6 +1872,7 @@ export default {
                 questions: [],
             };
             this.isEditing = false;
+            this.activeQuestionId = null;
         },
 
         showImportModal() {
@@ -1848,6 +1978,7 @@ export default {
                 };
 
                 this.normalizeTestData(this.test);
+                this.activeQuestionId = this.test.questions[0]?.id ?? null;
 
                 const modalElement =
                     document.getElementById("importModalCreator");
@@ -1899,9 +2030,11 @@ export default {
             test.questions.forEach((question) => {
                 // Для типа "text" обрабатываем оба варианта названия поля
                 if (question.type === "text") {
-                    if (question.options && !question.options) {
-                        question.options = question.options;
-                        delete question.options;
+                    if (
+                        (!question.options || !Array.isArray(question.options)) &&
+                        Array.isArray(question.answers)
+                    ) {
+                        question.options = [...question.answers];
                     }
 
                     if (!question.options || !Array.isArray(question.options)) {
@@ -1981,8 +2114,64 @@ export default {
 </script>
 
 <style scoped>
+.error-jump-badge {
+    appearance: none;
+    background: none;
+    cursor: pointer;
+}
+
 .question-card:hover {
     border-color: #0d6efd;
+}
+
+.question-card {
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.question-card-expanded {
+    box-shadow: 0 10px 25px rgba(13, 110, 253, 0.08);
+}
+
+.question-card-header {
+    display: flex;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+}
+
+.question-card-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+    gap: 1rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    text-align: left;
+}
+
+.question-card-main {
+    min-width: 0;
+    flex: 1;
+}
+
+.question-preview {
+    margin-top: 0.35rem;
+    font-size: 0.9rem;
+    line-height: 1.35;
+}
+
+.question-card-chevron {
+    color: #6c757d;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+
+.question-actions {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
 }
 
 .image-preview-container {
@@ -2002,6 +2191,26 @@ export default {
     border-left: 3px solid #e9ecef;
     padding-left: 15px;
     margin-bottom: 15px;
+}
+
+.compact-option-item {
+    padding-left: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.compact-media-panel {
+    margin-top: 0.5rem;
+}
+
+.compact-media-panel summary {
+    cursor: pointer;
+    color: #0d6efd;
+    font-size: 0.9rem;
+    user-select: none;
+}
+
+.compact-media-panel-inline summary {
+    font-size: 0.85rem;
 }
 
 .matching-pair {
@@ -2057,5 +2266,20 @@ export default {
 
 .drag-handle:active {
     cursor: grabbing;
+}
+
+@media (max-width: 768px) {
+    .question-card-header {
+        flex-direction: column;
+    }
+
+    .question-card-toggle {
+        width: 100%;
+    }
+
+    .question-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
 }
 </style>

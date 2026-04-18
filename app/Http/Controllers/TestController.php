@@ -243,7 +243,7 @@ class TestController extends Controller
     private function syncQuestions(Test $test, array $questions): void
     {
         foreach ($questions as $index => $questionData) {
-            $normalizedQuestion = $this->normalizeQuestionData($questionData);
+            $normalizedQuestion = $this->normalizeQuestionData($questionData, $index);
 
             $test->questions()->create([
                 'text' => $normalizedQuestion['text'],
@@ -308,7 +308,11 @@ class TestController extends Controller
             $options = $questionData['answers'];
         }
 
-        return [
+        if ($type === 'truefalse' && is_array($options) && isset($options[0]) && is_string($options[0])) {
+            $options = $options[0];
+        }
+
+        $normalizedQuestion = [
             'text' => (string) ($questionData['text'] ?? ''),
             'type' => $type,
             'points' => max(1, (int) ($questionData['points'] ?? 1)),
@@ -316,5 +320,131 @@ class TestController extends Controller
             'options' => $options,
             'order' => $questionData['order'] ?? $index ?? 0,
         ];
+
+        $validationError = $this->validateQuestionData($normalizedQuestion);
+        if ($validationError !== null) {
+            $questionNumber = $index !== null ? $index + 1 : '?';
+
+            throw ValidationException::withMessages([
+                'questions' => sprintf('Вопрос %s: %s', $questionNumber, $validationError),
+            ]);
+        }
+
+        return $normalizedQuestion;
+    }
+
+    private function validateQuestionData(array $questionData): ?string
+    {
+        $text = trim((string) ($questionData['text'] ?? ''));
+        $type = $questionData['type'] ?? null;
+        $options = $questionData['options'] ?? null;
+
+        if ($text === '') {
+            return 'не заполнен текст вопроса.';
+        }
+
+        switch ($type) {
+            case 'single':
+            case 'multiple':
+                if (!is_array($options) || count($options) < 2) {
+                    return 'должно быть не менее 2 вариантов ответа.';
+                }
+
+                $correctCount = 0;
+                foreach ($options as $optionIndex => $option) {
+                    $optionText = trim((string) ($option['text'] ?? ''));
+                    $hasImage = !empty($option['image']);
+
+                    if ($optionText === '' && !$hasImage) {
+                        return sprintf(
+                            'вариант ответа %d не заполнен.',
+                            $optionIndex + 1
+                        );
+                    }
+
+                    if (($option['correct'] ?? false) === true) {
+                        $correctCount++;
+                    }
+                }
+
+                if ($type === 'single' && $correctCount !== 1) {
+                    return 'для одиночного выбора должен быть выбран ровно один правильный ответ.';
+                }
+
+                if ($type === 'multiple' && $correctCount < 1) {
+                    return 'для множественного выбора должен быть выбран хотя бы один правильный ответ.';
+                }
+
+                break;
+
+            case 'truefalse':
+                if (is_array($options) && isset($options[0]) && is_string($options[0])) {
+                    $options = $options[0];
+                }
+
+                if (!in_array($options, ['true', 'false'], true)) {
+                    return 'для вопроса Да/Нет не выбран правильный ответ.';
+                }
+                break;
+
+            case 'text':
+                if (!is_array($options) || count($options) === 0) {
+                    return 'не указаны правильные ответы.';
+                }
+
+                foreach ($options as $answerIndex => $answer) {
+                    if (trim((string) $answer) === '') {
+                        return sprintf(
+                            'правильный ответ %d не заполнен.',
+                            $answerIndex + 1
+                        );
+                    }
+                }
+                break;
+
+            case 'matching':
+                if (!is_array($options) || count($options) < 2) {
+                    return 'должно быть не менее 2 пар для сопоставления.';
+                }
+
+                foreach ($options as $pairIndex => $pair) {
+                    $left = trim((string) ($pair['left'] ?? ''));
+                    $right = trim((string) ($pair['right'] ?? ''));
+                    $hasLeftImage = !empty($pair['leftImage']);
+
+                    if ($left === '' && !$hasLeftImage && $right === '') {
+                        return sprintf('пара %d не заполнена.', $pairIndex + 1);
+                    }
+
+                    if ($left === '' && !$hasLeftImage) {
+                        return sprintf('левая часть пары %d не заполнена.', $pairIndex + 1);
+                    }
+
+                    if ($right === '') {
+                        return sprintf('правая часть пары %d не заполнена.', $pairIndex + 1);
+                    }
+                }
+                break;
+
+            case 'sorting':
+                if (!is_array($options) || count($options) < 2) {
+                    return 'должно быть не менее 2 элементов для сортировки.';
+                }
+
+                foreach ($options as $itemIndex => $item) {
+                    $itemText = trim((string) ($item['text'] ?? ''));
+                    $hasImage = !empty($item['image']);
+
+                    if ($itemText === '' && !$hasImage) {
+                        return sprintf(
+                            'элемент %d не заполнен.',
+                            $itemIndex + 1
+                        );
+                    }
+                }
+                break;
+        }
+
+        return null;
     }
 }
