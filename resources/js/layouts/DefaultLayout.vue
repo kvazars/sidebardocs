@@ -1,12 +1,20 @@
 <template>
-    <div class="vh-100 position-relative">
+    <div class="vh-100 position-relative layout-shell">
         <AppSidebar
             v-if="showChrome && (menu.length > 0 || auths.id)"
+            :sidebarWidth="effectiveSidebarWidth"
             :catchError="catchError"
             :showToast="showToast"
             :menu="menu"
             :datasend="datasend" :getMenu="getMenu" :about="about" :server="server" :editFolder="editFolder" :newFolder="newFolder" />
-        <div class="wrapper d-flex flex-column">
+        <div
+            v-if="showSplitter"
+            class="sidebar-splitter"
+            :class="{ 'is-dragging': isResizingSidebar }"
+            :style="splitterStyle"
+            @mousedown="startSidebarResize"
+        ></div>
+        <div class="wrapper d-flex flex-column" :style="wrapperStyle">
             <AppHeader
                 v-if="showChrome"
                 :openWindowFunction="openWindowFunction"
@@ -260,6 +268,7 @@ import AppHeader from "../components/AppHeader.vue";
 import AppSidebar from "../components/AppSidebar.vue";
 import AuthWindow from "../components/AuthWindow.vue";
 import { useAuthIdStore } from "../stores/authId";
+import { useSidebarStore } from "../stores/sidebar";
 import AppBreadcrumb from "../components/AppBreadcrumb.vue";
 import AntiCopyProtection from "../components/AntiCopyProtection.vue";
 import { closeConfirmDialog, confirmState } from "../utils/uiConfirm";
@@ -281,6 +290,7 @@ export default {
             api: window.location.origin + "/api/",
             openWindow: false,
             auths: useAuthIdStore(),
+            sidebar: useSidebarStore(),
             dashboard: null,
             about: null,
             viewSuccess: false,
@@ -298,14 +308,43 @@ export default {
             folderId: null,
             folderTitle: "",
             confirmDialog: confirmState,
+            sidebarWidth: 320,
+            isResizingSidebar: false,
         };
     },
     mounted() {
+        this.restoreSidebarWidth();
         this.getMenu();
+        window.addEventListener("mousemove", this.handleSidebarResize);
+        window.addEventListener("mouseup", this.stopSidebarResize);
+        window.addEventListener("resize", this.handleWindowResize);
+        this.$nextTick(() => {
+            this.applySidebarWidthToDom();
+        });
+    },
+    beforeUnmount() {
+        window.removeEventListener("mousemove", this.handleSidebarResize);
+        window.removeEventListener("mouseup", this.stopSidebarResize);
+        window.removeEventListener("resize", this.handleWindowResize);
     },
     watch: {
         $route() {
             this.scheduleBreadcrumbsUpdate();
+        },
+        effectiveSidebarWidth() {
+            this.$nextTick(() => {
+                this.applySidebarWidthToDom();
+            });
+        },
+        "sidebar.visible"() {
+            this.$nextTick(() => {
+                this.applySidebarWidthToDom();
+            });
+        },
+        showChrome() {
+            this.$nextTick(() => {
+                this.applySidebarWidthToDom();
+            });
         },
     },
     computed: {
@@ -318,8 +357,118 @@ export default {
         isStandaloneRoute() {
             return ["NotFound", "Page500"].includes(this.$route.name);
         },
+        splitterStyle() {
+            return {
+                left: `${this.effectiveSidebarWidth - 3}px`,
+            };
+        },
+        wrapperStyle() {
+            if (!this.showChrome || this.isMobileViewport) {
+                return {
+                    paddingLeft: "0px",
+                };
+            }
+
+            return {
+                paddingLeft: `${this.effectiveSidebarWidth}px`,
+            };
+        },
+        effectiveSidebarWidth() {
+            if (this.sidebar.visible === false) {
+                return 0;
+            }
+
+            if (this.sidebar.unfoldable) {
+                return 64;
+            }
+
+            return this.sidebarWidth;
+        },
+        isMobileViewport() {
+            return window.innerWidth <= 991;
+        },
+        showSplitter() {
+            return (
+                this.showChrome &&
+                !this.isMobileViewport &&
+                this.sidebar.visible !== false &&
+                !this.sidebar.unfoldable &&
+                (this.menu.length > 0 || this.auths.id)
+            );
+        },
     },
     methods: {
+        restoreSidebarWidth() {
+            const savedWidth = Number(
+                localStorage.getItem("sidebarWidthPx") || 320
+            );
+
+            if (!Number.isNaN(savedWidth)) {
+                this.sidebarWidth = this.clampSidebarWidth(savedWidth);
+            }
+        },
+        clampSidebarWidth(width) {
+            const minWidth = 240;
+            const maxWidth = Math.min(520, window.innerWidth - 320);
+            return Math.max(minWidth, Math.min(width, maxWidth));
+        },
+        startSidebarResize() {
+            this.isResizingSidebar = true;
+            document.body.classList.add("sidebar-resizing");
+        },
+        handleSidebarResize(event) {
+            if (!this.isResizingSidebar || this.isMobileViewport) {
+                return;
+            }
+
+            this.sidebarWidth = this.clampSidebarWidth(event.clientX);
+        },
+        stopSidebarResize() {
+            if (!this.isResizingSidebar) {
+                return;
+            }
+
+            this.isResizingSidebar = false;
+            document.body.classList.remove("sidebar-resizing");
+            localStorage.setItem(
+                "sidebarWidthPx",
+                String(this.sidebarWidth)
+            );
+        },
+        handleWindowResize() {
+            this.sidebarWidth = this.clampSidebarWidth(this.sidebarWidth);
+            if (this.isMobileViewport) {
+                this.stopSidebarResize();
+            }
+            this.applySidebarWidthToDom();
+        },
+        applySidebarWidthToDom() {
+            const sidebarEl = document.querySelector(".sidebar");
+            if (!sidebarEl) {
+                return;
+            }
+
+            if (
+                !this.showChrome ||
+                this.isMobileViewport ||
+                this.sidebar.unfoldable ||
+                this.sidebar.visible === false
+            ) {
+                sidebarEl.style.removeProperty("width");
+                sidebarEl.style.removeProperty("min-width");
+                sidebarEl.style.removeProperty("max-width");
+                sidebarEl.style.removeProperty("flex-basis");
+                sidebarEl.style.removeProperty("--cui-sidebar-width");
+                return;
+            }
+
+            const width = `${this.effectiveSidebarWidth}px`;
+            sidebarEl.style.setProperty("width", width);
+            sidebarEl.style.setProperty("min-width", width);
+            sidebarEl.style.setProperty("max-width", width);
+            sidebarEl.style.setProperty("flex-basis", width);
+            sidebarEl.style.setProperty("--cui-sidebar-width", width);
+        },
         scheduleBreadcrumbsUpdate() {
             this.$nextTick(() => {
                 this.getBreadcrumbs();
@@ -467,6 +616,7 @@ export default {
         },
         setContent(content) {
             this.content = content;
+            this.scheduleBreadcrumbsUpdate();
         },
 
         openWindowFunction() {
@@ -606,6 +756,9 @@ export default {
                         this.menu = menucreateparent();
                         this.menu = this.transformItems(this.menu);
                         this.scheduleBreadcrumbsUpdate();
+                        this.$nextTick(() => {
+                            this.applySidebarWidthToDom();
+                        });
                     })
                     .catch((error) => {
                         this.showToast("Не удалось загрузить дерево документов", "danger");
@@ -649,17 +802,114 @@ export default {
         saveEditFile() {
             this.$refs.routeViewComponent?.save?.();
         },
+        findMenuPath(items, predicate, trail = []) {
+            for (const item of items) {
+                const nextTrail = [...trail, item];
+
+                if (predicate(item)) {
+                    return nextTrail;
+                }
+
+                if (item.child?.length) {
+                    const nestedPath = this.findMenuPath(
+                        item.child,
+                        predicate,
+                        nextTrail
+                    );
+
+                    if (nestedPath.length) {
+                        return nestedPath;
+                    }
+                }
+            }
+
+            return [];
+        },
+        getCurrentMenuPath() {
+            const routeName = this.$route.name;
+            const routeParams = this.$route.params || {};
+            const contentTreeId = Number(
+                this.content?.tree_id || this.content?.tree?.id || 0
+            );
+            const routeId = Number(routeParams.id || routeParams.parent || 0);
+            const currentSlug =
+                this.content?.tree?.slug ||
+                this.content?.slug ||
+                routeParams.slug ||
+                null;
+
+            if (!this.menu.length) {
+                return [];
+            }
+
+            if (routeName === "CreateFile" && routeId) {
+                return this.findMenuPath(
+                    this.menu,
+                    (item) => Number(item.id) === routeId
+                );
+            }
+
+            if (contentTreeId) {
+                const pathByContentId = this.findMenuPath(
+                    this.menu,
+                    (item) => Number(item.id) === contentTreeId
+                );
+
+                if (pathByContentId.length) {
+                    return pathByContentId;
+                }
+            }
+
+            if (routeId) {
+                const pathByRouteId = this.findMenuPath(
+                    this.menu,
+                    (item) => Number(item.id) === routeId
+                );
+
+                if (pathByRouteId.length) {
+                    return pathByRouteId;
+                }
+            }
+
+            if (currentSlug) {
+                return this.findMenuPath(
+                    this.menu,
+                    (item) => item.slug === currentSlug
+                );
+            }
+
+            return [];
+        },
         getBreadcrumbs() {
             const routeTitle = this.$router.currentRoute.value.meta.title;
             const arr = ["Документы"];
+            const contentName =
+                this.content?.name || this.content?.tree?.name || null;
+            const menuPath = this.getCurrentMenuPath();
+
+            if (menuPath.length) {
+                arr.push(...menuPath.map((item) => item.name));
+
+                if (
+                    this.$route.name === "CreateFile" &&
+                    arr[arr.length - 1] !== "Новый файл"
+                ) {
+                    arr.push("Новый файл");
+                }
+
+                this.breadcrumbs = arr;
+                return;
+            }
 
             if (
-                this.content?.name &&
+                contentName &&
                 ["ShowFile", "EditFile", "CreateFile"].includes(
                     this.$route.name
                 )
             ) {
-                arr.push(this.content.name);
+                arr.push(contentName);
+            } else if (this.$route.name === "CreateFile") {
+                arr.push("Новый файл");
             } else if (routeTitle && this.$route.name !== "Home") {
                 arr.push(routeTitle);
             }
@@ -669,3 +919,36 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+.layout-shell {
+    --cui-sidebar-width: 20rem;
+    --cui-sidebar-occupy-start: 20rem;
+}
+
+.sidebar-splitter {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    cursor: col-resize;
+    z-index: 1040;
+    background: transparent;
+}
+
+.sidebar-splitter::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 2px;
+    width: 2px;
+    background: rgba(13, 110, 253, 0.08);
+    transition: background-color 0.15s ease;
+}
+
+.sidebar-splitter:hover::before,
+.sidebar-splitter.is-dragging::before {
+    background: rgba(13, 110, 253, 0.5);
+}
+</style>

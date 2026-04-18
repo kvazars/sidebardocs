@@ -1,5 +1,6 @@
 <template>
     <CSidebar class="border-end" colorScheme="light" position="fixed" :unfoldable="sidebar.unfoldable"
+        :style="sidebarStyle"
         :visible="sidebar.visible" @visible-change="(value) => sidebar.toggleVisible(value)">
         <CSidebarHeader class="border-bottom">
             <RouterLink custom to="/" v-slot="{ href, navigate }">
@@ -157,6 +158,7 @@ export default {
         "about",
         "editFolder",
         "newFolder",
+        "sidebarWidth",
     ],
 
     data() {
@@ -228,6 +230,19 @@ export default {
     },
     mounted() {
         if (this.about) this.logo = this.server + "/" + this.about.logo;
+    },
+    computed: {
+        sidebarStyle() {
+            if (!this.sidebarWidth || this.sidebar.unfoldable) {
+                return null;
+            }
+
+            return {
+                width: `${this.sidebarWidth}px`,
+                "--cui-sidebar-width": `${this.sidebarWidth}px`,
+                flex: `0 0 ${this.sidebarWidth}px`,
+            };
+        },
     },
 
     methods: {
