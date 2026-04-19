@@ -636,6 +636,7 @@ import EditFile from "./EditFile.vue";
 import AdminFiles from "../components/AdminFiles.vue";
 import { CButtonGroup } from "@coreui/vue";
 import TestResults from "../components/TestResults.vue";
+import { useAuthIdStore } from "../stores/authId";
 import { confirmAction, getErrorMessage } from "../utils/uiHelpers";
 export default {
     props: [
@@ -674,6 +675,7 @@ export default {
             cacheCleanupStats: null,
             cacheCleanupMessage: "",
             results: [],
+            auths: useAuthIdStore(),
         };
     },
     mounted() {
@@ -696,6 +698,15 @@ export default {
                 this.datasend(`authUser`, "POST", form)
                     .then((res) => {
                         localStorage.setItem("token", res.token);
+                        this.auths.setToken(res.token);
+                        if (res.user) {
+                            this.auths.changeUser(
+                                res.user.id,
+                                res.user.name,
+                                res.user.role,
+                                res.token
+                            );
+                        }
                         location.reload();
                     })
                     .catch((error) => {

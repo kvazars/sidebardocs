@@ -214,11 +214,67 @@
                 </CTableBody>
             </CTable>
         </div>
-        <div class="d-flex justify-content-end">
-            <Bootstrap5Pagination
-                :data="files"
-                @pagination-change-page="setPage"
-            />
+        <div
+            v-if="files && files.last_page > 1"
+            class="d-flex justify-content-end mt-3"
+        >
+            <nav aria-label="Навигация по страницам файлов">
+                <ul class="pagination mb-0">
+                    <li
+                        class="page-item"
+                        :class="{ disabled: !files.prev_page_url }"
+                    >
+                        <button
+                            class="page-link"
+                            type="button"
+                            :disabled="!files.prev_page_url"
+                            @click="setPage(files.current_page - 1)"
+                        >
+                            Назад
+                        </button>
+                    </li>
+                    <li
+                        v-for="item in paginationItems"
+                        :key="item.key"
+                        class="page-item"
+                        :class="{
+                            active:
+                                item.type === 'page' &&
+                                item.page === files.current_page,
+                            disabled: item.type === 'ellipsis',
+                        }"
+                    >
+                        <span
+                            v-if="item.type === 'ellipsis'"
+                            class="page-link"
+                            aria-hidden="true"
+                        >
+                            ...
+                        </span>
+                        <button
+                            v-else
+                            class="page-link"
+                            type="button"
+                            @click="setPage(item.page)"
+                        >
+                            {{ item.page }}
+                        </button>
+                    </li>
+                    <li
+                        class="page-item"
+                        :class="{ disabled: !files.next_page_url }"
+                    >
+                        <button
+                            class="page-link"
+                            type="button"
+                            :disabled="!files.next_page_url"
+                            @click="setPage(files.current_page + 1)"
+                        >
+                            Вперёд
+                        </button>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
     <CModal
@@ -274,15 +330,11 @@
     </CModal>
 </template>
 <script>
-import { Bootstrap5Pagination } from "laravel-vue-pagination";
 import { useAuthIdStore } from "../stores/authId";
 import { CButton } from "@coreui/vue";
 import { confirmAction, getErrorMessage } from "../utils/uiHelpers";
 
 export default {
-    components: {
-        Bootstrap5Pagination,
-    },
     props: [
         "datasend",
         "catchError",
@@ -316,6 +368,57 @@ export default {
     },
     mounted() {
         this.getFiles();
+    },
+    computed: {
+        paginationItems() {
+            if (!this.files?.last_page) {
+                return [];
+            }
+
+            const current = this.files.current_page;
+            const last = this.files.last_page;
+            const pages = new Set([1, last]);
+
+            for (
+                let page = Math.max(1, current - 1);
+                page <= Math.min(last, current + 1);
+                page++
+            ) {
+                pages.add(page);
+            }
+
+            if (current <= 3) {
+                for (let page = 1; page <= Math.min(last, 4); page++) {
+                    pages.add(page);
+                }
+            }
+
+            if (current >= last - 2) {
+                for (let page = Math.max(1, last - 3); page <= last; page++) {
+                    pages.add(page);
+                }
+            }
+
+            const sortedPages = [...pages].sort((left, right) => left - right);
+            const items = [];
+
+            sortedPages.forEach((page, index) => {
+                if (index > 0 && page - sortedPages[index - 1] > 1) {
+                    items.push({
+                        type: "ellipsis",
+                        key: `ellipsis-${sortedPages[index - 1]}-${page}`,
+                    });
+                }
+
+                items.push({
+                    type: "page",
+                    page,
+                    key: `page-${page}`,
+                });
+            });
+
+            return items;
+        },
     },
     methods: {
         onChange(event) {
@@ -386,6 +489,15 @@ export default {
             }
         },
         setPage(page) {
+            if (
+                !page ||
+                page === this.page ||
+                page < 1 ||
+                (this.files?.last_page && page > this.files.last_page)
+            ) {
+                return;
+            }
+
             this.page = page;
             this.getFiles();
         },
@@ -418,6 +530,7 @@ export default {
             this.datasend(`getFiles?page=${this.page}&${form}`, "GET", {})
                 .then((res) => {
                     this.files = res.data.files;
+                    this.page = res.data.files.current_page;
 
                     if (res.data.users.length > 0) {
                         this.users = res.data.users;

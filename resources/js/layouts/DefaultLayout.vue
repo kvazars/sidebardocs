@@ -18,6 +18,7 @@
             <AppHeader
                 v-if="showChrome"
                 :openWindowFunction="openWindowFunction"
+                :isAuthLoading="isAuthLoading"
                 :datasend="datasend"
                 :logoutFun="logoutFun"
                 :showToast="showToast"
@@ -55,7 +56,8 @@
             <AppFooter :about="about" />
         </div>
         <AuthWindow :openWindow="openWindow" :openWindowFunction="openWindowFunction" :datasend="datasend"
-            :catchError="catchError" :getMenu="getMenu" />
+            :catchError="catchError" :getMenu="getMenu" :isAuthLoading="isAuthLoading"
+            :applyUserBootstrap="applyUserBootstrap" />
         <AntiCopyProtection />
         <CModal :visible="visibleSearchModal" @close="closeSearchModal" aria-labelledby="SearchModalLabel" size="lg"
             backdrop="static">
@@ -354,6 +356,9 @@ export default {
         canRenderRoute() {
             return this.viewSuccess || this.isStandaloneRoute;
         },
+        isAuthLoading() {
+            return this.auths.isBootstrapping;
+        },
         hasSidebarMenu() {
             return this.menu.length > 0;
         },
@@ -622,9 +627,110 @@ export default {
             this.content = content;
             this.scheduleBreadcrumbsUpdate();
         },
+        setAuthBootstrapState(isLoading) {
+            this.auths.setBootstrapping(isLoading);
+        },
+        clearSessionState() {
+            localStorage.removeItem("token");
+            this.auths.clearUser();
+        },
+        async loadHomepage() {
+            const res = await this.datasend("homepage", "GET", {});
+            this.menu = [];
+            this.allId = [];
+            this.dashboard = res.content;
+            this.about = res.about;
+            this.viewSuccess = true;
+            return res;
+        },
+        buildMenuTree(rawMenu = []) {
+            let menus = rawMenu;
 
-        openWindowFunction() {
-            this.openWindow = !this.openWindow;
+            function menucreateparent() {
+                let rrr = [];
+                menus.forEach((e) => {
+                    if (e.tree_id == null) {
+                        e.title = e.name;
+                        e.icon = "bi bi-folder2";
+
+                        e.child = menucreate(e.id);
+                        rrr.push(e);
+                        e.tree_id = 0;
+                    }
+                });
+                rrr.sort((f, s) => f.position - s.position);
+                return rrr;
+            }
+
+            function menucreate(i = 0) {
+                let rrr = [];
+                menus.forEach((e) => {
+                    if (e.tree_id == i) {
+                        if (e.type == "file") {
+                            e.href = "/files/" + e.slug;
+                        }
+                        e.title = e.name;
+                        e.icon =
+                            e.type == "folder"
+                                ? "bi bi-folder2"
+                                : e.accessibilitylink
+                                ? "bi bi-file text-primary"
+                                : "bi bi-file";
+                        e.child = menucreate(e.id);
+                        rrr.push(e);
+                    }
+                });
+                rrr.sort((f, s) => f.position - s.position);
+                return rrr;
+            }
+
+            return this.transformItems(menucreateparent());
+        },
+        applyUserBootstrap(res) {
+            this.allId = res.allId || [];
+            this.dashboard = res.content;
+            this.about = res.about;
+
+            if (res.user) {
+                this.auths.changeUser(
+                    res.user.id,
+                    res.user.name,
+                    res.user.role,
+                    this.auths.token
+                );
+            }
+
+            this.menu = this.buildMenuTree(res.menu || []);
+            this.viewSuccess = true;
+            this.scheduleBreadcrumbsUpdate();
+            this.$nextTick(() => {
+                this.applySidebarWidthToDom();
+            });
+        },
+        async handleUnauthorized(shouldNotify = true) {
+            this.clearSessionState();
+            this.openWindow = false;
+            if (shouldNotify) {
+                this.showToast("Сессия истекла. Войдите снова.", "warning");
+            }
+            try {
+                await this.loadHomepage();
+            } catch (error) {
+                this.showToast(
+                    "Не удалось загрузить главную страницу после завершения сессии",
+                    "danger"
+                );
+            }
+            this.$router.push({ name: "Home" });
+        },
+
+        openWindowFunction(force = null) {
+            if (force === true && this.isAuthLoading) {
+                return;
+            }
+
+            this.openWindow =
+                typeof force === "boolean" ? force : !this.openWindow;
         },
         async datasend(
             path,
@@ -634,10 +740,10 @@ export default {
             isBlob = false
         ) {
             const myHeaders = new Headers();
-            if (localStorage.getItem("token")) {
+            if (this.auths.token) {
                 myHeaders.append(
                     "Authorization",
-                    `Bearer ${localStorage.getItem("token")}`
+                    `Bearer ${this.auths.token}`
                 );
             }
             myHeaders.append("Accept", "application/json");
@@ -656,27 +762,61 @@ export default {
             // requestOptions.body = JSON.stringify(data);
             // }
 
+            let response;
+
             try {
-                let response = await fetch(
-                    this.api + path,
-                    requestOptions
-                ).catch((error) => {
-                    this.$router.push({ name: "Page500" });
-                });
-                if (!response) {
-                    return Promise.reject(
-                        new Error("Не удалось получить ответ от сервера")
-                    );
-                }
-                if (response.status == 403 || response.status == 401) {
-                    this.logoutFun();
-                    return response.json();
-                }
-                return (await !isBlob) ? response.json() : response.blob();
+                response = await fetch(this.api + path, requestOptions);
             } catch (error) {
-                this.$router.push({ name: "Page500" });
-                return Promise.reject(error);
+                const networkError = new Error(
+                    "Не удалось получить ответ от сервера"
+                );
+                networkError.cause = error;
+                networkError.isNetworkError = true;
+                throw networkError;
             }
+
+            if (isBlob) {
+                if (!response.ok) {
+                    const blobError = new Error("Не удалось обработать запрос");
+                    blobError.status = response.status;
+                    throw blobError;
+                }
+
+                return response.blob();
+            }
+
+            let payload = null;
+
+            try {
+                payload = await response.json();
+            } catch (error) {
+                payload = null;
+            }
+
+            if (response.status === 401 || response.status === 403) {
+                const authError = new Error(
+                    payload?.message || "Требуется повторная авторизация"
+                );
+                authError.status = response.status;
+                authError.payload = payload;
+                authError.isAuthError = true;
+                if (this.auths.hasToken) {
+                    await this.handleUnauthorized(false);
+                }
+                throw authError;
+            }
+
+            if (!response.ok) {
+                const requestError = new Error(
+                    payload?.message || "Не удалось обработать запрос"
+                );
+                requestError.status = response.status;
+                requestError.payload = payload;
+                requestError.isServerError = response.status >= 500;
+                throw requestError;
+            }
+
+            return payload;
         },
         catchError(error) {
             for (let index = 0; index < Object.keys(error).length; index++) {
@@ -686,87 +826,63 @@ export default {
             }
         },
         logoutFun() {
-            localStorage.removeItem("token");
-            this.auths.changeUser(null, null, null, null);
+            this.clearSessionState();
+            this.openWindow = false;
             this.getMenu();
             this.$router.push({ name: "Home" });
         },
-        getMenu() {
+        async getMenu(options = {}) {
+            const { throwOnError = false } = options;
             this.menu = [];
-            if (!localStorage.getItem("token")) {
-                this.datasend("homepage", "GET", {}).then((res) => {
-                    this.dashboard = res.content;
-                    this.about = res.about;
-                    this.viewSuccess = true;
-                });
-            } else {
-                this.datasend("userFolder", "GET", {})
-                    .then((res) => {
+            if (!this.auths.hasToken) {
+                this.setAuthBootstrapState(false);
+                try {
+                    return await this.loadHomepage();
+                } catch (error) {
+                    this.showToast(
+                        "Не удалось загрузить данные главной страницы",
+                        "danger"
+                    );
+                    if (throwOnError) {
+                        throw error;
+                    }
+                    return null;
+                }
+            }
 
-                        this.allId = res.allId;
-                        let menus = res.menu;
+            this.setAuthBootstrapState(true);
 
-                        this.dashboard = res.content;
-                        this.about = res.about;
+            try {
+                const res = await this.datasend("userFolder", "GET", {});
+                this.applyUserBootstrap(res);
+                return res;
+            } catch (error) {
+                if (error?.isAuthError) {
+                    if (throwOnError) {
+                        throw error;
+                    }
+                    return null;
+                }
 
-                        if (localStorage.getItem("token")) {
-                            let user = res.user;
-                            this.auths.changeUser(
-                                user.id,
-                                user.name,
-                                user.role
-                            );
-                        }
-                        this.viewSuccess = true;
-
-                        function menucreateparent() {
-                            let rrr = [];
-                            menus.forEach((e) => {
-                                if (e.tree_id == null) {
-                                    e.title = e.name;
-                                    e.icon = "bi bi-folder2";
-
-                                    e.child = menucreate(e.id);
-                                    rrr.push(e);
-                                    e.tree_id = 0;
-                                }
-                            });
-                            rrr.sort((f, s) => f.position - s.position);
-                            return rrr;
-                        }
-
-                        function menucreate(i = 0) {
-                            let rrr = [];
-                            menus.forEach((e) => {
-                                if (e.tree_id == i) {
-                                    if (e.type == "file") {
-                                        e.href = "/files/" + e.slug;
-                                    }
-                                    e.title = e.name;
-                                    e.icon =
-                                        e.type == "folder"
-                                            ? "bi bi-folder2"
-                                            : e.accessibilitylink
-                                            ? "bi bi-file text-primary"
-                                            : "bi bi-file";
-                                    e.child = menucreate(e.id);
-                                    rrr.push(e);
-                                }
-                            });
-                            rrr.sort((f, s) => f.position - s.position);
-                            return rrr;
-                        }
-
-                        this.menu = menucreateparent();
-                        this.menu = this.transformItems(this.menu);
-                        this.scheduleBreadcrumbsUpdate();
-                        this.$nextTick(() => {
-                            this.applySidebarWidthToDom();
-                        });
-                    })
-                    .catch((error) => {
-                        this.showToast("Не удалось загрузить дерево документов", "danger");
-                    });
+                this.clearSessionState();
+                try {
+                    await this.loadHomepage();
+                } catch (homepageError) {
+                    this.showToast(
+                        "Не удалось загрузить главную страницу после сброса авторизации",
+                        "danger"
+                    );
+                }
+                this.showToast(
+                    "Не удалось загрузить дерево документов. Авторизация сброшена, попробуйте войти снова.",
+                    "danger"
+                );
+                if (throwOnError) {
+                    throw error;
+                }
+                return null;
+            } finally {
+                this.setAuthBootstrapState(false);
             }
         },
         transformItems(items) {

@@ -84,7 +84,7 @@
                 </li>
 
                 <li
-                    v-if="!auths.id"
+                    v-if="!auths.hasToken && !auths.isBootstrapping"
                     class="nav-item d-flex align-items-center justify-content-center"
                 >
                     <div class="d-flex align-items-center">
@@ -155,6 +155,7 @@ export default {
         "openSearchModal",
         "addFirstLevel",
         "showToast",
+        "isAuthLoading",
     ],
     setup() {
         return {
@@ -203,15 +204,20 @@ export default {
         },
     },
     mounted() {
-        document.addEventListener("scroll", () => {
+        document.addEventListener("scroll", this.handleScroll);
+        this.handleScroll();
+    },
+    beforeUnmount() {
+        document.removeEventListener("scroll", this.handleScroll);
+    },
+    methods: {
+        handleScroll() {
             if (document.documentElement.scrollTop > 0) {
                 this.headerClassNames = "p-0 shadow-sm";
             } else {
                 this.headerClassNames = "p-0";
             }
-        });
-    },
-    methods: {
+        },
         applyTheme(mode) {
             this.setColorMode(mode);
             useThemeStore().toggleTheme(mode);

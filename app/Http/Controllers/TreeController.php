@@ -6,10 +6,8 @@ use App\Http\Requests\TreeStoreRequest;
 use App\Models\About;
 use App\Models\Available;
 use App\Models\Content;
-use App\Models\Group;
 use App\Models\Tree;
-use App\Models\User;
-use App\Models\UserGroups;
+use App\Services\UserBootstrapService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -71,133 +69,11 @@ class TreeController extends Controller
         }
         return response()->json(['success' => true, 'message' => "Успешно перемещено"]);
     }
-    public function userFolder()
+    public function userFolder(UserBootstrapService $userBootstrapService)
     {
-        $role = Auth::user()->role;
-        $about = About::first();
-        $content = Content::first();
-        $tree = null;
-
-        switch ($role) {
-            case 'ceo':
-                $tree = Tree::where("user_id", Auth::user()->id)->get();
-                $managersFiles = [];
-                $cd = Content::where('accessibilitymanagers', true)->pluck('tree_id')->toArray();
-
-                foreach ($cd as $key => $c) {
-
-                    if (
-                        Tree::where('id', $c)->where('user_id', Auth::user()->id)->first()
-                    ) {
-                        unset($cd[$key]);
-                    }
-                }
-
-                $hiddenByLink = Content::where('accessibilitylink', true)->pluck('tree_id')->toArray();
-                $cd = array_values(array_diff($cd, $hiddenByLink));
-
-                if (count($cd) > 0) {
-                    $all = array_merge($cd, $this->uploadTree($cd));
-                    $s = Tree::whereIn('id', $all)->whereIn('user_id', User::pluck('id')->toArray())->get();
-                    $users = User::whereIn('id', $s->pluck("user_id")->toArray())->get()->keyBy("id");
-                    $userArray = [];
-                    foreach ($users as $user) {
-                        $userArray[] = ['id' => "user_" . $user->id, 'user_id' => $user->id, 'name' => $user->name, 'type' => 'folder', 'tree_id' => null];
-                    }
-                    $new_collection = collect($s)->map(function ($arr) use ($users) {
-
-                        $arr['tree_id'] = $arr['tree_id'] ?: "user_" . $users[$arr->user_id]['id'];
-
-                        return $arr;
-                    });
-
-                    $managersFiles = array_merge($userArray, $new_collection->toArray());
-                    // return $tree;
-                }
-
-                $tree = array_merge($tree->toArray(), $managersFiles);
-                $fileIds = array_column(
-                    array_filter($tree, fn($item) => $item['type'] === 'file'),
-                    'id'
-                );
-                break;
-            case 'admin':
-                $tree = Tree::whereIn('user_id', User::pluck('id')->toArray())->get();
-                $users = User::whereIn('id', $tree->pluck("user_id")->toArray())->get()->keyBy("id");
-                $userArray = [];
-                foreach ($users as $user) {
-                    $userArray[] = ['id' => "user_" . $user->id, 'name' => $user->name, 'type' => 'folder', 'tree_id' => null];
-                }
-                $new_collection = collect($tree)->map(function ($arr) use ($users) {
-                    $arr['tree_id'] = $arr['tree_id'] ?: "user_" . $users[$arr->user_id]['id'];
-                    return $arr;
-                });
-                $tree = array_merge($userArray, $new_collection->toArray());
-                $fileIds = array_column(
-                    array_filter($tree, fn($item) => $item['type'] === 'file'),
-                    'id'
-                );
-                break;
-            case 'user':
-                $a = UserGroups::where("user_id", Auth::user()->id)->first("group_id");
-                $c = [];
-                if ($a) {
-                    $c = Available::where('group_id', $a->group_id)->pluck('tree_id')->toArray();
-                }
-                $cd = Content::where('accessibility', true)->pluck('tree_id')->toArray();
-                $ownTreeIds = Tree::where('user_id', Auth::user()->id)->pluck('id')->toArray();
-                $hiddenByLink = Content::where('accessibilitylink', true)
-                    ->whereNotIn('tree_id', $ownTreeIds)
-                    ->pluck('tree_id')
-                    ->toArray();
-                $tree=[];
-                $c = array_values(array_diff(array_merge($c, $cd), $hiddenByLink));
-                if (count($c) > 0) {
-                    $all = array_merge($c, $this->uploadTree($c));
-                    $tree = Tree::whereIn('id', $all)->whereIn('user_id', User::pluck('id')->toArray())->get();
-                    $users = User::whereIn('id', $tree->pluck("user_id")->toArray())->get()->keyBy("id");
-                    $userArray = [];
-                    foreach ($users as $user) {
-                        $userArray[] = ['id' => "user_" . $user->id, 'name' => $user->name, 'type' => 'folder', 'tree_id' => null];
-                    }
-                    $new_collection = collect($tree)->map(function ($arr) use ($users) {
-                        $arr['tree_id'] = $arr['tree_id'] ?: "user_" . $users[$arr->user_id]['id'];
-                        return $arr;
-                    });
-                    $tree = array_merge($userArray, $new_collection->toArray());
-                }
-                $fileIds = array_column(
-                    array_filter($tree, fn($item) => $item['type'] === 'file'),
-                    'id'
-                );
-                break;
-        }
-        $linkOnlyTreeIds = Content::where('accessibilitylink', true)->pluck('tree_id')->toArray();
-        $tree = is_array($tree) ? $tree : $tree->toArray();
-        $tree = array_map(function ($item) use ($linkOnlyTreeIds) {
-            if (($item['type'] ?? null) === 'file') {
-                $item['accessibilitylink'] = in_array($item['id'], $linkOnlyTreeIds);
-            }
-            return $item;
-        }, $tree);
-
-        return response()->json(['success' => true, 'allId' => $fileIds, 'user' => ["id" => Auth::user()->id, "name" => Auth::user()->name, "role" => $role], 'menu' => $tree, "about" => $about, "content" => $content]);
-    }
-    protected $fatherChild = [];
-    public function uploadTree($childTree)
-    {
-        foreach ($childTree as $tr) {
-            $trs = Tree::find($tr);
-            if ($trs) {
-                if ($trs->tree_id) {
-                    array_push($this->fatherChild, $trs->tree_id);
-                    $this->uploadTree([$trs->tree_id]);
-                } else {
-                    array_push($this->fatherChild, 0);
-                }
-            }
-        }
-        return $this->fatherChild;
+        return response()->json(
+            $userBootstrapService->buildForUser(Auth::user())
+        );
     }
     public function store(TreeStoreRequest $request)
     {

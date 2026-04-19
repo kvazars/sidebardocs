@@ -8,6 +8,7 @@ use App\Http\Requests\RegistrationRequest;
 use App\Http\Requests\UserUpdateRequest;
 use App\Models\User;
 use App\Models\UserGroups;
+use App\Services\UserBootstrapService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -55,14 +56,22 @@ class UserController extends Controller
         return response()->json(['success' => true, 'message' => 'Новый пользователь был создан']);
     }
 
-    public function auth(AuthRequest $request)
+    public function auth(AuthRequest $request, UserBootstrapService $userBootstrapService)
     {
         $user = User::where('login', $request->login)->first();
         if ($user && Hash::check($request->password, $user->password)) {
             $token = $user->createToken('api');
-            return response()->json(['success' => true, 'token' => $token->plainTextToken, 'name' => $user->name, 'role' => $user->role]);
+            $bootstrap = $userBootstrapService->buildForUser($user);
+
+            return response()->json([
+                'success' => true,
+                'token' => $token->plainTextToken,
+            ] + $bootstrap);
         } else {
-            return response()->json(['errors' => ["password" => ["Ошибка авторизации"]]]);
+            return response()->json([
+                'success' => false,
+                'errors' => ["password" => ["Ошибка авторизации"]],
+            ], 401);
         }
     }
     public function authadmin(Request $request)
