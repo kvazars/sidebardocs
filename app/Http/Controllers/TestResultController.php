@@ -153,6 +153,7 @@ class TestResultController extends Controller
                 'originalIndex' => $originalIndex,
                 'answered' => $evaluation['answered'],
                 'question_id' => $question->id,
+                'question_stable_key' => $question->stable_key,
             ];
         }
 

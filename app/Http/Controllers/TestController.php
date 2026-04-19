@@ -6,6 +6,7 @@ use App\Models\Test;
 use App\Models\Tree;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Intervention\Image\Laravel\Facades\Image;
 
@@ -36,11 +37,7 @@ class TestController extends Controller
                 'description' => $validated['description'] ?? null,
                 'timeLimit' => $validated['timeLimit'],
                 'tree_id' => $validated['tree_id'],
-                'settings' => [
-                    'shuffleQuestions' => $request->input('settings.shuffleQuestions', false),
-                    'shuffleAnswers' => $request->input('settings.shuffleAnswers', false),
-                    'randomQuestionCount' => max(0, min(10000, (int) $request->input('settings.randomQuestionCount', 0))),
-                ],
+                'settings' => $this->buildTestSettings($request->input('settings', [])),
                 'grading' => $validated['grading'] ?? null
             ]);
 
@@ -101,11 +98,7 @@ class TestController extends Controller
                 'title' => $validated['title'],
                 'description' => $validated['description'] ?? null,
                 'timeLimit' => $validated['timeLimit'],
-                'settings' => [
-                    'shuffleQuestions' => $request->input('settings.shuffleQuestions', false),
-                    'shuffleAnswers' => $request->input('settings.shuffleAnswers', false),
-                    'randomQuestionCount' => max(0, min(10000, (int) $request->input('settings.randomQuestionCount', 0))),
-                ],
+                'settings' => $this->buildTestSettings($request->input('settings', [])),
                 'grading' => $validated['grading'] ?? null
             ]);
 
@@ -222,6 +215,7 @@ class TestController extends Controller
             'questions' => $test->questions->map(function ($question) {
                 return [
                     'id' => $question->id,
+                    'stable_key' => $question->stable_key,
                     'text' => $question->text,
                     'type' => $question->type,
                     'points' => $question->points,
@@ -246,6 +240,7 @@ class TestController extends Controller
             $normalizedQuestion = $this->normalizeQuestionData($questionData, $index);
 
             $test->questions()->create([
+                'stable_key' => $normalizedQuestion['stable_key'],
                 'text' => $normalizedQuestion['text'],
                 'type' => $normalizedQuestion['type'],
                 'points' => $normalizedQuestion['points'],
@@ -254,6 +249,18 @@ class TestController extends Controller
                 'order' => $normalizedQuestion['order'] ?? $index,
             ]);
         }
+    }
+
+    private function buildTestSettings(array $settings = []): array
+    {
+        return [
+            'shuffleQuestions' => (bool) data_get($settings, 'shuffleQuestions', false),
+            'shuffleAnswers' => (bool) data_get($settings, 'shuffleAnswers', false),
+            'showCorrectAnswersAfterFinish' => (bool) data_get($settings, 'showCorrectAnswersAfterFinish', false),
+            'allowRetake' => (bool) data_get($settings, 'allowRetake', true),
+            'allowQuestionNavigation' => (bool) data_get($settings, 'allowQuestionNavigation', true),
+            'randomQuestionCount' => max(0, min(10000, (int) data_get($settings, 'randomQuestionCount', 0))),
+        ];
     }
 
     private function normalizeImportedTestData(array $testData): array
@@ -279,11 +286,7 @@ class TestController extends Controller
             'title' => $testData['title'],
             'description' => $testData['description'] ?? null,
             'timeLimit' => max(1, (int) ($testData['timeLimit'] ?? 30)),
-            'settings' => [
-                'shuffleQuestions' => (bool) data_get($testData, 'settings.shuffleQuestions', false),
-                'shuffleAnswers' => (bool) data_get($testData, 'settings.shuffleAnswers', false),
-                'randomQuestionCount' => max(0, min(10000, (int) data_get($testData, 'settings.randomQuestionCount', 0))),
-            ],
+            'settings' => $this->buildTestSettings($testData['settings'] ?? []),
             'grading' => isset($testData['grading']) && is_array($testData['grading']) ? $testData['grading'] : null,
             'questions' => $normalizedQuestions,
         ];
@@ -313,6 +316,7 @@ class TestController extends Controller
         }
 
         $normalizedQuestion = [
+            'stable_key' => (string) ($questionData['stable_key'] ?? Str::uuid()),
             'text' => (string) ($questionData['text'] ?? ''),
             'type' => $type,
             'points' => max(1, (int) ($questionData['points'] ?? 1)),

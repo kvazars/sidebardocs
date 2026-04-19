@@ -279,15 +279,31 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from "vue";
 import { useAuthIdStore } from "../stores/authId";
-import VueEasyLightbox from "vue-easy-lightbox";
-import PptxShow from "../components/PptxShow.vue";
-import PdfShow from "../components/PdfShow.vue";
-import DocxShow from "../components/DocxShow.vue";
-import ExcelShow from "../components/ExcelShow.vue";
 import IFrameShow from "../components/IFrameShow.vue";
-import TestRunner from "../components/TestRunner.vue";
-import TestResults from "../components/TestResults.vue";
+
+const VueEasyLightbox = defineAsyncComponent(
+    () => import("vue-easy-lightbox")
+);
+const PptxShow = defineAsyncComponent(
+    () => import("../components/PptxShow.vue")
+);
+const PdfShow = defineAsyncComponent(
+    () => import("../components/PdfShow.vue")
+);
+const DocxShow = defineAsyncComponent(
+    () => import("../components/DocxShow.vue")
+);
+const ExcelShow = defineAsyncComponent(
+    () => import("../components/ExcelShow.vue")
+);
+const TestRunner = defineAsyncComponent(
+    () => import("../components/TestRunner.vue")
+);
+const TestResults = defineAsyncComponent(
+    () => import("../components/TestResults.vue")
+);
 
 export default {
     components: {
@@ -313,6 +329,7 @@ export default {
         "catchError",
         "api",
         "getMenu",
+        "userRole",
     ],
     data() {
         return {

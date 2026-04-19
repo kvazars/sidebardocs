@@ -28,7 +28,20 @@ import { useRouter } from "vue-router";
 import { getErrorMessage } from "../utils/uiHelpers";
 
 export default {
-    props: ["datasend", "showToast", "catchError"],
+    props: [
+        "datasend",
+        "showToast",
+        "catchError",
+        "server",
+        "api",
+        "getMenu",
+        "authss",
+        "blockForTest",
+        "setContent",
+        "dashboard",
+        "about",
+        "userRole",
+    ],
     data() {
         return {
             password: "",

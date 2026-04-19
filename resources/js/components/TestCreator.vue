@@ -76,15 +76,17 @@
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label"
-                                >Время на выполнение (минут):</label
-                            >
-                            <input
-                                v-model="test.timeLimit"
-                                type="number"
-                                class="form-control"
-                                min="1"
-                            />
+                            <label class="form-label">Краткая сводка:</label>
+                            <div class="form-control bg-light d-flex align-items-center">
+                                <span class="me-3">
+                                    <i class="bi bi-clock me-1"></i>
+                                    {{ test.timeLimit || 0 }} мин
+                                </span>
+                                <span>
+                                    <i class="bi bi-question-circle me-1"></i>
+                                    {{ test.questions.length }} вопросов
+                                </span>
+                            </div>
                         </div>
                     </div>
                     <div class="mb-3">
@@ -97,16 +99,57 @@
                         ></textarea>
                     </div>
 
-                    <!-- Настройки перемешивания -->
+                    <!-- Параметры прохождения -->
                     <div class="card mt-3">
                         <div class="card-header bg-secondary text-white">
                             <h6 class="mb-0">
-                                <i class="bi bi-shuffle"></i> Настройки
-                                перемешивания
+                                <i class="bi bi-sliders"></i> Параметры
+                                прохождения
                             </h6>
                         </div>
                         <div class="card-body">
-                            <div class="row">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="border rounded p-3 h-100">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-clock me-2 text-primary"></i>
+                                            <strong>Ограничение по времени</strong>
+                                        </div>
+                                        <input
+                                            v-model.number="test.timeLimit"
+                                            type="number"
+                                            class="form-control"
+                                            min="1"
+                                        />
+                                        <div class="form-text">
+                                            Укажите длительность теста в минутах.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="border rounded p-3 h-100">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="bi bi-dice5 me-2 text-primary"></i>
+                                            <strong>Выборка вопросов из банка</strong>
+                                        </div>
+                                        <input
+                                            v-model.number="
+                                                test.settings.randomQuestionCount
+                                            "
+                                            type="number"
+                                            class="form-control"
+                                            min="0"
+                                            :max="Math.max(test.questions.length, 1)"
+                                            placeholder="0"
+                                        />
+                                        <div class="form-text">
+                                            <strong>0</strong> или пусто —
+                                            использовать все вопросы. Сейчас в банке:
+                                            {{ test.questions.length }}.
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="col-md-6">
                                     <div class="form-check form-switch mb-3">
                                         <input
@@ -146,29 +189,96 @@
                                         </label>
                                     </div>
                                 </div>
+                                <div class="col-md-6">
+                                    <div class="form-check form-switch mb-3">
+                                        <input
+                                            v-model="
+                                                test.settings.showCorrectAnswersAfterFinish
+                                            "
+                                            class="form-check-input"
+                                            type="checkbox"
+                                        />
+                                        <label class="form-check-label">
+                                            <strong>
+                                                Показывать правильные ответы после завершения
+                                            </strong>
+                                            <div class="form-text">
+                                                После отправки теста пользователь увидит разбор
+                                                вопросов и верные ответы.
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check form-switch mb-3">
+                                        <input
+                                            v-model="test.settings.allowRetake"
+                                            class="form-check-input"
+                                            type="checkbox"
+                                        />
+                                        <label class="form-check-label">
+                                            <strong>Разрешать повторное прохождение</strong>
+                                            <div class="form-text">
+                                                Если выключить, повторный запуск будет
+                                                ограничен для уже завершённой попытки.
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check form-switch mb-3">
+                                        <input
+                                            v-model="
+                                                test.settings.allowQuestionNavigation
+                                            "
+                                            class="form-check-input"
+                                            type="checkbox"
+                                        />
+                                        <label class="form-check-label">
+                                            <strong>Разрешать переход к любому вопросу</strong>
+                                            <div class="form-text">
+                                                Если включено, пользователь сможет
+                                                открывать любой вопрос по номеру.
+                                                Если выключено, навигация будет только
+                                                последовательной.
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
                                 <div class="col-12">
-                                    <label class="form-label"
-                                        >Случайная выборка вопросов при
-                                        прохождении</label
-                                    >
-                                    <input
-                                        v-model.number="
-                                            test.settings.randomQuestionCount
-                                        "
-                                        type="number"
-                                        class="form-control"
-                                        style="max-width: 12rem"
-                                        min="0"
-                                        :max="Math.max(test.questions.length, 1)"
-                                        placeholder="0"
-                                    />
-                                    <div class="form-text">
-                                        Укажите, сколько вопросов задавать из
-                                        банка (случайно). Значение
-                                        <strong>0</strong> или пусто —
-                                        задаются все вопросы. Не больше числа
-                                        вопросов в тесте (сейчас в банке:
-                                        {{ test.questions.length }}).
+                                    <div class="alert alert-light border mb-0">
+                                        <div class="fw-semibold mb-1">
+                                            Что сейчас включено
+                                        </div>
+                                        <div class="small text-muted">
+                                            Вопросы:
+                                            {{
+                                                test.settings.shuffleQuestions
+                                                    ? "перемешиваются"
+                                                    : "в исходном порядке"
+                                            }}, ответы:
+                                            {{
+                                                test.settings.shuffleAnswers
+                                                    ? "перемешиваются"
+                                                    : "в исходном порядке"
+                                            }}, правильные ответы после завершения:
+                                            {{
+                                                test.settings
+                                                    .showCorrectAnswersAfterFinish
+                                                    ? "показываются"
+                                                    : "скрыты"
+                                            }}, повторное прохождение:
+                                            {{
+                                                test.settings.allowRetake
+                                                    ? "разрешено"
+                                                    : "запрещено"
+                                            }}, переход между вопросами:
+                                            {{
+                                                test.settings.allowQuestionNavigation
+                                                    ? "свободный"
+                                                    : "только по порядку"
+                                            }}.
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1119,6 +1229,9 @@ export default {
                 settings: {
                     shuffleQuestions: false,
                     shuffleAnswers: false,
+                    showCorrectAnswersAfterFinish: false,
+                    allowRetake: true,
+                    allowQuestionNavigation: true,
                     randomQuestionCount: 0,
                 },
                 grading: [
@@ -1342,6 +1455,7 @@ export default {
 
             // Генерируем новый ID и обновляем текст
             duplicatedQuestion.id = Date.now() + Math.random();
+            delete duplicatedQuestion.stable_key;
             duplicatedQuestion.text = `${duplicatedQuestion.text} (копия)`;
 
             // Вставляем после оригинального вопроса
@@ -1857,6 +1971,9 @@ export default {
                 settings: {
                     shuffleQuestions: false,
                     shuffleAnswers: false,
+                    showCorrectAnswersAfterFinish: false,
+                    allowRetake: true,
+                    allowQuestionNavigation: true,
                     randomQuestionCount: 0,
                 },
                 grading: [
@@ -2002,8 +2119,20 @@ export default {
                 test.settings = {
                     shuffleQuestions: false,
                     shuffleAnswers: false,
+                    showCorrectAnswersAfterFinish: false,
+                    allowRetake: true,
+                    allowQuestionNavigation: true,
                     randomQuestionCount: 0,
                 };
+            }
+            if (test.settings.showCorrectAnswersAfterFinish === undefined) {
+                test.settings.showCorrectAnswersAfterFinish = false;
+            }
+            if (test.settings.allowRetake === undefined) {
+                test.settings.allowRetake = true;
+            }
+            if (test.settings.allowQuestionNavigation === undefined) {
+                test.settings.allowQuestionNavigation = true;
             }
             if (test.settings.randomQuestionCount === undefined) {
                 test.settings.randomQuestionCount = 0;

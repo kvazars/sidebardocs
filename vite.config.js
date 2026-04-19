@@ -39,6 +39,9 @@ export default defineConfig({
         }),
     ],
     build: {
+        // Large document viewers/editors are split into async chunks on purpose.
+        // Raise the warning threshold so build output stays actionable.
+        chunkSizeWarningLimit: 11000,
         rollupOptions: {
             output: {
                 manualChunks(id) {
@@ -50,16 +53,15 @@ export default defineConfig({
                         return "pdf";
                     }
 
-                    if (id.includes("docx")) {
-                        return "docx";
+                    if (id.includes("ace-builds")) {
+                        return "ace";
                     }
 
                     if (
                         id.includes("@editorjs") ||
-                        id.includes("editorjs") ||
-                        id.includes("ace-builds")
+                        id.includes("editorjs")
                     ) {
-                        return "editor";
+                        return "editorjs";
                     }
 
                     if (id.includes("@coreui")) {

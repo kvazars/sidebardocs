@@ -68,6 +68,8 @@ class TestResultSubmissionTest extends TestCase
         $this->assertCount(2, $result->question_results);
         $this->assertSame($questions[1]->id, $result->question_results[0]['question_id']);
         $this->assertSame($questions[2]->id, $result->question_results[1]['question_id']);
+        $this->assertSame($questions[1]->stable_key, $result->question_results[0]['question_stable_key']);
+        $this->assertSame($questions[2]->stable_key, $result->question_results[1]['question_stable_key']);
     }
 
     public function test_question_ids_define_the_answer_order_for_result_checking(): void
@@ -114,6 +116,8 @@ class TestResultSubmissionTest extends TestCase
         $this->assertSame('6.00', number_format((float) $result->total_score, 2, '.', ''));
         $this->assertSame($questions[1]->id, $result->question_results[0]['question_id']);
         $this->assertSame($questions[0]->id, $result->question_results[1]['question_id']);
+        $this->assertSame($questions[1]->stable_key, $result->question_results[0]['question_stable_key']);
+        $this->assertSame($questions[0]->stable_key, $result->question_results[1]['question_stable_key']);
         $this->assertTrue($result->question_results[0]['isCorrect']);
         $this->assertTrue($result->question_results[1]['isCorrect']);
     }

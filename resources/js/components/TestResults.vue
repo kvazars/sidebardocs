@@ -109,6 +109,207 @@
                 </div>
             </div>
 
+            <div v-if="statisticsByTest.length > 0" class="mb-4">
+                <div
+                    v-for="testStats in statisticsByTest"
+                    :key="'stats-' + testStats.testId"
+                    class="card mb-3 border-0 shadow-sm"
+                >
+                    <div class="card-header bg-light">
+                        <div
+                            class="d-flex justify-content-between align-items-start gap-3 flex-wrap"
+                        >
+                            <div>
+                                <h5 class="mb-1">
+                                    <i class="bi bi-bar-chart-line me-2"></i>
+                                    {{ testStats.title }}
+                                </h5>
+                                <small class="text-muted">
+                                    Агрегированная статистика по
+                                    {{ testStats.attemptsCount }}
+                                    {{
+                                        getAttemptsLabel(
+                                            testStats.attemptsCount
+                                        )
+                                    }}
+                                </small>
+                            </div>
+                            <button
+                                class="btn btn-outline-primary btn-sm"
+                                @click="toggleStatistics(testStats.testId)"
+                            >
+                                <i
+                                    class="bi"
+                                    :class="
+                                        isStatisticsExpanded(testStats.testId)
+                                            ? 'bi-chevron-up'
+                                            : 'bi-chevron-down'
+                                    "
+                                ></i>
+                                {{
+                                    isStatisticsExpanded(testStats.testId)
+                                        ? "Скрыть статистику"
+                                        : "Показать статистику"
+                                }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div
+                        v-if="isStatisticsExpanded(testStats.testId)"
+                        class="card-body"
+                    >
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <div class="stats-tile h-100">
+                                    <div class="text-muted small mb-1">
+                                        Средний балл
+                                    </div>
+                                    <div class="fs-4 fw-bold">
+                                        {{ formatScore(testStats.averageScore) }}
+                                        /
+                                        {{
+                                            formatScore(
+                                                testStats.averageMaxScore
+                                            )
+                                        }}
+                                    </div>
+                                    <div class="small text-muted">
+                                        {{
+                                            formatPercentage(
+                                                testStats.averagePercentage
+                                            )
+                                        }}
+                                        правильных ответов в среднем
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="stats-tile h-100">
+                                    <div class="text-muted small mb-1">
+                                        Чаще всего ошибаются
+                                    </div>
+                                    <div
+                                        v-if="testStats.hardestQuestion"
+                                        class="fw-semibold"
+                                    >
+                                        {{
+                                            testStats.hardestQuestion.label
+                                        }}
+                                    </div>
+                                    <div
+                                        v-if="testStats.hardestQuestion"
+                                        class="small text-muted mt-1"
+                                    >
+                                        Верно у
+                                        {{
+                                            formatPercentage(
+                                                testStats.hardestQuestion.correctRate
+                                            )
+                                        }}
+                                        участников
+                                        ({{ testStats.hardestQuestion.correctCount }}/{{ testStats.hardestQuestion.attempts }})
+                                    </div>
+                                    <div
+                                        v-else
+                                        class="small text-muted mt-1"
+                                    >
+                                        Недостаточно данных
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="stats-tile h-100">
+                                    <div class="text-muted small mb-1">
+                                        Лучший вопрос
+                                    </div>
+                                    <div
+                                        v-if="testStats.bestQuestion"
+                                        class="fw-semibold"
+                                    >
+                                        {{ testStats.bestQuestion.label }}
+                                    </div>
+                                    <div
+                                        v-if="testStats.bestQuestion"
+                                        class="small text-muted mt-1"
+                                    >
+                                        Верно у
+                                        {{
+                                            formatPercentage(
+                                                testStats.bestQuestion.correctRate
+                                            )
+                                        }}
+                                        участников
+                                        ({{ testStats.bestQuestion.correctCount }}/{{ testStats.bestQuestion.attempts }})
+                                    </div>
+                                    <div
+                                        v-else
+                                        class="small text-muted mt-1"
+                                    >
+                                        Недостаточно данных
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Вопрос</th>
+                                        <th>Верно</th>
+                                        <th>Неверно</th>
+                                        <th>Процент правильных</th>
+                                        <th>Средний балл</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr
+                                        v-for="questionStat in testStats.questions"
+                                        :key="'question-stat-' + questionStat.questionId"
+                                    >
+                                        <td>
+                                            <div class="fw-semibold">
+                                                {{ questionStat.label }}
+                                            </div>
+                                        </td>
+                                        <td>{{ questionStat.correctCount }}</td>
+                                        <td>{{ questionStat.incorrectCount }}</td>
+                                        <td>
+                                            <span
+                                                class="badge"
+                                                :class="
+                                                    getQuestionStatBadgeClass(
+                                                        questionStat.correctRate
+                                                    )
+                                                "
+                                            >
+                                                {{
+                                                    formatPercentage(
+                                                        questionStat.correctRate
+                                                    )
+                                                }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {{ formatScore(questionStat.averageScore) }}
+                                            /
+                                            {{
+                                                formatScore(
+                                                    questionStat.maxScore
+                                                )
+                                            }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Режим карточек -->
             <div v-if="viewMode === 'cards'" class="row">
                 <div
@@ -584,11 +785,12 @@ export default {
             viewMode: "table", // 'cards' или 'table'
             expandedResults: new Set(),
             selectedResults: new Set(), // Множество выбранных ID для массового удаления
+            expandedStatistics: new Set(),
         };
     },
     computed: {
         filteredResults() {
-            let filtered = this.results;
+            let filtered = [...this.results];
 
             if (this.searchQuery) {
                 const query = this.searchQuery.toLowerCase().trim();
@@ -643,6 +845,137 @@ export default {
 
             return filtered;
         },
+        statisticsByTest() {
+            const groupedTests = new Map();
+
+            this.filteredResults.forEach((result) => {
+                const testId = result.test_id || result.test?.id || "unknown";
+
+                if (!groupedTests.has(testId)) {
+                    groupedTests.set(testId, {
+                        testId,
+                        title: this.getTestTitle(result),
+                        results: [],
+                        questionsMap: new Map(),
+                    });
+                }
+
+                const group = groupedTests.get(testId);
+                group.results.push(result);
+
+                this.getQuestionResults(result).forEach((questionResult) => {
+                    const questionId = this.buildQuestionGroupKey(
+                        questionResult
+                    );
+
+                    if (!group.questionsMap.has(questionId)) {
+                        const questionText =
+                            questionResult.question || "Без текста";
+
+                        group.questionsMap.set(questionId, {
+                            questionId:
+                                questionResult.question_id ?? questionId,
+                            label: questionText,
+                            correctCount: 0,
+                            incorrectCount: 0,
+                            attempts: 0,
+                            totalScore: 0,
+                            maxScore: Number(questionResult.max_score || 0),
+                            sourceQuestionIds: new Set(),
+                        });
+                    }
+
+                    const questionStats = group.questionsMap.get(questionId);
+                    questionStats.attempts += 1;
+                    questionStats.totalScore += Number(
+                        questionResult.score || 0
+                    );
+                    questionStats.maxScore = Math.max(
+                        questionStats.maxScore,
+                        Number(questionResult.max_score || 0)
+                    );
+
+                    if (questionResult.question_id !== undefined) {
+                        questionStats.sourceQuestionIds.add(
+                            questionResult.question_id
+                        );
+                    }
+
+                    if (questionResult.isCorrect) {
+                        questionStats.correctCount += 1;
+                    } else {
+                        questionStats.incorrectCount += 1;
+                    }
+                });
+            });
+
+            return Array.from(groupedTests.values()).map((group) => {
+                const attemptsCount = group.results.length;
+                const totalScore = group.results.reduce(
+                    (sum, result) => sum + Number(result.total_score || 0),
+                    0
+                );
+                const totalMaxScore = group.results.reduce(
+                    (sum, result) => sum + Number(result.max_score || 0),
+                    0
+                );
+                const totalPercentage = group.results.reduce(
+                    (sum, result) => sum + Number(result.percentage || 0),
+                    0
+                );
+
+                const questions = Array.from(group.questionsMap.values())
+                    .map((questionStat) => ({
+                        ...questionStat,
+                        sourceQuestionIds: Array.from(
+                            questionStat.sourceQuestionIds || []
+                        ),
+                        correctRate:
+                            questionStat.attempts > 0
+                                ? (questionStat.correctCount /
+                                      questionStat.attempts) *
+                                  100
+                                : 0,
+                        averageScore:
+                            questionStat.attempts > 0
+                                ? questionStat.totalScore /
+                                  questionStat.attempts
+                                : 0,
+                    }))
+                    .sort((a, b) => {
+                        if (a.correctRate !== b.correctRate) {
+                            return a.correctRate - b.correctRate;
+                        }
+
+                        return a.label.localeCompare(b.label, "ru");
+                    });
+
+                return {
+                    testId: group.testId,
+                    title: group.title,
+                    attemptsCount,
+                    averageScore:
+                        attemptsCount > 0 ? totalScore / attemptsCount : 0,
+                    averageMaxScore:
+                        attemptsCount > 0 ? totalMaxScore / attemptsCount : 0,
+                    averagePercentage:
+                        totalMaxScore > 0
+                            ? (totalScore / totalMaxScore) * 100
+                            : 0,
+                    hardestQuestion: questions[0] || null,
+                    bestQuestion: questions.length
+                        ? [...questions].sort((a, b) => {
+                              if (a.correctRate !== b.correctRate) {
+                                  return b.correctRate - a.correctRate;
+                              }
+
+                              return a.label.localeCompare(b.label, "ru");
+                          })[0]
+                        : null,
+                    questions,
+                };
+            });
+        },
 
         // Проверка, все ли отфильтрованные результаты выбраны
         isAllFilteredSelected() {
@@ -658,6 +991,23 @@ export default {
         },
     },
     methods: {
+        buildQuestionGroupKey(questionResult) {
+            if (questionResult.question_stable_key) {
+                return `stable:${questionResult.question_stable_key}`;
+            }
+
+            const normalizedText = (questionResult.question || "")
+                .toString()
+                .trim()
+                .replace(/\s+/g, " ")
+                .toLowerCase();
+
+            if (normalizedText) {
+                return normalizedText;
+            }
+
+            return `fallback-${questionResult.originalIndex ?? 0}`;
+        },
         getResultKey(result) {
             return (
                 (result.created_at || "") +
@@ -672,6 +1022,56 @@ export default {
 
         getQuestionResults(result) {
             return result.question_results || [];
+        },
+        isStatisticsExpanded(testId) {
+            return this.expandedStatistics.has(testId);
+        },
+        toggleStatistics(testId) {
+            if (this.expandedStatistics.has(testId)) {
+                this.expandedStatistics.delete(testId);
+            } else {
+                this.expandedStatistics.add(testId);
+            }
+
+            this.$forceUpdate();
+        },
+        getAttemptsLabel(count) {
+            const mod10 = count % 10;
+            const mod100 = count % 100;
+
+            if (mod10 === 1 && mod100 !== 11) {
+                return "попытке";
+            }
+
+            if (mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)) {
+                return "попыткам";
+            }
+
+            return "попыткам";
+        },
+        formatScore(value) {
+            const numericValue = Number(value || 0);
+
+            if (Number.isInteger(numericValue)) {
+                return String(numericValue);
+            }
+
+            return numericValue.toFixed(1);
+        },
+        formatPercentage(value) {
+            const numericValue = Number(value || 0);
+
+            if (Number.isInteger(numericValue)) {
+                return `${numericValue}%`;
+            }
+
+            return `${numericValue.toFixed(1)}%`;
+        },
+        getQuestionStatBadgeClass(correctRate) {
+            if (correctRate >= 80) return "bg-success";
+            if (correctRate >= 60) return "bg-info";
+            if (correctRate >= 40) return "bg-warning text-dark";
+            return "bg-danger";
         },
 
         isResultExpanded(result) {
@@ -858,6 +1258,13 @@ export default {
 <style scoped>
 .statistics {
     text-align: center;
+}
+
+.stats-tile {
+    padding: 1rem;
+    border-radius: 0.75rem;
+    background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
+    border: 1px solid rgba(13, 110, 253, 0.08);
 }
 
 .result-excellent {

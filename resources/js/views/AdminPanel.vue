@@ -648,6 +648,9 @@ export default {
         "userRole",
         "getMenu",
         "setContent",
+        "authss",
+        "blockForTest",
+        "about",
     ],
 
     data() {

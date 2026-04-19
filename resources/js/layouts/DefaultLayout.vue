@@ -1,7 +1,7 @@
 <template>
     <div class="vh-100 position-relative layout-shell">
         <AppSidebar
-            v-if="showChrome && (menu.length > 0 || auths.id)"
+            v-if="showChrome && hasSidebarMenu"
             :sidebarWidth="effectiveSidebarWidth"
             :catchError="catchError"
             :showToast="showToast"
@@ -354,6 +354,9 @@ export default {
         canRenderRoute() {
             return this.viewSuccess || this.isStandaloneRoute;
         },
+        hasSidebarMenu() {
+            return this.menu.length > 0;
+        },
         isStandaloneRoute() {
             return ["NotFound", "Page500"].includes(this.$route.name);
         },
@@ -374,7 +377,7 @@ export default {
             };
         },
         effectiveSidebarWidth() {
-            if (this.sidebar.visible === false) {
+            if (!this.hasSidebarMenu || this.sidebar.visible === false) {
                 return 0;
             }
 
@@ -390,10 +393,10 @@ export default {
         showSplitter() {
             return (
                 this.showChrome &&
+                this.hasSidebarMenu &&
                 !this.isMobileViewport &&
                 this.sidebar.visible !== false &&
-                !this.sidebar.unfoldable &&
-                (this.menu.length > 0 || this.auths.id)
+                !this.sidebar.unfoldable
             );
         },
     },
@@ -450,6 +453,7 @@ export default {
 
             if (
                 !this.showChrome ||
+                !this.hasSidebarMenu ||
                 this.isMobileViewport ||
                 this.sidebar.unfoldable ||
                 this.sidebar.visible === false

@@ -324,6 +324,10 @@ export default {
         "showToast",
         "api",
         "setContent",
+        "authss",
+        "blockForTest",
+        "about",
+        "userRole",
     ],
     mounted() {
         if (this.datasend) {

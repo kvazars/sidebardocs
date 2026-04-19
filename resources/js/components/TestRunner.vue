@@ -32,8 +32,179 @@
                 </div>
             </div>
         </div>
+        <div
+            v-if="showFinishConfirm && selectedTest"
+            class="modal-overlay"
+        >
+            <div class="restore-dialog card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-check2-square"></i> Подтверждение отправки
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        Вы собираетесь завершить тест
+                        <strong>{{ selectedTest.title }}</strong>.
+                    </p>
+                    <div class="mb-3">
+                        <div>
+                            Отвечено вопросов:
+                            <strong>
+                                {{ answeredQuestions.size }} из
+                                {{ selectedTest.questions.length }}
+                            </strong>
+                        </div>
+                        <div>
+                            Неотвеченных вопросов:
+                            <strong>
+                                {{
+                                    selectedTest.questions.length -
+                                    answeredQuestions.size
+                                }}
+                            </strong>
+                        </div>
+                        <div>
+                            Оставшееся время:
+                            <strong>{{ formatTime(timeLeft) }}</strong>
+                        </div>
+                    </div>
+
+                    <div
+                        v-if="
+                            selectedTest.questions.length -
+                                answeredQuestions.size >
+                            0
+                        "
+                        class="alert alert-warning py-2"
+                    >
+                        После отправки изменить ответы уже не получится.
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button
+                            @click="confirmFinishTest"
+                            class="btn btn-success text-white"
+                        >
+                            <i class="bi bi-send-check"></i> Отправить результат
+                        </button>
+                        <button
+                            @click="closeFinishConfirm"
+                            class="btn btn-outline-secondary"
+                        >
+                            Вернуться к тесту
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-else-if="completedAttemptResult" class="test-completion">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="bi bi-patch-check"></i>
+                        Тест завершён: {{ completedAttemptResult.testTitle }}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <div class="border rounded p-3 h-100">
+                                <div class="small text-muted mb-1">Баллы</div>
+                                <div class="fs-4 fw-bold">
+                                    {{ completedAttemptResult.total_score }} /
+                                    {{ completedAttemptResult.max_score }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="border rounded p-3 h-100">
+                                <div class="small text-muted mb-1">Процент</div>
+                                <div class="fs-4 fw-bold">
+                                    {{ completedAttemptResult.percentage }}%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="border rounded p-3 h-100">
+                                <div class="small text-muted mb-1">Оценка</div>
+                                <div class="fs-4 fw-bold">
+                                    {{ completedAttemptResult.grade }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="border rounded p-3 h-100">
+                                <div class="small text-muted mb-1">Время</div>
+                                <div class="fs-4 fw-bold">
+                                    {{
+                                        formatTime(
+                                            completedAttemptResult.time_spent
+                                        )
+                                    }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        v-if="completedAttemptResult.showCorrectAnswers"
+                        class="alert alert-info"
+                    >
+                        <i class="bi bi-info-circle me-2"></i>
+                        Ниже показан разбор по каждому вопросу с правильными ответами.
+                    </div>
+                    <div v-else class="alert alert-secondary">
+                        <i class="bi bi-eye-slash me-2"></i>
+                        Правильные ответы скрыты настройками этого теста.
+                    </div>
+
+                    <div
+                        v-if="completedAttemptResult.showCorrectAnswers"
+                        class="d-flex flex-column gap-3 mb-4"
+                    >
+                        <div
+                            v-for="(qResult, index) in completedAttemptResult.question_results"
+                            :key="'completed-' + index"
+                            class="border rounded p-3"
+                            :class="
+                                qResult.isCorrect
+                                    ? 'border-success bg-success bg-opacity-10'
+                                    : 'border-danger bg-danger bg-opacity-10'
+                            "
+                        >
+                            <div class="fw-semibold mb-2">
+                                Вопрос {{ index + 1 }}. {{ qResult.question }}
+                            </div>
+                            <div class="mb-2">
+                                <strong>Ваш ответ:</strong>
+                                {{ formatCompletedAnswer(qResult.userAnswer) }}
+                            </div>
+                            <div class="mb-2">
+                                <strong>Правильный ответ:</strong>
+                                {{
+                                    formatCompletedAnswer(
+                                        qResult.correct_answer
+                                    )
+                                }}
+                            </div>
+                            <div class="small text-muted">
+                                Баллы: {{ qResult.score }}/{{ qResult.max_score }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <button
+                        @click="closeCompletedAttempt"
+                        class="btn btn-primary"
+                    >
+                        <i class="bi bi-list-ul"></i> Вернуться к списку тестов
+                    </button>
+                </div>
+            </div>
+        </div>
         <!-- Выбор теста -->
-        <div v-if="!selectedTest" class="test-selection">
+        <div v-else-if="!selectedTest" class="test-selection">
             <div v-if="tests.length != 0" class="row">
                 <h2 class="mb-4">
                     <i class="bi bi-play-circle"></i> Выберите тест для
@@ -43,9 +214,14 @@
                     v-for="test in tests"
                     :key="test.id"
                     class="col-md-12 col-lg-12 mb-3"
-                    @click="selectTest(test)"
                 >
-                    <div class="test-card card h-100">
+                    <div
+                        class="test-card card h-100"
+                        :class="{
+                            'opacity-75': isRetakeBlockedForCurrentUser(test),
+                        }"
+                        @click="selectTest(test)"
+                    >
                         <div class="card-body">
                             <h5 class="card-title">{{ test.title }}</h5>
                             <p class="card-text text-muted">
@@ -85,6 +261,26 @@
                                     {{ randomSubsetCount(test) }} из
                                     {{ test.questions.length }}
                                 </small>
+                                <small
+                                    v-if="
+                                        test.settings &&
+                                        test.settings.showCorrectAnswersAfterFinish
+                                    "
+                                    class="text-info d-block mt-1"
+                                >
+                                    <i class="bi bi-eye"></i> После завершения
+                                    показываются правильные ответы
+                                </small>
+                                <small
+                                    v-if="
+                                        test.settings &&
+                                        test.settings.allowRetake === false
+                                    "
+                                    class="text-danger d-block mt-1"
+                                >
+                                    <i class="bi bi-arrow-repeat"></i>
+                                    Повторное прохождение отключено
+                                </small>
                             </div>
                         </div>
                     </div>
@@ -94,15 +290,28 @@
 
         <!-- Ввод имени (если требуется) -->
         <div v-else-if="selectedTest && !userName" class="user-name-section">
-            <div class="card">
-                <div class="card-header bg-info text-white">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
                     <h5 class="mb-0">
                         <i class="bi bi-person"></i> Введите ваше имя
                     </h5>
                 </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label">Ваше имя:</label>
+                    <div class="card-body">
+                        <div
+                            v-if="
+                                selectedTest &&
+                                selectedTest.settings?.allowRetake === false &&
+                                isRetakeBlockedForUser(
+                                    selectedTest,
+                                    tempUserName
+                                )
+                            "
+                            class="alert alert-warning"
+                        >
+                            Для этого имени повторное прохождение уже недоступно.
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Ваше имя:</label>
                         <input
                             v-model="tempUserName"
                             type="text"
@@ -117,7 +326,15 @@
 
                     <button
                         @click="startTestWithName"
-                        :disabled="!tempUserName.trim()"
+                        :disabled="
+                            !tempUserName.trim() ||
+                            (selectedTest &&
+                                selectedTest.settings?.allowRetake === false &&
+                                isRetakeBlockedForUser(
+                                    selectedTest,
+                                    tempUserName
+                                ))
+                        "
                         class="btn btn-primary"
                     >
                         <i class="bi bi-play-circle"></i> Начать тест
@@ -166,6 +383,35 @@
                 <span v-if="selectedTest.settings.shuffleAnswers" class="ms-2">
                     <i class="bi bi-check-circle"></i> Ответы перемешаны
                 </span>
+                <span
+                    v-if="selectedTest.settings.showCorrectAnswersAfterFinish"
+                    class="ms-2"
+                >
+                    <i class="bi bi-eye"></i> После завершения будут показаны
+                    правильные ответы
+                </span>
+                <span
+                    v-if="selectedTest.settings.allowRetake === false"
+                    class="ms-2"
+                >
+                    <i class="bi bi-arrow-repeat"></i> Повторное прохождение
+                    отключено
+                </span>
+                <span class="ms-2">
+                    <i
+                        class="bi"
+                        :class="
+                            canJumpBetweenQuestions
+                                ? 'bi-grid-3x3-gap'
+                                : 'bi-arrow-left-right'
+                        "
+                    ></i>
+                    {{
+                        canJumpBetweenQuestions
+                            ? "Свободный переход между вопросами"
+                            : "Переход только по порядку"
+                    }}
+                </span>
             </div>
 
             <!-- Предупреждение о незаполненном вопросе -->
@@ -191,67 +437,59 @@
                 засчитаны.
             </div>
 
-            <!-- Таймер и прогресс -->
+            <!-- Таймер и навигация -->
             <div class="row mb-4">
                 <div class="col-md-8">
-                    <div class="progress-container mb-3">
-                        <div class="progress mb-2" style="height: 20px">
-                            <div
-                                class="progress-bar progress-bar-striped progress-bar-animated"
-                                :style="{ width: progress + '%' }"
-                                title="`Вопрос ${currentQuestionIndex + 1} из ${selectedTest.questions.length}`"
-                            ></div>
-                        </div>
+                    <div class="question-navigation card border-0 shadow-sm">
                         <div
-                            v-if="timeLeft <= 60"
-                            class="progress-bar bg-warning"
-                            :style="{
-                                width:
-                                    (answeredQuestions.size /
-                                        selectedTest.questions.length) *
-                                        100 +
-                                    '%',
-                                position: 'absolute',
-                                left: 0,
-                                opacity: 0.3,
-                            }"
-                            :title="`Отвечено: ${answeredQuestions.size} из ${selectedTest.questions.length}`"
-                        ></div>
-                        <div class="progress-markers">
-                            <div
-                                v-for="i in selectedTest.questions.length"
-                                :key="i"
-                                class="question-marker"
-                                :style="{
-                                    left:
-                                        ((i - 0.5) /
-                                            selectedTest.questions.length) *
-                                            100 +
-                                        '%',
-                                }"
-                                :class="{
-                                    answered: answeredQuestions.has(i - 1),
-                                    current: currentQuestionIndex === i - 1,
-                                    unanswered:
-                                        !answeredQuestions.has(i - 1) &&
-                                        currentQuestionIndex !== i - 1,
-                                }"
-                                @click="goToQuestion(i - 1)"
-                                :title="`Вопрос ${i}${
-                                    answeredQuestions.has(i - 1)
-                                        ? ' (отвечен)'
-                                        : ' (не отвечен)'
-                                }`"
-                            ></div>
+                            class="card-body py-3 d-flex justify-content-between align-items-center flex-wrap gap-2"
+                        >
+                            <div>
+                                <div class="fw-semibold">
+                                    Вопрос {{ currentQuestionIndex + 1 }} из
+                                    {{ selectedTest.questions.length }}
+                                </div>
+                                <small class="text-muted">
+                                    Отвечено: {{ answeredQuestions.size }}/{{
+                                        selectedTest.questions.length
+                                    }}
+                                </small>
+                            </div>
+                            <div class="small text-muted">
+                                {{
+                                    canJumpBetweenQuestions
+                                        ? "Можно перейти к любому номеру вопроса"
+                                        : "Переход по номерам отключён автором теста"
+                                }}
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white border-0 pt-0">
+                            <div class="question-number-grid">
+                                <button
+                                    v-for="i in selectedTest.questions.length"
+                                    :key="i"
+                                    type="button"
+                                    class="question-number-button"
+                                    :class="{
+                                        answered: answeredQuestions.has(i - 1),
+                                        current: currentQuestionIndex === i - 1,
+                                        unanswered:
+                                            !answeredQuestions.has(i - 1) &&
+                                            currentQuestionIndex !== i - 1,
+                                    }"
+                                    :disabled="!canJumpBetweenQuestions"
+                                    @click="goToQuestion(i - 1)"
+                                    :title="`Вопрос ${i}${
+                                        answeredQuestions.has(i - 1)
+                                            ? ' (отвечен)'
+                                            : ' (не отвечен)'
+                                    }`"
+                                >
+                                    {{ i }}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <small class="text-muted">
-                        Вопрос {{ currentQuestionIndex + 1 }} из
-                        {{ selectedTest.questions.length }}
-                        (отвечено: {{ answeredQuestions.size }}/{{
-                            selectedTest.questions.length
-                        }})
-                    </small>
                 </div>
                 <div class="col-md-4">
                     <div
@@ -767,6 +1005,8 @@ export default {
             lastHiddenTime: null,
             savedTestState: null,
             restoreAttempted: false,
+            showFinishConfirm: false,
+            completedAttemptResult: null,
         };
     },
     computed: {
@@ -855,6 +1095,11 @@ export default {
                 return "alert-warning";
             }
             return "alert-info";
+        },
+        canJumpBetweenQuestions() {
+            return (
+                this.selectedTest?.settings?.allowQuestionNavigation !== false
+            );
         },
         currentOriginalIndex() {
             if (!this.currentQuestion) return -1;
@@ -1037,6 +1282,97 @@ export default {
             if (n >= bank) return 0;
             return n;
         },
+        getCompletedAttemptsStorageKey() {
+            return "completedTestAttempts";
+        },
+        readCompletedAttempts() {
+            try {
+                return JSON.parse(
+                    localStorage.getItem(
+                        this.getCompletedAttemptsStorageKey()
+                    ) || "{}"
+                );
+            } catch (error) {
+                return {};
+            }
+        },
+        normalizeUserNameForAttempt(userName) {
+            return (userName || "").trim().toLowerCase();
+        },
+        saveCompletedAttempt(testId, userName) {
+            const normalizedUserName =
+                this.normalizeUserNameForAttempt(userName);
+
+            if (!testId || !normalizedUserName) {
+                return;
+            }
+
+            const attempts = this.readCompletedAttempts();
+            if (!Array.isArray(attempts[testId])) {
+                attempts[testId] = [];
+            }
+
+            if (!attempts[testId].includes(normalizedUserName)) {
+                attempts[testId].push(normalizedUserName);
+            }
+
+            localStorage.setItem(
+                this.getCompletedAttemptsStorageKey(),
+                JSON.stringify(attempts)
+            );
+        },
+        isRetakeBlockedForUser(test, userName) {
+            if (!test?.settings || test.settings.allowRetake !== false) {
+                return false;
+            }
+
+            const normalizedUserName =
+                this.normalizeUserNameForAttempt(userName);
+            if (!normalizedUserName) {
+                return false;
+            }
+
+            const attempts = this.readCompletedAttempts();
+            return Array.isArray(attempts[test.id])
+                ? attempts[test.id].includes(normalizedUserName)
+                : false;
+        },
+        isRetakeBlockedForCurrentUser(test) {
+            return this.isRetakeBlockedForUser(test, this.tempUserName);
+        },
+        normalizeTestSettings(test) {
+            if (!test) {
+                return;
+            }
+
+            if (!test.settings) {
+                test.settings = {};
+            }
+
+            if (test.settings.shuffleQuestions === undefined) {
+                test.settings.shuffleQuestions = false;
+            }
+
+            if (test.settings.shuffleAnswers === undefined) {
+                test.settings.shuffleAnswers = false;
+            }
+
+            if (test.settings.showCorrectAnswersAfterFinish === undefined) {
+                test.settings.showCorrectAnswersAfterFinish = false;
+            }
+
+            if (test.settings.allowRetake === undefined) {
+                test.settings.allowRetake = true;
+            }
+
+            if (test.settings.allowQuestionNavigation === undefined) {
+                test.settings.allowQuestionNavigation = true;
+            }
+
+            if (test.settings.randomQuestionCount === undefined) {
+                test.settings.randomQuestionCount = 0;
+            }
+        },
         questionCountLabel(test) {
             const bank = test.questions?.length ?? 0;
             const n = this.randomSubsetCount(test);
@@ -1195,6 +1531,7 @@ export default {
             }
 
             this.selectedTest = JSON.parse(JSON.stringify(testToRestore));
+            this.normalizeTestSettings(this.selectedTest);
             this.userName = state.userName;
             this.savedTestState = state;
 
@@ -1435,6 +1772,7 @@ export default {
                 }
             }
             this.selectedTest = JSON.parse(JSON.stringify(test));
+            this.normalizeTestSettings(this.selectedTest);
             this.userName = "";
             this.tempUserName = "";
             this.restoreAttempted = false;
@@ -1442,6 +1780,20 @@ export default {
 
         startTestWithName() {
             if (this.tempUserName.trim()) {
+                if (
+                    this.selectedTest?.settings?.allowRetake === false &&
+                    this.isRetakeBlockedForUser(
+                        this.selectedTest,
+                        this.tempUserName
+                    )
+                ) {
+                    this.showToast(
+                        "Повторное прохождение этого теста для указанного имени запрещено",
+                        "warning"
+                    );
+                    return;
+                }
+
                 this.userName = this.tempUserName.trim();
 
                 const restoreMode =
@@ -1495,9 +1847,7 @@ export default {
         },
 
         initializeTest(options = {}) {
-            if (!this.selectedTest.settings) {
-                this.selectedTest.settings = {};
-            }
+            this.normalizeTestSettings(this.selectedTest);
             if (!options.skipRandomSubset) {
                 this.applyRandomQuestionSubset();
             } else if (
@@ -2282,13 +2632,36 @@ export default {
             localStorage.removeItem("testProgress");
             this.savedTestState = null;
             this.restoreAttempted = false;
+            this.showFinishConfirm = false;
             this.blockForTest(false);
+        },
+        closeCompletedAttempt() {
+            this.completedAttemptResult = null;
         },
 
         formatTime(seconds) {
             const mins = Math.floor(seconds / 60);
             const secs = seconds % 60;
             return `${mins}:${secs.toString().padStart(2, "0")}`;
+        },
+        formatCompletedAnswer(value) {
+            if (value === null || value === undefined || value === "") {
+                return "Нет ответа";
+            }
+
+            if (Array.isArray(value)) {
+                return value.length > 0 ? value.join("; ") : "Нет ответа";
+            }
+
+            if (value === true || value === "true") {
+                return "Да";
+            }
+
+            if (value === false || value === "false") {
+                return "Нет";
+            }
+
+            return String(value);
         },
 
         // ВАЛИДАЦИЯ ВОПРОСОВ
@@ -2594,12 +2967,22 @@ export default {
                 return;
             }
 
-            // Если все вопросы отвечены, завершаем тест
-            this.finishTest();
+            // Если все вопросы отвечены, просим подтвердить отправку
+            this.openFinishConfirm();
         },
 
         clearValidationError() {
             this.validationError = "";
+        },
+        openFinishConfirm() {
+            this.showFinishConfirm = true;
+        },
+        closeFinishConfirm() {
+            this.showFinishConfirm = false;
+        },
+        confirmFinishTest() {
+            this.showFinishConfirm = false;
+            this.finishTest();
         },
 
         nextQuestion() {
@@ -2630,6 +3013,10 @@ export default {
         },
 
         goToQuestion(displayIndex) {
+            if (!this.canJumpBetweenQuestions) {
+                return;
+            }
+
             if (
                 displayIndex >= 0 &&
                 displayIndex < this.selectedTest.questions.length
@@ -2642,6 +3029,7 @@ export default {
         },
 
         finishTest() {
+            this.showFinishConfirm = false;
             clearInterval(this.timer);
 
             if (this.autoSaveTimer) {
@@ -2651,13 +3039,16 @@ export default {
             localStorage.removeItem("testProgress");
             const result = this.calculateResult();
             this.datasend("results", "POST", result).then(() => {
-                this.selectedTest = null;
-                this.userName = "";
-                this.tempUserName = "";
-                this.shuffledOptionsMap.clear();
-                this.shuffledPairsMap.clear();
-                this.answeredQuestions.clear();
-                this.validationError = "";
+                const completedTestTitle = this.selectedTest?.title || "";
+                const showCorrectAnswers =
+                    this.selectedTest?.settings
+                        ?.showCorrectAnswersAfterFinish === true;
+                this.saveCompletedAttempt(this.selectedTest?.id, this.userName);
+                this.completedAttemptResult = {
+                    ...result,
+                    testTitle: completedTestTitle,
+                    showCorrectAnswers,
+                };
                 const messageType = this.getMessageTypeByGrade(result.grade);
 
                 const toastMessage = `
@@ -3150,51 +3541,57 @@ export default {
     border-left: 4px solid #28a745 !important;
 }
 
-/* Стили для маркеров вопросов */
-.progress-container {
-    position: relative;
+.question-navigation {
+    border-radius: 16px;
 }
 
-.progress-markers {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 20px;
-    pointer-events: none;
+.question-number-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+    gap: 0.5rem;
 }
 
-.question-marker {
-    position: absolute;
-    top: 0;
-    width: 8px;
-    height: 20px;
-    cursor: pointer;
-    z-index: 10;
-    pointer-events: auto;
-    transition: background-color 0.3s ease;
+.question-number-button {
+    min-height: 42px;
+    border: 1px solid #d0d7de;
+    border-radius: 10px;
+    background: #fff;
+    font-weight: 600;
+    transition:
+        transform 0.15s ease,
+        border-color 0.15s ease,
+        background-color 0.15s ease,
+        color 0.15s ease;
 }
 
-.question-marker.answered {
-    background-color: #28a745;
+.question-number-button.current {
+    background: #0d6efd;
+    border-color: #0d6efd;
+    color: #fff;
 }
 
-.question-marker.current {
-    background-color: #ffc107;
-    width: 10px;
-    height: 24px;
-    top: -2px;
+.question-number-button.answered:not(.current) {
+    background: #eaf7ee;
+    border-color: #198754;
+    color: #146c43;
 }
 
-.question-marker.unanswered {
-    background-color: #dc3545;
+.question-number-button.unanswered:not(.current) {
+    background: #fff5f5;
+    border-color: #dc3545;
+    color: #b02a37;
 }
 
-.question-marker:hover {
-    transform: scale(1.2);
+.question-number-button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: #0d6efd;
 }
 
-/* Стили для навигации кнопок */
+.question-number-button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
 .btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
