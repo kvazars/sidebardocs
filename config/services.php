@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    'llm' => [
+        'chat_stream_url' => env(
+            'LLM_CHAT_STREAM_URL'
+        ),
+        'connect_timeout' => (int) env('LLM_CONNECT_TIMEOUT', 10),
+        'timeout' => (int) env('LLM_TIMEOUT', 60),
+    ],
+
 ];

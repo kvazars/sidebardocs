@@ -4,6 +4,7 @@ use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AvailableController;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\LlmController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\TestResultController;
 use App\Http\Controllers\TreeController;
@@ -65,6 +66,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/getFiles', [ContentController::class, 'getFiles']);
         Route::post('/newPass', [UserController::class, 'newPassword']);
         Route::post('/file/{id}/change-folder', [ContentController::class, 'changeFolder']);
+        Route::post('/llm/editor-stream', [LlmController::class, 'streamEditorContent']);
 
     });
     //admin

@@ -305,6 +305,8 @@ import { useRouter } from "vue-router";
 import { useAuthIdStore } from "../stores/authId";
 import TestManagement from "../components/TestManagement.vue";
 import TestCreator from "../components/TestCreator.vue";
+import EditorJsLlmTool from "../utils/editorJsLlmTool";
+import { convertLlmOutputToEditorBlocks } from "../utils/editorJsHtmlBlocks";
 import { importDocxToEditorJS, validateDocxFile } from "../utils/importFromDocx";
 import { importPptxToEditorJS, validatePptxFile } from "../utils/importFromPptx";
 import { importPdfToEditorJS, validatePdfFile } from "../utils/importFromPdf";
@@ -490,6 +492,127 @@ export default {
         changeCurrentView(view = "management", id = null) {
             this.currentView = view;
             this.editTestId = id;
+        },
+        async streamLlmEditorHtml(prompt, { onChunk } = {}) {
+            const token = localStorage.getItem("token");
+            const headers = new Headers({
+                Accept: "text/plain",
+                "Content-Type": "application/json",
+            });
+
+            if (token) {
+                headers.append("Authorization", `Bearer ${token}`);
+            }
+
+            let response;
+
+            try {
+                response = await fetch(this.api + "llm/editor-stream", {
+                    method: "POST",
+                    headers,
+                    body: JSON.stringify({ prompt }),
+                });
+            } catch (error) {
+                const networkError = new Error(
+                    "Не удалось получить ответ от LLM-сервиса"
+                );
+                networkError.cause = error;
+                throw networkError;
+            }
+
+            if (!response.ok) {
+                let message = "LLM-сервис вернул ошибку";
+
+                try {
+                    const payload = await response.json();
+                    message = payload?.message || message;
+                } catch {
+                    message = response.statusText || message;
+                }
+
+                throw new Error(message);
+            }
+
+            if (!response.body) {
+                return await response.text();
+            }
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder("utf-8");
+            let result = "";
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) {
+                    break;
+                }
+
+                const chunk = decoder.decode(value, { stream: true });
+                if (!chunk) {
+                    continue;
+                }
+
+                result += chunk;
+                onChunk?.(result, chunk);
+            }
+
+            result += decoder.decode();
+            onChunk?.(result, "");
+
+            return result;
+        },
+        async insertGeneratedBlocksAfter(blocks, blockIndex = null) {
+            const currentContent = await this.editor.save();
+            const currentBlocks = Array.isArray(currentContent.blocks)
+                ? currentContent.blocks
+                : [];
+
+            const normalizedIndex = Number.isInteger(blockIndex)
+                ? Math.max(-1, Math.min(blockIndex, currentBlocks.length - 1))
+                : currentBlocks.length - 1;
+
+            const nextBlocks = [...currentBlocks];
+            nextBlocks.splice(normalizedIndex + 1, 0, ...blocks);
+
+            await this.editor.render({
+                time: Date.now(),
+                version: currentContent.version || "2.30.6",
+                blocks: nextBlocks,
+            });
+        },
+        async handleLlmPromptGeneration({
+            prompt,
+            blockIndex,
+            setPreview,
+            setStatus,
+        }) {
+            setStatus("loading", "Генерация ответа...");
+
+            const llmHtml = await this.streamLlmEditorHtml(prompt, {
+                onChunk: (previewText) => {
+                    setPreview(previewText);
+                },
+            });
+
+            const blocks = convertLlmOutputToEditorBlocks(llmHtml);
+
+            if (blocks.length === 0) {
+                throw new Error(
+                    "LLM не вернул содержимое, пригодное для вставки в редактор"
+                );
+            }
+
+            await this.insertGeneratedBlocksAfter(blocks, blockIndex);
+            this.clearFieldError("data");
+            setPreview("");
+            setStatus(
+                "success",
+                `Добавлено ${blocks.length} блоков. AI-блок в документ не сохраняется.`
+            );
+            this.showToast(
+                `AI добавил ${blocks.length} блоков в документ`,
+                "success"
+            );
         },
 
         // Открывает диалог выбора файла DOCX
@@ -952,6 +1075,34 @@ export default {
                         class: AceCodeEditorJS,
                         config: aceConfig,
                     },
+                    llmPrompt: {
+                        class: EditorJsLlmTool,
+                        config: {
+                            onGenerate: async (payload) => {
+                                try {
+                                    await this.handleLlmPromptGeneration(
+                                        payload
+                                    );
+                                } catch (error) {
+                                    payload.setStatus(
+                                        "error",
+                                        getErrorMessage(
+                                            error,
+                                            "Ошибка генерации"
+                                        )
+                                    );
+                                    this.showToast(
+                                        getErrorMessage(
+                                            error,
+                                            "Ошибка генерации"
+                                        ),
+                                        "danger"
+                                    );
+                                    throw error;
+                                }
+                            },
+                        },
+                    },
                 },
                 i18n: {
                     messages: {
@@ -996,6 +1147,7 @@ export default {
                             "Raw HTML": "HTML-фрагмент",
                             Table: "Таблица",
                             Link: "Ссылка",
+                            llmPrompt: "AI-генератор",
                             Marker: "Маркер",
                             Bold: "Полужирный",
                             Attachment: "Файл",
@@ -1137,6 +1289,10 @@ export default {
         },
         normalizeEditorBlock(block) {
             if (!block || !block.type || !block.data) return null;
+
+            if (block.type === "llmPrompt") {
+                return null;
+            }
 
             if (block.type === "paragraph") {
                 const text = (block.data.text || "").toString().trim();
