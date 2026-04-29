@@ -2495,6 +2495,12 @@ export default {
 
             // Отправляем результат
             this.datasend("results", "POST", result).then((response) => {
+                const completedResult =
+                    this.buildCompletedAttemptResultFromResponse(
+                        response,
+                        result
+                    );
+
                 // Сброс состояния
                 this.selectedTest = null;
                 this.userName = "";
@@ -2506,38 +2512,71 @@ export default {
 
                 // Расчет дополнительной информации для сообщения
                 const answeredPercentage =
-                    result.total_questions_count > 0
+                    completedResult.total_questions_count > 0
                         ? Math.round(
-                              (result.answered_questions_count /
-                                  result.total_questions_count) *
+                              (completedResult.answered_questions_count /
+                                  completedResult.total_questions_count) *
                                   100
                           )
                         : 0;
 
                 // Показываем сообщение
-                const messageType = this.getMessageTypeByGrade(result.grade);
+                const messageType = this.getMessageTypeByGrade(
+                    completedResult.grade
+                );
 
                 // Формируем сообщение
                 const toastMessage = `
             <div style="text-align: left; line-height: 1.5;">
                 <strong>⏰ Время истекло! Тест завершен автоматически.</strong><br>
-                Отвечено вопросов: ${result.answered_questions_count} из ${
-                    result.total_questions_count
+                Отвечено вопросов: ${
+                    completedResult.answered_questions_count
+                } из ${
+                    completedResult.total_questions_count
                 } (${answeredPercentage}%)<br>
-                Набрано баллов: ${result.total_score} из ${result.max_score} (${
-                    result.percentage
-                }%)<br>
+                Набрано баллов: ${completedResult.total_score} из ${
+                    completedResult.max_score
+                } (${completedResult.percentage}%)<br>
                 <strong style="font-size: 1.2em; color: ${this.getGradeColor(
-                    result.grade
+                    completedResult.grade
                 )};">
-                    Оценка: ${result.grade}
+                    Оценка: ${completedResult.grade}
                 </strong>
             </div>
         `;
 
+                this.completedAttemptResult = completedResult;
                 this.showToast(toastMessage, messageType);
                 this.resetTestState();
             });
+        },
+
+        buildCompletedAttemptResultFromResponse(response, fallbackResult = null) {
+            const serverResult = response?.data || {};
+            const sourceResult = fallbackResult || {};
+
+            return {
+                ...sourceResult,
+                ...serverResult,
+                question_results:
+                    serverResult.question_results ||
+                    sourceResult.question_results ||
+                    [],
+                testTitle:
+                    serverResult.testTitle ||
+                    sourceResult.test_title ||
+                    this.selectedTest?.title ||
+                    "",
+                answered_questions_count:
+                    sourceResult.answered_questions_count ??
+                    this.getAnsweredQuestionsCount(),
+                total_questions_count:
+                    sourceResult.total_questions_count ??
+                    this.selectedTest?.questions?.length ??
+                    0,
+                showCorrectAnswers:
+                    serverResult.showCorrectAnswers === true,
+            };
         },
 
         getMessageTypeByGrade(grade) {
@@ -3038,29 +3077,28 @@ export default {
             }
             localStorage.removeItem("testProgress");
             const result = this.calculateResult();
-            this.datasend("results", "POST", result).then(() => {
-                const completedTestTitle = this.selectedTest?.title || "";
-                const showCorrectAnswers =
-                    this.selectedTest?.settings
-                        ?.showCorrectAnswersAfterFinish === true;
+            this.datasend("results", "POST", result).then((response) => {
+                const completedResult =
+                    this.buildCompletedAttemptResultFromResponse(
+                        response,
+                        result
+                    );
                 this.saveCompletedAttempt(this.selectedTest?.id, this.userName);
-                this.completedAttemptResult = {
-                    ...result,
-                    testTitle: completedTestTitle,
-                    showCorrectAnswers,
-                };
-                const messageType = this.getMessageTypeByGrade(result.grade);
+                this.completedAttemptResult = completedResult;
+                const messageType = this.getMessageTypeByGrade(
+                    completedResult.grade
+                );
 
                 const toastMessage = `
             <div style="text-align: left; line-height: 1.5;">
                 <strong>✅ Тест завершен успешно!</strong><br>
-                Набрано баллов: ${result.total_score} из ${result.max_score} (${
-                    result.percentage
-                }%)<br>
+                Набрано баллов: ${completedResult.total_score} из ${
+                    completedResult.max_score
+                } (${completedResult.percentage}%)<br>
                 <strong style="font-size: 1.2em; color: ${this.getGradeColor(
-                    result.grade
+                    completedResult.grade
                 )};">
-                    Оценка: ${result.grade}
+                    Оценка: ${completedResult.grade}
                 </strong>
             </div>
         `;

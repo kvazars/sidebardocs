@@ -65,7 +65,7 @@ class TestResultController extends Controller
             $validated['question_ids'] ?? null
         );
 
-        TestResult::create([
+        $storedResult = TestResult::create([
             'user_id' => Auth::id(),
             'test_id' => $test->id,
             'user_name' => $validated['user_name'] ?? null,
@@ -78,7 +78,10 @@ class TestResultController extends Controller
         ]);
 
 
-        return response()->json(['message' => 'Спасибо за прохождение теста!']);
+        return response()->json([
+            'message' => 'Спасибо за прохождение теста!',
+            'data' => $this->buildStudentResultResponse($storedResult, $test),
+        ]);
     }
 
     public function show(TestResult $result): JsonResponse
@@ -383,5 +386,32 @@ class TestResultController extends Controller
         }
 
         return 'false';
+    }
+
+    private function buildStudentResultResponse(TestResult $result, Test $test): array
+    {
+        $showCorrectAnswers = (bool) data_get($test->settings, 'showCorrectAnswersAfterFinish', false);
+        $questionResults = is_array($result->question_results) ? $result->question_results : [];
+
+        if (!$showCorrectAnswers) {
+            $questionResults = array_map(function (array $questionResult) {
+                unset($questionResult['correct_answer']);
+
+                return $questionResult;
+            }, $questionResults);
+        }
+
+        return [
+            'id' => $result->id,
+            'test_id' => $result->test_id,
+            'testTitle' => $test->title,
+            'total_score' => (float) $result->total_score,
+            'max_score' => (float) $result->max_score,
+            'percentage' => (float) $result->percentage,
+            'grade' => $result->grade,
+            'time_spent' => (int) $result->time_spent,
+            'question_results' => $questionResults,
+            'showCorrectAnswers' => $showCorrectAnswers,
+        ];
     }
 }

@@ -75,6 +75,25 @@ npm run dev
 npm run build
 ```
 
+## Deploy через GitHub Actions
+
+В репозиторий добавлен workflow [deploy-ftp.yml](/Users/macos/projects/sidebardocs/.github/workflows/deploy-ftp.yml), который:
+
+- запускается при `push` в ветку `main`
+- может быть запущен вручную из вкладки `Actions`
+- сначала выполняет `composer install`, `npm ci`, `npm run build`
+- затем загружает изменившиеся файлы на FTP
+- при этом в деплой попадает актуальная сборка из `public/build`
+
+Перед первым запуском нужно добавить repository secrets:
+
+- `FTP_SERVER` — адрес FTP-сервера
+- `FTP_USERNAME` — FTP-логин
+- `FTP_PASSWORD` — FTP-пароль
+- `FTP_SERVER_DIR` — удалённая папка проекта, обязательно с завершающим `/`
+
+По умолчанию workflow не выгружает `.env`, `node_modules`, `storage`, пользовательские файлы из `public/contentFiles`, `public/contentImages`, `public/logo`, а также исходники из `resources`, потому что сервер получает уже готовую сборку `public/build`.
+
 ## Основные каталоги
 
 - [app/Http/Controllers](/Users/macos/projects/sidebardocs/app/Http/Controllers) — API-контроллеры
