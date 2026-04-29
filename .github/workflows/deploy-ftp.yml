@@ -60,6 +60,20 @@ jobs:
       - name: Build frontend assets
         run: npm run build
 
+      - name: Replace remote public/build
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./public/build/
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}public/build/
+          state-name: .ftp-deploy-sync-state-build.json
+          dangerous-clean-slate: true
+          exclude: |
+            **/.git*
+            **/.git*/**
+
       - name: Upload changed files to FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.4.0
         with:
@@ -91,6 +105,7 @@ jobs:
             **/vite.config.js
             **/package.json
             **/package-lock.json
+            **/public/build/**
             **/public/hot
             **/public/storage/**
             **/public/contentFiles/**
