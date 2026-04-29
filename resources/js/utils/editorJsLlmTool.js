@@ -34,12 +34,12 @@ export default class EditorJsLlmTool {
         const hint = document.createElement("div");
         hint.className = "llm-editor-tool__hint";
         hint.textContent =
-            "Введите запрос. Ответ будет вставлен ниже в виде обычных блоков Editor.js.";
+            "Введите запрос";
 
         this.textarea = document.createElement("textarea");
         this.textarea.className = "llm-editor-tool__textarea";
         this.textarea.placeholder =
-            "Например: составь структуру статьи с заголовками, списком и ссылками";
+            "Например: составь структуру статьи с заголовками, списком и ссылками. (Лучше для ответа использовать короткую получаемую информацию и запросить несколько раз)";
         this.textarea.value = this.data.prompt || "";
         this.textarea.rows = 4;
 

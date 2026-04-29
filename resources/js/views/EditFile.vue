@@ -561,7 +561,11 @@ export default {
 
             return result;
         },
-        async insertGeneratedBlocksAfter(blocks, blockIndex = null) {
+        async insertGeneratedBlocksAfter(
+            blocks,
+            blockIndex = null,
+            { removeSourceBlock = false } = {}
+        ) {
             const currentContent = await this.editor.save();
             const currentBlocks = Array.isArray(currentContent.blocks)
                 ? currentContent.blocks
@@ -570,9 +574,19 @@ export default {
             const normalizedIndex = Number.isInteger(blockIndex)
                 ? Math.max(-1, Math.min(blockIndex, currentBlocks.length - 1))
                 : currentBlocks.length - 1;
+            const sourceBlock =
+                normalizedIndex >= 0 ? currentBlocks[normalizedIndex] : null;
 
             const nextBlocks = [...currentBlocks];
             nextBlocks.splice(normalizedIndex + 1, 0, ...blocks);
+
+            if (
+                removeSourceBlock &&
+                normalizedIndex >= 0 &&
+                sourceBlock?.type === "llmPrompt"
+            ) {
+                nextBlocks.splice(normalizedIndex, 1);
+            }
 
             await this.editor.render({
                 time: Date.now(),
@@ -602,13 +616,10 @@ export default {
                 );
             }
 
-            await this.insertGeneratedBlocksAfter(blocks, blockIndex);
+            await this.insertGeneratedBlocksAfter(blocks, blockIndex, {
+                removeSourceBlock: true,
+            });
             this.clearFieldError("data");
-            setPreview("");
-            setStatus(
-                "success",
-                `Добавлено ${blocks.length} блоков. AI-блок в документ не сохраняется.`
-            );
             this.showToast(
                 `AI добавил ${blocks.length} блоков в документ`,
                 "success"
