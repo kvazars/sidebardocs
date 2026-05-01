@@ -82,6 +82,7 @@ jobs:
           set cmd:fail-exit yes
           set net:max-retries 2
           set net:timeout 30
+          set ssl:verify-certificate no
           set xfer:clobber on
           mirror -R \
             --verbose=1 \
