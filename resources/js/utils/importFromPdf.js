@@ -28,11 +28,13 @@ export function validatePdfFile(file) {
 export async function importPdfToEditorJS(file, uploadImageCallback = null) {
     validatePdfFile(file);
 
-    const [{ GlobalWorkerOptions, getDocument, OPS }, workerModule] = await Promise.all([
-        import("pdfjs-dist/legacy/build/pdf.mjs"),
-        import("pdfjs-dist/legacy/build/pdf.worker.mjs?url"),
-    ]);
-    GlobalWorkerOptions.workerSrc = workerModule.default || workerModule;
+    const [{ GlobalWorkerOptions, getDocument, OPS }, workerModule] =
+        await Promise.all([
+            import("pdfjs-dist/legacy/build/pdf.mjs"),
+            import("pdfjs-dist/legacy/build/pdf.worker.mjs?worker&inline"),
+        ]);
+    const PdfWorker = workerModule.default || workerModule;
+    GlobalWorkerOptions.workerPort = new PdfWorker();
 
     const data = await file.arrayBuffer();
     const loadingTask = getDocument({
@@ -78,6 +80,8 @@ export async function importPdfToEditorJS(file, uploadImageCallback = null) {
         return sanitizeImportedBlocks(blocks);
     } finally {
         await loadingTask.destroy();
+        GlobalWorkerOptions.workerPort?.terminate?.();
+        GlobalWorkerOptions.workerPort = null;
     }
 }
 
