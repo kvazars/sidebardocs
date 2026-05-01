@@ -15,6 +15,10 @@ use Intervention\Image\Laravel\Facades\Image;
 
 class TestController extends Controller
 {
+    private const QUESTION_IMAGE_MAX_WIDTH = 640;
+    private const OPTION_IMAGE_MAX_WIDTH = 260;
+    private const MAX_IMAGE_DATA_URI_LENGTH = 60000;
+
     public function testTree(Tree $tree_id)
     {
         $tests = Test::with('questions')->where("tree_id", $tree_id->id)->get();
@@ -66,7 +70,7 @@ class TestController extends Controller
     }
 
 
-    private function processImage($imageData, $maxWidth = 800)
+    private function processImage($imageData, $maxWidth = self::QUESTION_IMAGE_MAX_WIDTH)
     {
         if (!$imageData) {
             return null;
@@ -78,17 +82,35 @@ class TestController extends Controller
             } else {
                 $image = Image::read($imageData);
             }
-            $image = $image->scale($maxWidth);
+            $currentWidth = min($maxWidth, $image->width());
+            $quality = 82;
+            $best = null;
 
-            $results = [
-                'webp' => 'data:image/webp;base64,' . base64_encode($image->toWebp(80)->toString()),
-                'jpg'  => 'data:image/jpeg;base64,' . base64_encode($image->toJpeg(85)->toString()),
-                'png'  => 'data:image/png;base64,' . base64_encode($image->toPng()->toString())
-            ];
-            $getBytes = fn($uri) => strlen(base64_decode(substr($uri, strpos($uri, ',') + 1)));
-            $sizes = array_map($getBytes, $results);
-            $bestFormat = array_keys($sizes, min($sizes))[0];
-            return $results[$bestFormat];
+            do {
+                $resized = clone $image;
+                $resized = $resized->scaleDown(width: $currentWidth);
+
+                foreach ([$quality, 72, 62, 52] as $candidateQuality) {
+                    $results = [
+                        'webp' => 'data:image/webp;base64,' . base64_encode($resized->toWebp($candidateQuality)->toString()),
+                        'jpg' => 'data:image/jpeg;base64,' . base64_encode($resized->toJpeg($candidateQuality)->toString()),
+                    ];
+
+                    $candidate = collect($results)->sortBy(fn($uri) => strlen($uri))->first();
+                    if ($best === null || strlen($candidate) < strlen($best)) {
+                        $best = $candidate;
+                    }
+
+                    if (strlen($candidate) <= self::MAX_IMAGE_DATA_URI_LENGTH) {
+                        return $candidate;
+                    }
+                }
+
+                $currentWidth = (int) floor($currentWidth * 0.75);
+                $quality = max(50, $quality - 10);
+            } while ($currentWidth >= 240);
+
+            return $best;
         } catch (\Exception $e) {
             return $imageData;
         }
@@ -140,7 +162,7 @@ class TestController extends Controller
                 // Для вопросов с вариантами выбора
                 foreach ($options as &$option) {
                     if (isset($option['image']) && $option['image']) {
-                        $option['image'] = $this->processImage($option['image'], 300);
+                        $option['image'] = $this->processImage($option['image'], self::OPTION_IMAGE_MAX_WIDTH);
                     }
                 }
                 break;
@@ -149,7 +171,15 @@ class TestController extends Controller
                 // Для вопросов на сопоставление
                 foreach ($options as &$pair) {
                     if (isset($pair['leftImage']) && $pair['leftImage']) {
-                        $pair['leftImage'] = $this->processImage($pair['leftImage'], 300);
+                        $pair['leftImage'] = $this->processImage($pair['leftImage'], self::OPTION_IMAGE_MAX_WIDTH);
+                    }
+                }
+                break;
+
+            case 'sorting':
+                foreach ($options as &$item) {
+                    if (isset($item['image']) && $item['image']) {
+                        $item['image'] = $this->processImage($item['image'], self::OPTION_IMAGE_MAX_WIDTH);
                     }
                 }
                 break;

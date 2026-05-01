@@ -17,7 +17,7 @@ return new class extends Migration
             $table->text('text');
             $table->string('type');
             $table->integer('points')->default(1);
-            $table->text('image')->nullable();
+            $table->longText('image')->nullable();
             $table->json('options')->nullable();
             $table->integer('order')->default(0);
             $table->timestamps();

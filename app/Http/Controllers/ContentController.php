@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Intervention\Image\Laravel\Facades\Image;
 
@@ -51,7 +50,7 @@ class ContentController extends Controller
             $name = Str::random(40) . "." . $extension;
             $fullPath = "{$dirshort}/{$name}";
 
-            // Сохраняем файл напрямую
+            Storage::disk('public')->makeDirectory($dirshort);
             $file->storeAs($dirshort, $name, 'public');
 
             \Log::info("Изображение успешно сохранено: $fullPath");
@@ -66,21 +65,16 @@ class ContentController extends Controller
     }
     public function saveFile(UploadFileRequest $request)
     {
-        if (!is_dir(public_path("contentFiles"))) {
-            mkdir(public_path("contentFiles"));
-        }
         $dirshort = "contentFiles/" . Auth::user()->id;
-        $dir = public_path($dirshort);
-        if (!is_dir(filename: $dir)) {
-            mkdir($dir);
-        }
+        Storage::disk('public')->makeDirectory($dirshort);
+
         $uploaded = $request->file('file');
         $originalName = $uploaded->getClientOriginalName();
         $size = $uploaded->getSize();
         $extension = strtolower($uploaded->getClientOriginalExtension());
         $name = Str::random(40) . "." . $uploaded->extension();
         $pathshort = $dirshort . '/' . $name;
-        Storage::disk("public")->putFileAs($dir, $uploaded, $name);
+        Storage::disk("public")->putFileAs($dirshort, $uploaded, $name);
         $withoutExt = $originalName !== ''
             ? pathinfo($originalName, PATHINFO_FILENAME)
             : pathinfo($name, PATHINFO_FILENAME);
@@ -89,7 +83,7 @@ class ContentController extends Controller
         return response()->json([
             'success' => 1,
             'file' => [
-                'url' => URL::to('/') . "/" . $pathshort,
+                'url' => asset("storage/{$pathshort}"),
                 'name' => $displayName,
                 'title' => $displayName,
                 'size' => $size,
@@ -101,19 +95,16 @@ class ContentController extends Controller
     public function saveImageByUrl(Request $request)
     {
         $dirshort = "contentImages/" . Auth::user()->id;
-        $dir = public_path($dirshort);
-        if (!is_dir($dir)) {
-            mkdir($dir);
-        }
+        Storage::disk('public')->makeDirectory($dirshort);
+
         $path   = Image::read(file_get_contents($request->url));
         $resize = $path->scaleDown(1024, 1024)->toWebp(100);
 
         $name = Str::random(40) . ".webp";
-        $path = $dir . "/" . $name;
         $pathshort = $dirshort . '/' . $name;
 
-        Storage::disk("public")->put($path, $resize);
-        return response()->json(['success' => 1, 'file' => ['url' => URL::to('/') . "/" . $pathshort]], 200);
+        Storage::disk("public")->put($pathshort, $resize->toString());
+        return response()->json(['success' => 1, 'file' => ['url' => asset("storage/{$pathshort}")]], 200);
     }
 
     public function saveResource(ResourceSaveRequest $request)
@@ -582,7 +573,8 @@ class ContentController extends Controller
         $suffix = 2;
 
         while (
-            Tree::where('slug', $slug)
+            Tree::withTrashed()
+                ->where('slug', $slug)
                 ->when($ignoreTreeId, fn($q) => $q->where('id', '!=', $ignoreTreeId))
                 ->exists()
         ) {

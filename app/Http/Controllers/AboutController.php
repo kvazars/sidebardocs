@@ -23,15 +23,12 @@ class AboutController extends Controller
             $request->validate([
                 'logo' => 'image|max:512',
             ]);
-            $dir = public_path("logo");
-            if (!is_dir($dir)) {
-                mkdir($dir);
-            }
+            Storage::disk('public')->makeDirectory('logo');
             $image   = Image::read($request->file('logo'));
             $resize = $image->scale(height: 35)->toWebp(100);
             $name = Str::random(40) . ".webp";
             $path = "logo/{$name}";
-            Storage::disk("public")->put("{$dir}/{$name}", $resize);
+            Storage::disk("public")->put($path, $resize->toString());
         }
         $about = About::find(1);
         
