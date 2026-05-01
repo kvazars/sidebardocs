@@ -1,6 +1,6 @@
 # SidebarDocs
 
-Внутреннее веб-приложение на Laravel 11 и Vue 3 для работы с деревом документов, редактором контента и тестами.
+Внутреннее веб-приложение на Laravel 13 и Vue 3 для работы с деревом документов, редактором контента и тестами.
 
 ## Что умеет проект
 
@@ -14,14 +14,14 @@
 
 ## Технологии
 
-- Backend: Laravel 11, Sanctum, Eloquent
+- Backend: Laravel 13, Sanctum, Eloquent
 - Frontend: Vue 3, Vue Router, Pinia, CoreUI, Bootstrap 5
 - Сборка: Vite 5
 - Работа с файлами: `mammoth`, `jszip`, `pdfjs-dist`, `docx`, `intervention/image`
 
 ## Требования
 
-- PHP `^8.2`
+- PHP `^8.3`
 - Composer
 - Node.js 18+ и npm
 - SQLite или другая поддерживаемая Laravel БД
