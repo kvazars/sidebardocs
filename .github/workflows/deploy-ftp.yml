@@ -65,6 +65,34 @@ jobs:
       - name: Build frontend assets
         run: npm run build
 
+      - name: Upload frontend build with deletions
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_SERVER_DIR: ${{ secrets.FTP_SERVER_DIR }}
+          FTP_PORT: ${{ secrets.FTP_PORT }}
+          FTP_PROTOCOL: ${{ secrets.FTP_PROTOCOL }}
+        run: |
+          FTP_PORT="${FTP_PORT:-21}"
+          FTP_PROTOCOL="${FTP_PROTOCOL:-ftp}"
+          LFTP_URL="${FTP_PROTOCOL}://${FTP_SERVER}:${FTP_PORT}"
+
+          lftp "$LFTP_URL" -u "$FTP_USERNAME","$FTP_PASSWORD" <<EOF
+          set cmd:fail-exit yes
+          set net:max-retries 2
+          set net:timeout 30
+          set ssl:verify-certificate no
+          set xfer:clobber on
+          mkdir -p ${FTP_SERVER_DIR}public
+          mirror -R \
+            --delete \
+            --verbose=1 \
+            --parallel=4 \
+            public/build ${FTP_SERVER_DIR}public/build
+          bye
+          EOF
+
       - name: Upload public without deletions
         env:
           FTP_SERVER: ${{ secrets.FTP_SERVER }}
@@ -87,6 +115,7 @@ jobs:
           mirror -R \
             --verbose=1 \
             --parallel=4 \
+            --exclude-glob build/** \
             --exclude-glob storage/** \
             --exclude-glob contentFiles/** \
             --exclude-glob contentImages/** \
