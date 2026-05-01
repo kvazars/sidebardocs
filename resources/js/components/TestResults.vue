@@ -166,17 +166,17 @@
                                         Средний балл
                                     </div>
                                     <div class="fs-4 fw-bold">
-                                        {{ formatScore(testStats.averageScore) }}
+                                        {{ formatRoundedScore(testStats.averageScore) }}
                                         /
                                         {{
-                                            formatScore(
+                                            formatRoundedScore(
                                                 testStats.averageMaxScore
                                             )
                                         }}
                                     </div>
                                     <div class="small text-muted">
                                         {{
-                                            formatPercentage(
+                                            formatRoundedPercentage(
                                                 testStats.averagePercentage
                                             )
                                         }}
@@ -204,7 +204,7 @@
                                     >
                                         Верно у
                                         {{
-                                            formatPercentage(
+                                            formatRoundedPercentage(
                                                 testStats.hardestQuestion.correctRate
                                             )
                                         }}
@@ -237,7 +237,7 @@
                                     >
                                         Верно у
                                         {{
-                                            formatPercentage(
+                                            formatRoundedPercentage(
                                                 testStats.bestQuestion.correctRate
                                             )
                                         }}
@@ -287,17 +287,17 @@
                                                 "
                                             >
                                                 {{
-                                                    formatPercentage(
+                                                    formatRoundedPercentage(
                                                         questionStat.correctRate
                                                     )
                                                 }}
                                             </span>
                                         </td>
                                         <td>
-                                            {{ formatScore(questionStat.averageScore) }}
+                                            {{ formatRoundedScore(questionStat.averageScore) }}
                                             /
                                             {{
-                                                formatScore(
+                                                formatRoundedScore(
                                                     questionStat.maxScore
                                                 )
                                             }}
@@ -585,180 +585,252 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr
+                        <template
                             v-for="result in filteredResults"
                             :key="getResultKey(result)"
                         >
-                            <td>
-                                <input
-                                    type="checkbox"
-                                    class="form-check-input"
-                                    :checked="isResultSelected(result)"
-                                    @change="toggleResultSelection(result)"
-                                />
-                            </td>
-                            <td>
-                                <strong>{{ getTestTitle(result) }}</strong>
-                            </td>
-                            <td>
-                                <span
-                                    v-if="result.user_name"
-                                    class="badge bg-info"
-                                >
-                                    <i class="bi bi-person"></i>
-                                    {{ result.user_name }}
-                                    ({{ result.user.name }})
-                                </span>
+                            <tr>
+                                <td>
+                                    <input
+                                        type="checkbox"
+                                        class="form-check-input"
+                                        :checked="isResultSelected(result)"
+                                        @change="toggleResultSelection(result)"
+                                    />
+                                </td>
+                                <td>
+                                    <strong>{{ getTestTitle(result) }}</strong>
+                                </td>
+                                <td>
+                                    <span
+                                        v-if="result.user_name"
+                                        class="badge bg-info"
+                                    >
+                                        <i class="bi bi-person"></i>
+                                        {{ result.user_name }}
+                                        <template v-if="result.user">
+                                            ({{ result.user.name }})
+                                        </template>
+                                    </span>
 
-                                <span v-else class="text-muted">—</span>
-                            </td>
-                            <td>
-                                <span class="fw-bold">
-                                    {{ formatScore(result.total_score) }}/{{
-                                        formatScore(result.max_score)
-                                    }}
-                                </span>
-                            </td>
-                            <td>
-                                <span
-                                    class="badge"
-                                    :class="getBadgeClass(result.percentage)"
-                                >
-                                    {{ formatPercentage(result.percentage) }}
-                                </span>
-                            </td>
-                            <td>
-                                <span class="fw-bold">{{
-                                    result.grade || "Не оценено"
-                                }}</span>
-                            </td>
-                            <td>
-                                <small>{{
-                                    formatTime(result.time_spent)
-                                }}</small>
-                            </td>
-                            <td>
-                                <small>{{
-                                    formatDate(result.created_at)
-                                }}</small>
-                            </td>
-                            <td>
-                                <div class="btn-group btn-group-sm">
-                                    <button
-                                        @click="toggleDetails(result)"
-                                        class="btn btn-outline-primary"
-                                        :title="
-                                            isResultExpanded(result)
-                                                ? 'Скрыть детали'
-                                                : 'Показать детали'
-                                        "
+                                    <span v-else class="text-muted">—</span>
+                                </td>
+                                <td>
+                                    <span class="fw-bold">
+                                        {{ formatScore(result.total_score) }}/{{
+                                            formatScore(result.max_score)
+                                        }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span
+                                        class="badge"
+                                        :class="getBadgeClass(result.percentage)"
                                     >
-                                        <i
-                                            class="bi"
-                                            :class="
+                                        {{ formatPercentage(result.percentage) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="fw-bold">{{
+                                        result.grade || "Не оценено"
+                                    }}</span>
+                                </td>
+                                <td>
+                                    <small>{{
+                                        formatTime(result.time_spent)
+                                    }}</small>
+                                </td>
+                                <td>
+                                    <small>{{
+                                        formatDate(result.created_at)
+                                    }}</small>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button
+                                            @click="toggleDetails(result)"
+                                            class="btn btn-outline-primary"
+                                            :title="
                                                 isResultExpanded(result)
-                                                    ? 'bi-chevron-up'
-                                                    : 'bi-chevron-down'
+                                                    ? 'Скрыть детали'
+                                                    : 'Показать детали'
                                             "
-                                        ></i>
-                                    </button>
-                                    <button
-                                        @click="deleteResult(result)"
-                                        class="btn btn-outline-danger"
-                                        title="Удалить результат"
-                                    >
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                                        >
+                                            <i
+                                                class="bi"
+                                                :class="
+                                                    isResultExpanded(result)
+                                                        ? 'bi-chevron-up'
+                                                        : 'bi-chevron-down'
+                                                "
+                                            ></i>
+                                        </button>
+                                        <button
+                                            @click="deleteResult(result)"
+                                            class="btn btn-outline-danger"
+                                            title="Удалить результат"
+                                        >
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr
+                                v-if="isResultExpanded(result)"
+                                class="result-details-row"
+                            >
+                                <td colspan="9">
+                                    <div class="result-details-panel">
+                                        <div
+                                            class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3"
+                                        >
+                                            <div>
+                                                <div class="fw-semibold">
+                                                    Данные прохождения:
+                                                    {{ getTestTitle(result) }}
+                                                </div>
+                                                <small class="text-muted">
+                                                    <span
+                                                        v-if="result.user_name"
+                                                    >
+                                                        {{ result.user_name }}
+                                                    </span>
+                                                    <span v-else>
+                                                        Пользователь не указан
+                                                    </span>
+                                                    ·
+                                                    {{
+                                                        formatDate(
+                                                            result.created_at
+                                                        )
+                                                    }}
+                                                </small>
+                                            </div>
+                                            <div
+                                                class="d-flex flex-wrap gap-2"
+                                            >
+                                                <span
+                                                    class="badge"
+                                                    :class="
+                                                        getBadgeClass(
+                                                            result.percentage
+                                                        )
+                                                    "
+                                                >
+                                                    {{
+                                                        formatPercentage(
+                                                            result.percentage
+                                                        )
+                                                    }}
+                                                </span>
+                                                <span class="badge bg-secondary">
+                                                    {{
+                                                        formatScore(
+                                                            result.total_score
+                                                        )
+                                                    }}/{{
+                                                        formatScore(
+                                                            result.max_score
+                                                        )
+                                                    }}
+                                                    баллов
+                                                </span>
+                                                <span class="badge bg-light text-dark">
+                                                    {{
+                                                        formatTime(
+                                                            result.time_spent
+                                                        )
+                                                    }}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div
+                                            v-for="(qResult, qIndex) in getQuestionResults(
+                                                result
+                                            )"
+                                            :key="qIndex"
+                                            class="question-result mb-3 p-3 rounded"
+                                            :class="
+                                                qResult.isCorrect
+                                                    ? 'bg-success bg-opacity-10'
+                                                    : 'bg-danger bg-opacity-10'
+                                            "
+                                        >
+                                            <h6 class="mb-1">
+                                                Вопрос {{ qIndex + 1 }}:
+                                                {{
+                                                    qResult.question ||
+                                                    "Без текста"
+                                                }}
+                                            </h6>
+                                            <div class="mb-2">
+                                                <strong>Ваш ответ:</strong>
+                                                <div
+                                                    :class="
+                                                        qResult.isCorrect
+                                                            ? 'text-success'
+                                                            : 'text-danger'
+                                                    "
+                                                >
+                                                    {{
+                                                        formatUserAnswer(
+                                                            qResult.userAnswer
+                                                        )
+                                                    }}
+                                                </div>
+                                            </div>
+                                            <div
+                                                v-if="!qResult.isCorrect"
+                                                class="mb-2"
+                                            >
+                                                <strong>Правильный ответ:</strong>
+                                                <div class="text-success">
+                                                    {{
+                                                        formatCorrectAnswer(
+                                                            qResult.correct_answer
+                                                        )
+                                                    }}
+                                                </div>
+                                            </div>
+                                            <div
+                                                class="d-flex justify-content-between align-items-center"
+                                            >
+                                                <span
+                                                    class="badge"
+                                                    :class="
+                                                        qResult.isCorrect
+                                                            ? 'bg-success'
+                                                            : 'bg-danger'
+                                                    "
+                                                >
+                                                    {{
+                                                        formatScore(
+                                                            qResult.score
+                                                        )
+                                                    }}/{{
+                                                        formatScore(
+                                                            qResult.max_score
+                                                        )
+                                                    }}
+                                                    баллов
+                                                </span>
+                                                <i
+                                                    class="bi"
+                                                    :class="
+                                                        qResult.isCorrect
+                                                            ? 'bi-check-circle text-success'
+                                                            : 'bi-x-circle text-danger'
+                                                    "
+                                                ></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
                     </tbody>
                 </table>
-
-                <!-- Детали результатов в табличном режиме -->
-                <div
-                    v-for="result in filteredResults.filter((r) =>
-                        isResultExpanded(r)
-                    )"
-                    :key="'details-' + getResultKey(result)"
-                    class="card mt-3"
-                >
-                    <div class="card-header bg-light">
-                        <h6 class="mb-0">
-                            Детали результатов: {{ getTestTitle(result) }}
-                            <span v-if="result.user_name" class="text-muted">
-                                ({{ result.user_name }})
-                            </span>
-                        </h6>
-                    </div>
-
-                    <div class="card-body">
-                        <div
-                            v-for="(qResult, qIndex) in getQuestionResults(
-                                result
-                            )"
-                            :key="qIndex"
-                            class="question-result mb-3 p-3 rounded"
-                            :class="
-                                qResult.isCorrect
-                                    ? 'bg-success bg-opacity-10'
-                                    : 'bg-danger bg-opacity-10'
-                            "
-                        >
-                            <h6 class="mb-1">
-                                Вопрос {{ qIndex + 1 }}:
-                                {{ qResult.question || "Без текста" }}
-                            </h6>
-                            <div class="mb-2">
-                                <strong>Ваш ответ:</strong>
-                                <div
-                                    :class="
-                                        qResult.isCorrect
-                                            ? 'text-success'
-                                            : 'text-danger'
-                                    "
-                                >
-                                    {{ formatUserAnswer(qResult.userAnswer) }}
-                                </div>
-                            </div>
-                            <div v-if="!qResult.isCorrect" class="mb-2">
-                                <strong>Правильный ответ:</strong>
-                                <div class="text-success">
-                                    {{
-                                        formatCorrectAnswer(
-                                            qResult.correct_answer
-                                        )
-                                    }}
-                                </div>
-                            </div>
-                            <div
-                                class="d-flex justify-content-between align-items-center"
-                            >
-                                <span
-                                    class="badge"
-                                    :class="
-                                        qResult.isCorrect
-                                            ? 'bg-success'
-                                            : 'bg-danger'
-                                    "
-                                >
-                                    {{ formatScore(qResult.score) }}/{{
-                                        formatScore(qResult.max_score)
-                                    }}
-                                    баллов
-                                </span>
-                                <i
-                                    class="bi"
-                                    :class="
-                                        qResult.isCorrect
-                                            ? 'bi-check-circle text-success'
-                                            : 'bi-x-circle text-danger'
-                                    "
-                                ></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- Пагинация -->
@@ -1059,6 +1131,17 @@ export default {
         formatPercentage(value) {
             return `${this.formatScore(value)}%`;
         },
+        formatRoundedScore(value) {
+            const numericValue = Number(value || 0);
+            if (!Number.isFinite(numericValue)) {
+                return "0";
+            }
+
+            return String(Number(numericValue.toFixed(1)));
+        },
+        formatRoundedPercentage(value) {
+            return `${this.formatRoundedScore(value)}%`;
+        },
         getQuestionStatBadgeClass(correctRate) {
             if (correctRate >= 80) return "bg-success";
             if (correctRate >= 60) return "bg-info";
@@ -1282,6 +1365,17 @@ export default {
 .table th,
 .table td {
     vertical-align: middle;
+}
+
+.result-details-row > td {
+    background: #f8f9fa;
+    border-top: 0;
+    padding: 0;
+}
+
+.result-details-panel {
+    padding: 1rem;
+    border-left: 4px solid #0d6efd;
 }
 
 .img-thumbnail {
