@@ -376,8 +376,8 @@
                                 <div class="col-6">
                                     <small class="text-muted">Баллы:</small>
                                     <div class="fw-bold">
-                                        {{ result.total_score || 0 }} /
-                                        {{ result.max_score || 0 }}
+                                        {{ formatScore(result.total_score) }} /
+                                        {{ formatScore(result.max_score) }}
                                     </div>
                                 </div>
                                 <div class="col-6">
@@ -539,11 +539,10 @@
                                                     : 'bg-danger'
                                             "
                                         >
-                                            {{
-                                                (qResult.score || 0).toFixed(1)
-                                            }}
+                                            {{ formatScore(qResult.score) }}
                                             /
-                                            {{ qResult.max_score || 0 }} баллов
+                                            {{ formatScore(qResult.max_score) }}
+                                            баллов
                                         </span>
                                         <i
                                             class="bi"
@@ -615,8 +614,8 @@
                             </td>
                             <td>
                                 <span class="fw-bold">
-                                    {{ result.total_score || 0 }}/{{
-                                        result.max_score || 0
+                                    {{ formatScore(result.total_score) }}/{{
+                                        formatScore(result.max_score)
                                     }}
                                 </span>
                             </td>
@@ -743,8 +742,8 @@
                                             : 'bg-danger'
                                     "
                                 >
-                                    {{ (qResult.score || 0).toFixed(1) }}/{{
-                                        qResult.max_score || 0
+                                    {{ formatScore(qResult.score) }}/{{
+                                        formatScore(qResult.max_score)
                                     }}
                                     баллов
                                 </span>
@@ -1051,12 +1050,11 @@ export default {
         },
         formatScore(value) {
             const numericValue = Number(value || 0);
-
-            if (Number.isInteger(numericValue)) {
-                return String(numericValue);
+            if (!Number.isFinite(numericValue)) {
+                return "0";
             }
 
-            return numericValue.toFixed(1);
+            return String(Number(numericValue.toFixed(10)));
         },
         formatPercentage(value) {
             const numericValue = Number(value || 0);

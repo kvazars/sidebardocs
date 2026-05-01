@@ -112,8 +112,17 @@
                             <div class="border rounded p-3 h-100">
                                 <div class="small text-muted mb-1">Баллы</div>
                                 <div class="fs-4 fw-bold">
-                                    {{ completedAttemptResult.total_score }} /
-                                    {{ completedAttemptResult.max_score }}
+                                    {{
+                                        formatScore(
+                                            completedAttemptResult.total_score
+                                        )
+                                    }}
+                                    /
+                                    {{
+                                        formatScore(
+                                            completedAttemptResult.max_score
+                                        )
+                                    }}
                                 </div>
                             </div>
                         </div>
@@ -189,7 +198,9 @@
                                 }}
                             </div>
                             <div class="small text-muted">
-                                Баллы: {{ qResult.score }}/{{ qResult.max_score }}
+                                Баллы: {{ formatScore(qResult.score) }}/{{
+                                    formatScore(qResult.max_score)
+                                }}
                             </div>
                         </div>
                     </div>
@@ -538,7 +549,7 @@
                         </small>
                     </h5>
                     <span class="badge bg-secondary"
-                        >{{ currentQuestion.points }} баллов</span
+                        >{{ formatScore(currentQuestion.points) }} баллов</span
                     >
                 </div>
                 <div class="card-body">
@@ -569,7 +580,7 @@
 
                     <p class="text-muted">
                         <i class="bi bi-star"></i> Баллы:
-                        {{ currentQuestion.points }}
+                        {{ formatScore(currentQuestion.points) }}
                     </p>
 
                     <div
@@ -2609,9 +2620,11 @@ export default {
                 } из ${
                     completedResult.total_questions_count
                 } (${answeredPercentage}%)<br>
-                Набрано баллов: ${completedResult.total_score} из ${
-                    completedResult.max_score
-                } (${completedResult.percentage}%)<br>
+                Набрано баллов: ${this.formatScore(
+                    completedResult.total_score
+                )} из ${this.formatScore(completedResult.max_score)} (${
+                    completedResult.percentage
+                }%)<br>
                 <strong style="font-size: 1.2em; color: ${this.getGradeColor(
                     completedResult.grade
                 )};">
@@ -2758,6 +2771,14 @@ export default {
             const mins = Math.floor(seconds / 60);
             const secs = seconds % 60;
             return `${mins}:${secs.toString().padStart(2, "0")}`;
+        },
+        formatScore(value) {
+            const numericValue = Number(value || 0);
+            if (!Number.isFinite(numericValue)) {
+                return "0";
+            }
+
+            return String(Number(numericValue.toFixed(10)));
         },
         formatCompletedAnswer(value) {
             if (value === null || value === undefined || value === "") {
@@ -3168,9 +3189,11 @@ export default {
                 const toastMessage = `
             <div style="text-align: left; line-height: 1.5;">
                 <strong>✅ Тест завершен успешно!</strong><br>
-                Набрано баллов: ${completedResult.total_score} из ${
-                    completedResult.max_score
-                } (${completedResult.percentage}%)<br>
+                Набрано баллов: ${this.formatScore(
+                    completedResult.total_score
+                )} из ${this.formatScore(completedResult.max_score)} (${
+                    completedResult.percentage
+                }%)<br>
                 <strong style="font-size: 1.2em; color: ${this.getGradeColor(
                     completedResult.grade
                 )};">

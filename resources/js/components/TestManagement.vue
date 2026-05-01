@@ -72,7 +72,7 @@
                                 <div class="col-4">
                                     <small class="text-muted">Баллы</small>
                                     <div class="fw-bold">
-                                        {{ getTotalPoints(test) }}
+                                        {{ formatScore(getTotalPoints(test)) }}
                                     </div>
                                 </div>
                                 <div class="col-4">
@@ -467,7 +467,7 @@
                                 </div>
                                 <div class="mb-2">
                                     <strong>Всего баллов:</strong>
-                                    {{ getTotalPoints(importPreview) }}
+                                    {{ formatScore(getTotalPoints(importPreview)) }}
                                 </div>
                                 <div class="mb-2">
                                     <strong>Типы вопросов:</strong>
@@ -538,7 +538,7 @@
                                                 >
                                                     Вопрос {{ idx + 1 }}:
                                                     {{ typeMap[question.type] }}
-                                                    ({{ question.points }}
+                                                    ({{ formatScore(question.points) }}
                                                     баллов)
                                                 </button>
                                             </h2>
@@ -704,9 +704,18 @@ export default {
 
         getTotalPoints(test) {
             return test.questions.reduce(
-                (sum, q) => sum + (parseInt(q.points) || 0),
+                (sum, q) => sum + (Number(q.points) || 0),
                 0
             );
+        },
+
+        formatScore(value) {
+            const numericValue = Number(value || 0);
+            if (!Number.isFinite(numericValue)) {
+                return "0";
+            }
+
+            return String(Number(numericValue.toFixed(10)));
         },
 
         getQuestionTypesCount(test) {

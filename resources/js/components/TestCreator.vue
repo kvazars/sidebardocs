@@ -395,7 +395,7 @@
                             <div class="card text-center">
                                 <div class="card-body py-2">
                                     <h6 class="card-title mb-0">
-                                        {{ totalPoints }}
+                                        {{ formatScore(totalPoints) }}
                                     </h6>
                                     <small class="text-muted">Баллы</small>
                                 </div>
@@ -486,7 +486,7 @@
                                             {{ getQuestionTypeLabel(question.type) }}
                                         </span>
                                         <span class="badge text-bg-secondary">
-                                            {{ question.points }}
+                                            {{ formatScore(question.points) }}
                                             {{ getPointsLabel(question.points) }}
                                         </span>
                                         <span
@@ -1282,7 +1282,7 @@ export default {
         },
         totalPoints() {
             return this.test.questions.reduce(
-                (sum, q) => sum + (parseInt(q.points) || 0),
+                (sum, q) => sum + (Number(q.points) || 0),
                 0
             );
         },
@@ -1391,6 +1391,15 @@ export default {
             }
 
             return "баллов";
+        },
+
+        formatScore(value) {
+            const numericValue = Number(value || 0);
+            if (!Number.isFinite(numericValue)) {
+                return "0";
+            }
+
+            return String(Number(numericValue.toFixed(10)));
         },
 
         toggleQuestion(questionId) {
