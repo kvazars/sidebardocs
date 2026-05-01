@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Test;
+use App\Models\TestAttempt;
 use App\Models\TestResult;
 use App\Models\Tree;
 use Illuminate\Http\Request;
@@ -54,21 +55,34 @@ class TestResultController extends Controller
             'user_name' => 'nullable|string|max:255',
             'time_spent' => 'required|integer',
             'user_answers' => 'required|array',
+            'attempt_id' => 'nullable|integer|exists:test_attempts,id',
             'question_ids' => 'nullable|array',
             'question_ids.*' => 'integer',
         ]);
 
         $test = Test::with('questions')->findOrFail($validated['test_id']);
+        $attempt = $this->resolveAttemptForSubmission($validated, $test);
+        $userName = $attempt ? $attempt->user_name : ($validated['user_name'] ?? null);
+        if (!$attempt && $this->requiresServerAttempt($test)) {
+            throw ValidationException::withMessages([
+                'attempt_id' => 'Для теста со случайной выборкой необходимо начать серверную попытку.',
+            ]);
+        }
+
+        $this->ensureAttemptIsAllowed($test, $userName);
+
         $calculatedResult = $this->calculateResult(
             $test,
             $validated['user_answers'],
-            $validated['question_ids'] ?? null
+            $attempt ? $attempt->question_ids : ($validated['question_ids'] ?? null),
+            !$attempt
         );
 
         $storedResult = TestResult::create([
             'user_id' => Auth::id(),
             'test_id' => $test->id,
-            'user_name' => $validated['user_name'] ?? null,
+            'test_attempt_id' => $attempt?->id,
+            'user_name' => $userName,
             'total_score' => $calculatedResult['total_score'],
             'max_score' => $calculatedResult['max_score'],
             'percentage' => $calculatedResult['percentage'],
@@ -77,11 +91,41 @@ class TestResultController extends Controller
             'question_results' => $calculatedResult['question_results'],
         ]);
 
+        if ($attempt) {
+            $attempt->update(['completed_at' => now()]);
+        }
 
         return response()->json([
             'message' => 'Спасибо за прохождение теста!',
             'data' => $this->buildStudentResultResponse($storedResult, $test),
         ]);
+    }
+
+    private function resolveAttemptForSubmission(array $validated, Test $test): ?TestAttempt
+    {
+        if (empty($validated['attempt_id'])) {
+            return null;
+        }
+
+        $attempt = TestAttempt::findOrFail((int) $validated['attempt_id']);
+
+        if ((int) $attempt->test_id !== (int) $test->id) {
+            throw ValidationException::withMessages([
+                'attempt_id' => 'Попытка не относится к переданному тесту.',
+            ]);
+        }
+
+        if ((int) $attempt->user_id !== (int) Auth::id()) {
+            abort(403, 'Недостаточно прав для завершения этой попытки.');
+        }
+
+        if ($attempt->completed_at !== null) {
+            throw ValidationException::withMessages([
+                'attempt_id' => 'Эта попытка уже завершена.',
+            ]);
+        }
+
+        return $attempt;
     }
 
     public function show(TestResult $result): JsonResponse
@@ -119,7 +163,7 @@ class TestResultController extends Controller
             abort(401);
         }
 
-        if ((int) $user->id === (int) $ownerId || $user->role === 'admin') {
+        if ((int) $user->id === (int) $ownerId || in_array($user->role, ['admin', 'ceo'], true)) {
             return;
         }
 
@@ -129,16 +173,17 @@ class TestResultController extends Controller
     private function calculateResult(
         Test $test,
         array $submittedAnswers,
-        ?array $questionIds = null
+        ?array $questionIds = null,
+        bool $enforceExpectedQuestionCount = true
     ): array
     {
-        $questions = $this->resolveQuestionsForAttempt($test, $questionIds);
+        $questions = $this->resolveQuestionsForAttempt($test, $questionIds, $enforceExpectedQuestionCount);
         $questionResults = [];
         $totalScore = 0;
         $maxScore = 0;
 
         foreach ($questions as $originalIndex => $question) {
-            $options = is_array($question->options) ? $question->options : [];
+            $options = $question->options ?? [];
             $maxPoints = (float) $question->points;
             $maxScore += $maxPoints;
 
@@ -171,15 +216,44 @@ class TestResultController extends Controller
         ];
     }
 
-    private function resolveQuestionsForAttempt(Test $test, ?array $questionIds = null)
+    private function resolveQuestionsForAttempt(
+        Test $test,
+        ?array $questionIds = null,
+        bool $enforceExpectedQuestionCount = true
+    )
     {
         $questions = $test->questions->values();
+        $expectedQuestionCount = $this->expectedQuestionCountForAttempt($test, $questions->count());
 
         if (!$questionIds || count($questionIds) === 0) {
+            if ($enforceExpectedQuestionCount && $expectedQuestionCount !== $questions->count()) {
+                throw ValidationException::withMessages([
+                    'question_ids' => sprintf(
+                        'Для этого теста необходимо передать ровно %d вопросов для проверки результата.',
+                        $expectedQuestionCount
+                    ),
+                ]);
+            }
+
             return $questions;
         }
 
         $uniqueIds = array_values(array_unique(array_map('intval', $questionIds)));
+        if (count($uniqueIds) !== count($questionIds)) {
+            throw ValidationException::withMessages([
+                'question_ids' => 'Передан повторяющийся набор вопросов для проверки результата.',
+            ]);
+        }
+
+        if ($enforceExpectedQuestionCount && count($uniqueIds) !== $expectedQuestionCount) {
+            throw ValidationException::withMessages([
+                'question_ids' => sprintf(
+                    'Для этого теста необходимо передать ровно %d вопросов для проверки результата.',
+                    $expectedQuestionCount
+                ),
+            ]);
+        }
+
         $questionMap = $questions->keyBy('id');
         $resolvedQuestions = collect($uniqueIds)
             ->map(fn($id) => $questionMap->get($id))
@@ -195,13 +269,61 @@ class TestResultController extends Controller
         return $resolvedQuestions;
     }
 
-    private function evaluateQuestion(string $type, array $options, mixed $userAnswer, float $maxPoints): array
+    private function expectedQuestionCountForAttempt(Test $test, int $bankCount): int
+    {
+        $randomQuestionCount = (int) data_get($test->settings, 'randomQuestionCount', 0);
+
+        if ($randomQuestionCount > 0 && $randomQuestionCount < $bankCount) {
+            return $randomQuestionCount;
+        }
+
+        return $bankCount;
+    }
+
+    private function requiresServerAttempt(Test $test): bool
+    {
+        $bankCount = $test->questions->count();
+        $randomQuestionCount = (int) data_get($test->settings, 'randomQuestionCount', 0);
+
+        return $randomQuestionCount > 0 && $randomQuestionCount < $bankCount;
+    }
+
+    private function ensureAttemptIsAllowed(Test $test, ?string $userName): void
+    {
+        if ((bool) data_get($test->settings, 'allowRetake', true)) {
+            return;
+        }
+
+        $query = TestResult::where('test_id', $test->id);
+        $normalizedUserName = mb_strtolower(trim((string) $userName));
+        $authId = Auth::id();
+
+        $query->where(function ($attemptQuery) use ($authId, $normalizedUserName) {
+            if ($authId) {
+                $attemptQuery->where('user_id', $authId);
+            }
+
+            if ($normalizedUserName !== '') {
+                $method = $authId ? 'orWhereRaw' : 'whereRaw';
+                $attemptQuery->{$method}('LOWER(TRIM(user_name)) = ?', [$normalizedUserName]);
+            }
+        });
+
+        if ($query->exists()) {
+            throw ValidationException::withMessages([
+                'test_id' => 'Повторное прохождение этого теста запрещено.',
+            ]);
+        }
+    }
+
+    private function evaluateQuestion(string $type, mixed $options, mixed $userAnswer, float $maxPoints): array
     {
         $answered = false;
         $isCorrect = false;
 
         switch ($type) {
             case 'single':
+                $options = is_array($options) ? $options : [];
                 $answered = $userAnswer !== null && $userAnswer !== '' && is_numeric($userAnswer);
                 if ($answered) {
                     $selectedIndex = (int) $userAnswer;
@@ -219,6 +341,7 @@ class TestResultController extends Controller
                 break;
 
             case 'multiple':
+                $options = is_array($options) ? $options : [];
                 $selectedValues = is_array($userAnswer) ? array_values(array_map('intval', $userAnswer)) : [];
                 $answered = count($selectedValues) > 0;
                 $correctIndices = collect($options)
@@ -233,6 +356,7 @@ class TestResultController extends Controller
                 break;
 
             case 'text':
+                $options = is_array($options) ? $options : [];
                 $normalizedAnswer = is_string($userAnswer) ? mb_strtolower(trim($userAnswer)) : '';
                 $answered = $normalizedAnswer !== '';
                 $correctAnswers = collect($options)
@@ -244,6 +368,7 @@ class TestResultController extends Controller
                 break;
 
             case 'matching':
+                $options = is_array($options) ? $options : [];
                 $selectedPairs = is_array($userAnswer) ? array_values($userAnswer) : [];
                 $answered = count($selectedPairs) === count($options)
                     && collect($selectedPairs)->every(fn($value) => $value !== null && trim((string) $value) !== '');
@@ -257,6 +382,7 @@ class TestResultController extends Controller
                 break;
 
             case 'sorting':
+                $options = is_array($options) ? $options : [];
                 $selectedOrder = is_array($userAnswer) ? array_values(array_map('intval', $userAnswer)) : [];
                 $answered = count($selectedOrder) === count($options);
                 if ($answered) {
@@ -288,21 +414,23 @@ class TestResultController extends Controller
         ];
     }
 
-    private function getCorrectAnswer(string $type, array $options): mixed
+    private function getCorrectAnswer(string $type, mixed $options): mixed
     {
+        $optionList = is_array($options) ? $options : [];
+
         return match ($type) {
-            'single' => collect($options)->firstWhere('correct', true)['text'] ?? '',
+            'single' => collect($optionList)->firstWhere('correct', true)['text'] ?? '',
             'truefalse' => $this->getTrueFalseCorrectValue($options) === 'true' ? 'Да' : 'Нет',
-            'multiple' => collect($options)
+            'multiple' => collect($optionList)
                 ->filter(fn($option) => ($option['correct'] ?? false) === true)
                 ->pluck('text')
                 ->values()
                 ->all(),
-            'text' => $options,
-            'matching' => collect($options)
+            'text' => $optionList,
+            'matching' => collect($optionList)
                 ->map(fn($pair) => sprintf('%s → %s', $pair['left'] ?? '', $pair['right'] ?? ''))
                 ->implode('; '),
-            'sorting' => collect($options)
+            'sorting' => collect($optionList)
                 ->map(function ($option, $index) {
                     return [
                         'text' => $option['text'] ?? sprintf('Элемент %d', $index + 1),
@@ -317,28 +445,30 @@ class TestResultController extends Controller
         };
     }
 
-    private function formatUserAnswerForDisplay(string $type, array $options, mixed $userAnswer): string
+    private function formatUserAnswerForDisplay(string $type, mixed $options, mixed $userAnswer): string
     {
         if ($userAnswer === null || $userAnswer === '' || $userAnswer === []) {
             return '';
         }
 
+        $optionList = is_array($options) ? $options : [];
+
         return match ($type) {
-            'single' => $options[(int) $userAnswer]['text'] ?? '',
+            'single' => $optionList[(int) $userAnswer]['text'] ?? '',
             'truefalse' => (string) $userAnswer === 'true' ? 'Да' : 'Нет',
             'multiple' => collect(is_array($userAnswer) ? $userAnswer : [])
-                ->map(fn($index) => $options[(int) $index]['text'] ?? sprintf('Вариант %d', ((int) $index) + 1))
+                ->map(fn($index) => $optionList[(int) $index]['text'] ?? sprintf('Вариант %d', ((int) $index) + 1))
                 ->implode(', '),
             'text' => (string) $userAnswer,
             'matching' => collect(is_array($userAnswer) ? $userAnswer : [])
-                ->map(function ($rightValue, $index) use ($options) {
-                    $leftValue = $options[$index]['left'] ?? sprintf('Элемент %d', $index + 1);
+                ->map(function ($rightValue, $index) use ($optionList) {
+                    $leftValue = $optionList[$index]['left'] ?? sprintf('Элемент %d', $index + 1);
                     return sprintf('%s → %s', $leftValue, (string) $rightValue);
                 })
                 ->implode('; '),
             'sorting' => collect(is_array($userAnswer) ? $userAnswer : [])
-                ->map(function ($itemIndex, $position) use ($options) {
-                    $itemText = $options[(int) $itemIndex]['text'] ?? sprintf('Элемент %d', ((int) $itemIndex) + 1);
+                ->map(function ($itemIndex, $position) use ($optionList) {
+                    $itemText = $optionList[(int) $itemIndex]['text'] ?? sprintf('Элемент %d', ((int) $itemIndex) + 1);
                     return sprintf('%d. %s', $position + 1, $itemText);
                 })
                 ->implode('; '),

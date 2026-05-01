@@ -6,35 +6,28 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class TestResult extends Model
+class TestAttempt extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'test_id',
-        'test_attempt_id',
-        'user_name',
-        'total_score',
-        'max_score',
-        'percentage',
-        'grade',
-        'time_spent',
-        'question_results',
         'user_id',
+        'test_id',
+        'user_name',
+        'question_ids',
+        'started_at',
+        'completed_at',
     ];
 
     protected $casts = [
-        'question_results' => 'array'
+        'question_ids' => 'array',
+        'started_at' => 'datetime',
+        'completed_at' => 'datetime',
     ];
 
     public function test(): BelongsTo
     {
         return $this->belongsTo(Test::class);
-    }
-
-    public function attempt(): BelongsTo
-    {
-        return $this->belongsTo(TestAttempt::class, 'test_attempt_id');
     }
 
     public function user(): BelongsTo

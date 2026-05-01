@@ -974,7 +974,7 @@ import { confirmAction } from "../utils/uiHelpers";
 
 export default {
     name: "TestRunner",
-    props: ["datasend", "tests", "showToast", "blockForTest"],
+    props: ["datasend", "tests", "resourceId", "showToast", "blockForTest"],
     data() {
         return {
             selectedTest: null,
@@ -1007,6 +1007,7 @@ export default {
             restoreAttempted: false,
             showFinishConfirm: false,
             completedAttemptResult: null,
+            currentAttemptId: null,
         };
     },
     computed: {
@@ -1271,6 +1272,17 @@ export default {
 
         this.checkForSavedTest();
     },
+    watch: {
+        tests: {
+            handler() {
+                this.checkForSavedTest();
+            },
+            deep: true,
+        },
+        resourceId() {
+            this.checkForSavedTest();
+        },
+    },
 
     methods: {
         randomSubsetCount(test) {
@@ -1407,16 +1419,38 @@ export default {
         checkForSavedTest() {
             this.restoreTestState();
         },
+        savedStateBelongsToCurrentDocument(state) {
+            if (!state?.testId) {
+                return false;
+            }
+
+            const tests = Array.isArray(this.tests) ? this.tests : [];
+            const hasTestInCurrentDocument = tests.some(
+                (test) => test.id === state.testId
+            );
+
+            if (!hasTestInCurrentDocument) {
+                return false;
+            }
+
+            if (state.resourceId === undefined || state.resourceId === null) {
+                return true;
+            }
+
+            return String(state.resourceId) === String(this.resourceId);
+        },
         saveTestState() {
             if (!this.selectedTest || !this.userName) return;
 
             const state = {
+                resourceId: this.resourceId,
                 testId: this.selectedTest.id,
                 userName: this.userName,
                 currentQuestionIndex: this.currentQuestionIndex,
                 timeLeft: this.timeLeft,
                 answers: Object.fromEntries(this.userAnswersByOriginalIndex),
                 questionIds: this.selectedTest.questions.map((q) => q.id),
+                attemptId: this.currentAttemptId,
                 shuffledQuestions: this.shuffledQuestions,
                 shuffledOptionsMap: Array.from(
                     this.shuffledOptionsMap.entries()
@@ -1447,6 +1481,12 @@ export default {
                     (Date.now() - state.timestamp) / (1000 * 60 * 60);
                 if (hoursPassed > 24) {
                     localStorage.removeItem("testProgress");
+                    this.savedTestState = null;
+                    return false;
+                }
+
+                if (!this.savedStateBelongsToCurrentDocument(state)) {
+                    this.savedTestState = null;
                     return false;
                 }
 
@@ -1468,6 +1508,7 @@ export default {
                 this.currentQuestionIndex =
                     this.savedTestState.currentQuestionIndex;
                 this.timeLeft = this.savedTestState.timeLeft;
+                this.currentAttemptId = this.savedTestState.attemptId || null;
 
                 // Восстанавливаем перемешанные вопросы
                 this.shuffledQuestions =
@@ -1526,7 +1567,7 @@ export default {
             }
 
             const testToRestore = this.tests.find((t) => t.id === state.testId);
-            if (!testToRestore) {
+            if (!testToRestore || !this.savedStateBelongsToCurrentDocument(state)) {
                 return false;
             }
 
@@ -1749,7 +1790,10 @@ export default {
             if (saved) {
                 try {
                     const state = JSON.parse(saved);
-                    if (state.testId === test.id) {
+                    if (
+                        state.testId === test.id &&
+                        this.savedStateBelongsToCurrentDocument(state)
+                    ) {
                         // Показываем диалог восстановления
                         if (
                             await confirmAction(
@@ -1778,7 +1822,7 @@ export default {
             this.restoreAttempted = false;
         },
 
-        startTestWithName() {
+        async startTestWithName() {
             if (this.tempUserName.trim()) {
                 if (
                     this.selectedTest?.settings?.allowRetake === false &&
@@ -1815,7 +1859,37 @@ export default {
                 }
 
                 // Иначе начинаем новый тест
-                this.initializeTest();
+                const attemptStarted = await this.startServerAttempt();
+                if (!attemptStarted) {
+                    return;
+                }
+                this.initializeTest({ skipRandomSubset: true });
+            }
+        },
+        async startServerAttempt() {
+            try {
+                const response = await this.datasend(
+                    `tests/${this.selectedTest.id}/attempts`,
+                    "POST",
+                    { user_name: this.userName }
+                );
+                const attempt = response?.data || {};
+
+                if (!attempt.attempt_id || !attempt.test) {
+                    this.showToast("Не удалось создать попытку теста", "error");
+                    return false;
+                }
+
+                this.currentAttemptId = attempt.attempt_id;
+                this.selectedTest = JSON.parse(JSON.stringify(attempt.test));
+                this.normalizeTestSettings(this.selectedTest);
+                return true;
+            } catch (error) {
+                this.showToast(
+                    "Не удалось начать тест. Попробуйте обновить страницу.",
+                    "error"
+                );
+                return false;
             }
         },
 
@@ -2468,6 +2542,7 @@ export default {
             };
 
             result.user_name = this.userName;
+            result.attempt_id = this.currentAttemptId;
 
             result.question_results = questionResults;
             result.user_answers = this.buildSubmissionAnswers();
@@ -2643,6 +2718,7 @@ export default {
             this.timer = null;
             this.userName = "";
             this.tempUserName = "";
+            this.currentAttemptId = null;
 
             // Очистка всех перемешанных данных
             this.shuffledQuestions = [];
@@ -3251,6 +3327,7 @@ export default {
             };
 
             result.user_name = this.userName;
+            result.attempt_id = this.currentAttemptId;
 
             result.question_results = questionResults;
             result.user_answers = this.buildSubmissionAnswers();

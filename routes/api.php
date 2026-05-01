@@ -5,6 +5,7 @@ use App\Http\Controllers\AvailableController;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\LlmController;
+use App\Http\Controllers\TestAttemptController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\TestResultController;
 use App\Http\Controllers\TreeController;
@@ -28,6 +29,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('tests/import', [TestController::class, 'import']);
     Route::get('tests/{test}/export', [TestController::class, 'export']);
+    Route::post('tests/{test}/attempts', [TestAttemptController::class, 'store']);
     Route::apiResources([
         'tests' => TestController::class,
         'results' => TestResultController::class,

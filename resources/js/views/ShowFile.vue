@@ -272,6 +272,7 @@
     </div>
     <TestRunner
         :tests="tests"
+        :resource-id="resourceId"
         :datasend="datasend"
         :showToast="showToast"
         :blockForTest="handleBlockForTest"

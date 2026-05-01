@@ -6,6 +6,7 @@ use App\Models\Test;
 use App\Models\Tree;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Intervention\Image\Laravel\Facades\Image;
@@ -17,6 +18,10 @@ class TestController extends Controller
     public function testTree(Tree $tree_id)
     {
         $tests = Test::with('questions')->where("tree_id", $tree_id->id)->get();
+        if (!$this->canManageTests($tree_id)) {
+            $tests = $tests->map(fn(Test $test) => $this->sanitizeTestForAttempt($test));
+        }
+
         return response()->json(['data' => $tests]);
     }
 
@@ -30,6 +35,7 @@ class TestController extends Controller
             'grading' => 'nullable|array',
             'tree_id' => 'required|exists:trees,id'
         ]);
+        $this->authorizeTestManagement((int) $validated['tree_id']);
 
         DB::transaction(function () use ($request, $validated) {
             $test = Test::create([
@@ -49,8 +55,14 @@ class TestController extends Controller
 
     public function show(Test $test)
     {
+        $test->load('questions');
 
-        return response()->json(['data' => $test->load('questions')]);
+        $tree = Tree::find($test->tree_id);
+        if (!$this->canManageTests($tree)) {
+            return response()->json(['data' => $this->sanitizeTestForAttempt($test)]);
+        }
+
+        return response()->json(['data' => $test]);
     }
 
 
@@ -92,6 +104,7 @@ class TestController extends Controller
             'settings' => 'nullable|array',
             'grading' => 'nullable|array'
         ]);
+        $this->authorizeTestManagement((int) $test->tree_id);
 
         DB::transaction(function () use ($request, $validated, $test) {
             $test->update([
@@ -148,6 +161,7 @@ class TestController extends Controller
 
     public function destroy(Test $test)
     {
+        $this->authorizeTestManagement((int) $test->tree_id);
 
         $test->delete();
         return response()->json(['message' => 'Тест успешно удалён!']);
@@ -162,6 +176,8 @@ class TestController extends Controller
             'format' => 'required|in:json,xml',
             'xml_data' => 'required_if:format,xml|string',
         ]);
+        $this->authorizeTestManagement((int) $request->tree_id);
+
         $format = $request->input('format');
 
         $file = $request->file('file');
@@ -204,6 +220,7 @@ class TestController extends Controller
 
     public function export(Test $test): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {
+        $this->authorizeTestManagement((int) $test->tree_id);
 
         $testData = [
             'id' => $test->id,
@@ -261,6 +278,98 @@ class TestController extends Controller
             'allowQuestionNavigation' => (bool) data_get($settings, 'allowQuestionNavigation', true),
             'randomQuestionCount' => max(0, min(10000, (int) data_get($settings, 'randomQuestionCount', 0))),
         ];
+    }
+
+    private function canManageTests(?Tree $tree): bool
+    {
+        $user = Auth::user();
+        if (!$user || !$tree) {
+            return false;
+        }
+
+        return (int) $user->id === (int) $tree->user_id || in_array($user->role, ['admin', 'ceo'], true);
+    }
+
+    private function authorizeTestManagement(int $treeId): void
+    {
+        if (!$this->canManageTests(Tree::find($treeId))) {
+            abort(403, 'Недостаточно прав для управления тестами.');
+        }
+    }
+
+    private function sanitizeTestForAttempt(Test $test): Test
+    {
+        $test->setRelation(
+            'questions',
+            $test->questions->map(function ($question) {
+                $question = clone $question;
+                $question->options = $this->sanitizeQuestionOptionsForAttempt(
+                    $question->type,
+                    $question->options
+                );
+
+                return $question;
+            })
+        );
+
+        return $test;
+    }
+
+    private function sanitizeQuestionOptionsForAttempt(string $type, mixed $options): mixed
+    {
+        if (!is_array($options)) {
+            return $type === 'truefalse' ? null : $options;
+        }
+
+        return match ($type) {
+            'single', 'multiple' => collect($options)
+                ->map(function ($option) {
+                    if (is_array($option)) {
+                        unset($option['correct']);
+                    }
+
+                    return $option;
+                })
+                ->values()
+                ->all(),
+            'truefalse', 'text' => null,
+            'matching' => $this->sanitizeMatchingOptionsForAttempt($options),
+            'sorting' => collect($options)
+                ->map(function ($option) {
+                    if (is_array($option)) {
+                        unset($option['correctPosition']);
+                    }
+
+                    return $option;
+                })
+                ->values()
+                ->all(),
+            default => $options,
+        };
+    }
+
+    private function sanitizeMatchingOptionsForAttempt(array $options): array
+    {
+        $rightOptions = collect($options)
+            ->map(fn($pair) => is_array($pair) ? (string) ($pair['right'] ?? '') : '')
+            ->shuffle()
+            ->values()
+            ->all();
+
+        return collect($options)
+            ->values()
+            ->map(function ($pair, $index) use ($rightOptions) {
+                if (!is_array($pair)) {
+                    return $pair;
+                }
+
+                return [
+                    'left' => $pair['left'] ?? '',
+                    'leftImage' => $pair['leftImage'] ?? null,
+                    'right' => $rightOptions[$index] ?? '',
+                ];
+            })
+            ->all();
     }
 
     private function normalizeImportedTestData(array $testData): array
