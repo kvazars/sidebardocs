@@ -2,18 +2,23 @@
     <div id="file" class="print-container p-4">
         <template v-if="!isTestRunning">
             <h1 class="text-center" v-html="pagetitle"></h1>
-            <div class="alert alert-success p-1" v-if="groups">
+            <div
+                class="alert alert-success p-1"
+                data-export-exclude="access-groups"
+                v-if="groups"
+            >
                 <strong>Доступно группам: </strong>{{ groups }}
             </div>
 
             <TestResults
+                data-export-exclude="test-results"
                 :results="results"
                 :datasend="datasend"
                 :showToast="showToast"
                 :getResult="getResult"
                 v-if="my && results.length > 0"
             />
-            <hr />
+            <hr data-export-exclude="document-meta-separator" />
         </template>
 
         <div v-if="!isTestRunning" v-for="val in fileData" :key="val">

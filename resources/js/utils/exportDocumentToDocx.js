@@ -68,6 +68,14 @@ function applyComputedStyles(sourceNode, cloneNode) {
 }
 
 function normalizeClone(clone) {
+    clone
+        .querySelectorAll(
+            "[data-export-exclude], .test-results, .test-runner"
+        )
+        .forEach((node) => {
+            node.remove();
+        });
+
     clone.querySelectorAll("button, .btn, .carousel-indicators, .carousel-control-prev, .carousel-control-next, .vue-easy-lightbox, script").forEach((node) => {
         node.remove();
     });
