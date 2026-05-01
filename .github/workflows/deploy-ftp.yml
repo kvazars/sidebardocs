@@ -34,13 +34,6 @@ jobs:
           test -n "$FTP_PASSWORD" || { echo "Missing secret FTP_PASSWORD"; exit 1; }
           test -n "$FTP_SERVER_DIR" || { echo "Missing secret FTP_SERVER_DIR"; exit 1; }
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.3'
-          extensions: ftp, mbstring, sqlite3
-          coverage: none
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -49,15 +42,6 @@ jobs:
 
       - name: Install lftp
         run: sudo apt-get update && sudo apt-get install -y lftp
-
-      - name: Prepare environment
-        run: |
-          cp .env.example .env
-          mkdir -p database
-          touch database/database.sqlite
-
-      - name: Install PHP dependencies
-        run: composer install --no-dev --prefer-dist --optimize-autoloader
 
       - name: Install Node.js dependencies
         run: npm ci
