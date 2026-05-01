@@ -130,7 +130,11 @@
                             <div class="border rounded p-3 h-100">
                                 <div class="small text-muted mb-1">Процент</div>
                                 <div class="fs-4 fw-bold">
-                                    {{ completedAttemptResult.percentage }}%
+                                    {{
+                                        formatPercentage(
+                                            completedAttemptResult.percentage
+                                        )
+                                    }}
                                 </div>
                             </div>
                         </div>
@@ -2619,12 +2623,12 @@ export default {
                     completedResult.answered_questions_count
                 } из ${
                     completedResult.total_questions_count
-                } (${answeredPercentage}%)<br>
+                } (${this.formatPercentage(answeredPercentage)})<br>
                 Набрано баллов: ${this.formatScore(
                     completedResult.total_score
                 )} из ${this.formatScore(completedResult.max_score)} (${
-                    completedResult.percentage
-                }%)<br>
+                    this.formatPercentage(completedResult.percentage)
+                })<br>
                 <strong style="font-size: 1.2em; color: ${this.getGradeColor(
                     completedResult.grade
                 )};">
@@ -2779,6 +2783,9 @@ export default {
             }
 
             return String(Number(numericValue.toFixed(10)));
+        },
+        formatPercentage(value) {
+            return `${this.formatScore(value)}%`;
         },
         formatCompletedAnswer(value) {
             if (value === null || value === undefined || value === "") {
@@ -3192,8 +3199,8 @@ export default {
                 Набрано баллов: ${this.formatScore(
                     completedResult.total_score
                 )} из ${this.formatScore(completedResult.max_score)} (${
-                    completedResult.percentage
-                }%)<br>
+                    this.formatPercentage(completedResult.percentage)
+                })<br>
                 <strong style="font-size: 1.2em; color: ${this.getGradeColor(
                     completedResult.grade
                 )};">

@@ -346,7 +346,7 @@
                                     class="badge"
                                     :class="getBadgeClass(result.percentage)"
                                 >
-                                    {{ result.percentage }}%
+                                    {{ formatPercentage(result.percentage) }}
                                 </span>
                                 <button
                                     @click="deleteResult(result)"
@@ -624,7 +624,7 @@
                                     class="badge"
                                     :class="getBadgeClass(result.percentage)"
                                 >
-                                    {{ result.percentage }}%
+                                    {{ formatPercentage(result.percentage) }}
                                 </span>
                             </td>
                             <td>
@@ -1057,13 +1057,7 @@ export default {
             return String(Number(numericValue.toFixed(10)));
         },
         formatPercentage(value) {
-            const numericValue = Number(value || 0);
-
-            if (Number.isInteger(numericValue)) {
-                return `${numericValue}%`;
-            }
-
-            return `${numericValue.toFixed(1)}%`;
+            return `${this.formatScore(value)}%`;
         },
         getQuestionStatBadgeClass(correctRate) {
             if (correctRate >= 80) return "bg-success";
