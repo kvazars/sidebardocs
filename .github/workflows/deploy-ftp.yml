@@ -84,7 +84,6 @@ jobs:
           set net:timeout 30
           set ssl:verify-certificate no
           set xfer:clobber on
-          mkdir -p ${FTP_SERVER_DIR}public
           mirror -R \
             --delete \
             --verbose=1 \
