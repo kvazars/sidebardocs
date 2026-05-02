@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Test;
 use App\Models\Tree;
+use App\Models\Question;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -454,8 +455,13 @@ class TestController extends Controller
             $options = $options[0];
         }
 
+        $stableKey = $questionData['stable_key'] ?? null;
+        if (!$stableKey || Question::where('stable_key', $stableKey)->exists()) {
+            $stableKey = (string) Str::uuid();
+        }
+
         $normalizedQuestion = [
-            'stable_key' => (string) ($questionData['stable_key'] ?? Str::uuid()),
+            'stable_key' => $stableKey,
             'text' => (string) ($questionData['text'] ?? ''),
             'type' => $type,
             'points' => max(1, (int) ($questionData['points'] ?? 1)),
