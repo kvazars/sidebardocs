@@ -53,7 +53,6 @@ class ContentController extends Controller
             Storage::disk('public')->makeDirectory($dirshort);
             $file->storeAs($dirshort, $name, 'public');
 
-            \Log::info("Изображение успешно сохранено: $fullPath");
 
             // Возвращаем URL, доступный из браузера
             $url = asset("storage/{$fullPath}");
