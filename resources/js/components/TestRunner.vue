@@ -996,6 +996,7 @@ export default {
             currentQuestionIndex: 0,
             timeLeft: 0,
             timer: null,
+            timerActive: false,
             userName: "",
             tempUserName: "",
             // Для перемешивания
@@ -1412,6 +1413,7 @@ export default {
             localStorage.removeItem("testProgress");
             this.savedTestState = null;
             this.selectedTest = null;
+            this.timerActive = false;
         },
         continueSavedTest() {
             const restored = this.prepareSavedTestSession();
@@ -2210,7 +2212,9 @@ export default {
             if (this.timer) {
                 clearInterval(this.timer);
                 this.timer = null;
+                this.timerActive = false;
             }
+            this.timerActive = true;
             this.timer = setInterval(() => {
                 this.timeLeft--;
                 if (this.timeLeft <= 0) {
@@ -2571,6 +2575,7 @@ export default {
             if (this.timer) {
                 clearInterval(this.timer);
                 this.timer = null;
+                this.timerActive = false;
             }
             if (this.autoSaveTimer) {
                 clearInterval(this.autoSaveTimer);
@@ -3599,8 +3604,8 @@ export default {
             if (document.hidden) {
                 // Запоминаем время ухода
                 this.lastHiddenTime = Date.now();
-            } else if (this.lastHiddenTime && this.selectedTest) {
-                // При возвращении корректируем время
+            } else if (this.lastHiddenTime && this.selectedTest && this.timerActive) {
+                // При возвращении корректируем время только если таймер активен
                 const timeHidden = Date.now() - this.lastHiddenTime;
                 this.timeLeft = Math.max(
                     0,
@@ -3624,6 +3629,7 @@ export default {
         if (this.timer) {
             clearInterval(this.timer);
             this.timer = null;
+            this.timerActive = false;
         }
         if (this.autoSaveTimer) {
             clearInterval(this.autoSaveTimer);
