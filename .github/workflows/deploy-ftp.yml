@@ -99,10 +99,15 @@ jobs:
             --verbose=1 \
             --parallel=4 \
             --exclude-glob build/** \
+            --exclude-glob build \
             --exclude-glob storage/** \
+            --exclude-glob storage \
             --exclude-glob contentFiles/** \
+            --exclude-glob contentFiles \
             --exclude-glob contentImages/** \
+            --exclude-glob contentImages \
             --exclude-glob logo/** \
+            --exclude-glob logo \
             --exclude-glob hot \
             public ${FTP_SERVER_DIR}public
           bye

@@ -98,11 +98,19 @@ npm run build
 
 Папка `public/build` загружается отдельным шагом через `lftp mirror -R --delete`, поэтому старые Vite-файлы с хешами удаляются с сервера при каждом деплое.
 
-Остальная папка `public/` загружается отдельным upload-only шагом без удаления файлов на сервере. Из него исключены `public/build`, `public/storage`, `public/contentFiles`, `public/contentImages`, `public/logo` и `public/hot`, чтобы не трогать пользовательские и служебные данные.
+Остальная папка `public/` загружается отдельным upload-only шагом без удаления файлов на сервере. Из него исключены как сами пути, так и их содержимое: `public/build`, `public/storage`, `public/contentFiles`, `public/contentImages`, `public/logo` и `public/hot`, чтобы не трогать пользовательские и служебные данные (включая symlink `public/storage`).
 
 Папка `vendor/` не участвует в FTP sync. PHP-зависимости должны быть уже установлены на сервере отдельно от GitHub Actions.
 
 Основной FTP sync после этого работает только по остальному проекту и полностью исключает `public/**`, `.env`, `node_modules`, `storage` и исходники из `resources`.
+
+Если `public/storage` на сервере всё же пропал (например, после ручных операций на сервере), его нужно восстановить командой:
+
+```bash
+php artisan storage:link
+```
+
+Для хостингов без SSH это обычно делается из панели управления хостингом (создание symlink), либо через поддержку.
 
 ## Основные каталоги
 
