@@ -1368,6 +1368,19 @@ export default {
         isRetakeBlockedForCurrentUser(test) {
             return this.isRetakeBlockedForUser(test, this.tempUserName);
         },
+        /** Безопасная длительность теста в секундах (избегаем NaN и 0). */
+        getTestDurationSeconds() {
+            if (!this.selectedTest) {
+                return 30 * 60;
+            }
+            const raw = this.selectedTest.timeLimit;
+            const minutes = Number(raw);
+            if (!Number.isFinite(minutes) || minutes <= 0) {
+                return 30 * 60;
+            }
+            return Math.floor(minutes * 60);
+        },
+
         normalizeTestSettings(test) {
             if (!test) {
                 return;
@@ -1417,14 +1430,19 @@ export default {
         },
         continueSavedTest() {
             const restored = this.prepareSavedTestSession();
-            if (restored && this.applyRestoredState()) {
-                return;
-            }
-
-            if (!restored) {
+            if (restored) {
+                const applied = this.applyRestoredState();
+                if (applied) {
+                    return;
+                }
+                this.showToast(
+                    "Сохранённая сессия истекла или повреждена. Начните тест заново.",
+                    "warning"
+                );
+            } else {
                 this.showToast("Тест не найден", "error");
-                localStorage.removeItem("testProgress");
             }
+            localStorage.removeItem("testProgress");
             this.savedTestState = null;
         },
         handleBeforeUnload(event) {
@@ -1524,7 +1542,16 @@ export default {
                 this.userName = this.savedTestState.userName;
                 this.currentQuestionIndex =
                     this.savedTestState.currentQuestionIndex;
-                this.timeLeft = this.savedTestState.timeLeft;
+                const maxSec = this.getTestDurationSeconds();
+                let restoredSec = Number(this.savedTestState.timeLeft);
+                if (!Number.isFinite(restoredSec) || restoredSec < 0) {
+                    restoredSec = maxSec;
+                }
+                this.timeLeft = Math.min(restoredSec, maxSec);
+                if (this.timeLeft <= 0) {
+                    localStorage.removeItem("testProgress");
+                    return false;
+                }
                 this.currentAttemptId = this.savedTestState.attemptId || null;
 
                 // Восстанавливаем перемешанные вопросы
@@ -1857,9 +1884,18 @@ export default {
 
                 this.userName = this.tempUserName.trim();
 
-                const restoreMode =
+                let restoreMode =
                     this.savedTestState &&
                     this.savedTestState.userName === this.userName;
+
+                if (restoreMode) {
+                    const savedTl = Number(this.savedTestState.timeLeft);
+                    if (!Number.isFinite(savedTl) || savedTl <= 0) {
+                        localStorage.removeItem("testProgress");
+                        this.savedTestState = null;
+                        restoreMode = false;
+                    }
+                }
 
                 // Если есть сохраненное состояние и это тот же пользователь
                 if (restoreMode) {
@@ -1873,9 +1909,16 @@ export default {
                         );
                         return;
                     }
+                    this.showToast(
+                        "Не удалось восстановить сессию — начата новая попытка.",
+                        "warning"
+                    );
                 }
 
-                // Иначе начинаем новый тест
+                // Иначе начинаем новый тест (старый прогресс не смешиваем с новой попыткой)
+                localStorage.removeItem("testProgress");
+                this.savedTestState = null;
+
                 const attemptStarted = await this.startServerAttempt();
                 if (!attemptStarted) {
                     return;
@@ -1938,6 +1981,7 @@ export default {
         },
 
         initializeTest(options = {}) {
+            this.lastHiddenTime = null;
             this.normalizeTestSettings(this.selectedTest);
             if (!options.skipRandomSubset) {
                 this.applyRandomQuestionSubset();
@@ -1999,7 +2043,7 @@ export default {
                 }
             });
 
-            this.timeLeft = this.selectedTest.timeLimit * 60;
+            this.timeLeft = this.getTestDurationSeconds();
             this.startTimer();
             this.initializeQuestion();
             this.startAutoSave();
@@ -2271,7 +2315,7 @@ export default {
         },
 
         getElapsedTime() {
-            const totalTime = (this.selectedTest?.timeLimit || 0) * 60;
+            const totalTime = this.getTestDurationSeconds();
             return Math.max(0, totalTime - Math.max(0, this.timeLeft));
         },
 
@@ -3607,12 +3651,15 @@ export default {
             } else if (this.lastHiddenTime && this.selectedTest && this.timerActive) {
                 // При возвращении корректируем время только если таймер активен
                 const timeHidden = Date.now() - this.lastHiddenTime;
+                // Обязательно сбрасываем, иначе повторные события «visible» без нового «hidden»
+                // будут снова вычитать прошедшее время и обнулят таймер.
+                this.lastHiddenTime = null;
+
                 this.timeLeft = Math.max(
                     0,
                     this.timeLeft - Math.floor(timeHidden / 1000)
                 );
 
-                // Проверяем, не истекло ли время
                 if (this.timeLeft <= 0) {
                     this.forceFinishTest();
                 }
