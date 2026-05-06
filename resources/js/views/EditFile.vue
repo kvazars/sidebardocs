@@ -310,7 +310,14 @@ import { convertLlmOutputToEditorBlocks } from "../utils/editorJsHtmlBlocks";
 import { importDocxToEditorJS, validateDocxFile } from "../utils/importFromDocx";
 import { importPptxToEditorJS, validatePptxFile } from "../utils/importFromPptx";
 import { importPdfToEditorJS, validatePdfFile } from "../utils/importFromPdf";
+import { installCodexNotifierToastBridge } from "../utils/codexNotifierToastBridge";
 import { confirmAction, getErrorMessage } from "../utils/uiHelpers";
+
+/** Как в UploadFileRequest: max:10000 (килобайт × 1024 байт) */
+const EDITOR_MAX_ATTACHMENT_BYTES = 10000 * 1024;
+/** saveImage на сервере без отдельного max — ограничиваем на клиенте */
+const EDITOR_MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+
 export default {
     components: {
         TestManagement,
@@ -331,7 +338,18 @@ export default {
         "about",
         "userRole",
     ],
+    beforeUnmount() {
+        if (this.teardownCodexNotifierBridge) {
+            this.teardownCodexNotifierBridge();
+            this.teardownCodexNotifierBridge = null;
+        }
+    },
+
     mounted() {
+        this.teardownCodexNotifierBridge = installCodexNotifierToastBridge(
+            (message, type) => this.showToast(message, type)
+        );
+
         if (this.datasend) {
             if (this.$route.params.id) {
                 this.datasend(
@@ -438,6 +456,7 @@ export default {
             accessibilitylink: false,
             groupAvailables: {},
             editor: null,
+            teardownCodexNotifierBridge: null,
             visibleGroups: false,
             tabPaneActiveKey: 1,
             currentView: "management",
@@ -706,7 +725,6 @@ export default {
 
                 // Функция для загрузки изображения на сервер
                 const uploadImage = async (imageBlob) => {
-                    // Пропускаем большие файлы (>2MB)
                     if (imageBlob.size > 2000000) {
                         return null;
                     }
@@ -775,7 +793,6 @@ export default {
                 this.showToast("Импортирование PDF...", "info");
 
                 const uploadImage = async (imageBlob) => {
-                    // Для PDF изображения могут быть тяжелее, чем из PPTX
                     if (imageBlob.size > 50000000) {
                         return null;
                     }
@@ -961,6 +978,86 @@ export default {
                 });
         },
 
+        formatFileSizeLimit(bytes) {
+            if (!Number.isFinite(bytes) || bytes <= 0) return "";
+            const mb = bytes / (1024 * 1024);
+            if (mb >= 1) {
+                return `${mb >= 10 ? Math.round(mb) : Math.round(mb * 10) / 10} МБ`;
+            }
+            return `${Math.max(1, Math.round(bytes / 1024))} КБ`;
+        },
+
+        notifyFileTooLarge(kind, fileSize, limitBytes) {
+            this.showToast(
+                `${kind}: максимум ${this.formatFileSizeLimit(limitBytes)}. Выбрано: ${this.formatFileSizeLimit(fileSize)}.`,
+                "warning"
+            );
+        },
+
+        async uploadEditorImageByFile(file) {
+            if (!file || file.size > EDITOR_MAX_IMAGE_BYTES) {
+                if (file?.size) {
+                    this.notifyFileTooLarge(
+                        "Изображение",
+                        file.size,
+                        EDITOR_MAX_IMAGE_BYTES
+                    );
+                }
+                return { success: 0 };
+            }
+            const formData = new FormData();
+            formData.append("image", file);
+            try {
+                return await this.datasend(
+                    "saveImage",
+                    "POST",
+                    formData,
+                    true
+                );
+            } catch (e) {
+                this.showToast(getErrorMessage(e, "Ошибка загрузки изображения"), "danger");
+                return { success: 0 };
+            }
+        },
+
+        async uploadEditorImageByUrl(url) {
+            try {
+                return await this.datasend("saveImageByUrl", "POST", { url });
+            } catch (e) {
+                this.showToast(
+                    getErrorMessage(e, "Ошибка загрузки изображения по ссылке"),
+                    "danger"
+                );
+                return { success: 0 };
+            }
+        },
+
+        async uploadEditorAttachmentByFile(file) {
+            if (!file || file.size > EDITOR_MAX_ATTACHMENT_BYTES) {
+                if (file?.size) {
+                    this.notifyFileTooLarge(
+                        "Вложение",
+                        file.size,
+                        EDITOR_MAX_ATTACHMENT_BYTES
+                    );
+                }
+                return { success: 0 };
+            }
+            const formData = new FormData();
+            formData.append("file", file);
+            try {
+                return await this.datasend(
+                    "saveFile",
+                    "POST",
+                    formData,
+                    true
+                );
+            } catch (e) {
+                this.showToast(getErrorMessage(e, "Ошибка загрузки файла"), "danger");
+                return { success: 0 };
+            }
+        },
+
         createEditor() {
             this.editor = new EditorJS({
                 holder: "editorjs",
@@ -1000,8 +1097,9 @@ export default {
                                     "token"
                                 )}`,
                             },
-                            endpoints: {
-                                byFile: this.api + "saveImage",
+                            uploader: {
+                                uploadByFile: (file) =>
+                                    this.uploadEditorImageByFile(file),
                             },
                         },
                     },
@@ -1022,9 +1120,12 @@ export default {
                                     "token"
                                 )}`,
                             },
-                            endpoint: this.api + "saveFile",
+                            uploader: {
+                                uploadByFile: (file) =>
+                                    this.uploadEditorAttachmentByFile(file),
+                            },
                             buttonText: "Добавить файл",
-                            errorMessage: "Ошибка загрузки файла",
+                            errorMessage: " ",
                         },
                     },
                     header: {
@@ -1047,9 +1148,11 @@ export default {
                                     "token"
                                 )}`,
                             },
-                            endpoints: {
-                                byFile: this.api + "saveImage",
-                                byUrl: this.api + "saveImageByUrl",
+                            uploader: {
+                                uploadByFile: (file) =>
+                                    this.uploadEditorImageByFile(file),
+                                uploadByUrl: (url) =>
+                                    this.uploadEditorImageByUrl(url),
                             },
                         },
                     },

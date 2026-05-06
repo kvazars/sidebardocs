@@ -141,14 +141,19 @@
             </div>
 
             <div v-if="val.type == 'attaches'" class="my-4">
-                <span>
+                <span class="d-inline-flex flex-wrap align-items-baseline gap-2">
                     <a
                         :href="imgs[val.id].url"
                         target="_blank"
                         download
                         v-html="imgs[val.id].title"
-                    ></a
-                ></span>
+                    ></a>
+                    <span
+                        v-if="attachSizeDisplay(val)"
+                        class="text-muted small text-nowrap"
+                        >{{ attachSizeDisplay(val) }}</span
+                    >
+                </span>
                 <PptxShow
                     v-if="imgs[val.id].url.split('.').pop() == 'pptx'"
                     :file="imgs[val.id].url"
@@ -288,6 +293,7 @@
 import { defineAsyncComponent } from "vue";
 import { useAuthIdStore } from "../stores/authId";
 import IFrameShow from "../components/IFrameShow.vue";
+import { formatHumanFileSize } from "../utils/formatHumanFileSize";
 
 const VueEasyLightbox = defineAsyncComponent(
     () => import("vue-easy-lightbox")
@@ -438,6 +444,9 @@ export default {
         },
         onHide(ref) {
             this.visibleRef[ref] = false;
+        },
+        attachSizeDisplay(block) {
+            return formatHumanFileSize(block?.data?.file?.size);
         },
         parseDoc(res) {
             this.fileData = JSON.parse(res.data);

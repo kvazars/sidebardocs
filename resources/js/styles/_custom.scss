@@ -392,9 +392,10 @@ body .sidebar .vsm-wrapper .vsm-scroll-wrapper .vsm-scroll-bar {
     z-index: 1035;
 }
 
+/* Сообщения Editor.js (codex-notifier) перехватываются в showToast; контейнер не показываем */
 body .cdx-notifies {
-    right: 0;
-    left: inherit;
+    display: none !important;
+    pointer-events: none;
 }
 
 body .sidebar .v-sidebar-menu {
