@@ -1137,10 +1137,6 @@ export default {
                 throw new Error("Отсутствует текст вопроса");
             }
 
-            const questionText = this.extractText(questionTextElement);
-            const questionImage = this.extractImage(questionTextElement);
-            // console.log(questionImage);
-
             const questionName = nameElement
                 ? this.stripTags(
                       this.extractText(
@@ -1152,6 +1148,13 @@ export default {
                       }
                   )
                 : `Вопрос ${index + 1}`;
+
+            let questionText = this.extractText(questionTextElement).trim();
+            if (!questionText) {
+                questionText = (questionName || "").trim() || `Вопрос ${index + 1}`;
+            }
+
+            const questionImage = this.extractImage(questionTextElement);
 
             // Баллы по умолчанию
             const defaultGradeElement = this.getChildElement(
@@ -1285,7 +1288,15 @@ export default {
             };
         },
         parseMultichoiceQuestion(qElement, name, text, points, image) {
-            const answerElements = qElement.getElementsByTagName("answer");
+            let answerElements = this.getMoodleDirectChildElements(
+                qElement,
+                "answer"
+            );
+            if (answerElements.length === 0) {
+                answerElements = Array.from(
+                    qElement.getElementsByTagName("answer")
+                );
+            }
             const answers = [];
             let correctAnswersCount = 0;
             for (let i = 0; i < answerElements.length; i++) {
@@ -1300,15 +1311,39 @@ export default {
 
                 if (isCorrect) correctAnswersCount++;
 
+                let optionText = this.stripTags(answerText, ["p", "b"], {
+                    keepContent: true,
+                });
+                const optionImage = answerImage || "";
+                if (
+                    String(optionText).trim() === "" &&
+                    String(optionImage).trim() === ""
+                ) {
+                    optionText = `Вариант ${i + 1}`;
+                }
+
                 answers.push({
                     id: i + 1,
-                    text: this.stripTags(answerText, ["p", "b"], {
-                        keepContent: true,
-                    }),
+                    text: optionText,
                     correct: isCorrect,
-                    image: answerImage,
+                    image: optionImage,
                     points: isCorrect ? points : 0,
                 });
+            }
+
+            // Moodle иногда экспортирует пустой первый/промежуточный вариант.
+            // Убираем полностью пустые (без текста и без картинки), если остаётся ≥2 вариантов.
+            const nonempty = answers.filter(
+                (a) =>
+                    String(a.text ?? "").trim() !== "" ||
+                    !!(a.image && String(a.image).trim() !== "")
+            );
+            if (nonempty.length >= 2 && nonempty.length < answers.length) {
+                nonempty.forEach((a, idx) => {
+                    a.id = idx + 1;
+                });
+                answers.splice(0, answers.length, ...nonempty);
+                correctAnswersCount = answers.filter((a) => a.correct).length;
             }
 
             // Определяем тип вопроса (single/multiple) на основе наличия single="false"
@@ -1576,27 +1611,112 @@ export default {
         },
 
         extractTextFromHTML(html) {
+            if (!html) {
+                return "";
+            }
             return html
+                .replace(/&nbsp;|&#160;|&#x0*A0;/gi, " ")
                 .replace(/<[^>]*>/g, "") // Удалить все теги
                 .replace(/<!\[CDATA\[[\s\S]*?]]>/g, "") // Удалить CDATA
-                .replace(/&[a-z]+;/gi, "") // Удалить HTML-сущности (&nbsp; и т.д.)
+                .replace(/&[a-z]+;/gi, "") // Прочие HTML-сущности
                 .replace(/]]>/g, "") // Удалить оставшиеся ]]>
                 .replace(/\[CDATA\[/g, "") // Удалить оставшиеся [CDATA[
+                .replace(/[\u200B-\u200D\uFEFF]/g, "") // zero-width / BOM
                 .replace(/\s+/g, " ") // Убрать лишние пробелы
                 .trim();
         },
 
-        extractText(element) {
-            if (!element) return "";
-            const textElement = element.getElementsByTagName("text")[0];
+        /**
+         * Прямые дочерние элементы с заданным localName (без вложенных одноимённых тегов).
+         */
+        getMoodleDirectChildElements(parent, localName) {
+            const out = [];
+            if (!parent || !parent.children || !localName) {
+                return out;
+            }
+            for (let i = 0; i < parent.children.length; i++) {
+                const el = parent.children[i];
+                if (el.localName === localName) {
+                    out.push(el);
+                }
+            }
+            return out;
+        },
+
+        /**
+         * Прямой дочерний <text> у Moodle-узла.
+         * У <answer> иногда несколько соседних <text> (пустой + с вариантом) —
+         * берём первый с непустым сырым содержимым.
+         */
+        getMoodleTextNode(parent) {
+            if (!parent) {
+                return null;
+            }
+            const directTexts = this.getMoodleDirectChildElements(
+                parent,
+                "text"
+            );
+            if (directTexts.length > 1) {
+                for (let i = 0; i < directTexts.length; i++) {
+                    const raw = this.getMoodleTextElementRawContent(
+                        directTexts[i]
+                    ).trim();
+                    if (raw) {
+                        return directTexts[i];
+                    }
+                }
+                return directTexts[0];
+            }
+            if (directTexts.length === 1) {
+                return directTexts[0];
+            }
+            const list = parent.getElementsByTagName("text");
+            return list.length > 0 ? list[0] : null;
+        },
+
+        /**
+         * Moodle XML: содержимое вопроса часто лежит в CDATA внутри <text>.
+         * В режиме text/xml у DOMParser у <text> часто пустой innerHTML,
+         * при этом textContent / дочерние CDATA-секции содержат разметку.
+         */
+        getMoodleTextElementRawContent(textElement) {
             if (!textElement) return "";
 
             let html = textElement.innerHTML || "";
-
-            // Если нет HTML контента, используем текст
-            if (!html || html.trim() === "") {
-                html = textElement.textContent || "";
+            if (html.trim()) {
+                return html;
             }
+
+            html = textElement.textContent || "";
+            if (html.trim()) {
+                return html;
+            }
+
+            const parts = [];
+            const childNodes = textElement.childNodes || [];
+            for (let i = 0; i < childNodes.length; i++) {
+                const node = childNodes[i];
+                if (node.nodeType === 4) {
+                    parts.push(node.data || "");
+                } else if (node.nodeType === 3) {
+                    parts.push(node.nodeValue || "");
+                } else if (
+                    node.nodeType === 1 &&
+                    typeof XMLSerializer !== "undefined"
+                ) {
+                    parts.push(new XMLSerializer().serializeToString(node));
+                }
+            }
+
+            return parts.join("");
+        },
+
+        extractText(element) {
+            if (!element) return "";
+            const textElement = this.getMoodleTextNode(element);
+            if (!textElement) return "";
+
+            const html = this.getMoodleTextElementRawContent(textElement);
 
             return this.stripTags(
                 this.extractTextFromHTML(html.replace(/\n/g, " ")),
@@ -1609,14 +1729,17 @@ export default {
 
         extractImage(element) {
             if (!element) return "";
-            const textElement = element.getElementsByTagName("text")[0];
+            const textElement = this.getMoodleTextNode(element);
             if (!textElement) return "";
-            const regex = /src="([^"]*)"/;
 
-            const match = element.innerHTML.match(regex);
+            const raw = this.getMoodleTextElementRawContent(textElement);
+            let match = raw.match(/src\s*=\s*"([^"]*)"/i);
+            if (!match) {
+                match = raw.match(/src\s*=\s*'([^']*)'/i);
+            }
 
             const src = match ? match[1] : null;
-            return src;
+            return src || "";
         },
 
         generateId() {
