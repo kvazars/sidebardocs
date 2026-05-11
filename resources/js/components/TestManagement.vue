@@ -1026,11 +1026,103 @@ export default {
                             shuffleAnswers: false,
                         },
                     };
-
-                    resolve(testData);
+                    this.optimizeImportedImages(testData)
+                        .then(() => resolve(testData))
+                        .catch(reject);
                 } catch (error) {
                     reject(error);
                 }
+            });
+        },
+        async optimizeImportedImages(testData) {
+            if (!testData || !Array.isArray(testData.questions)) return;
+
+            for (const question of testData.questions) {
+                if (question?.image) {
+                    question.image = await this.compressDataImageUri(
+                        question.image
+                    );
+                }
+
+                if (question?.type === "single" || question?.type === "multiple") {
+                    if (Array.isArray(question.options)) {
+                        for (const option of question.options) {
+                            if (option?.image) {
+                                option.image = await this.compressDataImageUri(
+                                    option.image
+                                );
+                            }
+                        }
+                    }
+                }
+
+                if (question?.type === "matching" && Array.isArray(question.options)) {
+                    for (const pair of question.options) {
+                        if (pair?.leftImage) {
+                            pair.leftImage = await this.compressDataImageUri(
+                                pair.leftImage
+                            );
+                        }
+                    }
+                }
+
+                if (question?.type === "sorting" && Array.isArray(question.items)) {
+                    for (const item of question.items) {
+                        if (item?.image) {
+                            item.image = await this.compressDataImageUri(
+                                item.image
+                            );
+                        }
+                    }
+                }
+            }
+        },
+        async compressDataImageUri(src) {
+            if (!src || typeof src !== "string" || !src.startsWith("data:image")) {
+                return src || "";
+            }
+
+            // Не трогаем уже компактные изображения.
+            if (src.length <= 45000) {
+                return src;
+            }
+
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement("canvas");
+                    let width = img.width;
+                    let height = img.height;
+                    let quality = 0.82;
+
+                    const maxWidth = 1200;
+                    if (width > maxWidth) {
+                        const ratio = maxWidth / width;
+                        width = Math.round(width * ratio);
+                        height = Math.round(height * ratio);
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext("2d");
+                    if (!ctx) {
+                        resolve(src);
+                        return;
+                    }
+
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    let result = canvas.toDataURL("image/jpeg", quality);
+                    // Пытаемся дополнительно ужать при больших data-uri.
+                    while (result.length > 65000 && quality > 0.45) {
+                        quality -= 0.1;
+                        result = canvas.toDataURL("image/jpeg", quality);
+                    }
+
+                    resolve(result || src);
+                };
+                img.onerror = () => resolve(src);
+                img.src = src;
             });
         },
 
@@ -1686,9 +1778,12 @@ export default {
 
             try {
                 let formData = new FormData();
-                formData.append("file", this.selectedFile);
                 formData.append("tree_id", this.$route.params.id);
                 formData.append("format", this.importFormat);
+
+                if (this.importFormat === "json") {
+                    formData.append("file", this.selectedFile);
+                }
 
                 // Для XML добавляем распарсенные данные
                 if (this.importFormat === "xml") {

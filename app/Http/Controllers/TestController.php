@@ -8,6 +8,7 @@ use App\Models\Question;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Intervention\Image\Laravel\Facades\Image;
@@ -19,6 +20,7 @@ class TestController extends Controller
     private const QUESTION_IMAGE_MAX_WIDTH = 640;
     private const OPTION_IMAGE_MAX_WIDTH = 260;
     private const MAX_IMAGE_DATA_URI_LENGTH = 60000;
+    private ?bool $questionsHasStableKeyColumn = null;
 
     public function testTree(Tree $tree_id)
     {
@@ -203,7 +205,7 @@ class TestController extends Controller
 
         $request->validate([
             'tree_id' => 'required|integer|exists:trees,id',
-            'file' => 'required|file|mimes:json,xml',
+            'file' => 'required_if:format,json|nullable|file|mimes:json,xml',
             'format' => 'required|in:json,xml',
             'xml_data' => 'required_if:format,xml|string',
         ]);
@@ -213,6 +215,11 @@ class TestController extends Controller
 
         $file = $request->file('file');
         if ($format === 'json') {
+            if (!$file) {
+                throw ValidationException::withMessages([
+                    'file' => 'Файл обязателен для импорта JSON.',
+                ]);
+            }
             $testData = json_decode(file_get_contents($file->getPathname()), true);
             if (json_last_error() !== JSON_ERROR_NONE || !is_array($testData)) {
                 throw ValidationException::withMessages([
@@ -286,17 +293,30 @@ class TestController extends Controller
     {
         foreach ($questions as $index => $questionData) {
             $normalizedQuestion = $this->normalizeQuestionData($questionData, $index);
-
-            $test->questions()->create([
-                'stable_key' => $normalizedQuestion['stable_key'],
+            $payload = [
                 'text' => $normalizedQuestion['text'],
                 'type' => $normalizedQuestion['type'],
                 'points' => $normalizedQuestion['points'],
                 'image' => $this->processImage($normalizedQuestion['image'] ?? null),
                 'options' => $this->processQuestionOptions($normalizedQuestion),
                 'order' => $normalizedQuestion['order'] ?? $index,
-            ]);
+            ];
+
+            if ($this->questionsHasStableKeyColumn()) {
+                $payload['stable_key'] = $normalizedQuestion['stable_key'];
+            }
+
+            $test->questions()->create($payload);
         }
+    }
+
+    private function questionsHasStableKeyColumn(): bool
+    {
+        if ($this->questionsHasStableKeyColumn !== null) {
+            return $this->questionsHasStableKeyColumn;
+        }
+
+        return $this->questionsHasStableKeyColumn = Schema::hasColumn('questions', 'stable_key');
     }
 
     private function buildTestSettings(array $settings = []): array
@@ -455,9 +475,12 @@ class TestController extends Controller
             $options = $options[0];
         }
 
-        $stableKey = $questionData['stable_key'] ?? null;
-        if (!$stableKey || Question::where('stable_key', $stableKey)->exists()) {
-            $stableKey = (string) Str::uuid();
+        $stableKey = null;
+        if ($this->questionsHasStableKeyColumn()) {
+            $stableKey = $questionData['stable_key'] ?? null;
+            if (!$stableKey || Question::where('stable_key', $stableKey)->exists()) {
+                $stableKey = (string) Str::uuid();
+            }
         }
 
         $normalizedQuestion = [
