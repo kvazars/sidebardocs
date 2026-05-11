@@ -1096,6 +1096,14 @@ export default {
                         points,
                         questionImage
                     );
+                case "numerical":
+                    return this.parseNumericalQuestion(
+                        qElement,
+                        questionName,
+                        questionText,
+                        points,
+                        questionImage
+                    );
                 case "essay":
                     return this.parseEssayQuestion(
                         qElement,
@@ -1329,6 +1337,50 @@ export default {
 
                 if (answerText && answerText.trim()) {
                     correctAnswers.push(answerText.trim());
+                }
+            }
+
+            return {
+                id: this.generateId(),
+                type: "text",
+                text: text,
+                image: image,
+                points: points,
+                correctAnswer: JSON.stringify(correctAnswers),
+                options: correctAnswers,
+                explanation: "",
+            };
+        },
+
+        parseNumericalQuestion(qElement, name, text, points, image) {
+            const answerElements = qElement.getElementsByTagName("answer");
+            const correctAnswers = [];
+
+            for (let i = 0; i < answerElements.length; i++) {
+                const answerElement = answerElements[i];
+                const fraction = parseFloat(
+                    answerElement.getAttribute("fraction") || "0"
+                );
+                const answerText = this.extractText(answerElement);
+
+                if (
+                    fraction > 0 &&
+                    answerText &&
+                    answerText.toString().trim() !== ""
+                ) {
+                    correctAnswers.push(answerText.toString().trim());
+                }
+            }
+
+            // Для совместимости: если корректный ответ не отмечен fraction,
+            // используем первый непустой ответ как fallback.
+            if (correctAnswers.length === 0) {
+                for (let i = 0; i < answerElements.length; i++) {
+                    const answerText = this.extractText(answerElements[i]);
+                    if (answerText && answerText.toString().trim() !== "") {
+                        correctAnswers.push(answerText.toString().trim());
+                        break;
+                    }
                 }
             }
 
