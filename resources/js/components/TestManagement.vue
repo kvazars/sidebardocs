@@ -1304,14 +1304,23 @@ export default {
 
                 if (answerElement) {
                     const answerText = this.extractText(answerElement);
-                    // const answerImage = this.extractImage(answerElement);
+                    const left = this.stripTags(questionText, ["p", "b"], {
+                        keepContent: true,
+                    }).trim();
+                    const right = this.stripTags(answerText, ["p", "b"], {
+                        keepContent: true,
+                    }).trim();
+
+                    // В Moodle matching могут встречаться служебные элементы
+                    // с пустой левой частью. Не включаем их, иначе бэкенд
+                    // валидатор отклонит вопрос.
+                    if ((left === "" && !leftImage) || right === "") {
+                        continue;
+                    }
+
                     options.push({
-                        left: this.stripTags(questionText, ["p", "b"], {
-                            keepContent: true,
-                        }),
-                        right: this.stripTags(answerText, ["p", "b"], {
-                            keepContent: true,
-                        }),
+                        left,
+                        right,
                         leftImage: leftImage,
                     });
                 }
