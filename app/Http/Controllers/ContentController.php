@@ -16,8 +16,12 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Intervention\Image\Laravel\Facades\Image;
+use App\Models\Test;
+use App\Models\Question;
+use Illuminate\Support\Facades\File;
+use ZipArchive;
+use Illuminate\Support\Str;
 
 class ContentController extends Controller
 {
@@ -573,9 +577,9 @@ class ContentController extends Controller
 
         while (
             Tree::withTrashed()
-                ->where('slug', $slug)
-                ->when($ignoreTreeId, fn($q) => $q->where('id', '!=', $ignoreTreeId))
-                ->exists()
+            ->where('slug', $slug)
+            ->when($ignoreTreeId, fn($q) => $q->where('id', '!=', $ignoreTreeId))
+            ->exists()
         ) {
             $slug = $base . '-' . $suffix;
             $suffix++;
@@ -716,4 +720,801 @@ class ContentController extends Controller
         $id->update(["tree_id" => $request->tree_id]);
         return response()->json(['success' => true, 'message' => 'Успешно перемещено!'], 200);
     }
+
+    public function exportResource(Request $request, $id)
+    {
+        // $id — tree_id (как и во всех остальных роутах)
+        $content = Content::with('tree')->where('tree_id', $id)->first();
+
+        if (!$content) {
+            return response()->json(['success' => false, 'message' => 'Ресурс не найден'], 404);
+        }
+
+        // Проверка прав доступа
+        $user = Auth::user();
+        if ($user->role !== 'admin' && $content->tree->user_id !== $user->id) {
+            return response()->json(['success' => false, 'message' => 'Доступ запрещен'], 403);
+        }
+
+        $includeTests = filter_var($request->input('include_tests', false), FILTER_VALIDATE_BOOLEAN);
+
+        // Отключаем буферизацию
+        if (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        try {
+            $dataBlocks = json_decode($content->data, true);
+            $files = $this->collectFilesFromBlocks($dataBlocks);
+
+            $tempDir = storage_path('app/temp/export_' . uniqid());
+            File::makeDirectory($tempDir, 0755, true);
+
+            $filePaths = [];
+            foreach ($files as $key => $fileData) {
+                $filePath = $this->copyFileToTemp($fileData, $tempDir);
+                if ($filePath) {
+                    $filePaths[$key] = $filePath;
+                }
+            }
+
+            $updatedData = $this->updatePathsInBlocks($dataBlocks, $filePaths);
+
+            $exportData = [
+                'version' => '2.0',
+                'exported_at' => now()->toISOString(),
+                'resource' => [
+                    'name' => $content->tree->name,
+                    'data' => $updatedData,
+                ],
+                'files' => $filePaths,
+            ];
+
+            if ($includeTests) {
+                $tests = Test::where('tree_id', $content->tree_id)->get();
+                $exportData['tests'] = $tests->map(function ($test) {
+                    return [
+                        'id' => $test->id,
+                        'title' => $test->title,
+                        'description' => $test->description,
+                        'timeLimit' => $test->timeLimit,
+                        'settings' => $test->settings,
+                        'grading' => $test->grading,
+                        'questions' => $this->exportQuestions($test->id),
+                    ];
+                });
+                $exportData['has_tests'] = true;
+                $exportData['tests_count'] = $tests->count();
+            } else {
+                $exportData['has_tests'] = false;
+                $exportData['tests_count'] = 0;
+            }
+
+            // Сохраняем JSON
+            $jsonPath = $tempDir . '/resource.json';
+            File::put($jsonPath, json_encode($exportData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+            // Создаем ZIP
+            $zipFileName = 'resource_' . $content->tree->slug . '_' . date('Y-m-d') . '.zip';
+            $zipPath = storage_path('app/temp/' . $zipFileName);
+
+            if (File::exists($zipPath)) {
+                File::delete($zipPath);
+            }
+
+            $zip = new \ZipArchive();
+            if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
+                throw new \Exception('Не удалось создать ZIP архив');
+            }
+
+            $this->addDirectoryToZip($zip, $tempDir, '');
+            $zip->close();
+
+            if (!File::exists($zipPath) || File::size($zipPath) === 0) {
+                throw new \Exception('ZIP архив не создан или пуст');
+            }
+
+            File::deleteDirectory($tempDir);
+
+            return response()
+                ->download($zipPath, $zipFileName, [
+                    'Content-Type' => 'application/zip',
+                    'Content-Disposition' => 'attachment; filename="' . $zipFileName . '"',
+                    'Cache-Control' => 'private, no-cache, must-revalidate',
+                ])
+                ->deleteFileAfterSend(true);
+        } catch (\Exception $e) {
+            \Log::error('Export error: ' . $e->getMessage());
+
+            if (isset($tempDir) && File::exists($tempDir)) {
+                File::deleteDirectory($tempDir);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Импорт содержимого в НОВЫЙ ресурс.
+     * Создаёт Tree + Content (+ тесты) в указанной родительской папке
+     * и возвращает данные созданного документа.
+     */
+    public function importResource(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:zip|max:51200',
+            'parent_id' => 'nullable|exists:trees,id',
+            'name' => 'nullable|string|max:255',
+            'include_tests' => 'nullable|in:0,1,true,false,on,off',
+        ]);
+
+        $user = Auth::user();
+
+        // Проверяем права на родительскую папку (если указана)
+        $parentId = $request->filled('parent_id') ? (int) $request->input('parent_id') : null;
+        if ($parentId) {
+            $parent = Tree::find($parentId);
+            if (!$parent || !$this->canManageTree($user, $parent)) {
+                return response()->json(['success' => false, 'message' => 'Доступ запрещен'], 403);
+            }
+        }
+
+        try {
+            // Читаем и валидируем импортируемый файл
+            $importData = $this->readImportFile($request->file('file'));
+
+            $resourceData = $importData['resource'];
+
+            if (empty($resourceData['data']) || !is_array($resourceData['data'])) {
+                throw new \Exception('Нет содержимого для импорта');
+            }
+
+            // Восстанавливаем файлы из архива
+            $filePaths = $this->restoreImportedFiles($importData, $request->file('file'));
+
+            // Обновляем пути в блоках на восстановленные файлы
+            $updatedData = $this->updatePathsInBlocks($resourceData['data'], $filePaths);
+
+            // Название: из формы > из файла > по умолчанию
+            $resourceName = $request->input('name') ?: ($resourceData['name'] ?? 'Импортированный ресурс');
+            $baseName = $resourceName;
+            $counter = 1;
+            while (Tree::where('tree_id', $parentId)->where('name', $resourceName)->exists()) {
+                $resourceName = $baseName . ' (' . $counter . ')';
+                $counter++;
+            }
+
+            $position = Tree::where('tree_id', $parentId)->count();
+
+            $tree = Tree::create([
+                'name' => $resourceName,
+                'slug' => $this->generateUniqueTreeSlug($resourceName),
+                'tree_id' => $parentId,
+                'user_id' => $user->id,
+                'position' => $position,
+                'type' => 'file',
+            ]);
+
+            $content = Content::create([
+                'tree_id' => $tree->id,
+                'data' => json_encode($updatedData, JSON_UNESCAPED_UNICODE),
+                'accessibility' => 0,
+                'accessibilitymanagers' => 0,
+                'accessibilitylink' => 0,
+            ]);
+
+            // Импортируем тесты
+            $testsCount = 0;
+            if ($this->wantsTests($request) && isset($importData['tests']) && !empty($importData['tests'])) {
+                $testsCount = $this->importTests($tree->id, $importData['tests']);
+            }
+
+            return response()->json([
+                'success' => true,
+                'is_new' => true,
+                'name' => $resourceName,
+                'tree_id' => $tree->id,
+                'slug' => $tree->slug,
+                'tests_imported' => $testsCount,
+                'message' => "Документ '{$resourceName}' успешно создан" . ($testsCount > 0 ? " с {$testsCount} тестами" : ''),
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Import error: ' . $e->getMessage());
+            \Log::error($e->getTraceAsString());
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    /**
+     * Читает ZIP архив импорта и возвращает распарсенные данные resource.json.
+     * Бросает исключение при неверном формате.
+     */
+    private function readImportFile($file)
+    {
+        $tempDir = storage_path('app/temp/import_' . uniqid());
+        File::makeDirectory($tempDir, 0755, true);
+
+        try {
+            $zip = new \ZipArchive();
+            if ($zip->open($file->path()) !== true) {
+                throw new \Exception('Не удалось открыть ZIP архив');
+            }
+            $zip->extractTo($tempDir);
+            $zip->close();
+
+            $jsonPath = $tempDir . '/resource.json';
+            if (!File::exists($jsonPath)) {
+                throw new \Exception('В ZIP архиве не найден файл resource.json');
+            }
+
+            $jsonContent = File::get($jsonPath);
+
+            $importData = json_decode($jsonContent, true);
+
+            if (!$importData || !isset($importData['resource'])) {
+                throw new \Exception('Неверный формат файла импорта');
+            }
+
+            if (!isset($importData['version'])) {
+                throw new \Exception('Неизвестная версия файла');
+            }
+
+            return $importData;
+        } finally {
+            if (File::exists($tempDir)) {
+                File::deleteDirectory($tempDir);
+            }
+        }
+    }
+
+    /**
+     * Восстанавливает файлы из ZIP архива на постоянное хранение.
+     */
+    private function restoreImportedFiles($importData, $file)
+    {
+        $filePaths = [];
+        if (!isset($importData['files']) || !is_array($importData['files'])) {
+            return $filePaths;
+        }
+
+        $tempDir = storage_path('app/temp/import_' . uniqid());
+        File::makeDirectory($tempDir, 0755, true);
+
+        try {
+            $zip = new \ZipArchive();
+            if ($zip->open($file->path()) !== true) {
+                throw new \Exception('Не удалось открыть ZIP архив');
+            }
+            $zip->extractTo($tempDir);
+            $zip->close();
+
+            foreach ($importData['files'] as $key => $relativePath) {
+                $sourcePath = $tempDir . '/' . $relativePath;
+                if (File::exists($sourcePath)) {
+                    $savedPath = $this->saveImportedFile($sourcePath);
+                    if ($savedPath) {
+                        $filePaths[$key] = $savedPath;
+                    }
+                }
+            }
+        } finally {
+            if (File::exists($tempDir)) {
+                File::deleteDirectory($tempDir);
+            }
+        }
+
+        return $filePaths;
+    }
+
+    /**
+     * Разбирает флаг include_tests из запроса.
+     */
+    private function wantsTests(Request $request)
+    {
+        $includeTests = $request->input('include_tests', '1');
+        if (is_string($includeTests)) {
+            return in_array($includeTests, ['1', 'true', 'on'], true);
+        }
+        return (bool) $includeTests;
+    }
+
+    /**
+     * Импорт содержимого в РЕДАКТИРЫЕМЫЙ документ.
+     * Ничего не сохраняет в БД: восстанавливает файлы на диск,
+     * возвращает блоки для вставки в редактор на клиенте.
+     * Тесты (опционально) сразу привязываются к текущему дереву.
+     */
+    public function importIntoResource(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:zip|max:51200',
+            'tree_id' => 'nullable|exists:trees,id',
+            'include_tests' => 'nullable|in:0,1,true,false,on,off',
+        ]);
+
+        $user = Auth::user();
+        $treeId = $request->filled('tree_id') ? (int) $request->input('tree_id') : null;
+
+        // Если документ уже сохранён — проверяем права на него.
+        // Для нового (ещё не сохранённого) документа tree_id нет — просто вставляем блоки.
+        if ($treeId) {
+            $tree = Tree::find($treeId);
+            if (!$tree) {
+                return response()->json(['success' => false, 'message' => 'Документ не найден'], 404);
+            }
+
+            if (!$this->canManageTree($user, $tree)) {
+                return response()->json(['success' => false, 'message' => 'Доступ запрещен'], 403);
+            }
+        }
+
+        try {
+            // Читаем и валидируем импортируемый файл
+            $importData = $this->readImportFile($request->file('file'));
+
+            $resourceData = $importData['resource'];
+
+            if (empty($resourceData['data']) || !is_array($resourceData['data'])) {
+                throw new \Exception('Нет содержимого для импорта');
+            }
+
+            // Восстанавливаем файлы из архива на постоянное хранение
+            $filePaths = $this->restoreImportedFiles($importData, $request->file('file'));
+
+            // Обновляем пути в блоках на восстановленные файлы
+            $updatedData = $this->updatePathsInBlocks($resourceData['data'], $filePaths);
+
+            // Импортируем тесты (сразу в БД, к текущему дереву)
+            $testsCount = 0;
+            if ($this->wantsTests($request) && $treeId && isset($importData['tests']) && !empty($importData['tests'])) {
+                $testsCount = $this->importTests($treeId, $importData['tests']);
+            }
+
+            return response()->json([
+                'success' => true,
+                'blocks' => $updatedData,
+                'name' => $resourceData['name'] ?? null,
+                'tests_imported' => $testsCount,
+                'message' => 'Содержимое готово к вставке' . ($testsCount > 0 ? " (тестов импортировано: {$testsCount})" : ''),
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Import into resource error: ' . $e->getMessage());
+            \Log::error($e->getTraceAsString());
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    private function collectFilesFromBlocks($blocks)
+    {
+        $files = [];
+
+        if (!is_array($blocks)) {
+            return $files;
+        }
+
+        foreach ($blocks as $index => $block) {
+            if (!isset($block['type']) || !isset($block['data'])) {
+                continue;
+            }
+
+            // Изображения
+            if ($block['type'] === 'image' && isset($block['data']['file']['url'])) {
+                $key = 'image_' . $index;
+                $files[$key] = [
+                    'url' => $block['data']['file']['url'],
+                    'type' => 'image',
+                    'block_index' => $index,
+                ];
+            }
+
+            // Галерея
+            if ($block['type'] === 'gallery' && isset($block['data']['files'])) {
+                foreach ($block['data']['files'] as $fileIndex => $file) {
+                    if (isset($file['url'])) {
+                        $key = 'gallery_' . $index . '_' . $fileIndex;
+                        $files[$key] = [
+                            'url' => $file['url'],
+                            'type' => 'gallery',
+                            'block_index' => $index,
+                            'file_index' => $fileIndex,
+                        ];
+                    }
+                }
+            }
+
+            // Вложения
+            if ($block['type'] === 'attaches' && isset($block['data']['file']['url'])) {
+                $key = 'attach_' . $index;
+                $files[$key] = [
+                    'url' => $block['data']['file']['url'],
+                    'type' => 'attach',
+                    'block_index' => $index,
+                ];
+            }
+        }
+
+        return $files;
+    }
+
+    private function copyFileToTemp($fileData, $tempDir)
+    {
+        try {
+            $url = $fileData['url'];
+
+            // Если путь уже начинается с /storage/, используем его
+            if (strpos($url, '/storage/') === 0) {
+                $path = $url;
+            } else {
+                // Убираем домен
+                $parsedUrl = parse_url($url);
+                $path = $parsedUrl['path'] ?? $url;
+            }
+
+            // Пытаемся найти файл
+            $fullPath = null;
+            $searchPaths = [
+                public_path($path),
+                storage_path('app/public/' . ltrim($path, '/')),
+                storage_path('app/' . ltrim($path, '/')),
+            ];
+
+            // Если путь содержит /storage/, пробуем другие варианты
+            if (strpos($path, '/storage/') === 0) {
+                $relativePath = substr($path, 9); // убираем /storage/
+                $searchPaths[] = storage_path('app/public/' . $relativePath);
+                $searchPaths[] = public_path('storage/' . $relativePath);
+            }
+
+            foreach ($searchPaths as $searchPath) {
+                if (File::exists($searchPath)) {
+                    $fullPath = $searchPath;
+                    break;
+                }
+            }
+
+            // Если файл не найден, пробуем скачать
+            if (!$fullPath && filter_var($url, FILTER_VALIDATE_URL)) {
+                $content = @file_get_contents($url);
+                if ($content !== false) {
+                    $filename = basename($url);
+                    if (empty($filename) || !strpos($filename, '.')) {
+                        $filename = 'file_' . uniqid() . '.tmp';
+                    }
+                    $relativePath = 'files/' . $filename;
+                    $tempPath = $tempDir . '/' . $relativePath;
+                    File::makeDirectory(dirname($tempPath), 0755, true);
+                    File::put($tempPath, $content);
+                    return $relativePath;
+                }
+                return null;
+            }
+
+            if (!$fullPath) {
+                \Log::warning('File not found: ' . $url);
+                return null;
+            }
+
+            // Копируем файл во временную папку
+            $filename = basename($fullPath);
+            if (empty($filename)) {
+                $extension = File::extension($fullPath);
+                $filename = uniqid() . '.' . $extension;
+            }
+
+            $relativePath = 'files/' . $filename;
+            $tempPath = $tempDir . '/' . $relativePath;
+            File::makeDirectory(dirname($tempPath), 0755, true);
+            File::copy($fullPath, $tempPath);
+
+            return $relativePath;
+        } catch (\Exception $e) {
+            \Log::error('Error copying file: ' . $e->getMessage() . ' URL: ' . ($fileData['url'] ?? ''));
+            return null;
+        }
+    }
+
+    public function downloadResource($id)
+    {
+        // $id — tree_id (как и во всех остальных роутах)
+        $content = Content::with('tree')->where('tree_id', $id)->first();
+
+        if (!$content) {
+            abort(404, 'Ресурс не найден');
+        }
+
+        // Проверка прав через Auth (для web middleware)
+        $user = Auth::user();
+        if (!$user || ($user->role !== 'admin' && $content->tree->user_id !== $user->id)) {
+            abort(403, 'Доступ запрещен');
+        }
+
+        // Получаем параметры из запроса
+        $includeTests = filter_var(request()->input('include_tests', false), FILTER_VALIDATE_BOOLEAN);
+
+        try {
+            // Парсим содержимое
+            $dataBlocks = json_decode($content->data, true);
+            if (!is_array($dataBlocks)) {
+                $dataBlocks = [];
+            }
+
+            // Собираем файлы из блоков
+            $files = $this->collectFilesFromBlocks($dataBlocks);
+
+            // Создаем временную папку
+            $tempDir = storage_path('app/temp/export_' . uniqid());
+            if (!File::exists($tempDir)) {
+                File::makeDirectory($tempDir, 0755, true);
+            }
+
+            // Копируем файлы
+            $filePaths = [];
+            foreach ($files as $key => $fileData) {
+                $filePath = $this->copyFileToTemp($fileData, $tempDir);
+                if ($filePath) {
+                    $filePaths[$key] = $filePath;
+                }
+            }
+
+            // Обновляем пути в блоках
+            $updatedData = $this->updatePathsInBlocks($dataBlocks, $filePaths);
+
+            // Формируем данные для экспорта
+            $exportData = [
+                'version' => '2.0',
+                'exported_at' => now()->toISOString(),
+                'resource' => [
+                    'name' => $content->tree->name,
+                    'data' => $updatedData,
+                ],
+                'files' => $filePaths,
+            ];
+
+            // Добавляем тесты если нужно
+            if ($includeTests) {
+                $tests = Test::where('tree_id', $content->tree_id)->get();
+                $exportData['tests'] = $tests->map(function ($test) {
+                    return [
+                        'id' => $test->id,
+                        'title' => $test->title,
+                        'description' => $test->description,
+                        'timeLimit' => $test->timeLimit,
+                        'settings' => $test->settings,
+                        'grading' => $test->grading,
+                        'questions' => $this->exportQuestions($test->id),
+                    ];
+                });
+                $exportData['has_tests'] = true;
+                $exportData['tests_count'] = $tests->count();
+            } else {
+                $exportData['has_tests'] = false;
+                $exportData['tests_count'] = 0;
+            }
+
+            // Сохраняем JSON
+            $jsonPath = $tempDir . '/resource.json';
+            File::put($jsonPath, json_encode($exportData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+            // Создаем ZIP
+            $zipFileName = 'resource_' . $content->tree->slug . '_' . date('Y-m-d') . '.zip';
+            $zipPath = storage_path('app/temp/' . $zipFileName);
+
+            // Удаляем старый ZIP если есть
+            if (File::exists($zipPath)) {
+                File::delete($zipPath);
+            }
+
+            $zip = new \ZipArchive();
+            if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
+                throw new \Exception('Не удалось создать ZIP архив');
+            }
+
+            // Добавляем все файлы из временной папки
+            $this->addDirectoryToZip($zip, $tempDir, '');
+
+            $zip->close();
+
+            // Проверяем, что ZIP создан
+            if (!File::exists($zipPath) || File::size($zipPath) === 0) {
+                throw new \Exception('ZIP архив не создан или пуст');
+            }
+
+            // Очищаем временную папку
+            File::deleteDirectory($tempDir);
+
+            // Отдаем файл
+            return response()
+                ->download($zipPath, $zipFileName, [
+                    'Content-Type' => 'application/zip',
+                    'Content-Disposition' => 'attachment; filename="' . $zipFileName . '"',
+                    'Cache-Control' => 'private, no-cache, must-revalidate',
+                ])
+                ->deleteFileAfterSend(true);
+        } catch (\Exception $e) {
+            \Log::error('Export error: ' . $e->getMessage());
+            \Log::error($e->getTraceAsString());
+
+            // Очищаем временную папку если есть
+            if (isset($tempDir) && File::exists($tempDir)) {
+                File::deleteDirectory($tempDir);
+            }
+
+            // Возвращаем ошибку в JSON для API или HTML для web
+            if (request()->expectsJson() || request()->is('api/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ], 500);
+            }
+
+            abort(500, $e->getMessage());
+        }
+    }
+
+
+
+    private function addFilesToZip($zip, $dir, $relativePath = '')
+    {
+        $files = File::allFiles($dir);
+
+        foreach ($files as $file) {
+            $filePath = $file->getPathname();
+            $relative = ltrim(str_replace($dir, '', $filePath), DIRECTORY_SEPARATOR);
+            $relative = str_replace('\\', '/', $relative);
+
+            // Добавляем файл в ZIP с указанием пути
+            $zip->addFile($filePath, $relative);
+        }
+    }
+
+    private function updatePathsInBlocks($blocks, $filePaths)
+    {
+        if (!is_array($blocks)) {
+            return $blocks;
+        }
+
+        foreach ($blocks as $index => &$block) {
+            if (!isset($block['type']) || !isset($block['data'])) {
+                continue;
+            }
+
+            // Изображения
+            if ($block['type'] === 'image' && isset($block['data']['file']['url'])) {
+                $key = 'image_' . $index;
+                if (isset($filePaths[$key])) {
+                    // Для импорта - оставляем как есть, путь будет заменен
+                    $block['data']['file']['url'] = $filePaths[$key];
+                }
+            }
+
+            // Галерея
+            if ($block['type'] === 'gallery' && isset($block['data']['files'])) {
+                foreach ($block['data']['files'] as $fileIndex => &$file) {
+                    if (isset($file['url'])) {
+                        $key = 'gallery_' . $index . '_' . $fileIndex;
+                        if (isset($filePaths[$key])) {
+                            $file['url'] = $filePaths[$key];
+                        }
+                    }
+                }
+            }
+
+            // Вложения
+            if ($block['type'] === 'attaches' && isset($block['data']['file']['url'])) {
+                $key = 'attach_' . $index;
+                if (isset($filePaths[$key])) {
+                    $block['data']['file']['url'] = $filePaths[$key];
+                }
+            }
+        }
+
+        return $blocks;
+    }
+
+    private function saveImportedFile($sourcePath)
+    {
+        try {
+            $filename = basename($sourcePath);
+            $extension = File::extension($sourcePath);
+
+            // Создаем уникальное имя
+            $newFilename = uniqid() . '.' . $extension;
+
+            // Путь для сохранения
+            $savePath = 'uploads/' . date('Y/m/d');
+            $fullSavePath = storage_path('app/public/' . $savePath);
+
+            File::makeDirectory($fullSavePath, 0755, true);
+
+            $destination = $fullSavePath . '/' . $newFilename;
+            File::copy($sourcePath, $destination);
+
+            return '/storage/' . $savePath . '/' . $newFilename;
+        } catch (\Exception $e) {
+            \Log::error('Error saving imported file: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    private function addDirectoryToZip($zip, $dir, $relativePath)
+    {
+        $files = File::allFiles($dir);
+
+        foreach ($files as $file) {
+            $filePath = $file->getPathname();
+            // Получаем относительный путь от корня временной папки
+            $relative = ltrim(str_replace($dir, '', $filePath), DIRECTORY_SEPARATOR);
+            // Для Windows заменяем обратные слеши
+            $relative = str_replace('\\', '/', $relative);
+            $zip->addFile($filePath, $relative);
+        }
+    }
+
+    private function exportQuestions($testId)
+    {
+        $questions = Question::where('test_id', $testId)->orderBy('order')->get();
+
+        return $questions->map(function ($question) {
+            return [
+                'id' => $question->id,
+                'stable_key' => $question->stable_key,
+                'text' => $question->text,
+                'type' => $question->type,
+                'points' => $question->points ?? 1,
+                'image' => $question->image,
+                'options' => $question->options,
+                'order' => $question->order ?? 0,
+            ];
+        });
+    }
+
+    private function importTests($treeId, $testsData)
+    {
+        $count = 0;
+
+        foreach ($testsData as $testData) {
+            $test = Test::create([
+                'tree_id' => $treeId,
+                'title' => $testData['name'] ?? $testData['title'] ?? 'Импортированный тест',
+                'description' => $testData['description'] ?? null,
+                'timeLimit' => $testData['timeLimit'] ?? ($testData['settings']['time_limit'] ?? null),
+                'settings' => is_array($testData['settings'] ?? null)
+                    ? $testData['settings']
+                    : null,
+                'grading' => $testData['grading'] ?? null,
+            ]);
+
+            if (!empty($testData['questions'])) {
+                foreach ($testData['questions'] as $index => $questionData) {
+                    $options = $questionData['options'] ?? [];
+
+                    Question::create([
+                        'test_id' => $test->id,
+                        'text' => $questionData['question'] ?? $questionData['text'] ?? '',
+                        'type' => $questionData['type'] ?? 'single',
+                        'points' => $questionData['points'] ?? 1,
+                        'image' => $questionData['image'] ?? null,
+                        'options' => is_array($options) ? $options : json_decode($options ?: '[]', true),
+                        'order' => $questionData['order'] ?? $index,
+                    ]);
+                }
+            }
+
+            $count++;
+        }
+
+        return $count;
+    }
+
 }

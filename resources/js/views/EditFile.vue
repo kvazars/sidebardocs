@@ -2,54 +2,32 @@
     <div v-if="user">
         <CNav variant="tabs">
             <CNavItem>
-                <CNavLink
-                    href="javascript:void(0);"
-                    :active="tabPaneActiveKey == 1"
-                    @click="
-                        () => {
-                            tabPaneActiveKey = 1;
-                        }
-                    "
-                >
+                <CNavLink href="javascript:void(0);" :active="tabPaneActiveKey == 1" @click="
+                    () => {
+                        tabPaneActiveKey = 1;
+                    }
+                ">
                     <i class="bi bi-archive"></i> Ресурс
                 </CNavLink>
             </CNavItem>
             <CNavItem v-if="!this.$route.params.parent">
-                <CNavLink
-                    href="javascript:void(0);"
-                    :active="tabPaneActiveKey == 2"
-                    v-if="this.$route.params.id"
+                <CNavLink href="javascript:void(0);" :active="tabPaneActiveKey == 2" v-if="this.$route.params.id"
                     @click="
                         () => {
                             tabPaneActiveKey = 2;
                         }
-                    "
-                    ><i class="bi bi-gear"></i> Управление тестами</CNavLink
-                >
+                    "><i class="bi bi-gear"></i> Управление тестами</CNavLink>
             </CNavItem>
         </CNav>
         <CTabContent>
-            <CTabPane
-                role="tabpanel"
-                aria-labelledby="home-tab"
-                :visible="tabPaneActiveKey == 1"
-            >
+            <CTabPane role="tabpanel" aria-labelledby="home-tab" :visible="tabPaneActiveKey == 1">
                 <CCard v-if="datasend" class="my-4">
                     <CCardHeader>Информация</CCardHeader>
                     <CCardBody>
-                        <CFormInput
-                            type="text"
-                            id="exampleFormControlInput1"
-                            label="Название документа"
-                            placeholder="Введите название документа"
-                            v-model="name"
-                            :class="{ 'is-invalid': !!validationErrors.name }"
-                            @input="clearFieldError('name')"
-                        />
-                        <div
-                            v-if="validationErrors.name"
-                            class="invalid-feedback d-block"
-                        >
+                        <CFormInput type="text" id="exampleFormControlInput1" label="Название документа"
+                            placeholder="Введите название документа" v-model="name"
+                            :class="{ 'is-invalid': !!validationErrors.name }" @input="clearFieldError('name')" />
+                        <div v-if="validationErrors.name" class="invalid-feedback d-block">
                             {{ validationErrors.name }}
                         </div>
                         <CAccordion class="mt-4">
@@ -59,65 +37,33 @@
                                 </CAccordionHeader>
                                 <CAccordionBody>
                                     <div class="w-100 d-flex flex-column gap-3">
-                                        <div
-                                            class="d-flex gap-3 align-items-center"
-                                        >
+                                        <div class="d-flex gap-3 align-items-center">
                                             <div>
-                                                <CFormSwitch
-                                                    v-model="
-                                                        accessibilitymanagers
-                                                    "
-                                                    label="Доступно для всех менеджеров"
-                                                    id="accessibilitymanagers_for"
-                                                />
+                                                <CFormSwitch v-model="accessibilitymanagers
+                                                    " label="Доступно для всех менеджеров"
+                                                    id="accessibilitymanagers_for" />
                                             </div>
                                             <div>
-                                                <CFormSwitch
-                                                    v-model="accessibility"
-                                                    label="Доступно всем авторизованным"
-                                                    id="accessibility_for"
-                                                />
+                                                <CFormSwitch v-model="accessibility"
+                                                    label="Доступно всем авторизованным" id="accessibility_for" />
                                             </div>
                                             <div>
-                                                <CFormSwitch
-                                                    v-model="accessibilitylink"
+                                                <CFormSwitch v-model="accessibilitylink"
                                                     label="Только для авторизованных по ссылке"
-                                                    id="accessibility_link"
-                                                />
+                                                    id="accessibility_link" />
                                             </div>
                                         </div>
-                                        <div
-                                            v-if="!accessibility"
-                                            class="row w-100 px-2"
-                                        >
-                                            <div
-                                                class="col-lg-3"
-                                                v-for="(
-                                                    item, key
-                                                ) in groupAvailables"
-                                                :key="key"
-                                            >
-                                                <div
-                                                    class="d-flex form-check gap-2"
-                                                    v-for="(gr, index) in item"
-                                                    :key="index"
-                                                >
-                                                    <input
-                                                        class="form-check-input"
-                                                        type="checkbox"
-                                                        :value="
-                                                            'group_' + gr.id
-                                                        "
-                                                        :id="'group_' + gr.id"
-                                                        v-model="gr.checked"
-                                                    />
-                                                    <label
-                                                        style="
+                                        <div v-if="!accessibility" class="row w-100 px-2">
+                                            <div class="col-lg-3" v-for="(
+item, key
+                                                ) in groupAvailables" :key="key">
+                                                <div class="d-flex form-check gap-2" v-for="(gr, index) in item"
+                                                    :key="index">
+                                                    <input class="form-check-input" type="checkbox" :value="'group_' + gr.id
+                                                        " :id="'group_' + gr.id" v-model="gr.checked" />
+                                                    <label style="
                                                             user-select: none;
-                                                        "
-                                                        class="form-check-label"
-                                                        :for="'group_' + gr.id"
-                                                    >
+                                                        " class="form-check-label" :for="'group_' + gr.id">
                                                         {{ gr.name }}
                                                     </label>
                                                 </div>
@@ -133,146 +79,93 @@
                     <CCardHeader class="d-flex justify-content-between align-items-center">
                         <span>Содержимое</span>
                         <div class="btn-group btn-group-sm" role="group" aria-label="Document actions">
-                            <button
-                                class="btn btn-success text-white"
-                                @click="save"
-                                title="Сохранить документ"
-                            >
+                            <button class="btn btn-success text-white" @click="save" title="Сохранить документ">
                                 <i class="bi bi-check-circle me-1"></i>Сохранить
                             </button>
-                            <button
-                                class="btn btn-secondary text-white"
-                                @click="cancel"
-                                title="Отменить и вернуться"
-                            >
+                            <button class="btn btn-secondary text-white" @click="cancel" title="Отменить и вернуться">
                                 <i class="bi bi-x-circle me-1"></i>Отмена
                             </button>
-                            <button
-                                class="btn btn-danger text-white"
-                                @click="deleteResource"
-                                v-if="this.$route.params.id"
-                                title="Удалить документ"
-                            >
+                            <button class="btn btn-danger text-white" @click="deleteResource"
+                                v-if="this.$route.params.id" title="Удалить документ">
                                 <i class="bi bi-trash me-1"></i>Удалить
                             </button>
+                            <button class="btn btn-primary text-white" @click="showExportDialog = true"
+                                v-if="this.$route.params.id" title="Экспортировать ресурс в ZIP">
+                                <i class="bi bi-download me-1"></i>Экспорт
+                            </button>
                             <div class="btn-group" role="group">
-                                <button
-                                    class="btn btn-info text-white dropdown-toggle"
-                                    type="button"
-                                    data-bs-toggle="dropdown"
-                                    aria-expanded="false"
-                                    title="Импортировать содержимое из файла"
-                                >
+                                <button class="btn btn-info text-white dropdown-toggle" type="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false"
+                                    title="Импортировать содержимое из файла">
                                     <i class="bi bi-upload me-1"></i>Импорт
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li>
-                                        <button
-                                            class="dropdown-item"
-                                            type="button"
-                                            @click="triggerImportDocx"
-                                        >
-                                            <i class="bi bi-file-word me-2"></i
-                                            >DOCX
+                                        <button class="dropdown-item" type="button" @click="triggerImportDocx">
+                                            <i class="bi bi-file-word me-2"></i>DOCX
                                         </button>
                                     </li>
                                     <li>
-                                        <button
-                                            class="dropdown-item"
-                                            type="button"
-                                            @click="triggerImportPptx"
-                                        >
-                                            <i class="bi bi-file-slides me-2"></i
-                                            >PPTX
+                                        <button class="dropdown-item" type="button" @click="triggerImportPptx">
+                                            <i class="bi bi-file-slides me-2"></i>PPTX
                                         </button>
                                     </li>
                                     <li>
-                                        <button
-                                            class="dropdown-item"
-                                            type="button"
-                                            @click="triggerImportPdf"
-                                        >
-                                            <i
-                                                class="bi bi-file-earmark-pdf me-2"
-                                            ></i
-                                            >PDF
+                                        <button class="dropdown-item" type="button" @click="triggerImportPdf">
+                                            <i class="bi bi-file-earmark-pdf me-2"></i>PDF
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item" type="button" @click="showImportDialog = true">
+                                            <i class="bi bi-filetype-json me-2"></i>Из другого ресурса
                                         </button>
                                     </li>
                                 </ul>
                             </div>
                         </div>
-                        <input
-                            ref="docxFileInput"
-                            type="file"
-                            accept=".docx"
-                            style="display: none"
-                            @change="handleDocxImport"
-                        />
-                        <input
-                            ref="pptxFileInput"
-                            type="file"
-                            accept=".pptx"
-                            style="display: none"
-                            @change="handlePptxImport"
-                        />
-                        <input
-                            ref="pdfFileInput"
-                            type="file"
-                            accept=".pdf,application/pdf"
-                            style="display: none"
-                            @change="handlePdfImport"
-                        />
+                        <input ref="docxFileInput" type="file" accept=".docx" style="display: none"
+                            @change="handleDocxImport" />
+                        <input ref="pptxFileInput" type="file" accept=".pptx" style="display: none"
+                            @change="handlePptxImport" />
+                        <input ref="pdfFileInput" type="file" accept=".pdf,application/pdf" style="display: none"
+                            @change="handlePdfImport" />
+
                     </CCardHeader>
                     <CCardBody class="p-1">
                         <div v-if="importError" class="alert alert-danger mb-2">
                             {{ importError }}
                         </div>
-                        <div
-                            :class="{
-                                'border border-danger rounded p-2':
-                                    !!validationErrors.data,
-                            }"
-                        >
+                        <div :class="{
+                            'border border-danger rounded p-2':
+                                !!validationErrors.data,
+                        }">
                             <div id="editorjs"></div>
                         </div>
-                        <div
-                            v-if="validationErrors.data"
-                            class="invalid-feedback d-block"
-                        >
+                        <div v-if="validationErrors.data" class="invalid-feedback d-block">
                             {{ validationErrors.data }}
                         </div>
                     </CCardBody>
                 </CCard>
             </CTabPane>
-            <CTabPane
-                role="tabpanel"
-                aria-labelledby="profile-tab"
-                :visible="tabPaneActiveKey == 2"
-                v-if="this.$route.params.id"
-            >
-                <TestManagement
-                    :datasend="datasend"
-                    :showToast="showToast"
-                    :changeCurrentView="changeCurrentView"
-                    v-if="currentView == 'management'"
-                />
+            <CTabPane role="tabpanel" aria-labelledby="profile-tab" :visible="tabPaneActiveKey == 2"
+                v-if="this.$route.params.id">
+                <TestManagement :datasend="datasend" :showToast="showToast" :changeCurrentView="changeCurrentView"
+                    v-if="currentView == 'management'" />
 
-                <TestCreator
-                    v-if="currentView == 'creator'"
-                    :editTestId="editTestId"
-                    :changeCurrentView="changeCurrentView"
-                    :datasend="datasend"
-                    :showToast="showToast"
-                />
+                <TestCreator v-if="currentView == 'creator'" :editTestId="editTestId"
+                    :changeCurrentView="changeCurrentView" :datasend="datasend" :showToast="showToast" />
             </CTabPane>
-            <CTabPane
-                role="tabpanel"
-                aria-labelledby="contact-tab"
-                :visible="tabPaneActiveKey == 3"
-            >
+            <CTabPane role="tabpanel" aria-labelledby="contact-tab" :visible="tabPaneActiveKey == 3">
                 Результаты
             </CTabPane>
         </CTabContent>
+        <ImportDialog :visible="showImportDialog" :datasend="datasend" :showToast="showToast" :getMenu="getMenu"
+            :resource-id="$route.params.id || null" :parent-folder-id="$route.params.parent || null"
+            :server="server" :editor="editor" @close="showImportDialog = false" />
+
+        <ExportDialog :visible="showExportDialog" :resource-id="$route.params.id" :resource-name="name"
+            :datasend="datasend" :showToast="showToast" :api-base="apiBase"
+            @close="showExportDialog = false" />
     </div>
 </template>
 <script>
@@ -312,7 +205,8 @@ import { importPptxToEditorJS, validatePptxFile } from "../utils/importFromPptx"
 import { importPdfToEditorJS, validatePdfFile } from "../utils/importFromPdf";
 import { installCodexNotifierToastBridge } from "../utils/codexNotifierToastBridge";
 import { confirmAction, getErrorMessage } from "../utils/uiHelpers";
-
+import ExportDialog from '../components/ExportDialog.vue';
+import ImportDialog from '../components/ImportDialog.vue';
 /** Как в UploadFileRequest: max:10000 (килобайт × 1024 байт) */
 const EDITOR_MAX_ATTACHMENT_BYTES = 10000 * 1024;
 /** saveImage на сервере без отдельного max — ограничиваем на клиенте */
@@ -322,6 +216,8 @@ export default {
     components: {
         TestManagement,
         TestCreator,
+        ExportDialog,
+        ImportDialog,
     },
 
     props: [
@@ -361,7 +257,7 @@ export default {
                         if (!res || res.success === false || !res.content) {
                             this.showToast(
                                 (res && res.message) ||
-                                    "Доступ запрещен",
+                                "Доступ запрещен",
                                 "warning"
                             );
                             this.$router.push({ name: "NotFound" });
@@ -466,6 +362,9 @@ export default {
                 name: null,
                 data: null,
             },
+            showExportDialog: false,
+            showImportDialog: false,
+            apiBase: window.location.origin,
         };
     },
     methods: {
@@ -1456,12 +1355,12 @@ export default {
             if (block.type === "list") {
                 const items = Array.isArray(block.data.items)
                     ? block.data.items
-                          .map((item) =>
-                              item === null || item === undefined
-                                  ? ""
-                                  : item.toString().trim()
-                          )
-                          .filter(Boolean)
+                        .map((item) =>
+                            item === null || item === undefined
+                                ? ""
+                                : item.toString().trim()
+                        )
+                        .filter(Boolean)
                     : [];
                 if (!items.length) return null;
                 return {
@@ -1490,8 +1389,8 @@ export default {
                 if (cleaned.type === "gallery") {
                     const files = Array.isArray(cleaned.data.files)
                         ? cleaned.data.files.filter(
-                              (f) => f && typeof f.url === "string" && f.url
-                          )
+                            (f) => f && typeof f.url === "string" && f.url
+                        )
                         : [];
                     if (!files.length) continue;
                     cleaned.data.files = files;

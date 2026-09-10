@@ -69,7 +69,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/newPass', [UserController::class, 'newPassword']);
         Route::post('/file/{id}/change-folder', [ContentController::class, 'changeFolder']);
         Route::post('/llm/editor-stream', [LlmController::class, 'streamEditorContent']);
-
+        Route::get('/resource/export/{id}', [ContentController::class, 'exportResource']);
+        Route::get('/resource/download/{id}', [ContentController::class, 'downloadResource'])->name('resource.download');
+        Route::post('/resource/import', [ContentController::class, 'importResource']);
+        Route::post('/resource/import-into', [ContentController::class, 'importIntoResource']);
     });
     //admin
     Route::middleware(["role:admin"])->group(function () {
