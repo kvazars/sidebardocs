@@ -15,6 +15,7 @@ class LlmController extends Controller
 
         $validated = $request->validate([
             'prompt' => ['required', 'string', 'max:10000'],
+            'image' => ['nullable', 'string', 'max:6291456'], // data URL изображения (до ~6 МБ base64)
         ]);
 
         $endpoint = config('services.llm.chat_stream_url');
@@ -26,6 +27,16 @@ class LlmController extends Controller
             ], 500);
         }
 
+        $payload = [
+            'prompt' => $this->buildEditorPrompt($validated['prompt']),
+        ];
+
+        // Если передано изображение — прикладываем его к запросу.
+        // Формат: data:image/png;base64,... или обычный URL
+        if (!empty($validated['image'])) {
+            $payload['image'] = $validated['image'];
+        }
+
         try {
             $upstream = Http::withHeaders([
                 'Accept' => 'text/event-stream, application/json, text/plain',
@@ -34,9 +45,7 @@ class LlmController extends Controller
                 ->timeout($timeout)
                 ->withOptions(['stream' => true])
                 ->send('POST', $endpoint, [
-                    'json' => [
-                        'prompt' => $this->buildEditorPrompt($validated['prompt']),
-                    ],
+                    'json' => $payload,
                 ]);
         } catch (Throwable $exception) {
             report($exception);
@@ -111,21 +120,95 @@ class LlmController extends Controller
 
     private function extractErrorMessage(string $body): string
     {
-        $decoded = json_decode($body, true);
+        $decoded = $this->unwrapJson($body);
 
-        if (json_last_error() === JSON_ERROR_NONE) {
-            $message = $this->extractTextFromDecoded($decoded);
-
-            if ($message !== '') {
-                return $message;
-            }
-
-            if (is_array($decoded) && isset($decoded['message']) && is_string($decoded['message'])) {
-                return $decoded['message'];
+        if (is_array($decoded)) {
+            // Рекурсивно ищем человекочитаемый текст ошибки.
+            // Ответ может быть многослойным конвертом:
+            // {"ok":false,"body":"{\"error\":\"{\\\"error\\\":{...}}\"}"}
+            $text = $this->extractErrorText($decoded);
+            if ($text !== '') {
+                return $text;
             }
         }
 
+        // Не-JSON ответ (HTML-страница ошибки и т.п.) — берём начало тела
+        $plain = trim(strip_tags($body));
+        if ($plain !== '') {
+            return mb_substr($plain, 0, 300);
+        }
+
         return 'LLM-сервис вернул ошибку';
+    }
+
+    /**
+     * Рекурсивно разворачивает вложенные JSON-строки.
+     * {"error":"{\"message\":\"...\"}"} -> {"error":{"message":"..."}}
+     */
+    private function unwrapJson(mixed $value): mixed
+    {
+        if (is_string($value) && trim($value) !== '') {
+            $trimmed = trim($value);
+
+            // Разворачиваем только строки, похожие на JSON-объект или массив
+            if (
+                (str_starts_with($trimmed, '{') && str_ends_with($trimmed, '}')) ||
+                (str_starts_with($trimmed, '[') && str_ends_with($trimmed, ']'))
+            ) {
+                $decoded = json_decode($trimmed, true);
+
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    return $this->unwrapJson($decoded);
+                }
+            }
+
+            return $value;
+        }
+
+        if (is_array($value)) {
+            $result = [];
+
+            foreach ($value as $key => $item) {
+                $result[$key] = $this->unwrapJson($item);
+            }
+
+            return $result;
+        }
+
+        return $value;
+    }
+
+    private function extractErrorText(mixed $value): string
+    {
+        if (is_string($value)) {
+            $text = trim($value);
+            // Игнорируем шум вроде "[DONE]" или чистых чисел-статусов
+            return ($text === '' || $text === '[DONE]' || ctype_digit($text))
+                ? ''
+                : $text;
+        }
+
+        if (is_array($value)) {
+            // Приоритет: сначала «человекочитаемые» ключи ошибок
+            foreach (['message', 'error', 'detail', 'text', 'content', 'body'] as $key) {
+                if (array_key_exists($key, $value)) {
+                    $text = $this->extractErrorText($value[$key]);
+                    if ($text !== '') {
+                        return $text;
+                    }
+                }
+            }
+
+            // Иначе — первый непустой элемент
+            foreach ($value as $item) {
+                $text = $this->extractErrorText($item);
+                if ($text !== '') {
+                    return $text;
+                }
+            }
+        }
+
+        return '';
     }
 
     private function drainStreamBuffer(string &$buffer, string &$mode, bool $final): string

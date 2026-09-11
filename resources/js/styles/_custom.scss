@@ -307,6 +307,35 @@ body .vsm--wrapper {
     line-height: 1.45;
 }
 
+.llm-editor-tool__attach {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.llm-editor-tool__image-wrap {
+    position: relative;
+    display: inline-block;
+    max-width: 320px;
+}
+
+.llm-editor-tool__image {
+    display: block;
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 8px;
+    border: 1px solid var(--cui-border-color, #d8dbe0);
+}
+
+.llm-editor-tool__image-remove {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    padding: 2px 6px;
+    line-height: 1;
+    font-size: 12px;
+}
+
 body .sidebar-narrow-unfoldable:hover .vsm--wrapper {
     overflow: auto;
 }

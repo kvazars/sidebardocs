@@ -411,7 +411,7 @@ export default {
             this.currentView = view;
             this.editTestId = id;
         },
-        async streamLlmEditorHtml(prompt, { onChunk } = {}) {
+        async streamLlmEditorHtml(prompt, { image = null, onChunk } = {}) {
             const token = localStorage.getItem("token");
             const headers = new Headers({
                 Accept: "text/plain",
@@ -422,13 +422,18 @@ export default {
                 headers.append("Authorization", `Bearer ${token}`);
             }
 
+            const bodyPayload = { prompt };
+            if (image) {
+                bodyPayload.image = image;
+            }
+
             let response;
 
             try {
                 response = await fetch(this.api + "llm/editor-stream", {
                     method: "POST",
                     headers,
-                    body: JSON.stringify({ prompt }),
+                    body: JSON.stringify(bodyPayload),
                 });
             } catch (error) {
                 const networkError = new Error(
@@ -439,13 +444,18 @@ export default {
             }
 
             if (!response.ok) {
-                let message = "LLM-сервис вернул ошибку";
+                let message = `LLM-сервис вернул ошибку (${response.status})`;
 
                 try {
                     const payload = await response.json();
-                    message = payload?.message || message;
+                    message =
+                        payload?.message ||
+                        payload?.error ||
+                        message;
                 } catch {
-                    message = response.statusText || message;
+                    if (response.statusText) {
+                        message = `LLM-сервис вернул ошибку (${response.status} ${response.statusText})`;
+                    }
                 }
 
                 throw new Error(message);
@@ -514,6 +524,7 @@ export default {
         },
         async handleLlmPromptGeneration({
             prompt,
+            image,
             blockIndex,
             setPreview,
             setStatus,
@@ -521,6 +532,7 @@ export default {
             setStatus("loading", "Генерация ответа...");
 
             const llmHtml = await this.streamLlmEditorHtml(prompt, {
+                image,
                 onChunk: (previewText) => {
                     setPreview(previewText);
                 },
