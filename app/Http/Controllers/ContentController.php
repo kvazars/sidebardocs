@@ -721,18 +721,22 @@ class ContentController extends Controller
         return response()->json(['success' => true, 'message' => 'Успешно перемещено!'], 200);
     }
 
+    /**
+     * Экспорт ресурса в ZIP-архив (содержимое + файлы + опционально тесты).
+     * $id — tree_id (как и во всех остальных роутах).
+     */
     public function exportResource(Request $request, $id)
     {
-        // $id — tree_id (как и во всех остальных роутах)
+        // На публичных роутингах без middleware auth:sanctum Auth::user() может быть null,
+        // даже если передан Bearer-токен. Берем пользователя из sanctum-guard напрямую.
+        $user = auth('sanctum')->user() ?? Auth::user();
         $content = Content::with('tree')->where('tree_id', $id)->first();
 
         if (!$content) {
             return response()->json(['success' => false, 'message' => 'Ресурс не найден'], 404);
         }
 
-        // Проверка прав доступа
-        $user = Auth::user();
-        if ($user->role !== 'admin' && $content->tree->user_id !== $user->id) {
+        if (!$user || ($user->role !== 'admin' && $content->tree->user_id !== $user->id)) {
             return response()->json(['success' => false, 'message' => 'Доступ запрещен'], 403);
         }
 
@@ -744,12 +748,35 @@ class ContentController extends Controller
         }
 
         try {
-            $dataBlocks = json_decode($content->data, true);
-            $files = $this->collectFilesFromBlocks($dataBlocks);
+            return $this->buildExportZip($content, $includeTests);
+        } catch (\Exception $e) {
+            \Log::error('Export error: ' . $e->getMessage());
+            \Log::error($e->getTraceAsString());
 
-            $tempDir = storage_path('app/temp/export_' . uniqid());
-            File::makeDirectory($tempDir, 0755, true);
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 
+    /**
+     * Собирает ZIP-архив экспорта ресурса и возвращает DownloadResponse.
+     * Временные файлы удаляются после отправки.
+     */
+    private function buildExportZip(Content $content, bool $includeTests)
+    {
+        $dataBlocks = json_decode($content->data, true);
+        if (!is_array($dataBlocks)) {
+            $dataBlocks = [];
+        }
+
+        $files = $this->collectFilesFromBlocks($dataBlocks);
+
+        $tempDir = storage_path('app/temp/export_' . uniqid());
+        File::makeDirectory($tempDir, 0755, true);
+
+        try {
             $filePaths = [];
             foreach ($files as $key => $fileData) {
                 $filePath = $this->copyFileToTemp($fileData, $tempDir);
@@ -770,8 +797,8 @@ class ContentController extends Controller
                 'files' => $filePaths,
             ];
 
-            if ($includeTests) {
-                $tests = Test::where('tree_id', $content->tree_id)->get();
+            $tests = Test::where('tree_id', $content->tree_id)->get();
+            if ($includeTests && $tests->isNotEmpty()) {
                 $exportData['tests'] = $tests->map(function ($test) {
                     return [
                         'id' => $test->id,
@@ -783,12 +810,9 @@ class ContentController extends Controller
                         'questions' => $this->exportQuestions($test->id),
                     ];
                 });
-                $exportData['has_tests'] = true;
-                $exportData['tests_count'] = $tests->count();
-            } else {
-                $exportData['has_tests'] = false;
-                $exportData['tests_count'] = 0;
             }
+            $exportData['has_tests'] = $includeTests && $tests->isNotEmpty();
+            $exportData['tests_count'] = $includeTests ? $tests->count() : 0;
 
             // Сохраняем JSON
             $jsonPath = $tempDir . '/resource.json';
@@ -802,19 +826,17 @@ class ContentController extends Controller
                 File::delete($zipPath);
             }
 
-            $zip = new \ZipArchive();
-            if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
+            $zip = new ZipArchive();
+            if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
                 throw new \Exception('Не удалось создать ZIP архив');
             }
 
-            $this->addDirectoryToZip($zip, $tempDir, '');
+            $this->addDirectoryToZip($zip, $tempDir);
             $zip->close();
 
             if (!File::exists($zipPath) || File::size($zipPath) === 0) {
                 throw new \Exception('ZIP архив не создан или пуст');
             }
-
-            File::deleteDirectory($tempDir);
 
             return response()
                 ->download($zipPath, $zipFileName, [
@@ -823,17 +845,10 @@ class ContentController extends Controller
                     'Cache-Control' => 'private, no-cache, must-revalidate',
                 ])
                 ->deleteFileAfterSend(true);
-        } catch (\Exception $e) {
-            \Log::error('Export error: ' . $e->getMessage());
-
-            if (isset($tempDir) && File::exists($tempDir)) {
+        } finally {
+            if (File::exists($tempDir)) {
                 File::deleteDirectory($tempDir);
             }
-
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 500);
         }
     }
 
@@ -863,17 +878,14 @@ class ContentController extends Controller
         }
 
         try {
-            // Читаем и валидируем импортируемый файл
-            $importData = $this->readImportFile($request->file('file'));
+            // Распаковываем архив один раз: читаем resource.json и восстанавливаем файлы
+            [$importData, $filePaths] = $this->extractImportArchive($request->file('file'));
 
             $resourceData = $importData['resource'];
 
             if (empty($resourceData['data']) || !is_array($resourceData['data'])) {
                 throw new \Exception('Нет содержимого для импорта');
             }
-
-            // Восстанавливаем файлы из архива
-            $filePaths = $this->restoreImportedFiles($importData, $request->file('file'));
 
             // Обновляем пути в блоках на восстановленные файлы
             $updatedData = $this->updatePathsInBlocks($resourceData['data'], $filePaths);
@@ -933,16 +945,18 @@ class ContentController extends Controller
     }
 
     /**
-     * Читает ZIP архив импорта и возвращает распарсенные данные resource.json.
+     * Распаковывает ZIP архив импорта один раз:
+     * читает resource.json и восстанавливает файлы на постоянное хранение.
+     * Возвращает [данные resource.json, карта путей восстановленных файлов].
      * Бросает исключение при неверном формате.
      */
-    private function readImportFile($file)
+    private function extractImportArchive($file)
     {
         $tempDir = storage_path('app/temp/import_' . uniqid());
         File::makeDirectory($tempDir, 0755, true);
 
         try {
-            $zip = new \ZipArchive();
+            $zip = new ZipArchive();
             if ($zip->open($file->path()) !== true) {
                 throw new \Exception('Не удалось открыть ZIP архив');
             }
@@ -954,9 +968,7 @@ class ContentController extends Controller
                 throw new \Exception('В ZIP архиве не найден файл resource.json');
             }
 
-            $jsonContent = File::get($jsonPath);
-
-            $importData = json_decode($jsonContent, true);
+            $importData = json_decode(File::get($jsonPath), true);
 
             if (!$importData || !isset($importData['resource'])) {
                 throw new \Exception('Неверный формат файла импорта');
@@ -966,51 +978,26 @@ class ContentController extends Controller
                 throw new \Exception('Неизвестная версия файла');
             }
 
-            return $importData;
-        } finally {
-            if (File::exists($tempDir)) {
-                File::deleteDirectory($tempDir);
-            }
-        }
-    }
-
-    /**
-     * Восстанавливает файлы из ZIP архива на постоянное хранение.
-     */
-    private function restoreImportedFiles($importData, $file)
-    {
-        $filePaths = [];
-        if (!isset($importData['files']) || !is_array($importData['files'])) {
-            return $filePaths;
-        }
-
-        $tempDir = storage_path('app/temp/import_' . uniqid());
-        File::makeDirectory($tempDir, 0755, true);
-
-        try {
-            $zip = new \ZipArchive();
-            if ($zip->open($file->path()) !== true) {
-                throw new \Exception('Не удалось открыть ZIP архив');
-            }
-            $zip->extractTo($tempDir);
-            $zip->close();
-
-            foreach ($importData['files'] as $key => $relativePath) {
-                $sourcePath = $tempDir . '/' . $relativePath;
-                if (File::exists($sourcePath)) {
-                    $savedPath = $this->saveImportedFile($sourcePath);
-                    if ($savedPath) {
-                        $filePaths[$key] = $savedPath;
+            // Восстанавливаем файлы из архива на постоянное хранение
+            $filePaths = [];
+            if (isset($importData['files']) && is_array($importData['files'])) {
+                foreach ($importData['files'] as $key => $relativePath) {
+                    $sourcePath = $tempDir . '/' . $relativePath;
+                    if (File::exists($sourcePath)) {
+                        $savedPath = $this->saveImportedFile($sourcePath);
+                        if ($savedPath) {
+                            $filePaths[$key] = $savedPath;
+                        }
                     }
                 }
             }
+
+            return [$importData, $filePaths];
         } finally {
             if (File::exists($tempDir)) {
                 File::deleteDirectory($tempDir);
             }
         }
-
-        return $filePaths;
     }
 
     /**
@@ -1056,17 +1043,14 @@ class ContentController extends Controller
         }
 
         try {
-            // Читаем и валидируем импортируемый файл
-            $importData = $this->readImportFile($request->file('file'));
+            // Распаковываем архив один раз: читаем resource.json и восстанавливаем файлы
+            [$importData, $filePaths] = $this->extractImportArchive($request->file('file'));
 
             $resourceData = $importData['resource'];
 
             if (empty($resourceData['data']) || !is_array($resourceData['data'])) {
                 throw new \Exception('Нет содержимого для импорта');
             }
-
-            // Восстанавливаем файлы из архива на постоянное хранение
-            $filePaths = $this->restoreImportedFiles($importData, $request->file('file'));
 
             // Обновляем пути в блоках на восстановленные файлы
             $updatedData = $this->updatePathsInBlocks($resourceData['data'], $filePaths);
@@ -1224,160 +1208,6 @@ class ContentController extends Controller
         }
     }
 
-    public function downloadResource($id)
-    {
-        // $id — tree_id (как и во всех остальных роутах)
-        $content = Content::with('tree')->where('tree_id', $id)->first();
-
-        if (!$content) {
-            abort(404, 'Ресурс не найден');
-        }
-
-        // Проверка прав через Auth (для web middleware)
-        $user = Auth::user();
-        if (!$user || ($user->role !== 'admin' && $content->tree->user_id !== $user->id)) {
-            abort(403, 'Доступ запрещен');
-        }
-
-        // Получаем параметры из запроса
-        $includeTests = filter_var(request()->input('include_tests', false), FILTER_VALIDATE_BOOLEAN);
-
-        try {
-            // Парсим содержимое
-            $dataBlocks = json_decode($content->data, true);
-            if (!is_array($dataBlocks)) {
-                $dataBlocks = [];
-            }
-
-            // Собираем файлы из блоков
-            $files = $this->collectFilesFromBlocks($dataBlocks);
-
-            // Создаем временную папку
-            $tempDir = storage_path('app/temp/export_' . uniqid());
-            if (!File::exists($tempDir)) {
-                File::makeDirectory($tempDir, 0755, true);
-            }
-
-            // Копируем файлы
-            $filePaths = [];
-            foreach ($files as $key => $fileData) {
-                $filePath = $this->copyFileToTemp($fileData, $tempDir);
-                if ($filePath) {
-                    $filePaths[$key] = $filePath;
-                }
-            }
-
-            // Обновляем пути в блоках
-            $updatedData = $this->updatePathsInBlocks($dataBlocks, $filePaths);
-
-            // Формируем данные для экспорта
-            $exportData = [
-                'version' => '2.0',
-                'exported_at' => now()->toISOString(),
-                'resource' => [
-                    'name' => $content->tree->name,
-                    'data' => $updatedData,
-                ],
-                'files' => $filePaths,
-            ];
-
-            // Добавляем тесты если нужно
-            if ($includeTests) {
-                $tests = Test::where('tree_id', $content->tree_id)->get();
-                $exportData['tests'] = $tests->map(function ($test) {
-                    return [
-                        'id' => $test->id,
-                        'title' => $test->title,
-                        'description' => $test->description,
-                        'timeLimit' => $test->timeLimit,
-                        'settings' => $test->settings,
-                        'grading' => $test->grading,
-                        'questions' => $this->exportQuestions($test->id),
-                    ];
-                });
-                $exportData['has_tests'] = true;
-                $exportData['tests_count'] = $tests->count();
-            } else {
-                $exportData['has_tests'] = false;
-                $exportData['tests_count'] = 0;
-            }
-
-            // Сохраняем JSON
-            $jsonPath = $tempDir . '/resource.json';
-            File::put($jsonPath, json_encode($exportData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
-
-            // Создаем ZIP
-            $zipFileName = 'resource_' . $content->tree->slug . '_' . date('Y-m-d') . '.zip';
-            $zipPath = storage_path('app/temp/' . $zipFileName);
-
-            // Удаляем старый ZIP если есть
-            if (File::exists($zipPath)) {
-                File::delete($zipPath);
-            }
-
-            $zip = new \ZipArchive();
-            if ($zip->open($zipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) !== true) {
-                throw new \Exception('Не удалось создать ZIP архив');
-            }
-
-            // Добавляем все файлы из временной папки
-            $this->addDirectoryToZip($zip, $tempDir, '');
-
-            $zip->close();
-
-            // Проверяем, что ZIP создан
-            if (!File::exists($zipPath) || File::size($zipPath) === 0) {
-                throw new \Exception('ZIP архив не создан или пуст');
-            }
-
-            // Очищаем временную папку
-            File::deleteDirectory($tempDir);
-
-            // Отдаем файл
-            return response()
-                ->download($zipPath, $zipFileName, [
-                    'Content-Type' => 'application/zip',
-                    'Content-Disposition' => 'attachment; filename="' . $zipFileName . '"',
-                    'Cache-Control' => 'private, no-cache, must-revalidate',
-                ])
-                ->deleteFileAfterSend(true);
-        } catch (\Exception $e) {
-            \Log::error('Export error: ' . $e->getMessage());
-            \Log::error($e->getTraceAsString());
-
-            // Очищаем временную папку если есть
-            if (isset($tempDir) && File::exists($tempDir)) {
-                File::deleteDirectory($tempDir);
-            }
-
-            // Возвращаем ошибку в JSON для API или HTML для web
-            if (request()->expectsJson() || request()->is('api/*')) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $e->getMessage()
-                ], 500);
-            }
-
-            abort(500, $e->getMessage());
-        }
-    }
-
-
-
-    private function addFilesToZip($zip, $dir, $relativePath = '')
-    {
-        $files = File::allFiles($dir);
-
-        foreach ($files as $file) {
-            $filePath = $file->getPathname();
-            $relative = ltrim(str_replace($dir, '', $filePath), DIRECTORY_SEPARATOR);
-            $relative = str_replace('\\', '/', $relative);
-
-            // Добавляем файл в ZIP с указанием пути
-            $zip->addFile($filePath, $relative);
-        }
-    }
-
     private function updatePathsInBlocks($blocks, $filePaths)
     {
         if (!is_array($blocks)) {
@@ -1447,7 +1277,7 @@ class ContentController extends Controller
         }
     }
 
-    private function addDirectoryToZip($zip, $dir, $relativePath)
+    private function addDirectoryToZip($zip, $dir)
     {
         $files = File::allFiles($dir);
 

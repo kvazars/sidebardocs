@@ -34,6 +34,18 @@ jobs:
           test -n "$FTP_PASSWORD" || { echo "Missing secret FTP_PASSWORD"; exit 1; }
           test -n "$FTP_SERVER_DIR" || { echo "Missing secret FTP_SERVER_DIR"; exit 1; }
 
+      - name: Guard sensitive files
+        run: |
+          # .env и БД никогда не должны попадать на сервер из репозитория
+          if [ -f .env ]; then
+            echo "ERROR: .env found in checkout — remove it from the repo before deploying"
+            exit 1
+          fi
+          if [ -f database/database.sqlite ]; then
+            echo "ERROR: database/database.sqlite found in checkout — remove it from the repo before deploying"
+            exit 1
+          fi
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -126,8 +138,12 @@ jobs:
             **/.git*/**
             **/node_modules/**
             **/tests/**
+            .env
+            .env.*
             **/.env
             **/.env.*
+            .env.backup
+            .env.production
             **/.editorconfig
             **/.gitattributes
             **/.gitignore
@@ -140,7 +156,7 @@ jobs:
             **/storage/**
             **/resources/**
             **/scripts/**
-            **/database/database.sqlite
+            **/database/**
             **/phpunit.xml
             **/vite.config.js
             **/package.json
@@ -148,3 +164,4 @@ jobs:
             **/public/**
             **/public/hot
             **/.ftp-deploy-sync-state.json
+            **/docs/**

@@ -177,7 +177,7 @@ import Table from "@editorjs/table";
 import Embed from "@editorjs/embed";
 import Quote from "@editorjs/quote";
 import AceCodeEditorJS from "ace-code-editorjs";
-import ace, { edit } from "ace-builds";
+import ace from "ace-builds";
 import "ace-builds/esm-resolver";
 import InlineCode from "@editorjs/inline-code";
 import AttachesTool from "@editorjs/attaches";
