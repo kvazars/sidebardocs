@@ -180,7 +180,7 @@ import AceCodeEditorJS from "ace-code-editorjs";
 import ace from "ace-builds";
 import "ace-builds/esm-resolver";
 import InlineCode from "@editorjs/inline-code";
-import AttachesTool from "@editorjs/attaches";
+import DroppableAttachesTool from "../utils/editorJsDroppableAttaches";
 import ImageGallery from "@kiberpro/editorjs-gallery";
 import Sortable from "sortablejs";
 import modeHTMLWorker from "ace-builds/src-noconflict/worker-html?url";
@@ -1024,7 +1024,7 @@ export default {
                         },
                     },
                     attaches: {
-                        class: AttachesTool,
+                        class: DroppableAttachesTool,
                         config: {
                             additionalRequestHeaders: {
                                 Authorization: `Bearer ${localStorage.getItem(
