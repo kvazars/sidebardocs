@@ -171,7 +171,6 @@ item, key
 <script>
 import EditorJS from "@editorjs/editorjs";
 import Header from "@editorjs/header";
-import ImageTool from "@editorjs/image";
 import List from "@editorjs/list";
 import Table from "@editorjs/table";
 import Embed from "@editorjs/embed";
@@ -180,7 +179,7 @@ import AceCodeEditorJS from "ace-code-editorjs";
 import ace from "ace-builds";
 import "ace-builds/esm-resolver";
 import InlineCode from "@editorjs/inline-code";
-import DroppableAttachesTool from "../utils/editorJsDroppableAttaches";
+import { DroppableAttachesTool, DroppableImageTool } from "../utils/editorJsDropTools";
 import ImageGallery from "@kiberpro/editorjs-gallery";
 import Sortable from "sortablejs";
 import modeHTMLWorker from "ace-builds/src-noconflict/worker-html?url";
@@ -1052,7 +1051,7 @@ export default {
                     },
 
                     image: {
-                        class: ImageTool,
+                        class: DroppableImageTool,
                         config: {
                             additionalRequestHeaders: {
                                 Authorization: `Bearer ${localStorage.getItem(
