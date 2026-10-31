@@ -986,13 +986,18 @@ export default {
             event.stopImmediatePropagation();
 
             // читаем содержимое в память сразу, пока временный файл жив
-            const readings = files.map((file) => this.readDroppedFile(file));
+            const readings = files.map((file) => ({
+                name: file.name,
+                promise: this.readDroppedFile(file),
+            }));
             const position = this.getDropInsertPosition(event);
 
             this.processDroppedFiles(readings, position);
         },
 
-        // Читает перетащенный файл в память; при неудаче возвращает исходный
+        // Читает перетащенный файл в память; при неудаче возвращает null
+        // (источник перетаскивания не отдал содержимое: Telegram, Outlook,
+        // перетаскивание прямо из архива, облачный placeholder OneDrive и т.п.)
         async readDroppedFile(file) {
             try {
                 const buffer = await file.arrayBuffer();
@@ -1005,7 +1010,7 @@ export default {
                     "Не удалось прочитать перетащенный файл в память:",
                     e
                 );
-                return file;
+                return null;
             }
         },
 
@@ -1030,7 +1035,18 @@ export default {
             let inserted = 0;
 
             for (const reading of readings) {
-                const file = await reading;
+                const file = await reading.promise;
+
+                if (!file) {
+                    this.showToast(
+                        `Не удалось прочитать файл «${reading.name}». ` +
+                            "Если вы перетаскиваете его из мессенджера, письма или архива — " +
+                            "сначала сохраните файл на диск и перетащите из папки.",
+                        "warning"
+                    );
+                    continue;
+                }
+
                 const ok = await this.uploadAndInsertDroppedFile(
                     file,
                     position,
