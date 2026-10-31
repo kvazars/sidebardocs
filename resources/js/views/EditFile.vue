@@ -180,6 +180,7 @@ import ace from "ace-builds";
 import "ace-builds/esm-resolver";
 import InlineCode from "@editorjs/inline-code";
 import { DroppableAttachesTool, DroppableImageTool } from "../utils/editorJsDropTools";
+import { cacheDroppedFiles } from "../utils/droppedFilesCache";
 import ImageGallery from "@kiberpro/editorjs-gallery";
 import Sortable from "sortablejs";
 import modeHTMLWorker from "ace-builds/src-noconflict/worker-html?url";
@@ -925,6 +926,7 @@ export default {
                     true
                 );
             } catch (e) {
+                console.error("Ошибка загрузки изображения:", e, e?.cause);
                 this.showToast(getErrorMessage(e, "Ошибка загрузки изображения"), "danger");
                 return { success: 0 };
             }
@@ -963,12 +965,25 @@ export default {
                     true
                 );
             } catch (e) {
+                console.error("Ошибка загрузки файла:", e, e?.cause);
                 this.showToast(getErrorMessage(e, "Ошибка загрузки файла"), "danger");
                 return { success: 0 };
             }
         },
 
         createEditor() {
+            // Читаем перетащенные файлы в память сразу во время drop:
+            // файлы из Telegram/Outlook/WinRAR и т.п. — временные, и к моменту
+            // фактической загрузки могут быть уже недоступны (net::ERR_FAILED)
+            const editorHolder = document.getElementById("editorjs");
+            if (editorHolder) {
+                editorHolder.addEventListener(
+                    "drop",
+                    (event) => cacheDroppedFiles(event.dataTransfer),
+                    true
+                );
+            }
+
             this.editor = new EditorJS({
                 holder: "editorjs",
                 tools: {
