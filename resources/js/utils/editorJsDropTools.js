@@ -1,6 +1,5 @@
 import AttachesTool from "@editorjs/attaches";
 import ImageTool from "@editorjs/image";
-import { resolveDroppedFile } from "./droppedFilesCache";
 
 /**
  * MIME-типы файлов, принимаемых перетаскиванием.
@@ -107,9 +106,7 @@ export class DroppableAttachesTool extends AttachesTool {
             return;
         }
 
-        resolveDroppedFile(file).then((safeFile) => {
-            this.uploadDroppedFile(safeFile);
-        });
+        this.uploadDroppedFile(file);
     }
 
     /**
@@ -161,16 +158,9 @@ export class DroppableAttachesTool extends AttachesTool {
  * Загрузка через кнопку выбора файла сохраняет штатное поведение.
  */
 export class DroppableImageTool extends ImageTool {
-    async onPaste(event) {
+    onPaste(event) {
         if (event.type === "file") {
             this._filePasteInProgress = true;
-
-            const file = event.detail && event.detail.file;
-
-            if (file) {
-                // подменяем на прочитанную в память копию (см. droppedFilesCache)
-                event.detail.file = await resolveDroppedFile(file);
-            }
         }
         super.onPaste(event);
     }
