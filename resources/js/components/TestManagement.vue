@@ -992,7 +992,11 @@ export default {
                                 i
                             );
 
-                            if (question) {
+                            if (Array.isArray(question)) {
+                                questions.push(
+                                    ...question.filter(Boolean)
+                                );
+                            } else if (question) {
                                 questions.push(question);
                             }
                         } catch (error) {
@@ -1183,6 +1187,14 @@ export default {
                         points,
                         questionImage
                     );
+                case "gapselect":
+                    return this.parseGapselectQuestion(
+                        qElement,
+                        questionName,
+                        questionText,
+                        points,
+                        questionImage
+                    );
                 case "shortanswer":
                     return this.parseShortanswerQuestion(
                         qElement,
@@ -1224,14 +1236,8 @@ export default {
                         questionImage
                     );
                 default:
-                    console.warn(`Неподдерживаемый тип вопроса: ${type}`);
-                    return this.parseFallbackQuestion(
-                        qElement,
-                        questionName,
-                        questionText,
-                        points,
-                        type,
-                        questionImage
+                    throw new Error(
+                        `Неподдерживаемый тип вопроса Moodle: ${type}. Вопрос пропущен.`
                     );
             }
         },
@@ -1320,6 +1326,8 @@ export default {
                     String(optionImage).trim() === ""
                 ) {
                     optionText = `Вариант ${i + 1}`;
+                } else if (String(optionText).trim() === "") {
+                    optionText = `Изображение ${i + 1}`;
                 }
 
                 answers.push({
@@ -1346,14 +1354,35 @@ export default {
                 correctAnswersCount = answers.filter((a) => a.correct).length;
             }
 
-            // Определяем тип вопроса (single/multiple) на основе наличия single="false"
-            const singleAttr = qElement.getAttribute("single");
-            const isSingleChoice =
-                singleAttr !== "false" && correctAnswersCount <= 1;
+            if (answers.length < 2) {
+                throw new Error(
+                    "В вопросе с выбором ответа меньше двух вариантов"
+                );
+            }
+            if (correctAnswersCount === 0) {
+                throw new Error(
+                    "В вопросе с выбором ответа не отмечен правильный вариант"
+                );
+            }
 
-            // Проверяем shuffleanswers
+            // Moodle хранит режим выбора в дочернем <single>, а не в атрибуте.
+            const singleElement = this.getChildElement(qElement, "single");
+            const singleValue = (singleElement?.textContent || "")
+                .trim()
+                .toLowerCase();
+            const isSingleChoice =
+                singleValue !== "false" && correctAnswersCount <= 1;
+
+            // Проверяем shuffleanswers по значению, а не по факту наличия тега.
+            const shuffleElement = this.getChildElement(
+                qElement,
+                "shuffleanswers"
+            );
+            const shuffleValue = (shuffleElement?.textContent || "")
+                .trim()
+                .toLowerCase();
             const shuffleAnswers =
-                qElement.getElementsByTagName("shuffleanswers").length > 0;
+                shuffleValue === "1" || shuffleValue === "true";
 
             return {
                 id: this.generateId(),
@@ -1453,6 +1482,12 @@ export default {
                 }
             }
 
+            if (options.length < 2) {
+                throw new Error(
+                    "В вопросе на сопоставление меньше двух корректных пар"
+                );
+            }
+
             return {
                 id: this.generateId(),
                 type: "matching",
@@ -1462,6 +1497,151 @@ export default {
                 options: options,
                 explanation: "",
             };
+        },
+
+        parseGapselectQuestion(qElement, name, text, points, image) {
+            const selectOptions = Array.from(
+                this.getMoodleDirectChildElements(qElement, "selectoption")
+            )
+                .map((optionElement, index) => {
+                    const groupElement = this.getChildElement(
+                        optionElement,
+                        "group"
+                    );
+                    const optionText = this.stripTags(
+                        this.extractText(optionElement),
+                        ["p", "b"],
+                        { keepContent: true }
+                    ).trim();
+                    const optionImage = this.extractImage(optionElement);
+
+                    return {
+                        index,
+                        group: (groupElement?.textContent || "1").trim(),
+                        text: optionText,
+                        image: optionImage,
+                    };
+                });
+
+            if (selectOptions.length === 0) {
+                throw new Error("Вопрос gapselect не содержит вариантов выбора");
+            }
+
+            const placeholderNumbers = Array.from(
+                new Set(
+                    Array.from(text.matchAll(/\[\[(\d+)]]/g)).map((match) =>
+                        parseInt(match[1], 10)
+                    )
+                )
+            ).filter((number) => Number.isInteger(number) && number > 0);
+
+            if (placeholderNumbers.length === 0) {
+                throw new Error(
+                    "В вопросе gapselect не найдены пропуски [[n]]"
+                );
+            }
+
+            const shuffleElement = this.getChildElement(
+                qElement,
+                "shuffleanswers"
+            );
+            const shuffleValue = (shuffleElement?.textContent || "")
+                .trim()
+                .toLowerCase();
+            const shuffleAnswers =
+                shuffleValue === "1" || shuffleValue === "true";
+
+            const totalPoints = Number(points) > 0 ? Number(points) : 1;
+            const basePoints = Math.max(
+                1,
+                Math.floor(totalPoints / placeholderNumbers.length)
+            );
+            const extraPoints = Math.max(
+                0,
+                totalPoints - basePoints * placeholderNumbers.length
+            );
+
+            const generatedQuestions = placeholderNumbers
+                .map((placeholderNumber, gapIndex) => {
+                    // Номер [[n]] в Moodle указывает на n-й selectoption
+                    // (нумерация сквозная по всем группам).
+                    const correctOption =
+                        selectOptions[placeholderNumber - 1];
+                    if (!correctOption) {
+                        return null;
+                    }
+
+                    const groupOptions = selectOptions.filter(
+                        (option) =>
+                            option.group === correctOption.group &&
+                            (option.text !== "" || option.image !== "")
+                    );
+                    const correctIndex = groupOptions.findIndex(
+                        (option) => option.index === correctOption.index
+                    );
+                    if (correctIndex === -1) {
+                        return null;
+                    }
+                    if (groupOptions.length < 2) {
+                        throw new Error(
+                            "В вопросе gapselect меньше двух вариантов выбора"
+                        );
+                    }
+
+                    let questionText = text;
+                    placeholderNumbers.forEach((number) => {
+                        let replacement = "______";
+                        if (number !== placeholderNumber) {
+                            replacement =
+                                selectOptions[number - 1]?.text || "______";
+                        }
+                        questionText = questionText.replace(
+                            new RegExp(`\\[\\[${number}]]`, "g"),
+                            replacement
+                        );
+                    });
+
+                    const options = groupOptions.map(
+                        (option, optionIndex) => {
+                            const isCorrect = optionIndex === correctIndex;
+                            return {
+                                id: optionIndex + 1,
+                                text:
+                                    option.text ||
+                                    `Изображение ${optionIndex + 1}`,
+                                correct: isCorrect,
+                                image: option.image || "",
+                                points: isCorrect
+                                    ? basePoints +
+                                      (gapIndex === 0 ? extraPoints : 0)
+                                    : 0,
+                            };
+                        }
+                    );
+
+                    return {
+                        id: this.generateId(),
+                        type: "single",
+                        text: questionText,
+                        image: image,
+                        points:
+                            basePoints + (gapIndex === 0 ? extraPoints : 0),
+                        options: options,
+                        explanation: "",
+                        settings: {
+                            shuffleAnswers: shuffleAnswers,
+                        },
+                    };
+                })
+                .filter(Boolean);
+
+            if (generatedQuestions.length === 0) {
+                throw new Error(
+                    "Не удалось преобразовать вопрос gapselect: пропуски не соответствуют вариантам"
+                );
+            }
+
+            return generatedQuestions;
         },
 
         parseShortanswerQuestion(qElement, name, text, points, image) {
@@ -1474,6 +1654,12 @@ export default {
                 if (answerText && answerText.trim()) {
                     correctAnswers.push(answerText.trim());
                 }
+            }
+
+            if (correctAnswers.length === 0) {
+                throw new Error(
+                    "В вопросе с коротким ответом не указан правильный ответ"
+                );
             }
 
             return {
@@ -1520,6 +1706,12 @@ export default {
                 }
             }
 
+            if (correctAnswers.length === 0) {
+                throw new Error(
+                    "В числовом вопросе не указан правильный ответ"
+                );
+            }
+
             return {
                 id: this.generateId(),
                 type: "text",
@@ -1533,14 +1725,9 @@ export default {
         },
 
         parseEssayQuestion(qElement, name, text, points, image) {
-            return {
-                id: this.generateId(),
-                type: "text",
-                image: image,
-                text: text,
-                points: points,
-                explanation: "",
-            };
+            throw new Error(
+                "Тип вопроса essay не поддерживается. Вопрос пропущен."
+            );
         },
 
         parseTruefalseQuestion(qElement, name, text, points, image) {
@@ -1561,45 +1748,17 @@ export default {
                 }
             }
 
+            if (correctAnswer === null) {
+                throw new Error("В вопросе Да/Нет не выбран правильный ответ");
+            }
+
             return {
                 id: this.generateId(),
-                type: "single",
+                type: "truefalse",
                 text: text,
                 image: image,
                 points: points,
-                answers: [
-                    {
-                        id: 1,
-                        text: "Верно",
-                        correct: correctAnswer === true,
-                        points: correctAnswer === true ? points : 0,
-                    },
-                    {
-                        id: 2,
-                        text: "Неверно",
-                        correct: correctAnswer === false,
-                        points: correctAnswer === false ? points : 0,
-                    },
-                ],
-                explanation: "",
-            };
-        },
-
-        parseFallbackQuestion(
-            qElement,
-            name,
-            text,
-            points,
-            originalType,
-            image
-        ) {
-            // Fallback для неподдерживаемых типов - преобразуем в текстовый вопрос
-            return {
-                id: this.generateId(),
-                type: "text",
-                image: image,
-                text: `${text}`,
-                points: points,
+                options: correctAnswer ? "true" : "false",
                 explanation: "",
             };
         },
@@ -1631,12 +1790,17 @@ export default {
          */
         getMoodleDirectChildElements(parent, localName) {
             const out = [];
-            if (!parent || !parent.children || !localName) {
+            if (!parent || !localName) {
                 return out;
             }
-            for (let i = 0; i < parent.children.length; i++) {
-                const el = parent.children[i];
-                if (el.localName === localName) {
+            const nodes = parent.children || parent.childNodes || [];
+            for (let i = 0; i < nodes.length; i++) {
+                const el = nodes[i];
+                if (!el || el.nodeType !== 1) {
+                    continue;
+                }
+                const nodeName = el.localName || el.nodeName;
+                if (nodeName === localName) {
                     out.push(el);
                 }
             }
@@ -1739,7 +1903,98 @@ export default {
             }
 
             const src = match ? match[1] : null;
-            return src || "";
+            return this.resolveMoodleImageSrc(src, element);
+        },
+
+        /**
+         * Moodle хранит вложенные файлы отдельными узлами <file> рядом с <text>,
+         * а в HTML оставляет ссылки вида @@PLUGINFILE@@/имя.jpg. Собираем карту
+         * имя файла -> data URI, чтобы картинки не терялись при импорте.
+         */
+        buildMoodleFileMap(container) {
+            const fileMap = new Map();
+            if (!container || !container.getElementsByTagName) {
+                return fileMap;
+            }
+
+            const fileElements = container.getElementsByTagName("file");
+            for (let i = 0; i < fileElements.length; i++) {
+                const fileElement = fileElements[i];
+                const name = fileElement.getAttribute("name") || "";
+                const encoding = (
+                    fileElement.getAttribute("encoding") || ""
+                ).toLowerCase();
+                if (encoding !== "base64") {
+                    continue;
+                }
+
+                const base64 = (fileElement.textContent || "").replace(
+                    /\s+/g,
+                    ""
+                );
+                if (!name || !base64) {
+                    continue;
+                }
+
+                const mimeType = this.getMoodleFileMimeType(name);
+                fileMap.set(
+                    this.normalizeMoodleFileName(name),
+                    `data:${mimeType};base64,${base64}`
+                );
+            }
+
+            return fileMap;
+        },
+
+        normalizeMoodleFileName(name) {
+            let value = String(name || "").trim();
+            try {
+                value = decodeURIComponent(value);
+            } catch (error) {
+                // Оставляем исходное имя, если оно содержит некорректный escape.
+            }
+            value = value.replace(/\\/g, "/");
+            const parts = value.split("/");
+            return (parts[parts.length - 1] || value).toLowerCase();
+        },
+
+        getMoodleFileMimeType(name) {
+            const extension = String(name || "")
+                .split(".")
+                .pop()
+                .toLowerCase();
+
+            switch (extension) {
+                case "png":
+                    return "image/png";
+                case "gif":
+                    return "image/gif";
+                case "webp":
+                    return "image/webp";
+                case "svg":
+                    return "image/svg+xml";
+                case "bmp":
+                    return "image/bmp";
+                case "jpeg":
+                case "jpg":
+                default:
+                    return "image/jpeg";
+            }
+        },
+
+        resolveMoodleImageSrc(src, container) {
+            if (!src || !src.startsWith("@@PLUGINFILE@@")) {
+                return src || "";
+            }
+
+            const fileMap = this.buildMoodleFileMap(container);
+            const path = src
+                .slice("@@PLUGINFILE@@".length)
+                .replace(/^\/+/, "")
+                .split(/[?#]/)[0];
+            const key = this.normalizeMoodleFileName(path);
+
+            return fileMap.get(key) || src;
         },
 
         generateId() {
